@@ -1,0 +1,191 @@
+import { test, expect, group, link, draggable, presentation, tree, flat, start, rightClick } from './helpers';
+
+test('flat ancestry, separate roots, launcher tiles, and background context-menu keyboard navigation', async ({ page }) => {
+  await start(page);
+  await expect(page.locator('.metro-group')).toHaveCount(7);
+  await expect(group(page, 'Tools').locator('.group-path')).toHaveText('Bookmarks bar / Learning /');
+  await expect(link(page, 'Figma')).toHaveAttribute('href', 'https://www.figma.com/');
+  await expect(link(page, 'Figma').locator('.metro-tile-large')).toHaveCount(1);
+  await page.getByRole('button', { name: /^Other bookmarks/ }).click();
+  await expect(page.locator('.metro-group')).toHaveCount(1);
+  await expect(page.locator('a.tile-slot')).toHaveCount(4);
+  await expect(group(page, 'Other bookmarks')).toBeVisible();
+  await page.getByRole('button', { name: /^All bookmarks/ }).click();
+  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } });
+  await expect(page.getByRole('menuitem', { name: 'Add bookmark', exact: true })).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('menuitem', { name: 'Create folder / group', exact: true })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('menu')).toHaveCount(0);
+});
+
+test('create, edit, customize, resize, move, delete and Undo; dialogs close without exceptions', async ({ page }) => {
+  await start(page);
+  await page.getByRole('button', { name: 'Add bookmark', exact: true }).click();
+  let dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Title', { exact: true }).fill('QA new favorite');
+  await dialog.getByLabel('Website address', { exact: true }).fill('https://example.com/one');
+  await dialog.getByRole('button', { name: 'Add bookmark', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(link(page, 'QA new favorite')).toBeVisible();
+  await rightClick(page, 'QA new favorite');
+  await page.getByRole('menuitem', { name: 'Edit bookmark', exact: true }).click();
+  dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Title', { exact: true }).fill('QA edited favorite');
+  await dialog.getByLabel('Website address', { exact: true }).fill('https://example.com/two');
+  await dialog.getByRole('button', { name: 'Save changes' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(link(page, 'QA edited favorite')).toHaveAttribute('href', 'https://example.com/two');
+  await rightClick(page, 'QA edited favorite');
+  await page.getByRole('menuitem', { name: 'Customize tile' }).click();
+  dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Tile size', { exact: true }).selectOption('wide');
+  await dialog.getByLabel('Custom tile color').evaluate((input: HTMLInputElement) => { input.value = '#f7f7f7'; input.dispatchEvent(new Event('input', { bubbles: true })); });
+  await dialog.getByLabel('Icon', { exact: true }).selectOption('globe');
+  await dialog.getByRole('button', { name: 'Save changes' }).click();
+  await expect(link(page, 'QA edited favorite').locator('.metro-tile-wide')).toHaveCSS('color', 'rgb(0, 0, 0)');
+  for (const size of ['small', 'medium', 'large', 'wide']) {
+    await rightClick(page, 'QA edited favorite');
+    await page.getByRole('menuitem', { name: `Resize to ${size}`, exact: true }).click();
+    // Small tiles intentionally have no visible title; address via the accessible name.
+    await expect(page.locator('a[aria-label^="Open QA edited favorite"] .metro-tile-' + size)).toHaveCount(1);
+  }
+  await rightClick(page, 'QA edited favorite');
+  await page.getByRole('menuitem', { name: 'Move to folder' }).click();
+  await page.getByRole('dialog').getByLabel('Folder', { exact: true }).selectOption('work');
+  await page.getByRole('button', { name: 'Move here' }).click();
+  await expect(group(page, 'Work').locator('a[aria-label^="Open QA edited favorite"]')).toHaveCount(1);
+  await expect.poll(async () => flat(await tree(page)).find((node) => node.title === 'QA edited favorite')?.parentId).toBe('work');
+  await rightClick(page, 'QA edited favorite');
+  await page.getByRole('menuitem', { name: 'Delete bookmark', exact: true }).click();
+  await expect(link(page, 'QA edited favorite')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(group(page, 'Work').locator('a[aria-label^="Open QA edited favorite"] .metro-tile-wide')).toHaveCount(1);
+  await expect.poll(async () => flat(await tree(page)).filter((node) => node.title === 'QA edited favorite').length).toBe(1);
+});
+
+test('folder create/rename, flat nested paths, whole-subtree delete and Undo with remapped IDs', async ({ page }) => {
+  await start(page);
+  await page.getByRole('button', { name: 'Manage Learning', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Create child folder' }).click();
+  await page.getByRole('dialog').getByLabel('Folder name').fill('QA child');
+  await page.getByRole('button', { name: 'Create group' }).click();
+  await expect(group(page, 'QA child').locator('.group-path')).toHaveText('Bookmarks bar / Learning /');
+  await page.getByRole('button', { name: 'Manage QA child', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Rename folder' }).click();
+  await page.getByRole('dialog').getByLabel('Folder name').fill('QA renamed child');
+  await page.getByRole('button', { name: 'Save changes' }).click();
+  await page.getByRole('button', { name: 'Manage QA renamed child', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Add bookmark here' }).click();
+  await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('QA nested favorite');
+  await page.getByRole('dialog').getByLabel('Website address', { exact: true }).fill('https://example.com/nested');
+  await page.getByRole('dialog').getByRole('button', { name: 'Add bookmark', exact: true }).click();
+  await page.getByRole('button', { name: 'Manage Learning', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Delete folder', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('Delete this folder?');
+  await page.getByRole('dialog').getByRole('button', { name: 'Delete folder', exact: true }).click();
+  await expect(group(page, 'Learning')).toHaveCount(0);
+  await expect(group(page, 'Tools')).toHaveCount(0);
+  await expect(link(page, 'QA nested favorite')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(group(page, 'QA renamed child').locator('a[aria-label^="Open QA nested favorite"]')).toHaveCount(1);
+  await expect(group(page, 'Tools').locator('.group-path')).toHaveText('Bookmarks bar / Learning /');
+  await expect.poll(async () => flat(await tree(page)).filter((node) => node.title === 'QA nested favorite').length).toBe(1);
+});
+
+test('pointer and keyboard arrangement persist without reordering native siblings; cancel remains usable', async ({ page }) => {
+  await start(page);
+  const nativeBefore = await page.evaluate(() => localStorage.getItem('metro.preview.bookmarks.v1'));
+  await page.getByRole('button', { name: 'Arrange tiles', exact: true }).click();
+  const github = draggable(page, 'github');
+  const original = { x: 4, y: 2 };
+  const from = (await github.boundingBox())!;
+  const area = (await group(page, 'Bookmarks bar').locator('.metro-grid').boundingBox())!;
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + from.width / 2, area.y + 50, { steps: 20 });
+  await page.mouse.up();
+  await expect.poll(async () => { const tile = (await presentation(page)).layouts?.bar?.find((item) => item.i === 'github'); return tile ? { x: tile.x, y: tile.y } : original; }).not.toEqual(original);
+  const afterPointer = (await presentation(page)).layouts.bar.find((item) => item.i === 'github')!;
+  await github.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.grid-placeholder')).toHaveCount(1);
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+  await expect.poll(async () => (await presentation(page)).layouts.bar.find((item) => item.i === 'github')).not.toEqual(afterPointer);
+  expect(await page.evaluate(() => localStorage.getItem('metro.preview.bookmarks.v1'))).toBe(nativeBefore);
+  const saved = (await presentation(page)).layouts.bar;
+  // Escape cancels a keyboard gesture rather than closing Arrange mode.
+  await github.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.grid-placeholder')).toHaveCount(1);
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.grid-placeholder')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Done arranging', exact: true })).toBeVisible();
+  expect((await presentation(page)).layouts.bar).toEqual(saved);
+  // A pointer drop outside every group also cancels without trapping click suppression.
+  const cancelFrom = (await github.boundingBox())!;
+  await page.mouse.move(cancelFrom.x + 40, cancelFrom.y + 40);
+  await page.mouse.down();
+  await page.mouse.move(350, 110, { steps: 15 });
+  await page.mouse.up();
+  await page.waitForTimeout(240); // Match the deliberate post-gesture click-suppression interval.
+  await github.click();
+  await expect(page.getByRole('button', { name: 'Edit selected bookmark' })).toBeVisible();
+  expect((await presentation(page)).layouts.bar).toEqual(saved);
+  await page.reload();
+  await expect(link(page, 'GitHub')).toBeVisible();
+  expect((await presentation(page)).layouts.bar).toEqual(saved);
+});
+
+test('cross-group pointer dragging changes the real parent; Undo restores it', async ({ page }) => {
+  await start(page);
+  await page.getByRole('button', { name: 'Arrange tiles', exact: true }).click();
+  const tile = draggable(page, 'github');
+  const source = (await tile.boundingBox())!;
+  const target = (await group(page, 'Work').locator('.metro-grid').boundingBox())!;
+  await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(target.x + 70, target.y + 210, { steps: 35 });
+  await page.mouse.up();
+  await expect.poll(async () => flat(await tree(page)).find((node) => node.id === 'github')?.parentId).toBe('work');
+  await expect(group(page, 'Work').locator('button[data-grid-id="github"]')).toHaveCount(1);
+  await expect(group(page, 'Bookmarks bar').locator('button[data-grid-id="github"]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(async () => flat(await tree(page)).find((node) => node.id === 'github')?.parentId).toBe('bar');
+  await expect(group(page, 'Bookmarks bar').locator('button[data-grid-id="github"]')).toHaveCount(1);
+});
+
+test('cross-tab updates, search, persistent Paper theme and small-window access', async ({ page, context }) => {
+  await start(page);
+  const second = await context.newPage();
+  await start(second);
+  const secondErrors: string[] = [];
+  second.on('pageerror', (error) => secondErrors.push(error.message));
+  await rightClick(page, 'Figma');
+  await page.getByRole('menuitem', { name: 'Edit bookmark', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('QA across tabs');
+  await page.getByRole('dialog').getByRole('button', { name: 'Save changes' }).click();
+  await expect(link(second, 'QA across tabs')).toBeVisible();
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await page.getByRole('button', { name: 'Paper', exact: true }).click();
+  await expect(page.locator('.metro-app')).toHaveClass(/theme-paper/);
+  await expect(second.locator('.metro-app')).toHaveClass(/theme-paper/);
+  await page.keyboard.press('Escape');
+  await page.getByRole('searchbox', { name: 'Search bookmarks' }).fill('QA across');
+  await expect(page.locator('a.tile-slot')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: 'Arrange tiles', exact: true })).toBeDisabled();
+  await page.getByRole('searchbox', { name: 'Search bookmarks' }).fill('nothing matches this phrase');
+  await expect(page.getByRole('heading', { name: 'No favorites found.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Clear search', exact: true }).first().click();
+  await page.reload();
+  await expect(page.locator('.metro-app')).toHaveClass(/theme-paper/);
+  await page.setViewportSize({ width: 800, height: 600 });
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('searchbox', { name: 'Search bookmarks' })).toBeVisible();
+  expect(secondErrors).toEqual([]);
+});
