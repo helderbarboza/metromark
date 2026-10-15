@@ -5,14 +5,20 @@
 -->
 <script lang="ts">
   import type { MetroFace } from "../types";
+  import FaviconIcon from "./FaviconIcon.svelte";
 
   interface Props {
     faces: MetroFace[];
     icon?: string;
     period?: number;
+    faviconPageUrl?: string;
+    tint?: string;
+    fallbackIcon?: string;
+    requestSize?: number;
+    scaleFactor?: 1 | 2;
   }
 
-  let { faces, icon = "", period = 6000 }: Props = $props();
+  let { faces, icon = "", period = 6000, faviconPageUrl, tint = "#ffffff", fallbackIcon = "", requestSize = 64, scaleFactor = 2 }: Props = $props();
 
   // index -1 = the icon face
   const count = $derived(faces.length + 1);
@@ -43,8 +49,14 @@
 
 {#snippet face(i: number)}
   {#if i === 0}
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    <div class="metro-tile-icon">{@html icon}</div>
+    <div class="metro-tile-icon">
+      {#if faviconPageUrl}
+        <FaviconIcon pageUrl={faviconPageUrl} tint={tint} {requestSize} convertSize={requestSize} {scaleFactor} fallback={fallbackIcon || icon} />
+      {:else}
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+        {@html icon}
+      {/if}
+    </div>
   {:else}
     {@const f = faces[i - 1]}
     {#if f?.background}

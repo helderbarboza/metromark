@@ -53,7 +53,9 @@ export function website(url: string): { domain: string; icon: string; color: str
 }
 export function tileFor(node: BookmarkNode, appearance: Appearance = {}, tree?: BookmarkNode[]): TileView {
   const site = website(node.url ?? '');
-  const iconKey = appearance.icon ?? site.icon;
+  // Explicit icon choices win. Otherwise every tile attempts the site's
+  // original favicon first (see FaviconIcon) and falls back to this default.
+  const iconKey = appearance.icon ?? 'globe';
   return {
     id: node.id, title: node.title || site.domain, url: node.url ?? '', domain: site.domain,
     size: appearance.size ?? 'medium', color: appearance.color ?? site.color,

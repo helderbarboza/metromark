@@ -72,7 +72,7 @@ Work completed before delivery included native Chrome and Firefox smoke checks, 
 
 ## Privacy, limitations and release notes
 
-Only `bookmarks` and `storage` permissions are requested. There are no host permissions, accounts, analytics, remote favicon requests or external font requests. See [PRIVACY.md](PRIVACY.md).
+Only `bookmarks` and `storage` permissions are requested, plus the Chrome-only `favicon` permission for tile icons (local favicon cache only). There are no host permissions, accounts, analytics, remote favicon requests or external font requests. See [PRIVACY.md](PRIVACY.md).
 
 Presentation metadata is local to the extension/profile and is not synced through `storage.sync`. Native bookmark syncing remains controlled by the browser. Removing the extension does not undo edits made to real bookmarks; it may remove local appearance and Undo metadata. Undo expires after 30 seconds and refuses to overwrite conflicting external edits. Back up important bookmarks before testing management operations.
 

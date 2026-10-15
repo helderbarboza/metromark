@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { demoData, demoTree } from '../src/lib/demo';
 import { normalizeTree } from '../src/lib/adapters/memory';
-import { canModify, canAddTo, flatten, indexTree, isBookmark, projectGroups, validateUrl } from '../src/lib/tree';
+import { canModify, canAddTo, flatten, indexTree, isBookmark, projectGroups, tileFor, validateUrl } from '../src/lib/tree';
+import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '../src/lib/icon-sources';
+import { getIcon } from '../src/lib/icons';
 import { overlaps, reconcileLayout, validateLayout, usedCols } from '../src/lib/layout';
 import type { Snapshot } from '../src/lib/types';
 const fixture = (): Snapshot => ({ ...demoData(), tree: normalizeTree(demoTree()), revision: 0, mode: 'preview', undos: [] });
@@ -82,4 +84,52 @@ describe('safe navigation', () => {
   it('accepts valid web and mail addresses', () => { expect(validateUrl(' https://example.com ')).toBe('https://example.com'); expect(validateUrl('mailto:me@example.com')).toBe('mailto:me@example.com'); });
   it.each(['javascript:alert(1)', 'data:text/html,<script>', 'vbscript:msgbox(1)', 'blob:https://example.com/id', 'example.com', ''])('rejects %s', (url) => { expect(() => validateUrl(url)).toThrow(); });
   it('keeps all sample URLs as actual distinct bookmark entities', () => { expect(flatten(fixture().tree).filter(isBookmark)).toHaveLength(24); });
+});
+
+describe('tile favicons', () => {
+  const base = 'chrome-extension://test-id/_favicon/';
+  it('builds a cache URL for http(s) pages', () => {
+    const url = buildExtensionFaviconUrl('https://example.com/page', 64, base)!;
+    expect(url).toContain('/_favicon/');
+    expect(url).toContain(`pageUrl=${encodeURIComponent('https://example.com/page')}`);
+    expect(url).toContain('size=64');
+  });
+  it('clamps the requested size to the browser-supported range', () => {
+    expect(buildExtensionFaviconUrl('https://example.com', 512, base)).toContain('size=64');
+    expect(clampFaviconSize(512)).toBe(64);
+    expect(clampFaviconSize(8)).toBe(16);
+  });
+  it('appends the density probe only at 2x', () => {
+    expect(buildExtensionFaviconUrl('https://example.com', 64, base, 2)).toContain('scale_factor=2x');
+    expect(buildExtensionFaviconUrl('https://example.com', 64, base)).not.toContain('scale_factor');
+  });
+  it('maps tile sizes to favicon requests', () => {
+    expect(faviconRequestForTile('small')).toEqual({ requestSize: 32, scaleFactor: 1 });
+    expect(faviconRequestForTile('medium')).toEqual({ requestSize: 64, scaleFactor: 2 });
+    expect(faviconRequestForTile('wide')).toEqual({ requestSize: 64, scaleFactor: 2 });
+    expect(faviconRequestForTile('large')).toEqual({ requestSize: 64, scaleFactor: 2 });
+  });
+  it.each(['javascript:alert(1)', 'data:text/html,x', 'blob:https://example.com/id', 'mailto:me@example.com', 'ftp://example.com/f', 'not a url', ''])('returns null for %s', (url) => {
+    expect(buildExtensionFaviconUrl(url, 64, base)).toBeNull();
+  });
+  it('returns null without an extension runtime base', () => {
+    expect(buildExtensionFaviconUrl('https://example.com')).toBeNull();
+  });
+  it('detects favicon-eligible pages', () => {
+    expect(isFaviconEligible('https://example.com')).toBe(true);
+    expect(isFaviconEligible('http://example.com')).toBe(true);
+    expect(isFaviconEligible('javascript:alert(1)')).toBe(false);
+    expect(isFaviconEligible('')).toBe(false);
+  });
+  it('falls back to the default globe icon when automatic', () => {
+    const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' });
+    expect(tile.iconKey).toBe('globe');
+    expect(tile.icon).toBe(getIcon('globe'));
+    expect(tile.url).toBe('https://example.com');
+  });
+  it('lets an explicit icon choice win over favicons', () => {
+    const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' }, { icon: 'book' });
+    expect(tile.iconKey).toBe('book');
+    expect(tile.icon).toBe(getIcon('book'));
+  });
 });
