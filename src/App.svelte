@@ -225,6 +225,7 @@
 			clearInterval(clock);
 			clearTimeout(layoutTimer);
 			clearTimeout(gestureTimer);
+cancelSmoothScroll();
 		};
 	});
 	$effect(() => {
@@ -452,6 +453,10 @@
 		const max = scroller.scrollWidth - scroller.clientWidth;
 		canScroll = max > 3;
 		scrollProgress = max > 0 ? scroller.scrollLeft / max : 0;
+if (smoothFrame === null) {
+			targetScroll = scroller.scrollLeft;
+			currentScroll = scroller.scrollLeft;
+		}
 		const elements = [
 			...scroller.querySelectorAll<HTMLElement>(".metro-group"),
 		];
@@ -461,6 +466,40 @@
 			elements.findLastIndex((element) => element.offsetLeft <= left),
 		);
 	}
+
+	let targetScroll = 0;
+	let currentScroll = 0;
+	let smoothFrame: number | null = null;
+
+	function cancelSmoothScroll() {
+		if (smoothFrame !== null) {
+			cancelAnimationFrame(smoothFrame);
+			smoothFrame = null;
+		}
+		if (scroller) scroller.style.scrollBehavior = "";
+	}
+
+	function smoothScroll() {
+		if (!scroller) {
+			smoothFrame = null;
+			return;
+		}
+		const diff = targetScroll - currentScroll;
+
+		// Stop when close enough
+		if (Math.abs(diff) < 0.5) {
+			currentScroll = targetScroll;
+			scroller.scrollLeft = currentScroll;
+			smoothFrame = null;
+			scroller.style.scrollBehavior = "";
+			return;
+		}
+
+		currentScroll += diff * 0.15; // easing factor (lower = smoother/slower)
+		scroller.scrollLeft = currentScroll;
+		smoothFrame = requestAnimationFrame(smoothScroll);
+	}
+
 	function wheel(event: WheelEvent) {
 		if (
 			!scroller ||
@@ -469,19 +508,46 @@
 			Math.abs(event.deltaX) >= Math.abs(event.deltaY)
 		)
 			return;
-		// In very short windows, preserve vertical access to the bottom of the canvas.
+		
 		if (scroller.scrollHeight > scroller.clientHeight + 4 && !event.shiftKey)
 			return;
+
 		event.preventDefault();
-		scroller.scrollLeft +=
+		
+		const delta =
 			event.deltaY *
 			(event.deltaMode === 1
 				? 16
 				: event.deltaMode === 2
 					? scroller.clientWidth
 					: 1);
+	
+		if (snapshot?.settings.reducedMotion) {
+			cancelSmoothScroll();
+			scroller.scrollLeft += delta;
+			targetScroll = scroller.scrollLeft;
+			currentScroll = scroller.scrollLeft;
+			return;
+		}
+
+		if (smoothFrame === null) {
+			// Resync in case of external scrolls (scrollbar, keyboard, buttons).
+			targetScroll = scroller.scrollLeft;
+			currentScroll = scroller.scrollLeft;
+			// Avoid CSS smooth behavior double-smoothing direct scrollLeft writes.
+			scroller.style.scrollBehavior = "auto";
+		}
+
+		const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+		targetScroll = Math.min(Math.max(targetScroll + delta, 0), maxScroll);
+
+		if (smoothFrame === null) {
+			smoothFrame = requestAnimationFrame(smoothScroll);
+		}
 	}
+
 	function scroll(direction: -1 | 1) {
+cancelSmoothScroll();
 		scroller?.scrollBy({
 			left: direction * Math.max(250, scroller.clientWidth * 0.65),
 			behavior: snapshot?.settings.reducedMotion ? "instant" : "smooth",
@@ -490,6 +556,7 @@
 	function jump(index: number) {
 		const element =
 			scroller?.querySelectorAll<HTMLElement>(".metro-group")[index];
+if (element && scroller) cancelSmoothScroll();
 		if (element && scroller)
 			scroller.scrollTo({
 				left: Math.max(0, element.offsetLeft - 68),
@@ -579,7 +646,8 @@
 				><button
 					class="button primary px-4 text-xs max-md:h-9 max-md:w-9 max-md:p-0"
 					disabled={!snapshot || !defaultFolder()}
-					onclick={() => edit({ kind: "bookmark", parentId: defaultFolder() })}
+						onclick={() =>
+							edit({ kind: "bookmark", parentId: defaultFolder() })}
 					><Icon name="plus" size={16} /><span class="max-md:hidden"
 						>Add bookmark</span
 					></button
@@ -606,7 +674,7 @@
 					aria-pressed={rootFilter === "all"}
 					onclick={() => {
 						rootFilter = "all";
-						scroller?.scrollTo({ left: 0 });
+							cancelSmoothScroll(); scroller?.scrollTo({ left: 0 });
 					}}
 					>All bookmarks <span
 						class={rootFilter === "all"
@@ -620,7 +688,7 @@
 						aria-pressed={rootFilter === root.id}
 						onclick={() => {
 							rootFilter = root.id;
-							scroller?.scrollTo({ left: 0 });
+								cancelSmoothScroll(); scroller?.scrollTo({ left: 0 });
 						}}
 						>{root.title}<span
 							class={rootFilter === root.id
@@ -650,7 +718,7 @@
 	<!-- Canvas right-click has a matching visible Add button and keyboard-accessible settings. -->
 	<main
 		id="canvas"
-		class="relative min-h-0 flex-1 overflow-auto pt-4 outline-none scrollbar-none] [&::-webkit-scrollbar]:hidden 2xl:pt-6"
+			class="relative min-h-0 flex-1 overflow-auto scroll-smooth pt-4 outline-none scrollbar-none] [&::-webkit-scrollbar]:hidden 2xl:pt-6"
 		bind:this={scroller}
 		onscroll={updateScroll}
 		onwheel={wheel}
@@ -691,7 +759,8 @@
 				<p class="mb-6 px-5 text-xs leading-relaxed">
 					Nothing matches “{query}”. Try a title, website, or folder.
 				</p>
-				<button class="button" onclick={() => (query = "")}>Clear search</button
+					<button class="button" onclick={() => (query = "")}
+						>Clear search</button
 				>
 			</div>
 		{:else}
@@ -738,8 +807,8 @@
 									><Icon name="plus" size={23} /></span
 								><strong class="text-sm font-medium text-(--text)"
 									>New group</strong
-								><span class="mt-2 text-xs">Create a bookmark folder</span><span
-									class="absolute top-4 right-4 opacity-60"
+									><span class="mt-2 text-xs">Create a bookmark folder</span
+									><span class="absolute top-4 right-4 opacity-60"
 									><Icon name="arrow" size={16} /></span
 								></button
 							>
