@@ -8,7 +8,7 @@
 2. Open `chrome://extensions`.
 3. Enable **Developer mode**.
 4. Click **Load unpacked** and select the directory containing `manifest.json`.
-5. Open a new tab. Metro should show **Browser connected** and your real bookmarks.
+5. Open a new tab. Metro should show your bookmark counters and your real bookmarks.
 
 Keep the unpacked folder in a stable location. Other new-tab extensions may compete with this override; disable them if necessary. Minimum manifest version target: Chrome 128.
 

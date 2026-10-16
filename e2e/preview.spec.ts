@@ -21,7 +21,8 @@ test('flat ancestry, separate roots, launcher tiles, and background context-menu
 
 test('create, edit, customize, resize, move, delete and Undo; dialogs close without exceptions', async ({ page }) => {
   await start(page);
-  await page.getByRole('button', { name: 'Add bookmark', exact: true }).click();
+  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } });
+  await page.getByRole('menuitem', { name: 'Add bookmark', exact: true }).click();
   let dialog = page.getByRole('dialog');
   await dialog.getByLabel('Title', { exact: true }).fill('QA new favorite');
   await dialog.getByLabel('Website address', { exact: true }).fill('https://example.com/one');
@@ -169,7 +170,8 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('QA across tabs');
   await page.getByRole('dialog').getByRole('button', { name: 'Save changes' }).click();
   await expect(link(second, 'QA across tabs')).toBeVisible();
-  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } });
+  await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click();
   await page.getByRole('button', { name: 'Paper', exact: true }).click();
   await expect(page.locator('.metro-app')).toHaveClass(/theme-paper/);
   await expect(second.locator('.metro-app')).toHaveClass(/theme-paper/);
@@ -183,7 +185,8 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await page.reload();
   await expect(page.locator('.metro-app')).toHaveClass(/theme-paper/);
   await page.setViewportSize({ width: 800, height: 600 });
-  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } });
+  await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('searchbox', { name: 'Search bookmarks' })).toBeVisible();

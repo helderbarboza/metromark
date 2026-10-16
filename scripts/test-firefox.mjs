@@ -31,7 +31,7 @@ try {
   const handles = await driver.wait(async () => { const value = await driver.getAllWindowHandles(); return value.length > before.length ? value : false; }, 10000);
   await driver.switchTo().window(handles.find((handle) => !before.includes(handle)));
   await driver.wait(until.elementLocated(By.css('.metro-group')), 20000);
-  assert.match(await driver.findElement(By.css('.save-state')).getText(), /Browser connected/);
+  assert.match(await driver.findElement(By.css('footer')).getText(), /bookmarks, \d+ folders/);
   assert.equal(await driver.getCurrentUrl(), override);
   console.log('PASS Firefox native new-tab override and connected boot');
 

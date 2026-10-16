@@ -123,9 +123,6 @@
 			})
 			.filter((group) => group.layout.length);
 	});
-	const resultCount = $derived(
-		visibleGroups.reduce((count, group) => count + group.layout.length, 0),
-	);
 	const undo = $derived(
 		notice?.undoId
 			? snapshot?.undos.find(
@@ -609,57 +606,6 @@ if (element && scroller) cancelSmoothScroll();
 	class:reduced={snapshot?.settings.reducedMotion}
 >
 	<header class="shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6">
-		<div class="flex h-5 items-center justify-between">
-			<span
-				class="text-xs uppercase tracking-widest text-(--muted) max-sm:hidden"
-				>{today}</span
-			>
-		</div>
-		<div
-			class="flex items-center justify-between gap-7 py-8 max-md:items-end max-md:gap-4 max-sm:block max-sm:py-6"
-		>
-			<div
-				class="flex items-center gap-2.5 pt-3.5 max-md:max-w-67 max-md:flex-wrap max-md:justify-end max-md:gap-1.5 max-md:pt-0 max-sm:mt-6 max-sm:max-w-none max-sm:flex-nowrap max-sm:justify-start"
-			>
-				<label
-					class="flex h-10 w-60 items-center gap-2.5 rounded border border-(--line) bg-(--surface) px-3 text-(--muted) focus-within:border-(--accent) max-lg:w-55 max-md:h-9 max-md:w-46 max-sm:flex-1"
-					><Icon name="search" size={17} /><input
-						bind:this={searchInput}
-						bind:value={query}
-						type="search"
-						aria-label="Search bookmarks"
-						placeholder="Find a bookmark…"
-						autocomplete="off"
-						spellcheck="false"
-						class="w-full min-w-0 bg-transparent p-0 text-xs text-(--text) outline-none placeholder:text-(--muted) [&::-webkit-search-cancel-button]:hidden"
-					/>{#if query}<button
-							aria-label="Clear search"
-							class="bg-transparent p-1 text-(--muted)"
-							onclick={() => {
-								query = "";
-								searchInput.focus();
-							}}><Icon name="close" size={13} /></button
-						>{:else}<kbd
-							class="flex h-5 w-4 items-center justify-center rounded border border-(--line) font-inherit text-xs"
-							>/</kbd
-						>{/if}</label
-				><button
-					class="button primary px-4 text-xs max-md:h-9 max-md:w-9 max-md:p-0"
-					disabled={!snapshot || !defaultFolder()}
-						onclick={() =>
-							edit({ kind: "bookmark", parentId: defaultFolder() })}
-					><Icon name="plus" size={16} /><span class="max-md:hidden"
-						>Add bookmark</span
-					></button
-				><button
-					class="icon-button -mr-2 max-md:h-8 max-md:w-7 max-sm:ml-1"
-					aria-label="Open settings"
-					disabled={!snapshot}
-					onclick={() => edit({ kind: "settings" })}
-					><Icon name="settings" size={20} /></button
-				>
-			</div>
-		</div>
 		<div
 			class="flex items-center justify-between gap-5 border-b border-(--line) pb-3.5 max-sm:pb-2.5"
 		>
@@ -715,7 +661,7 @@ if (element && scroller) cancelSmoothScroll();
 		</div>
 	</header>
 
-	<!-- Canvas right-click has a matching visible Add button and keyboard-accessible settings. -->
+	<!-- Canvas right-click opens the canvas menu (add bookmark/folder, arrange, settings). -->
 	<main
 		id="canvas"
 			class="relative min-h-0 flex-1 overflow-auto scroll-smooth pt-4 outline-none scrollbar-none] [&::-webkit-scrollbar]:hidden 2xl:pt-6"
@@ -833,52 +779,63 @@ if (element && scroller) cancelSmoothScroll();
 	<footer
 		class="flex min-h-16 shrink-0 items-center justify-between gap-5 px-16 pb-1.5 max-lg:px-9 max-md:px-6"
 	>
-		<div
-			class="flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)"
-		>
-			<span
-				class={busy
-					? "mr-px size-1 animate-pulse rounded-full bg-(--accent)"
-					: "mr-px size-1 rounded-full bg-[#95a980]"}
-			></span><span
-				>{busy
-					? "Saving changes…"
-					: client.mode === "preview"
-						? "Demo workspace"
-						: "Browser connected"}</span
-			>{#if client.mode === "preview"}<span class="opacity-50">·</span><span
-					class="text-xs max-lg:max-w-42 max-lg:truncate max-md:hidden"
-					>saved locally, not your real bookmarks</span
-				>{:else}<span class="opacity-50">·</span><span
-					class="text-xs max-lg:max-w-42 max-lg:truncate max-md:hidden"
-					>{bookmarkCount} bookmarks, {folderCount} folders</span
-				>{/if}
-		</div>
-		<nav
-			class="absolute left-1/2 flex -translate-x-1/2 gap-1.5 p-2.5 max-md:hidden"
-			aria-label="Jump to bookmark group"
-		>
-			{#each visibleGroups as group, index (group.id)}<button
-					class={activeGroup === index
-						? "w-4 rounded-full bg-(--accent) p-0 transition-all"
-						: "size-1 rounded-full bg-(--line) p-0 transition-all"}
-					aria-label="Jump to {group.path.join(' / ')}"
-					aria-current={activeGroup === index ? "true" : undefined}
-					onclick={() => jump(index)}
-				></button>{/each}
-		</nav>
-		<div class="flex items-center gap-7 text-(--muted)">
-			<span class="flex items-center gap-2 text-xs max-lg:hidden"
-				><Icon name="mouse" size={13} />Right-click to make it yours</span
+		<span role="status" class="sr-only">{busy ? "Saving changes…" : ""}</span>
+		<div class="flex shrink-0 items-center">
+			<label
+				class="flex h-8 w-60 items-center gap-2.5 rounded border border-(--line) bg-(--surface) px-3 text-(--muted) focus-within:border-(--accent) max-lg:w-55 max-md:h-9 max-md:w-46"
+				><Icon name="search" size={17} /><input
+					bind:this={searchInput}
+					bind:value={query}
+					type="search"
+					aria-label="Search bookmarks"
+					placeholder="Find a bookmark…"
+					autocomplete="off"
+					spellcheck="false"
+					class="w-full min-w-0 bg-transparent p-0 text-xs text-(--text) outline-none placeholder:text-(--muted) [&::-webkit-search-cancel-button]:hidden"
+				/>{#if query}<button
+						aria-label="Clear search"
+						class="bg-transparent p-1 text-(--muted)"
+						onclick={() => {
+							query = "";
+							searchInput.focus();
+						}}><Icon name="close" size={13} /></button
+					>{:else}<kbd
+						class="flex h-5 w-4 items-center justify-center rounded border border-(--line) font-inherit text-xs"
+						>/</kbd
+					>{/if}</label
 			>
+		</div>
+		<div class="flex min-w-0 flex-1 items-center justify-center gap-5">
+			
+			<nav
+			class="absolute left-1/2 flex -translate-x-1/2 gap-1.5 p-2.5 max-md:hidden"
+				aria-label="Jump to bookmark group"
+			>
+				{#each visibleGroups as group, index (group.id)}<button
+						class={activeGroup === index
+							? "w-4 rounded-full bg-(--accent) p-0 transition-all"
+							: "size-1 rounded-full bg-(--line) p-0 transition-all"}
+						aria-label="Jump to {group.path.join(' / ')}"
+						aria-current={activeGroup === index ? "true" : undefined}
+						onclick={() => jump(index)}
+					></button>{/each}
+			</nav>
+			
+		</div>
+		<div class="flex shrink-0 items-center gap-4">
+			<div
+				class="flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)"
+			>
+				<span class="max-sm:hidden">{bookmarkCount} bookmarks, {folderCount} folders</span>
+				<span class="sm:hidden">{bookmarkCount} / {folderCount}</span>
+				{#if client.mode === "preview"}<span
+						class="rounded border border-(--line) px-1.5 py-0.5 text-xs text-(--muted)"
+						title="saved locally, not your real bookmarks"
+						>Demo</span
+					>{/if}
+			</div>
 			<div class="flex items-center gap-0.5">
-				<span class="mr-2.5 text-xs tracking-widest max-sm:hidden"
-					>{normalizedQuery
-						? `${resultCount} found`
-						: canScroll
-							? "SCROLL TO EXPLORE"
-							: "ALL IN VIEW"}</span
-				><button
+				<button
 					class="icon-button h-7 w-6 rounded disabled:opacity-25"
 					aria-label="Scroll groups left"
 					disabled={!canScroll || scrollProgress < 0.01}
