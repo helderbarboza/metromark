@@ -1,6 +1,6 @@
 import type {
   AppData, Appearance, BookmarkNode, BookmarkPort, Command, CommandResult, DeletedBackup,
-  Layout, Notice, PersistencePort, Settings, Snapshot, UndoRecord,
+  Density, Layout, Notice, PersistencePort, Settings, Snapshot, UndoRecord,
 } from './types';
 import { SIZES, freePosition, reconcileLayout, validateLayout } from './layout';
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups, validateUrl } from './tree';
@@ -8,8 +8,13 @@ import { iconChoices } from './icons';
 
 export const UNDO_TTL = 30_000;
 export const DEFAULT_SETTINGS: Settings = {
-  theme: 'midnight', density: 'comfortable', showDomains: true, reducedMotion: false,
+  theme: 'midnight', density: 'default', showDomains: true, reducedMotion: false,
 };
+const DENSITIES: Density[] = ['default', 'compact', 'small', 'half'];
+export function normalizeDensity(value: unknown): Density {
+  if (value === 'comfortable') return 'default';
+  return DENSITIES.includes(value as Density) ? (value as Density) : 'default';
+}
 export const emptyData = (): AppData => ({
   schema: 1, appearance: {}, layouts: {}, settings: { ...DEFAULT_SETTINGS }, undos: [],
 });
@@ -45,7 +50,10 @@ export class BookmarkCoordinator {
     });
     this.ready = this.exclusive(async () => {
       const stored = await persistence.read();
-      if (stored?.schema === 1) this.data = { ...emptyData(), ...stored, settings: { ...DEFAULT_SETTINGS, ...stored.settings } };
+      if (stored?.schema === 1) {
+        this.data = { ...emptyData(), ...stored, settings: { ...DEFAULT_SETTINGS, ...stored.settings } };
+        this.data.settings.density = normalizeDensity((stored.settings as { density?: unknown } | undefined)?.density);
+      }
       await this.refresh();
       if (this.recoverPrepared()) await this.save();
     });
@@ -273,9 +281,14 @@ export class BookmarkCoordinator {
         return undo ? { message: 'Bookmark moved to its new folder.', undoId: undo.id } : undefined;
       }
       case 'settings.update': {
-        const patch = command.patch;
+        let patch = command.patch;
         if (patch.theme !== undefined && !['midnight', 'dusk', 'forest', 'paper'].includes(patch.theme)) throw new Error('Invalid theme.');
-        if (patch.density !== undefined && !['comfortable', 'compact'].includes(patch.density)) throw new Error('Invalid density.');
+        if (patch.density !== undefined) {
+          const density = normalizeDensity(patch.density);
+          // Reject unknown values instead of silently coercing them.
+          if ((patch.density as string) !== 'comfortable' && !(DENSITIES as string[]).includes(patch.density as string)) throw new Error('Invalid density.');
+          patch = { ...patch, density };
+        }
         if (patch.showDomains !== undefined && typeof patch.showDomains !== 'boolean') throw new Error('Invalid domain setting.');
         if (patch.reducedMotion !== undefined && typeof patch.reducedMotion !== 'boolean') throw new Error('Invalid motion setting.');
         this.data.settings = { ...this.data.settings, ...patch };

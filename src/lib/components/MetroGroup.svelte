@@ -1,14 +1,14 @@
 <script lang="ts">
   import { createGridContainer, createGridPlaceholder, horizontalCompactor } from '@snapgridjs/svelte';
-  import type { GroupView, Layout, TileView } from '../types';
+  import type { Density, GroupView, Layout, TileView } from '../types';
   import { cellsToPx, GAP, ROWS, usedCols, sizeOf } from '../layout';
   import { validateUrl } from '../tree';
   import MetroTile from './MetroTile.svelte';
   import GridTile from './GridTile.svelte';
   import Icon from './Icon.svelte';
-  let { group, layout, tiles, cell, arranging, dragging, selectedId, showDomains, preview,
+  let { group, layout, tiles, cell, gap = GAP, density = 'default', arranging, dragging, selectedId, showDomains, preview,
     onLayoutChange, onDragStart, onDragStop, onSelect, onContext, onAdd, onBlocked }: {
-    group: GroupView; layout: Layout; tiles: Record<string, TileView>; cell: number; arranging: boolean; dragging: boolean;
+    group: GroupView; layout: Layout; tiles: Record<string, TileView>; cell: number; gap?: number; density?: Density; arranging: boolean; dragging: boolean;
     selectedId: string | null; showDomains: boolean; preview: boolean;
     onLayoutChange: (id: string, layout: Layout) => void;
     onDragStart: () => void; onDragStop: () => void; onSelect: (id: string) => void;
@@ -17,11 +17,11 @@
   } = $props();
   let liveCols = $state(0);
   const cols = $derived(Math.max(usedCols(layout), liveCols, group.layout.length ? 2 : 4));
-  const visibleWidth = $derived(cellsToPx(cols, cell));
+  const visibleWidth = $derived(cellsToPx(cols, cell, gap));
   const engineCols = $derived(Math.max(usedCols(layout) + 12, layout.length * 4 + 12, 24));
   const container = createGridContainer(() => ({
-    id: group.id, layout, width: cellsToPx(engineCols, cell),
-    gridConfig: { cols: engineCols, rowHeight: cell, margin: [GAP, GAP], containerPadding: [0, 0], maxRows: ROWS },
+    id: group.id, layout, width: cellsToPx(engineCols, cell, gap),
+    gridConfig: { cols: engineCols, rowHeight: cell, margin: [gap, gap], containerPadding: [0, 0], maxRows: ROWS },
     compactor: horizontalCompactor, isResizable: false, autoSize: false,
     isDraggable: arranging && group.writable,
     dragConfig: { threshold: 6 },
@@ -46,20 +46,20 @@
     <button class="icon-button group-menu" aria-label="Manage {group.title || 'unnamed group'}" onclick={(event) => onContext(event, 'group', group.id)}><Icon name="more" size={17} /></button>
   </header>
   <!-- Right-click only; standard keyboard management is provided by the labeled heading button. -->
-  <div {@attach container.attach} style="{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell)}px;" class="metro-grid" role="group" aria-label="Tiles in {group.path.join(' / ')}" class:drop-target={container.isDropTarget}
+  <div {@attach container.attach} style="{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell, gap)}px;" class="metro-grid" role="group" aria-label="Tiles in {group.path.join(' / ')}" class:drop-target={container.isDropTarget}
     oncontextmenu={(event) => onContext(event, 'canvas', group.id)}>
     {#each layout as entry (entry.i)}
       {@const tile = tiles[entry.i]}
       {#if tile}
         {#if arranging && group.writable && tile.writable}
-          <GridTile id={entry.i} group={container.group} {tile} selected={selectedId === entry.i} {showDomains}
+          <GridTile id={entry.i} group={container.group} {tile} selected={selectedId === entry.i} {showDomains} {density}
             onclick={() => { if (!dragging) onSelect(entry.i); }} oncontextmenu={(event) => onContext(event, 'tile', entry.i)} />
         {:else}
           <a class="tile-slot" href={href(tile)} target={preview ? '_blank' : undefined} rel="noopener noreferrer" title="{tile.title} — {tile.url}"
-            style:left="{entry.x * (cell + GAP)}px" style:top="{entry.y * (cell + GAP)}px"
-            style:width="{cellsToPx(entry.w, cell)}px" style:height="{cellsToPx(entry.h, cell)}px"
+            style:left="{entry.x * (cell + gap)}px" style:top="{entry.y * (cell + gap)}px"
+            style:width="{cellsToPx(entry.w, cell, gap)}px" style:height="{cellsToPx(entry.h, cell, gap)}px"
             aria-label="Open {tile.title}{showDomains && sizeOf(entry) !== 'small' ? ' ' + tile.domain : ''}" onclick={(event) => launch(event, tile)} oncontextmenu={(event) => onContext(event, 'tile', entry.i)}>
-            <MetroTile {tile} size={sizeOf(entry)} selected={selectedId === entry.i} domain={tile.domain} showDomain={showDomains} />
+            <MetroTile {tile} size={sizeOf(entry)} selected={selectedId === entry.i} domain={tile.domain} showDomain={showDomains} {density} />
           </a>
         {/if}
       {/if}

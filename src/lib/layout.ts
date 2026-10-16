@@ -1,8 +1,14 @@
 import type { Layout, LayoutItem } from '@snapgridjs/core';
-import type { Appearance, BookmarkNode, TileSize } from './types';
+import type { Appearance, BookmarkNode, Density, TileSize } from './types';
 
 export const ROWS = 6;
 export const GAP = 8;
+export const DENSITY: Record<Density, { cell: number; gap: number }> = {
+  default: { cell: 56, gap: 8 },
+  compact: { cell: 42, gap: 6 },
+  small: { cell: 35, gap: 5 },
+  half: { cell: 28, gap: 4 },
+};
 export const SIZES: Record<TileSize, [number, number]> = {
   small: [1, 1], medium: [2, 2], wide: [4, 2], large: [4, 4],
 };

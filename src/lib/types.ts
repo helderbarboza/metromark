@@ -2,6 +2,7 @@ import type { Layout, LayoutItem } from '@snapgridjs/core';
 export type { Layout, LayoutItem } from '@snapgridjs/core';
 
 export type TileSize = 'small' | 'medium' | 'wide' | 'large';
+export type Density = 'default' | 'compact' | 'small' | 'half';
 export interface MetroFace { big?: string | number; title?: string; lines?: string[]; background?: string }
 export interface MetroTileDef { title: string; color: string; icon?: string; badge?: string | number; faces?: MetroFace[]; period?: number; url?: string; iconKey?: string }
 
@@ -21,7 +22,7 @@ export interface CreateNode { parentId: string; title?: string; url?: string; in
 export interface Appearance { size?: TileSize; color?: string; icon?: string }
 export interface Settings {
   theme: 'midnight' | 'dusk' | 'forest' | 'paper';
-  density: 'comfortable' | 'compact';
+  density: Density;
   showDomains: boolean;
   reducedMotion: boolean;
 }

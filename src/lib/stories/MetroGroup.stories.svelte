@@ -7,6 +7,7 @@
   import { getIcon } from '../icons';
   import type { GroupView, TileView } from '../types';
   import type { Layout } from '@snapgridjs/core';
+  import { DENSITY } from '../layout';
 
   const tiles: Record<string, TileView> = {
     figma: { id: 'figma', title: 'Figma', url: 'https://figma.com', domain: 'figma.com', iconKey: 'figma', icon: getIcon('figma'), color: '#af572f', size: 'medium', writable: true },
@@ -45,7 +46,7 @@
     title: 'Metro/Tile grid', component: MetroGroup, tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },
     args: {
-      group, layout, tiles, cell: 68, arranging: false, dragging: false,
+      group, layout, tiles, cell: DENSITY.default.cell, gap: DENSITY.default.gap, density: 'default', arranging: false, dragging: false,
       selectedId: null, showDomains: true, preview: true,
       onLayoutChange: fn(), onDragStart: fn(), onDragStop: fn(),
       onSelect: fn(), onContext: fn(), onAdd: fn(), onBlocked: fn(),

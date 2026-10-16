@@ -4,15 +4,15 @@
   import MetroTile from '../components/MetroTile.svelte';
   import type { ComponentProps } from 'svelte';
   import { getIcon } from '../icons';
-  import { SIZES, cellsToPx } from '../layout';
+  import { DENSITY, SIZES, cellsToPx } from '../layout';
   const { Story } = defineMeta({
     title: 'Metro/Bookmark tile', component: MetroTile, tags: ['autodocs'],
-    args: { tile: { title: 'Figma', color: '#af572f', icon: getIcon('figma') }, size: 'medium', domain: 'figma.com', showDomain: true },
-    argTypes: { size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] }, selected: { control: 'boolean' }, arranging: { control: 'boolean' } },
+    args: { tile: { title: 'Figma', color: '#af572f', icon: getIcon('figma') }, size: 'medium', density: 'default', domain: 'figma.com', showDomain: true },
+    argTypes: { size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] }, density: { control: 'radio', options: ['default', 'compact', 'small', 'half'] }, selected: { control: 'boolean' }, arranging: { control: 'boolean' } },
   });
 </script>
 {#snippet template(args: ComponentProps<typeof MetroTile>)}
-  <a href="https://figma.com" aria-label="Open {args.tile.title}{args.showDomain && args.size !== 'small' ? ' ' + args.domain : ''}" style="display:block;width:{cellsToPx(SIZES[args.size][0], 68)}px;height:{cellsToPx(SIZES[args.size][1], 68)}px;text-decoration:none"><MetroTile {...args} /></a>
+  <a href="https://figma.com" aria-label="Open {args.tile.title}{args.showDomain && args.size !== 'small' ? ' ' + args.domain : ''}" style="display:block;width:{cellsToPx(SIZES[args.size][0], DENSITY[args.density ?? 'default'].cell, DENSITY[args.density ?? 'default'].gap)}px;height:{cellsToPx(SIZES[args.size][1], DENSITY[args.density ?? 'default'].cell, DENSITY[args.density ?? 'default'].gap)}px;text-decoration:none"><MetroTile {...args} /></a>
 {/snippet}
 <Story name="Small" args={{ size: 'small' }} {template} />
 <Story name="Medium" {template} play={async ({ canvas }) => { await expect(canvas.getByRole('link', { name: /^Open Figma/ })).toBeVisible(); await expect(canvas.getByText('figma.com')).toBeVisible(); }} />

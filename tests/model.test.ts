@@ -4,7 +4,7 @@ import { normalizeTree } from '../src/lib/adapters/memory';
 import { canModify, canAddTo, flatten, indexTree, isBookmark, projectGroups, tileFor, validateUrl } from '../src/lib/tree';
 import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '../src/lib/icon-sources';
 import { getIcon } from '../src/lib/icons';
-import { overlaps, reconcileLayout, validateLayout, usedCols } from '../src/lib/layout';
+import { overlaps, reconcileLayout, validateLayout, usedCols, DENSITY, cellsToPx, SIZES } from '../src/lib/layout';
 import type { Snapshot } from '../src/lib/types';
 const fixture = (): Snapshot => ({ ...demoData(), tree: normalizeTree(demoTree()), revision: 0, mode: 'preview', undos: [] });
 
@@ -77,6 +77,21 @@ describe('independent layouts', () => {
     expect(() => validateLayout([{ i: 'a', x: -1, y: 0, w: 2, h: 2 }])).toThrow();
     expect(() => validateLayout([{ i: 'a', x: 0, y: 0, w: 3, h: 3 }])).toThrow();
     expect(() => validateLayout([{ i: 'a', x: 0, y: 0, w: 2, h: 2 }, { i: 'a', x: 2, y: 0, w: 2, h: 2 }])).toThrow();
+  });
+});
+
+describe('density tile sizes', () => {
+  const expected: Record<keyof typeof DENSITY, Record<'small' | 'medium' | 'wide' | 'large', [number, number]>> = {
+    default: { small: [56, 56], medium: [120, 120], wide: [248, 120], large: [248, 248] },
+    compact: { small: [42, 42], medium: [90, 90], wide: [186, 90], large: [186, 186] },
+    small: { small: [35, 35], medium: [75, 75], wide: [155, 75], large: [155, 155] },
+    half: { small: [28, 28], medium: [60, 60], wide: [124, 60], large: [124, 124] },
+  };
+  it.each(Object.keys(expected) as (keyof typeof DENSITY)[])('matches the %s pixel table', (density) => {
+    const { cell, gap } = DENSITY[density];
+    for (const [size, [w, h]] of Object.entries(SIZES)) {
+      expect([cellsToPx(w, cell, gap), cellsToPx(h, cell, gap)]).toEqual(expected[density][size as keyof typeof expected.default]);
+    }
   });
 });
 

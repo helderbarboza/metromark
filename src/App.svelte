@@ -16,7 +16,7 @@
 		projectGroups,
 		countBookmarks,
 	} from "./lib/tree";
-	import { reconcileLayout, ROWS, GAP, cellsToPx } from "./lib/layout";
+	import { reconcileLayout, ROWS, DENSITY, cellsToPx } from "./lib/layout";
 	import Icon from "./lib/components/Icon.svelte";
 	import MetroGroup from "./lib/components/MetroGroup.svelte";
 	import ContextMenu from "./lib/components/ContextMenu.svelte";
@@ -76,15 +76,18 @@
 	const folderCount = $derived(
 		groups.filter((group) => !group.isSystem).length,
 	);
+	const metrics = $derived(DENSITY[snapshot?.settings.density ?? "default"] ?? DENSITY.default);
+	const gap = $derived(metrics.gap);
 	const cell = $derived(
 		Math.max(
-			34,
+			28,
 			Math.min(
-				snapshot?.settings.density === "compact" ? 54 : 68,
-				Math.floor((viewportHeight - 279 - (ROWS - 1) * GAP) / ROWS),
+				metrics.cell,
+				Math.floor((viewportHeight - 279 - (ROWS - 1) * metrics.gap) / ROWS),
 			),
 		),
 	);
+	const density = $derived(snapshot?.settings.density ?? "default");
 	const normalizedQuery = $derived(query.trim().toLowerCase());
 	const visibleGroups = $derived.by(() => {
 		const filtered = groups.filter(
@@ -234,6 +237,7 @@ cancelSmoothScroll();
 	$effect(() => {
 		void visibleGroups;
 		void cell;
+		void gap;
 		requestAnimationFrame(updateScroll);
 	});
 
@@ -774,6 +778,8 @@ if (element && scroller) cancelSmoothScroll();
 							layout={draftLayouts[group.id] ?? group.layout}
 							tiles={allTiles}
 							{cell}
+							{gap}
+							{density}
 							arranging={arranging && !normalizedQuery}
 							{dragging}
 							{selectedId}
@@ -799,7 +805,7 @@ if (element && scroller) cancelSmoothScroll();
 							</div>
 							<button
 								class="relative flex w-full flex-col items-center justify-center border border-dashed border-(--line) bg-transparent text-(--muted) transition-colors duration-150 hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)"
-								style:height="{cellsToPx(ROWS, cell)}px"
+								style:height="{cellsToPx(ROWS, cell, gap)}px"
 								onclick={() =>
 									edit({ kind: "folder", parentId: defaultFolder() })}
 								><span

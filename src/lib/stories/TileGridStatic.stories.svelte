@@ -4,8 +4,8 @@
   import MetroTile from '../components/MetroTile.svelte';
   import type { ComponentProps } from 'svelte';
   import { getIcon } from '../icons';
-  import { SIZES, cellsToPx } from '../layout';
-  import type { TileSize } from '../types';
+  import { DENSITY, SIZES, cellsToPx } from '../layout';
+  import type { Density, TileSize } from '../types';
 
   interface StaticTile {
     id: string;
@@ -29,8 +29,9 @@
     parameters: { layout: 'fullscreen' },
     args: {
       tile: { title: 'Figma', color: '#af572f', icon: getIcon('figma') },
-      size: 'medium', domain: 'figma.com', showDomain: true,
+      size: 'medium', density: 'default' as Density, domain: 'figma.com', showDomain: true,
     },
+    argTypes: { density: { control: 'radio', options: ['default', 'compact', 'small', 'half'] } },
   });
 
   function label(tile: StaticTile, showDomain: boolean): string {
@@ -39,14 +40,14 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof MetroTile>)}
-  <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:32px;background:var(--bg);min-height:100vh">
+  <div style="display:flex;flex-wrap:wrap;gap:{DENSITY[(args.density ?? 'default') as Density].gap}px;align-items:flex-start;padding:32px;background:var(--bg);min-height:100vh">
     {#each staticTiles as tile (tile.id)}
       <a
         href={tile.href}
         aria-label={label(tile, args.showDomain ?? true)}
-        style="display:block;width:{cellsToPx(SIZES[tile.size][0], 68)}px;height:{cellsToPx(SIZES[tile.size][1], 68)}px;text-decoration:none"
+        style="display:block;width:{cellsToPx(SIZES[tile.size][0], DENSITY[(args.density ?? 'default') as Density].cell, DENSITY[(args.density ?? 'default') as Density].gap)}px;height:{cellsToPx(SIZES[tile.size][1], DENSITY[(args.density ?? 'default') as Density].cell, DENSITY[(args.density ?? 'default') as Density].gap)}px;text-decoration:none"
       >
-        <MetroTile tile={{ title: tile.title, color: tile.color, icon: tile.icon }} size={tile.size} domain={tile.domain} showDomain={args.showDomain ?? true} />
+        <MetroTile tile={{ title: tile.title, color: tile.color, icon: tile.icon }} size={tile.size} density={(args.density ?? 'default') as Density} domain={tile.domain} showDomain={args.showDomain ?? true} />
       </a>
     {/each}
   </div>
