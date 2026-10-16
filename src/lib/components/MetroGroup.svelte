@@ -72,20 +72,23 @@
   .metro-group { flex: none; transition: width 140ms ease; }
   .group-header { display: flex; align-items: flex-end; justify-content: space-between; height: 60px; padding-bottom: 17px; gap: 8px; }
   .group-heading { min-width: 0; }
-  .group-path { font-size: 8px; color: var(--muted); letter-spacing: 1.1px; text-transform: uppercase; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; margin-bottom: 6px; }
+  .group-path { font-size: 11px; color: var(--muted); letter-spacing: 1.1px; text-transform: uppercase; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; margin-bottom: 6px; }
   .group-name-line { display: flex; align-items: center; gap: 11px; }
-  h2 { font-size: 16px; font-weight: 450; line-height: 1.1; letter-spacing: -.35px; color: var(--text); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .group-count { color: var(--muted); font-size: 9px; font-variant-numeric: tabular-nums; }
-  .group-menu { width: 24px; height: 25px; border-radius: 3px; opacity: .5; flex-shrink: 0; }
+  h2 { font-size: 16px; font-weight: 600; line-height: 1.1; color: var(--text); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .group-count { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .group-menu { width: 38px; height: 38px; border-radius: 3px; opacity: .85; flex-shrink: 0; }
   .metro-group:hover .group-menu, .group-menu:focus-visible { opacity: 1; }
-  .metro-grid { position: relative; transition: outline 150ms; }
+  .metro-grid { position: relative; }
   .metro-grid.drop-target { outline: 1px solid var(--accent); outline-offset: 6px; }
-  .tile-slot { position: absolute; display: block; text-decoration: none; color: white; transition: left 140ms, top 140ms, width 140ms, height 140ms; }
+  .tile-slot { position: absolute; display: block; text-decoration: none; color: inherit; transition: left 140ms, top 140ms, width 140ms, height 140ms; }
   .tile-slot:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; z-index: 2; }
-  .grid-placeholder { position: absolute; background: #c4b6f428; outline: 1px dashed var(--accent); z-index: 0; pointer-events: none; }
+  .grid-placeholder { position: absolute; background: color-mix(in srgb, var(--accent) 16%, transparent); outline: 1px dashed var(--accent); z-index: 0; pointer-events: none; }
   .empty-group { border: 1px dashed var(--line); height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); }
-  .empty-group h3 { font-size: 16px; font-weight: 450; color: var(--text); margin: 16px 0 9px; }
-  .empty-group p { font-size: 10px; margin: 0; }
+  .empty-group h3 { font-size: 16px; font-weight: 600; color: var(--text); margin: 16px 0 9px; }
+  .empty-group p { font-size: 12px; margin: 0; }
   .empty-add { display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px; margin-top: 26px; background: var(--surface); border: 1px solid var(--line); font-size: 11px; color: var(--text); border-radius: 3px; }
   .empty-add:hover { background: var(--surface-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .metro-group, .tile-slot { transition: none; }
+  }
 </style>
