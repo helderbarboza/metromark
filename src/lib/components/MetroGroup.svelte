@@ -6,9 +6,9 @@
   import MetroTile from './MetroTile.svelte';
   import GridTile from './GridTile.svelte';
   import Icon from './Icon.svelte';
-  let { group, layout, tiles, cell, arranging, dragging, selectedId, showDomains, preview,
+  let { group, layout, tiles, cell, rows = ROWS, arranging, dragging, selectedId, showDomains, preview,
     onLayoutChange, onDragStart, onDragStop, onSelect, onContext, onAdd, onBlocked }: {
-    group: GroupView; layout: Layout; tiles: Record<string, TileView>; cell: number; arranging: boolean; dragging: boolean;
+    group: GroupView; layout: Layout; tiles: Record<string, TileView>; cell: number; rows?: number; arranging: boolean; dragging: boolean;
     selectedId: string | null; showDomains: boolean; preview: boolean;
     onLayoutChange: (id: string, layout: Layout) => void;
     onDragStart: () => void; onDragStop: () => void; onSelect: (id: string) => void;
@@ -21,7 +21,7 @@
   const engineCols = $derived(Math.max(usedCols(layout) + 12, layout.length * 4 + 12, 24));
   const container = createGridContainer(() => ({
     id: group.id, layout, width: cellsToPx(engineCols, cell),
-    gridConfig: { cols: engineCols, rowHeight: cell, margin: [GAP, GAP], containerPadding: [0, 0], maxRows: ROWS },
+    gridConfig: { cols: engineCols, rowHeight: cell, margin: [GAP, GAP], containerPadding: [0, 0], maxRows: rows },
     compactor: horizontalCompactor, isResizable: false, autoSize: false,
     isDraggable: arranging && group.writable,
     dragConfig: { threshold: 6 },
@@ -46,7 +46,7 @@
     <button class="icon-button group-menu" aria-label="Manage {group.title || 'unnamed group'}" onclick={(event) => onContext(event, 'group', group.id)}><Icon name="more" size={17} /></button>
   </header>
   <!-- Right-click only; standard keyboard management is provided by the labeled heading button. -->
-  <div {@attach container.attach} style="{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell)}px;" class="metro-grid" role="group" aria-label="Tiles in {group.path.join(' / ')}" class:drop-target={container.isDropTarget}
+  <div {@attach container.attach} style="{container.style} width: {visibleWidth}px; height: {cellsToPx(rows, cell)}px;" class="metro-grid" role="group" aria-label="Tiles in {group.path.join(' / ')}" class:drop-target={container.isDropTarget}
     oncontextmenu={(event) => onContext(event, 'canvas', group.id)}>
     {#each layout as entry (entry.i)}
       {@const tile = tiles[entry.i]}

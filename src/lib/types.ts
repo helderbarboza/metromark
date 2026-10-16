@@ -24,6 +24,7 @@ export interface Settings {
   density: 'comfortable' | 'compact';
   showDomains: boolean;
   reducedMotion: boolean;
+  showMoreTiles: boolean;
 }
 export interface DeletedBackup {
   node: BookmarkNode;

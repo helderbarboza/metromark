@@ -2,13 +2,14 @@ import type {
   AppData, Appearance, BookmarkNode, BookmarkPort, Command, CommandResult, DeletedBackup,
   Layout, Notice, PersistencePort, Settings, Snapshot, UndoRecord,
 } from './types';
-import { SIZES, freePosition, reconcileLayout, validateLayout } from './layout';
+import { MAX_ROWS, SIZES, freePosition, reconcileLayout, validateLayout } from './layout';
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups, validateUrl } from './tree';
 import { iconChoices } from './icons';
 
 export const UNDO_TTL = 30_000;
 export const DEFAULT_SETTINGS: Settings = {
   theme: 'midnight', density: 'comfortable', showDomains: true, reducedMotion: false,
+  showMoreTiles: false,
 };
 export const emptyData = (): AppData => ({
   schema: 1, appearance: {}, layouts: {}, settings: { ...DEFAULT_SETTINGS }, undos: [],
@@ -191,7 +192,7 @@ export class BookmarkCoordinator {
         await this.bookmarks.move(node.id, { parentId: command.parentId });
         if (isBookmark(node) && source && target && position) {
           this.data.layouts[source.id] = source.layout.filter((item) => item.i !== node.id);
-          this.data.layouts[target.id] = [...target.layout, freePosition(target.layout, position)];
+          this.data.layouts[target.id] = [...target.layout, freePosition(target.layout, position, MAX_ROWS)];
         }
         this.commitUndo(undo);
         return { message: isFolder(node) ? 'Folder moved.' : 'Bookmark moved.', undoId: undo.id };
@@ -238,7 +239,7 @@ export class BookmarkCoordinator {
         const existing = { ...this.data.appearance[node.id] };
         if (command.patch.icon === 'auto') delete existing.icon;
         this.data.appearance[node.id] = { ...existing, ...patch };
-        if (group) this.data.layouts[group.id] = reconcileLayout((this.node(group.id).children ?? []).filter(isBookmark), group.layout, this.data.appearance);
+        if (group) this.data.layouts[group.id] = reconcileLayout((this.node(group.id).children ?? []).filter(isBookmark), this.data.layouts[group.id] ?? group.layout, this.data.appearance, MAX_ROWS);
         return undefined;
       }
       case 'layout.commit': {
@@ -278,6 +279,7 @@ export class BookmarkCoordinator {
         if (patch.density !== undefined && !['comfortable', 'compact'].includes(patch.density)) throw new Error('Invalid density.');
         if (patch.showDomains !== undefined && typeof patch.showDomains !== 'boolean') throw new Error('Invalid domain setting.');
         if (patch.reducedMotion !== undefined && typeof patch.reducedMotion !== 'boolean') throw new Error('Invalid motion setting.');
+        if (patch.showMoreTiles !== undefined && typeof patch.showMoreTiles !== 'boolean') throw new Error('Invalid tile grid setting.');
         this.data.settings = { ...this.data.settings, ...patch };
         return undefined;
       }

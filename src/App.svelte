@@ -16,7 +16,7 @@
 		projectGroups,
 		countBookmarks,
 	} from "./lib/tree";
-	import { reconcileLayout, ROWS, GAP, cellsToPx } from "./lib/layout";
+	import { reconcileLayout, ROWS, MAX_ROWS, GAP, cellsToPx } from "./lib/layout";
 	import Icon from "./lib/components/Icon.svelte";
 	import MetroGroup from "./lib/components/MetroGroup.svelte";
 	import ContextMenu from "./lib/components/ContextMenu.svelte";
@@ -76,12 +76,13 @@
 	const folderCount = $derived(
 		groups.filter((group) => !group.isSystem).length,
 	);
+	const rows = $derived(snapshot?.settings.showMoreTiles ? MAX_ROWS : ROWS);
 	const cell = $derived(
 		Math.max(
 			34,
 			Math.min(
 				snapshot?.settings.density === "compact" ? 54 : 68,
-				Math.floor((viewportHeight - 279 - (ROWS - 1) * GAP) / ROWS),
+				Math.floor((viewportHeight - 279 - (rows - 1) * GAP) / rows),
 			),
 		),
 	);
@@ -118,6 +119,7 @@
 						})),
 						[],
 						sizes,
+						rows,
 					),
 				};
 			})
@@ -720,6 +722,7 @@ if (element && scroller) cancelSmoothScroll();
 							layout={draftLayouts[group.id] ?? group.layout}
 							tiles={allTiles}
 							{cell}
+							{rows}
 							arranging={arranging && !normalizedQuery}
 							{dragging}
 							{selectedId}
@@ -745,7 +748,7 @@ if (element && scroller) cancelSmoothScroll();
 							</div>
 							<button
 								class="relative flex w-full flex-col items-center justify-center border border-dashed border-(--line) bg-transparent text-(--muted) transition-colors duration-150 hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)"
-								style:height="{cellsToPx(ROWS, cell)}px"
+								style:height="{cellsToPx(rows, cell)}px"
 								onclick={() =>
 									edit({ kind: "folder", parentId: defaultFolder() })}
 								><span

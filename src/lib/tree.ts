@@ -1,5 +1,5 @@
 import type { Appearance, BookmarkNode, GroupView, Snapshot, TileView } from './types';
-import { reconcileLayout, sizeOf } from './layout';
+import { MAX_ROWS, ROWS, reconcileLayout, sizeOf } from './layout';
 import { getIcon } from './icons';
 
 export const PALETTE = ['#af572f', '#6559b4', '#32767d', '#4b6eaa', '#767148', '#9b526b', '#53774f', '#a14e47'];
@@ -65,11 +65,12 @@ export function tileFor(node: BookmarkNode, appearance: Appearance = {}, tree?: 
 export function projectGroups(snapshot: Snapshot): GroupView[] {
   const nodes = indexTree(snapshot.tree);
   const result: GroupView[] = [];
+  const rows = snapshot.settings.showMoreTiles ? MAX_ROWS : ROWS;
   const walk = (node: BookmarkNode, path: string[], rootId: string) => {
     if (!isFolder(node)) return;
     const currentPath = [...path, node.title || 'Untitled folder'];
     const links = (node.children ?? []).filter(isBookmark);
-    const layout = reconcileLayout(links, snapshot.layouts[node.id], snapshot.appearance);
+    const layout = reconcileLayout(links, snapshot.layouts[node.id], snapshot.appearance, rows);
     const tiles = Object.fromEntries(links.map((bookmark) => {
       const tile = tileFor(bookmark, snapshot.appearance[bookmark.id]);
       tile.writable = !isManaged(bookmark, nodes);
@@ -88,7 +89,7 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
     const links = (root.children ?? []).filter(isBookmark);
     if (links.length) result.unshift({ id: root.id, title: '', path: [], rootId: root.id,
       isSystem: true, mutable: false, writable: false,
-      layout: reconcileLayout(links, snapshot.layouts[root.id], snapshot.appearance),
+      layout: reconcileLayout(links, snapshot.layouts[root.id], snapshot.appearance, rows),
       tiles: Object.fromEntries(links.map((node) => [node.id, tileFor(node, snapshot.appearance[node.id], snapshot.tree)])) });
   }
   return result;
