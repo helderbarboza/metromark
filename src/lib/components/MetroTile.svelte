@@ -25,7 +25,6 @@
   const scaleFactor = $derived(faviconRequest.scaleFactor);
 </script>
 <div class="metro-tile metro-tile-{size}" class:selected style:background={tile.color} style:--tile-color={tile.color} style:--tile-fg={fg}>
-  {#if size === 'large'}<div class="tile-decoration" aria-hidden="true"><span></span><span></span><span></span></div>{/if}
   {#if children}
     {@render children()}
   {:else if showLive}
@@ -69,6 +68,4 @@
   .tile-check { position: absolute; right: 0; top: 0; background: white; color: #2c3033; padding: 5px; }
   .tile-grip { position: absolute; right: 10px; top: 8px; color: #ffffffa0; font-size: 19px; }
   .tile-badge { position: absolute; right: 10px; bottom: 10px; font-size: 12px; }
-  .tile-decoration { position: absolute; width: 180px; height: 180px; top: -35px; right: -35px; border: 1px solid #ffffff0a; transform: rotate(40deg); z-index: -1; }
-  .tile-decoration span { display: block; height: 60px; border-bottom: 1px solid #ffffff0a; }
 </style>
