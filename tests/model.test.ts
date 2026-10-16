@@ -3,9 +3,9 @@ import { demoData, demoTree } from '../src/lib/demo';
 import { normalizeTree } from '../src/lib/adapters/memory';
 import { canModify, canAddTo, flatten, indexTree, isBookmark, projectGroups, tileFor, validateUrl } from '../src/lib/tree';
 import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '../src/lib/icon-sources';
-import { getIcon } from '../src/lib/icons';
+import { globeIcon } from '../src/lib/icons';
 import { overlaps, reconcileLayout, validateLayout, usedCols } from '../src/lib/layout';
-import type { Snapshot } from '../src/lib/types';
+import type { Appearance, Snapshot } from '../src/lib/types';
 const fixture = (): Snapshot => ({ ...demoData(), tree: normalizeTree(demoTree()), revision: 0, mode: 'preview', undos: [] });
 
 describe('bookmark tree projection', () => {
@@ -121,15 +121,13 @@ describe('tile favicons', () => {
     expect(isFaviconEligible('javascript:alert(1)')).toBe(false);
     expect(isFaviconEligible('')).toBe(false);
   });
-  it('falls back to the default globe icon when automatic', () => {
+  it('falls back to the generic globe icon when no favicon is available', () => {
     const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' });
-    expect(tile.iconKey).toBe('globe');
-    expect(tile.icon).toBe(getIcon('globe'));
+    expect(tile.icon).toBe(globeIcon);
     expect(tile.url).toBe('https://example.com');
   });
-  it('lets an explicit icon choice win over favicons', () => {
-    const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' }, { icon: 'book' });
-    expect(tile.iconKey).toBe('book');
-    expect(tile.icon).toBe(getIcon('book'));
+  it('ignores legacy appearance icon choices and still uses the favicon', () => {
+    const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' }, { icon: 'book' } as Appearance);
+    expect(tile.icon).toBe(globeIcon);
   });
 });

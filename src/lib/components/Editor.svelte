@@ -8,7 +8,6 @@
   import { onMount } from 'svelte';
   import type { Command, Settings, Snapshot, TileSize } from '../types';
   import { indexTree, projectGroups, flatten, isFolder, countBookmarks, PALETTE, tileFor } from '../tree';
-  import { iconChoices } from '../icons';
   import Modal from './Modal.svelte';
   import Icon from './Icon.svelte';
   let { spec, snapshot, oncommand, onclose, onresetpreview }: {
@@ -26,7 +25,6 @@
   let parentId = $state('');
   let size = $state<TileSize>('medium');
   let color = $state(PALETTE[0]);
-  let icon = $state('auto');
   let busy = $state(false);
   let error = $state('');
   let confirmReset = $state(false);
@@ -37,7 +35,6 @@
     parentId = spec.parentId ?? node?.parentId ?? folders[0]?.id ?? '';
     size = tile?.size ?? 'medium';
     color = tile?.color ?? PALETTE[0];
-    icon = snapshot.appearance[spec.id ?? '']?.icon ?? 'auto';
   });
   const title = $derived(spec.kind === 'bookmark' ? node ? 'Edit bookmark' : 'A new favorite'
     : spec.kind === 'folder' ? 'Make a little room'
@@ -65,7 +62,7 @@
       case 'folder': return send({ type: 'folder.create', parentId, title: name });
       case 'rename': if (node) return send({ type: 'node.update', id: node.id, title: name }); break;
       case 'move': if (node) return send({ type: 'node.move', id: node.id, parentId }); break;
-      case 'appearance': if (node) return send({ type: 'tile.appearance', id: node.id, patch: { size, color, icon } }); break;
+      case 'appearance': if (node) return send({ type: 'tile.appearance', id: node.id, patch: { size, color } }); break;
       case 'restore': if (spec.undoId) return send({ type: 'undo', id: spec.undoId, parentId }); break;
     }
   }
@@ -110,7 +107,6 @@
         <p class="dialog-description">A little personality for <strong class="text-[var(--text)]">{tile.title}</strong>. Appearance changes are local; the bookmark itself stays untouched.</p>
         <label class="field"><span class="field-label" id={uid + '-size-label'}>Tile size</span><select aria-labelledby={uid + '-size-label'} bind:value={size} data-initial-focus>{#each ['small', 'medium', 'wide', 'large'] as preset (preset)}<option value={preset}>{preset[0].toUpperCase() + preset.slice(1)}</option>{/each}</select></label>
         <div class="field"><span class="field-label" id="tile-color-label">Color</span><div class="color-swatches" role="group" aria-labelledby="tile-color-label">{#each PALETTE as swatch (swatch)}<button type="button" style:background={swatch} class:chosen={color.toLowerCase() === swatch} aria-label="Use color {swatch}" aria-pressed={color.toLowerCase() === swatch} onclick={() => color = swatch}>{#if color.toLowerCase() === swatch}<Icon name="check" size={16} />{/if}</button>{/each}<input type="color" bind:value={color} aria-label="Custom tile color" title="Custom color" /></div></div>
-        <label class="field"><span class="field-label" id={uid + '-icon-label'}>Icon</span><select aria-labelledby={uid + '-icon-label'} aria-describedby={uid + '-icon-hint'} bind:value={icon}><option value="auto">Website icon (automatic)</option>{#each iconChoices as choice (choice)}<option value={choice}>{choice[0].toUpperCase() + choice.slice(1)}</option>{/each}</select><span class="field-hint" id={uid + '-icon-hint'}>Automatic uses the site's icon from your browser's local favicon cache, styled Metro-white, or the default icon when unavailable. No website requests.</span></label>
       {/if}
       {#if error}<p class="form-error" role="alert">{error}</p>{/if}
       <div class="dialog-actions"><button class="button" type="button" onclick={onclose}>Cancel</button><button class="button primary" type="submit" disabled={busy || ((spec.kind === 'move' || spec.kind === 'restore' || spec.kind === 'folder' || (spec.kind === 'bookmark' && !node)) && !parentId)}>{busy ? 'Saving…' : spec.kind === 'move' ? 'Move here' : spec.kind === 'restore' ? 'Restore here' : spec.kind === 'folder' ? 'Create group' : spec.kind === 'bookmark' && !node ? 'Add bookmark' : 'Save changes'}</button></div>

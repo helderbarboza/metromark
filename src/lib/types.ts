@@ -3,7 +3,7 @@ export type { Layout, LayoutItem } from '@snapgridjs/core';
 
 export type TileSize = 'small' | 'medium' | 'wide' | 'large';
 export interface MetroFace { big?: string | number; title?: string; lines?: string[]; background?: string }
-export interface MetroTileDef { title: string; color: string; icon?: string; badge?: string | number; faces?: MetroFace[]; period?: number; url?: string; iconKey?: string }
+export interface MetroTileDef { title: string; color: string; icon?: string; badge?: string | number; faces?: MetroFace[]; period?: number; url?: string }
 
 export interface BookmarkNode {
   id: string;
@@ -18,7 +18,7 @@ export interface BookmarkNode {
   children?: BookmarkNode[];
 }
 export interface CreateNode { parentId: string; title?: string; url?: string; index?: number; type?: 'separator' }
-export interface Appearance { size?: TileSize; color?: string; icon?: string }
+export interface Appearance { size?: TileSize; color?: string }
 export interface Settings {
   theme: 'midnight' | 'dusk' | 'forest' | 'paper';
   density: 'comfortable' | 'compact';
@@ -67,7 +67,6 @@ export interface TileView extends MetroTileDef {
   id: string;
   url: string;
   domain: string;
-  iconKey: string;
   size: TileSize;
   writable: boolean;
 }

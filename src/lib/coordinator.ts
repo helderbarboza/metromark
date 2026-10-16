@@ -4,7 +4,6 @@ import type {
 } from './types';
 import { SIZES, freePosition, reconcileLayout, validateLayout } from './layout';
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups, validateUrl } from './tree';
-import { iconChoices } from './icons';
 
 export const UNDO_TTL = 30_000;
 export const DEFAULT_SETTINGS: Settings = {
@@ -230,13 +229,8 @@ export class BookmarkCoordinator {
           if (!/^#[0-9a-f]{6}$/i.test(command.patch.color)) throw new Error('Use a six-digit hex color.');
           patch.color = command.patch.color;
         }
-        if (command.patch.icon !== undefined) {
-          if (command.patch.icon !== 'auto' && !iconChoices.includes(command.patch.icon)) throw new Error('Choose a bundled icon.');
-          if (command.patch.icon !== 'auto') patch.icon = command.patch.icon;
-        }
         const group = projectGroups(this.currentSnapshot()).find((entry) => entry.id === node.parentId);
         const existing = { ...this.data.appearance[node.id] };
-        if (command.patch.icon === 'auto') delete existing.icon;
         this.data.appearance[node.id] = { ...existing, ...patch };
         if (group) this.data.layouts[group.id] = reconcileLayout((this.node(group.id).children ?? []).filter(isBookmark), group.layout, this.data.appearance);
         return undefined;

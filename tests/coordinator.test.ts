@@ -73,8 +73,8 @@ describe('commands and synchronization', () => {
   it('resizes tiles and persists metadata without modifying the bookmark', async () => {
     const { coordinator, bookmarks } = fixture();
     const update = vi.spyOn(bookmarks, 'update');
-    const result = await coordinator.execute({ type: 'tile.appearance', id: 'figma', patch: { size: 'small', color: '#123456', icon: 'book' } });
-    expect(result.snapshot.appearance.figma).toEqual({ size: 'small', color: '#123456', icon: 'book' });
+    const result = await coordinator.execute({ type: 'tile.appearance', id: 'figma', patch: { size: 'small', color: '#123456' } });
+    expect(result.snapshot.appearance.figma).toEqual({ size: 'small', color: '#123456' });
     expect(update).not.toHaveBeenCalled();
   });
 });

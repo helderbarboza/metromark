@@ -4,17 +4,17 @@
   import { SnapGridGroup } from '@snapgridjs/svelte';
   import MetroGroup from '../components/MetroGroup.svelte';
   import type { ComponentProps } from 'svelte';
-  import { getIcon } from '../icons';
+  import { globeIcon } from '../icons';
   import type { GroupView, TileView } from '../types';
   import type { Layout } from '@snapgridjs/core';
 
   const tiles: Record<string, TileView> = {
-    figma: { id: 'figma', title: 'Figma', url: 'https://figma.com', domain: 'figma.com', iconKey: 'figma', icon: getIcon('figma'), color: '#af572f', size: 'medium', writable: true },
-    github: { id: 'github', title: 'GitHub', url: 'https://github.com', domain: 'github.com', iconKey: 'github', icon: getIcon('github'), color: '#3b546e', size: 'medium', writable: true },
-    gmail: { id: 'gmail', title: 'Gmail', url: 'https://mail.google.com', domain: 'mail.google.com', iconKey: 'gmail', icon: getIcon('gmail'), color: '#a44f4c', size: 'wide', writable: true },
-    notion: { id: 'notion', title: 'Notion', url: 'https://notion.so', domain: 'notion.so', iconKey: 'notion', icon: getIcon('notion'), color: '#586857', size: 'large', writable: true },
-    drive: { id: 'drive', title: 'Drive', url: 'https://drive.google.com', domain: 'drive.google.com', iconKey: 'drive', icon: getIcon('drive'), color: '#467953', size: 'medium', writable: true },
-    slack: { id: 'slack', title: 'Slack', url: 'https://slack.com', domain: 'slack.com', iconKey: 'slack', icon: getIcon('slack'), color: '#845576', size: 'small', writable: true },
+    figma: { id: 'figma', title: 'Figma', url: 'https://figma.com', domain: 'figma.com', icon: globeIcon, color: '#af572f', size: 'medium', writable: true },
+    github: { id: 'github', title: 'GitHub', url: 'https://github.com', domain: 'github.com', icon: globeIcon, color: '#3b546e', size: 'medium', writable: true },
+    gmail: { id: 'gmail', title: 'Gmail', url: 'https://mail.google.com', domain: 'mail.google.com', icon: globeIcon, color: '#a44f4c', size: 'wide', writable: true },
+    notion: { id: 'notion', title: 'Notion', url: 'https://notion.so', domain: 'notion.so', icon: globeIcon, color: '#586857', size: 'large', writable: true },
+    drive: { id: 'drive', title: 'Drive', url: 'https://drive.google.com', domain: 'drive.google.com', icon: globeIcon, color: '#467953', size: 'medium', writable: true },
+    slack: { id: 'slack', title: 'Slack', url: 'https://slack.com', domain: 'slack.com', icon: globeIcon, color: '#845576', size: 'small', writable: true },
   };
 
   const layout: Layout = [

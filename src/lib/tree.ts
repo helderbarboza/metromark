@@ -1,6 +1,6 @@
 import type { Appearance, BookmarkNode, GroupView, Snapshot, TileView } from './types';
 import { reconcileLayout, sizeOf } from './layout';
-import { getIcon } from './icons';
+import { globeIcon } from './icons';
 
 export const PALETTE = ['#af572f', '#6559b4', '#32767d', '#4b6eaa', '#767148', '#9b526b', '#53774f', '#a14e47'];
 export const isBookmark = (node: BookmarkNode) => typeof node.url === 'string' && node.type !== 'separator';
@@ -37,29 +37,20 @@ export function canModify(node: BookmarkNode, tree: BookmarkNode[]): boolean {
 export function canAddTo(node: BookmarkNode, tree: BookmarkNode[]): boolean {
   return isFolder(node) && Boolean(node.parentId) && !isManaged(node, indexTree(tree));
 }
-const brandMap: [string, string, string][] = [
-  ['figma.com', 'figma', '#af572f'], ['linear.app', 'linear', '#6259ac'], ['github.com', 'github', '#3b546e'],
-  ['notion.so', 'notion', '#586857'], ['notion.com', 'notion', '#586857'], ['mail.google.com', 'gmail', '#a44f4c'],
-  ['slack.com', 'slack', '#845576'], ['drive.google.com', 'drive', '#467953'], ['calendar.google.com', 'calendar', '#496eaf'],
-  ['meet.google.com', 'meet', '#34847f'], ['are.na', 'arena', '#637254'], ['dribbble.com', 'dribbble', '#9d536e'],
-  ['pinterest.com', 'pinterest', '#a54d47'], ['open.spotify.com', 'spotify', '#357c59'], ['youtube.com', 'youtube', '#a64e47'],
-];
-export function website(url: string): { domain: string; icon: string; color: string } {
-  let domain = '';
+export function website(url: string): { domain: string; color: string } {
+  let domain: string;
   try { domain = new URL(url).hostname.replace(/^www\./, '') || new URL(url).protocol.replace(':', ''); } catch { domain = 'bookmark'; }
-  const brand = brandMap.find(([host]) => domain === host || domain.endsWith(`.${host}`));
   const hash = [...domain].reduce((n, letter) => (n * 31 + letter.charCodeAt(0)) >>> 0, 0);
-  return { domain, icon: brand?.[1] ?? 'globe', color: brand?.[2] ?? PALETTE[hash % PALETTE.length] };
+  return { domain, color: PALETTE[hash % PALETTE.length] };
 }
 export function tileFor(node: BookmarkNode, appearance: Appearance = {}, tree?: BookmarkNode[]): TileView {
   const site = website(node.url ?? '');
-  // Explicit icon choices win. Otherwise every tile attempts the site's
-  // original favicon first (see FaviconIcon) and falls back to this default.
-  const iconKey = appearance.icon ?? 'globe';
+  // Every tile renders the site's original favicon (see FaviconIcon) and
+  // falls back to the single generic globe when no favicon is available.
   return {
     id: node.id, title: node.title || site.domain, url: node.url ?? '', domain: site.domain,
     size: appearance.size ?? 'medium', color: appearance.color ?? site.color,
-    iconKey, icon: getIcon(iconKey), writable: tree ? canModify(node, tree) : true,
+    icon: globeIcon, writable: tree ? canModify(node, tree) : true,
   };
 }
 export function projectGroups(snapshot: Snapshot): GroupView[] {

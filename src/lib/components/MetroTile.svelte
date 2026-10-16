@@ -17,9 +17,8 @@
   }
   const showLive = $derived(Boolean(tile.faces?.length) && size !== 'small');
   const fg = $derived(foreground(tile.color));
-  // Explicit icon choices win over favicons. Automatic tiles (globe key)
-  // attempt the site's original favicon; anything else renders bundled SVG.
-  const useFavicon = $derived((tile.iconKey ?? 'globe') === 'globe' && Boolean(tile.url?.trim()));
+  // Tiles render the site's original favicon, falling back to the generic
+  // globe when the page has no cached favicon or conversion fails.
   const faviconRequest = $derived(faviconRequestForTile(size));
   const requestSize = $derived(faviconRequest.requestSize);
   const convertSize = $derived(faviconRequest.requestSize);
@@ -30,16 +29,10 @@
   {#if children}
     {@render children()}
   {:else if showLive}
-    <MetroLiveFaces faces={tile.faces ?? []} icon={tile.icon} period={tile.period} faviconPageUrl={useFavicon ? tile.url : undefined} tint={fg} fallbackIcon={tile.icon ?? ''} {requestSize} {scaleFactor} />
+    <MetroLiveFaces faces={tile.faces ?? []} icon={tile.icon} period={tile.period} faviconPageUrl={tile.url} tint={fg} fallbackIcon={tile.icon ?? ''} {requestSize} {scaleFactor} />
   {:else}
     <div class="metro-tile-icon" aria-hidden="true">
-      {#if useFavicon}
-        <FaviconIcon pageUrl={tile.url ?? ''} tint={fg} {requestSize} {convertSize} {scaleFactor} fallback={tile.icon ?? ''} />
-      {:else}
-        <!-- Safe: icons are selected from our bundled SVG registry, never the bookmark title/URL. -->
-        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-        {@html tile.icon ?? ''}
-      {/if}
+      <FaviconIcon pageUrl={tile.url ?? ''} tint={fg} {requestSize} {convertSize} {scaleFactor} fallback={tile.icon ?? ''} />
     </div>
   {/if}
   {#if size !== 'small'}
