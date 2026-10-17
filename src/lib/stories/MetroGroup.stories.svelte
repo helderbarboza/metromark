@@ -45,7 +45,7 @@
     title: 'Metro/Tile grid', component: MetroGroup, tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },
     args: {
-      group, layout, tiles, cell: 68, arranging: false, dragging: false,
+      group, layout, tiles, cell: 68, draggable: true, dragging: false,
       selectedId: null, showDomains: true, preview: true,
       onLayoutChange: fn(), onDragStart: fn(), onDragStop: fn(),
       onSelect: fn(), onContext: fn(), onAdd: fn(), onBlocked: fn(),
@@ -94,12 +94,24 @@
 />
 
 <Story
-  name="Arranging with selection"
-  args={{ arranging: true, selectedId: 'figma' }}
+  name="Selection"
+  args={{ selectedId: 'figma' }}
   {template}
-  play={async ({ canvas }) => {
-    await expect(await canvas.findByRole('button', { name: /Arrange Figma/ })).toBeVisible();
-    await expect(await canvas.findByRole('button', { name: /Arrange Gmail/ })).toBeVisible();
+  play={async ({ canvas, canvasElement }) => {
+    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible();
+    await expect(canvasElement.querySelectorAll('.metro-tile.selected')).toHaveLength(1);
+  }}
+/>
+
+<Story
+  name="Tiles are always draggable"
+  {template}
+  play={async ({ canvas, canvasElement }) => {
+    const tile = await canvas.findByRole('link', { name: /^Open Figma/ });
+    await expect(tile).toHaveAttribute('data-grid-id', 'figma');
+    // Native link dragging must stay off so the pointer gesture belongs to the grid.
+    await expect(tile).toHaveAttribute('draggable', 'false');
+    await expect(canvasElement.querySelectorAll('.snapgrid-item')).toHaveLength(6);
   }}
 />
 

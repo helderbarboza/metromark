@@ -246,7 +246,7 @@ export class BookmarkCoordinator {
           const layout = validateLayout(raw);
           for (const item of layout) {
             const node = nodes.get(item.i);
-            if (!node || !isBookmark(node)) throw new Error('A tile changed while you were arranging. Try again.');
+            if (!node || !isBookmark(node)) throw new Error('A tile changed while you were moving it. Try again.');
             if (ownership.has(node.id)) throw new Error('A tile cannot belong to two groups.');
             ownership.set(node.id, folderId);
             if (node.parentId !== folderId) { this.editable(node.id); this.checkMove(node, folderId); moves.push({ node, destination: folderId }); }

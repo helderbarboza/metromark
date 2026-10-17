@@ -3,15 +3,16 @@
   import type { GroupView, Layout, TileView } from '../types';
   import { cellsToPx, GAP, ROWS, usedCols, sizeOf } from '../layout';
   import { validateUrl } from '../tree';
+  import { DRAG_PX } from '../interaction';
   import MetroTile from './MetroTile.svelte';
   import GridTile from './GridTile.svelte';
   import Icon from './Icon.svelte';
-  let { group, layout, tiles, cell, arranging, dragging, selectedId, showDomains, preview,
+  let { group, layout, tiles, cell, draggable, dragging, selectedId, showDomains, preview,
     onLayoutChange, onDragStart, onDragStop, onSelect, onContext, onAdd, onBlocked }: {
-    group: GroupView; layout: Layout; tiles: Record<string, TileView>; cell: number; arranging: boolean; dragging: boolean;
+    group: GroupView; layout: Layout; tiles: Record<string, TileView>; cell: number; draggable: boolean; dragging: boolean;
     selectedId: string | null; showDomains: boolean; preview: boolean;
     onLayoutChange: (id: string, layout: Layout) => void;
-    onDragStart: () => void; onDragStop: () => void; onSelect: (id: string) => void;
+    onDragStart: () => void; onDragStop: () => void; onSelect: (id: string, event: PointerEvent) => void;
     onContext: (event: MouseEvent, target: 'tile' | 'group' | 'canvas', id: string) => void;
     onAdd: (folderId: string) => void; onBlocked: (message: string) => void;
   } = $props();
@@ -19,12 +20,15 @@
   const cols = $derived(Math.max(usedCols(layout), liveCols, group.layout.length ? 2 : 4));
   const visibleWidth = $derived(cellsToPx(cols, cell));
   const engineCols = $derived(Math.max(usedCols(layout) + 12, layout.length * 4 + 12, 24));
+  const movable = $derived(draggable && group.writable);
   const container = createGridContainer(() => ({
     id: group.id, layout, width: cellsToPx(engineCols, cell),
     gridConfig: { cols: engineCols, rowHeight: cell, margin: [GAP, GAP], containerPadding: [0, 0], maxRows: ROWS },
     compactor: horizontalCompactor, isResizable: false, autoSize: false,
-    isDraggable: arranging && group.writable,
-    dragConfig: { threshold: 6 },
+    isDraggable: movable,
+    // Tiles are always draggable, so the threshold has to leave room for the
+    // cross-slide selection band between REVEAL_PX and DRAG_PX (uwp8 pp. 76-80).
+    dragConfig: { threshold: DRAG_PX },
     onLayoutChange: (next) => onLayoutChange(group.id, next),
     onDragStart,
     onDrag: (next) => { liveCols = usedCols(next); },
@@ -51,9 +55,9 @@
     {#each layout as entry (entry.i)}
       {@const tile = tiles[entry.i]}
       {#if tile}
-        {#if arranging && group.writable && tile.writable}
-          <GridTile id={entry.i} group={container.group} {tile} selected={selectedId === entry.i} {showDomains}
-            onclick={() => { if (!dragging) onSelect(entry.i); }} oncontextmenu={(event) => onContext(event, 'tile', entry.i)} />
+        {#if movable && tile.writable}
+          <GridTile id={entry.i} group={container.group} {tile} selected={selectedId === entry.i} {showDomains} {preview} {dragging}
+            onselect={onSelect} oncontextmenu={(event) => onContext(event, 'tile', entry.i)} onblocked={onBlocked} />
         {:else}
           <a class="tile-slot" href={href(tile)} target={preview ? '_blank' : undefined} rel="noopener noreferrer" title="{tile.title} — {tile.url}"
             style:left="{entry.x * (cell + GAP)}px" style:top="{entry.y * (cell + GAP)}px"

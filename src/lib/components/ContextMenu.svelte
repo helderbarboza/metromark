@@ -50,21 +50,23 @@
   {/if}
 </div>
 <style>
-  .context-menu { position: fixed; z-index: 100; width: 235px; padding: 6px; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 7px; box-shadow: var(--shadow); }
+  .context-menu { position: fixed; z-index: 100; width: 260px; padding: 6px; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 7px; box-shadow: var(--shadow); max-height: calc(100vh - 16px); overflow-y: auto; }
   .menu-heading { padding: 10px 10px 13px; display: flex; flex-direction: column; gap: 5px; border-bottom: 1px solid var(--line); margin-bottom: 5px; }
-  .menu-heading strong { font-size: 12px; font-weight: 550; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .menu-heading span { font-size: 10px; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  button { display: flex; width: 100%; align-items: center; gap: 10px; height: 34px; background: transparent; border-radius: 3px; padding: 0 10px; font-size: 11px; text-align: left; }
+  .menu-heading strong { font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .menu-heading span { font-size: 12px; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  button { display: flex; width: 100%; align-items: center; gap: 10px; height: var(--target-min); background: transparent; border-radius: 3px; padding: 0 10px; font-size: 13px; text-align: left; }
   button :global(.icon) { color: var(--muted); }
   button:hover, button:focus-visible { background: var(--surface-hover); outline: none; }
   button:disabled { opacity: .3; }
   button.danger { color: var(--danger); }
   button.danger :global(.icon) { color: var(--danger); }
   .menu-separator { height: 1px; background: var(--line); margin: 5px 3px; }
-  .size-label { font-size: 8px; color: var(--muted); padding: 10px 10px 7px; letter-spacing: 1px; }
+  .size-label { font-size: 11px; color: var(--muted); padding: 10px 10px 7px; letter-spacing: 1px; }
   .sizes { display: flex; gap: 4px; padding: 0 4px 5px; }
-  .sizes button { display: flex; flex-direction: column; justify-content: center; gap: 6px; width: 25%; height: 48px; padding: 0; text-transform: capitalize; font-size: 8px; color: var(--muted); }
+  .sizes button { display: flex; flex-direction: column; justify-content: center; gap: 6px; width: 25%; height: 64px; padding: 0; text-transform: capitalize; font-size: 10px; color: var(--muted); }
   .sizes button.current { background: var(--surface-hover); color: var(--accent); }
+  /* Current size gets a shape cue, not color alone. */
+  .sizes button.current .size-box { outline: 2px solid var(--accent); outline-offset: 2px; }
   .size-box { width: 12px; height: 12px; border: 1px solid currentColor; }
   .size-box.small { width: 7px; height: 7px; margin-top: 5px; }
   .size-box.wide { width: 20px; height: 10px; margin-top: 2px; }

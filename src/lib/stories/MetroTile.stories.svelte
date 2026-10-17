@@ -8,7 +8,7 @@
   const { Story } = defineMeta({
     title: 'Metro/Bookmark tile', component: MetroTile, tags: ['autodocs'],
     args: { tile: { title: 'Figma', color: '#af572f', url: 'https://figma.com', icon: globeIcon }, size: 'medium', domain: 'figma.com', showDomain: true },
-    argTypes: { size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] }, selected: { control: 'boolean' }, arranging: { control: 'boolean' } },
+    argTypes: { size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] }, selected: { control: 'boolean' }, revealed: { control: 'boolean' } },
   });
 </script>
 {#snippet template(args: ComponentProps<typeof MetroTile>)}
@@ -19,6 +19,6 @@
 <Story name="Wide" args={{ size: 'wide', tile: { title: 'Gmail', color: '#a44f4c', url: 'https://mail.google.com', icon: globeIcon }, domain: 'mail.google.com' }} {template} />
 <Story name="Large" args={{ size: 'large' }} {template} />
 <Story name="Selected" args={{ selected: true }} {template} />
-<Story name="Arranging" args={{ arranging: true }} {template} />
+<Story name="Self-revealing" args={{ revealed: true }} {template} />
 <Story name="Long title" args={{ tile: { title: 'A bookmark with a very long but completely safe title', color: '#3b546e', url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }} {template} />
 <Story name="Without icon" args={{ tile: { title: 'A quiet bookmark', color: '#3b546e', url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }} {template} />

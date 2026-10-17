@@ -28,7 +28,7 @@ Reuse and adapt the supplied Metro components rather than replacing them with an
 4. Within-folder dragging changes local layout metadata only. It must not reorder native bookmark siblings.
 5. Cross-group pointer dragging moves the actual bookmark into the destination folder. The Move to folder dialog provides a keyboard-accessible alternative.
 6. Changes from the native bookmark manager update open new-tab pages, and Metro's management changes update native bookmarks.
-7. Tile and canvas right-clicks open actual context menus. Group controls provide folder management.
+7. Tile right-clicks select the tile and open its app bar of commands; group and canvas right-clicks open actual context menus. Group controls provide folder management.
 8. Destructive actions offer Undo. Preserve whole-subtree restoration, recreated-ID remapping, missing-destination recovery, and conflict guards.
 9. Protect managed bookmarks and browser-owned containers. Do not assume every folder is writable or removable.
 10. The new-tab page is the manager. Do not add a separate manager view or alter the native bookmark-manager UI without authorization.

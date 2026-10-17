@@ -17,6 +17,7 @@
 		countBookmarks,
 	} from "./lib/tree";
 	import { reconcileLayout, ROWS, GAP, cellsToPx } from "./lib/layout";
+	import { toggleSelection } from "./lib/interaction";
 	import Icon from "./lib/components/Icon.svelte";
 	import MetroGroup from "./lib/components/MetroGroup.svelte";
 	import ContextMenu from "./lib/components/ContextMenu.svelte";
@@ -31,9 +32,13 @@
 	let loadError = $state("");
 	let query = $state("");
 	let rootFilter = $state("all");
-	let arranging = $state(false);
 	let dragging = $state(false);
+	// Single selection for now: uwp8 p. 79 defines selection as marking without
+	// launching, and `toggleSelection` is the one place a future multi-select
+	// (selection basket) has to change.
 	let selectedId = $state<string | null>(null);
+	let selectionOrigin = $state<HTMLElement | null>(null);
+	let focusRequest = $state(0);
 	let busy = $state(false);
 	let now = $state(Date.now());
 	let viewportHeight = $state(800);
@@ -53,6 +58,10 @@
 		y: number;
 	} | null>(null);
 	let contextOrigin: HTMLElement | null = null;
+	// Extra commands for the selected tile, opened from the app bar (uwp8 p. 157).
+	let more = $state<{ x: number; y: number; origin: HTMLElement | null } | null>(
+		null,
+	);
 	let notice = $state<Notice | null>(null);
 	let noticeUntil = $state(0);
 
@@ -245,9 +254,76 @@ cancelSmoothScroll();
 		dialog = spec;
 		selectedId = spec.id ?? selectedId;
 	}
+	/** Right-click, the menu key, or Shift+F10 on a tile marks it selected (uwp8 p. 158). */
+	function selectTile(event: MouseEvent, id: string) {
+		event.preventDefault();
+		event.stopPropagation();
+		const tile = allTiles[id];
+		// Commands for objects that cannot be selected stay in a context menu (p. 160).
+		if (!tile?.writable) {
+			showContext(event, "tile", id);
+			return;
+		}
+		selectionOrigin =
+			(event.target as HTMLElement).closest<HTMLElement>("a, button") ?? null;
+		// Right-click always shows the commands for the tile it was pressed on; the
+		// cross-slide gesture is what cancels a selection (uwp8 pp. 81-82).
+		selectedId = id;
+		// Marking an item also gives it focus, so Escape can hand focus back.
+		selectionOrigin?.focus({ preventScroll: true });
+		if (event.clientX === 0 && event.clientY === 0) focusRequest += 1;
+	}
+	/** Tiles select; group headers and the canvas keep their own menus. */
+	function contextFor(
+		event: MouseEvent,
+		target: "tile" | "group" | "canvas",
+		id: string,
+	) {
+		if (target === "tile") selectTile(event, id);
+		else showContext(event, target, id);
+	}
+	/** Cross-slide selection from a touch or pen gesture (uwp8 pp. 79-80). */
+	function selectByGesture(id: string, event: PointerEvent) {
+		selectionOrigin =
+			(event.target as HTMLElement).closest<HTMLElement>("a, button") ?? null;
+		selectedId = toggleSelection(selectedId, id);
+	}
+	function clearSelection() {
+		if (!selectedId) return;
+		// Escape and the app bar's own commands leave focus stranded when the bar unmounts.
+		const keyboard =
+			document.activeElement instanceof HTMLElement &&
+			document.activeElement.closest('[role="toolbar"]') !== null;
+		selectedId = null;
+		more = null;
+		if (keyboard) selectionOrigin?.focus({ preventScroll: true });
+		selectionOrigin = null;
+	}
+	function canvasPointerDown(event: PointerEvent) {
+		if (dragging) return;
+		// Activating a tile opens it; pressing anywhere else drops the selection (p. 82).
+		if ((event.target as HTMLElement).closest("[data-grid-id], .tile-slot"))
+			return;
+		clearSelection();
+	}
+	/** Searching replaces the grid with a filtered, non-interactive view. */
+	function search(event: Event) {
+		query = (event.currentTarget as HTMLInputElement).value;
+		if (query.trim()) clearSelection();
+	}
 	function closeContext() {
 		context = null;
 		contextOrigin?.focus({ preventScroll: true });
+	}
+	function openMore(event: MouseEvent) {
+		const origin = event.currentTarget as HTMLElement;
+		const rect = origin.getBoundingClientRect();
+		more = { x: rect.left, y: rect.top, origin };
+	}
+	function closeMore() {
+		const origin = more?.origin ?? null;
+		more = null;
+		origin?.focus({ preventScroll: true });
 	}
 	function showContext(
 		event: MouseEvent,
@@ -401,15 +477,16 @@ cancelSmoothScroll();
 				disabled: !parentId,
 				action: () => edit({ kind: "folder", parentId }),
 			},
-			{
-				label: arranging ? "Finish arranging" : "Arrange tiles",
-				icon: "arrange",
-				separator: true,
-				action: () => {
-					arranging = !arranging;
-					selectedId = null;
-				},
-			},
+			...(!selectedId
+				? []
+				: [
+						{
+							label: "Clear selection",
+							icon: "close",
+							separator: true,
+							action: () => clearSelection(),
+						},
+					]),
 			{
 				label: "Search bookmarks",
 				icon: "search",
@@ -420,6 +497,41 @@ cancelSmoothScroll();
 				icon: "settings",
 				separator: true,
 				action: () => edit({ kind: "settings" }),
+			},
+		];
+	});
+	// Commands that stay off the app bar itself live in a menu opened from one of
+	// its buttons (uwp8 p. 157), so they are not duplicated as bar commands.
+	const appBarMenuItems = $derived.by((): MenuItem[] => {
+		const tile = selectedTile;
+		if (!tile) return [];
+		return [
+			{
+				label: "Open in new tab",
+				icon: "external",
+				action: () => {
+					void open(tile.url, "tab");
+				},
+			},
+			{
+				label: "Open in new window",
+				icon: "desktop",
+				action: () => {
+					void open(tile.url, "window");
+				},
+			},
+			{
+				label: "Copy website address",
+				icon: "copy",
+				action: () => {
+					void copy(tile.id);
+				},
+			},
+			{
+				label: "Customize tile",
+				icon: "arrange",
+				separator: true,
+				action: () => edit({ kind: "appearance", id: tile.id }),
 			},
 		];
 	});
@@ -443,6 +555,8 @@ cancelSmoothScroll();
 		clearTimeout(gestureTimer);
 		gestureTimer = setTimeout(() => {
 			dragging = false;
+			// Restore the canvas's own smooth scrolling once the gesture is over.
+			if (scroller) scroller.style.scrollBehavior = "";
 		}, 180);
 	}
 	function updateScroll() {
@@ -564,7 +678,7 @@ if (element && scroller) cancelSmoothScroll();
 		const input =
 			event.target instanceof HTMLElement &&
 			["INPUT", "SELECT", "TEXTAREA"].includes(event.target.tagName);
-		if (dialog || context) return;
+		if (dialog || context || more) return;
 		if (
 			!input &&
 			(event.key === "/" ||
@@ -587,9 +701,9 @@ if (element && scroller) cancelSmoothScroll();
 			}
 		}
 		if (event.key === "Escape" && !dragging) {
-			selectedId = null;
 			if (query) query = "";
-			else arranging = false;
+			// Selection itself is cleared here; the app bar returns focus to its tile.
+			clearSelection();
 		}
 	}
 	function performUndo(id: string) {
@@ -643,31 +757,18 @@ if (element && scroller) cancelSmoothScroll();
 						></button
 					>{/each}
 			</nav>
-			<button
-				class={arranging
-					? "inline-flex items-center gap-2 bg-transparent py-1.5 pl-2.5 text-xs whitespace-nowrap text-(--accent)"
-					: "inline-flex items-center gap-2 bg-transparent py-1.5 pl-2.5 text-xs whitespace-nowrap text-(--muted) hover:text-(--accent) disabled:opacity-40"}
-				disabled={!snapshot || Boolean(normalizedQuery) || busy}
-				aria-pressed={arranging}
-				onclick={() => {
-					arranging = !arranging;
-					selectedId = null;
-				}}
-				><Icon name={arranging ? "check" : "arrange"} size={14} /><span
-					class="max-md:hidden"
-					>{arranging ? "Done arranging" : "Arrange tiles"}</span
-				></button
-			>
 		</div>
 	</header>
 
-	<!-- Canvas right-click opens the canvas menu (add bookmark/folder, arrange, settings). -->
+	<!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
 	<main
 		id="canvas"
 			class="relative min-h-0 flex-1 overflow-auto scroll-smooth pt-4 outline-none scrollbar-none] [&::-webkit-scrollbar]:hidden 2xl:pt-6"
+		class:is-dragging={dragging}
 		bind:this={scroller}
 		onscroll={updateScroll}
 		onwheel={wheel}
+		onpointerdown={canvasPointerDown}
 		oncontextmenu={(event) => showContext(event, "canvas", defaultFolder())}
 		aria-label="Bookmark tile canvas"
 		tabindex="-1"
@@ -720,7 +821,7 @@ if (element && scroller) cancelSmoothScroll();
 							layout={draftLayouts[group.id] ?? group.layout}
 							tiles={allTiles}
 							{cell}
-							arranging={arranging && !normalizedQuery}
+							draggable={!normalizedQuery}
 							{dragging}
 							{selectedId}
 							showDomains={snapshot.settings.showDomains}
@@ -728,11 +829,17 @@ if (element && scroller) cancelSmoothScroll();
 							onLayoutChange={stageLayout}
 							onDragStart={() => {
 								dragging = true;
+								// A tile on the way to another group must not keep the app bar (uwp8 p. 82).
 								selectedId = null;
+								selectionOrigin = null;
+								// An in-flight smooth scroll would fight the drag and keep the canvas
+								// moving under the pointer, so stop it and hold scrolling still.
+								cancelSmoothScroll();
+								if (scroller) scroller.style.scrollBehavior = "auto";
 							}}
 							onDragStop={dragStop}
-							onSelect={(id) => (selectedId = id)}
-							onContext={showContext}
+							onSelect={selectByGesture}
+							onContext={contextFor}
 							onAdd={(parentId) => edit({ kind: "bookmark", parentId })}
 							onBlocked={(message) => showNotice({ message, tone: "error" })}
 						/>
@@ -785,7 +892,8 @@ if (element && scroller) cancelSmoothScroll();
 				class="flex h-8 w-60 items-center gap-2.5 rounded border border-(--line) bg-(--surface) px-3 text-(--muted) focus-within:border-(--accent) max-lg:w-55 max-md:h-9 max-md:w-46"
 				><Icon name="search" size={17} /><input
 					bind:this={searchInput}
-					bind:value={query}
+					value={query}
+					oninput={search}
 					type="search"
 					aria-label="Search bookmarks"
 					placeholder="Find a bookmark…"
@@ -849,16 +957,27 @@ if (element && scroller) cancelSmoothScroll();
 			</div>
 		</div>
 	</footer>
-	{#if arranging && selectedTile}<MetroAppBar
+	{#if selectedTile && !dragging}<MetroAppBar
 			title={selectedTile.title}
 			size={selectedTile.size}
 			writable={selectedTile.writable}
+			{focusRequest}
 			onresize={(size) => resizeTile(selectedTile.id, size)}
 			onedit={() => edit({ kind: "bookmark", id: selectedTile.id })}
+			onmove={() => edit({ kind: "move", id: selectedTile.id })}
+			onmore={openMore}
 			ondelete={() => {
 				void execute({ type: "node.remove", id: selectedTile.id });
 			}}
-			onclear={() => (selectedId = null)}
+			onclear={clearSelection}
+		/>{/if}
+	{#if more && selectedTile}<ContextMenu
+			x={more.x}
+			y={more.y}
+			title={selectedTile.title}
+			subtitle={selectedTile.domain}
+			items={appBarMenuItems}
+			onclose={closeMore}
 		/>{/if}
 	{#if context}<ContextMenu
 			x={context.x}

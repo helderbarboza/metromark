@@ -12,10 +12,14 @@ export const test = base.extend<{ noPageErrors: void }>({
 });
 export { expect };
 export const group = (page: Page, title: string) => page.locator('.metro-group').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
-export const link = (page: Page, title: string) => page.getByRole('link', { name: new RegExp('^Open ' + title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:$| )') });
-export const draggable = (page: Page, id: string) => page.locator(`button[data-grid-id="${id}"]`);
+export const link = (page: Page, title: string) => page.getByRole('link', { name: new RegExp('^Open ' + title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b') });
+export const draggable = (page: Page, id: string) => page.locator(`a[data-grid-id="${id}"]`);
+export const appBar = (page: Page) => page.getByRole('toolbar');
 export const presentation = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('metro.preview.presentation.v1') ?? '{}')) as Promise<AppData>;
 export const tree = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('metro.preview.bookmarks.v1') ?? '[]')) as Promise<BookmarkNode[]>;
 export function flat(nodes: BookmarkNode[]): BookmarkNode[] { return nodes.flatMap((node) => [node, ...flat(node.children ?? [])]); }
 export async function start(page: Page) { await page.goto('/'); await expect(link(page, 'Figma')).toBeVisible(); }
-export async function rightClick(page: Page, title: string) { await link(page, title).click({ button: 'right' }); }
+/** Tiles select on right-click (uwp8 p. 158); commands then come from the app bar. */
+export async function rightClick(page: Page, title: string) { await link(page, title).click({ button: 'right' }); await expect(appBar(page)).toBeVisible(); }
+/** Opens the app bar's overflow menu, where commands that are not bar commands live. */
+export async function moreActions(page: Page, title: string) { await page.getByRole('button', { name: `More actions for ${title}`, exact: true }).click(); }

@@ -22,14 +22,14 @@ The live web preview is an isolated **demo workspace**; it cannot access your re
 - Presents every folder as a flat group. A subfolder header displays its full ancestry, including its browser container.
 - Provides small, medium, wide and large tiles: 1×1, 2×2, 4×2 and 4×4 grid cells.
 - Receives native bookmark changes in open new tabs and writes management changes back to the actual browser tree.
-- Supports tile, group and background context menus; creation, editing, folder management, moving, customization and deletion are available directly on the new-tab page.
+- Selecting a tile (right-click, the menu key or Shift+F10) opens an app bar with its edit, move, delete and size commands; group and background right-clicks open context menus. Creation, editing, folder management, moving, customization and deletion are available directly on the new-tab page.
 - Offers **30-second Undo** for deletion, moves, bookmark edits and layout resets. Folder deletion backs up the entire subtree and remaps recreated bookmark IDs on restoration.
 - Stores appearance and tile placement separately from the browser's bookmarks.
 - Includes title/URL/path search, browser-container filtering, horizontal group navigation, four themes, two densities and reduced-motion settings.
 
 ### Arrangement rules
 
-Turn on **Arrange tiles** to drag tiles. Within-folder movement changes only local presentation metadata; it does **not** reorder native bookmark siblings. Cross-group pointer dragging moves the real bookmark into the destination folder. Keyboard dragging works within a group: Enter or Space picks up/drops, arrow keys move, and Escape cancels. Use the Move to folder dialog for keyboard-accessible cross-folder moves.
+Tiles are always movable; no mode has to be turned on first. Within-folder movement changes only local presentation metadata; it does **not** reorder native bookmark siblings. Cross-group pointer dragging moves the real bookmark into the destination folder. On a touch screen a short drag down on a tile reveals the selection check: releasing there selects the tile, while continuing past the drag threshold picks it up to move. Tiles claim the touch gesture, so pan the canvas by dragging its empty background rather than a tile. Keyboard dragging works within a group: Space picks up/drops, arrow keys move, and Escape cancels. Use the Move to folder dialog for keyboard-accessible cross-folder moves.
 
 Managed bookmarks and browser-owned containers are protected. Writable browser containers can receive bookmarks but cannot be renamed or deleted through Metro. Firefox separators are not shown as tiles and are preserved when restoring a deleted subtree.
 
@@ -37,7 +37,7 @@ Managed bookmarks and browser-owned containers are protected. Writable browser c
 
 - `/` or Ctrl/Cmd+K: focus search when not typing in another field.
 - Ctrl/Cmd+Z: undo the most recent eligible operation when not typing.
-- Escape: close a dialog/menu, clear search/selection or leave Arrange mode; during a drag it cancels the gesture instead.
+- Escape: close a dialog/menu, clear the search or the tile selection; during a drag it cancels the gesture instead.
 
 ## Development
 
