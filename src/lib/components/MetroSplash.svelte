@@ -3,30 +3,30 @@
   Full-bleed "app launch" screen in the tile's colour. Click (or Esc, handled by
   MetroStart) to close.
 -->
-<script lang="ts">
-  import type { MetroTileDef } from "../types";
+<script lang='ts'>
+  import type { MetroTileDef } from '../types'
 
   interface Props {
-    tile: MetroTileDef;
-    hint?: string;
-    onClose?: () => void;
+    tile: MetroTileDef
+    hint?: string
+    onClose?: () => void
   }
 
-  let { tile, hint = "Click or press Esc to return to Start", onClose }: Props = $props();
+  const { tile, hint = 'Click or press Esc to return to Start', onClose }: Props = $props()
 </script>
 
 <div
-  class="metro-splash"
+  class='metro-splash'
   style:background={tile.color}
-  role="button"
-  tabindex="0"
+  role='button'
+  tabindex='0'
   onclick={() => onClose?.()}
-  onkeydown={(e) => (e.key === "Enter" || e.key === " ") && onClose?.()}
+  onkeydown={e => (e.key === 'Enter' || e.key === ' ') && onClose?.()}
 >
   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-  <div class="icon">{@html tile.icon ?? ""}</div>
-  <div class="title">{tile.title}</div>
-  {#if hint}<div class="hint">{hint}</div>{/if}
+  <div class='icon'>{@html tile.icon ?? ''}</div>
+  <div class='title'>{tile.title}</div>
+  {#if hint}<div class='hint'>{hint}</div>{/if}
 </div>
 
 <style>

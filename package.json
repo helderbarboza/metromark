@@ -1,8 +1,8 @@
 {
   "name": "metro-bookmarks",
+  "type": "module",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "engines": {
     "node": ">=24"
   },
@@ -16,6 +16,7 @@
     "build:preview": "vite build",
     "check": "svelte-check --tsconfig tsconfig.json",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "vitest run --project unit",
     "test:stories": "vitest run --project storybook",
     "test:e2e": "playwright test",
@@ -33,7 +34,7 @@
     "svelte": "5.57.2"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.0",
+    "@antfu/eslint-config": "^9.5.1",
     "@playwright/test": "^1.56.0",
     "@storybook/addon-a11y": "10.6.1",
     "@storybook/addon-docs": "10.6.1",
@@ -52,20 +53,20 @@
     "eslint-plugin-svelte": "3.23.1",
     "fflate": "0.8.3",
     "geckodriver": "8.0.0",
-    "globals": "^17.0.0",
     "playwright": "^1.56.0",
     "selenium-webdriver": "4.51.0",
     "storybook": "10.6.1",
     "svelte-check": "^4.3.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.71.1",
     "vite": "7.3.7",
     "vitest": "4.1.11",
     "web-ext": "10.7.0",
     "wxt": "0.21.4"
   },
   "overrides": {
+    "@typescript-eslint/eslint-plugin": "^8.71.2",
+    "@typescript-eslint/parser": "^8.71.2",
     "shell-quote": "1.12.0"
   }
 }

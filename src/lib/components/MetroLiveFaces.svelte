@@ -3,55 +3,62 @@
   Live-tile faces. Face 0 is the tile icon; the rest come from `faces`.
   Each new face slides up from the bottom and pushes the old one out.
 -->
-<script lang="ts">
-  import type { MetroFace } from "../types";
-  import FaviconIcon from "./FaviconIcon.svelte";
+<script lang='ts'>
+  import type { MetroFace } from '../types'
+  import FaviconIcon from './FaviconIcon.svelte'
 
   interface Props {
-    faces: MetroFace[];
-    icon?: string;
-    period?: number;
-    faviconPageUrl?: string;
-    tint?: string;
-    fallbackIcon?: string;
-    requestSize?: number;
-    scaleFactor?: 1 | 2;
+    faces: MetroFace[]
+    icon?: string
+    period?: number
+    faviconPageUrl?: string
+    tint?: string
+    fallbackIcon?: string
+    requestSize?: number
+    scaleFactor?: 1 | 2
   }
 
-  let { faces, icon = "", period = 6000, faviconPageUrl, tint = "#ffffff", fallbackIcon = "", requestSize = 64, scaleFactor = 2 }: Props = $props();
+  const { faces, icon = '', period = 6000, faviconPageUrl, tint = '#ffffff', fallbackIcon = '', requestSize = 64, scaleFactor = 2 }: Props = $props()
 
   // index -1 = the icon face
-  const count = $derived(faces.length + 1);
-  let idx = $state(0);
-  let prev = $state<number | null>(null);
-  let tick = $state(0); // unique key per transition so the animation restarts
+  const count = $derived(faces.length + 1)
+  let idx = $state(0)
+  let prev = $state<number | null>(null)
+  let tick = $state(0) // unique key per transition so the animation restarts
 
   $effect(() => {
-    const n = count;
-    const ms = period;
-    let iv: ReturnType<typeof setInterval> | undefined;
+    const n = count
+    const ms = period
+    let iv: ReturnType<typeof setInterval> | undefined
     const step = () => {
-      prev = idx;
-      idx = (idx + 1) % n;
-      tick++;
-    };
+      prev = idx
+      idx = (idx + 1) % n
+      tick++
+    }
     // stagger tiles so they don't all flip together
     const t = setTimeout(() => {
-      step();
-      iv = setInterval(step, ms);
-    }, 1500 + Math.random() * 3000);
+      step()
+      iv = setInterval(step, ms)
+    }, 1500 + Math.random() * 3000)
     return () => {
-      clearTimeout(t);
-      clearInterval(iv);
-    };
-  });
+      clearTimeout(t)
+      clearInterval(iv)
+    }
+  })
 </script>
 
 {#snippet face(i: number)}
   {#if i === 0}
-    <div class="metro-tile-icon">
+    <div class='metro-tile-icon'>
       {#if faviconPageUrl}
-        <FaviconIcon pageUrl={faviconPageUrl} tint={tint} {requestSize} convertSize={requestSize} {scaleFactor} fallback={fallbackIcon || icon} />
+        <FaviconIcon
+          pageUrl={faviconPageUrl}
+          tint={tint}
+          {requestSize}
+          convertSize={requestSize}
+          {scaleFactor}
+          fallback={fallbackIcon || icon}
+        />
       {:else}
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
         {@html icon}
@@ -60,23 +67,29 @@
   {:else}
     {@const f = faces[i - 1]}
     {#if f?.background}
-      <div class="photo" style:background={f.background}></div>
+      <div
+        class='photo'
+        style:background={f.background}
+      ></div>
     {:else if f}
-      <div class="text">
-        {#if f.big !== undefined}<div class="big">{f.big}</div>{/if}
-        {#if f.title}<div class="title">{f.title}</div>{/if}
-        {#each f.lines ?? [] as line, lineIndex (lineIndex)}<div class="line">{line}</div>{/each}
+      <div class='text'>
+        {#if f.big !== undefined}<div class='big'>{f.big}</div>{/if}
+        {#if f.title}<div class='title'>{f.title}</div>{/if}
+        {#each f.lines ?? [] as line, lineIndex (lineIndex)}<div class='line'>{line}</div>{/each}
       </div>
     {/if}
   {/if}
 {/snippet}
 
-<div class="faces">
+<div class='faces'>
   {#key tick}
     {#if prev !== null}
-      <div class="face out">{@render face(prev)}</div>
+      <div class='face out'>{@render face(prev)}</div>
     {/if}
-    <div class="face" class:in={prev !== null}>{@render face(idx)}</div>
+    <div
+      class='face'
+      class:in={prev !== null}
+    >{@render face(idx)}</div>
   {/key}
 </div>
 

@@ -1,9 +1,9 @@
-import { emptyData } from './coordinator';
-import { sizeOf } from './layout';
-import type { AppData, BookmarkNode, Layout } from './types';
+import type { AppData, BookmarkNode, Layout } from './types'
+import { emptyData } from './coordinator'
+import { sizeOf } from './layout'
 
-const link = (id: string, title: string, url: string): BookmarkNode => ({ id, title, url });
-const folder = (id: string, title: string, children: BookmarkNode[], folderType?: string): BookmarkNode => ({ id, title, children, folderType });
+const link = (id: string, title: string, url: string): BookmarkNode => ({ id, title, url })
+const folder = (id: string, title: string, children: BookmarkNode[], folderType?: string): BookmarkNode => ({ id, title, children, folderType })
 export function demoTree(): BookmarkNode[] {
   return [folder('root', '', [
     folder('bar', 'Bookmarks bar', [
@@ -43,9 +43,9 @@ export function demoTree(): BookmarkNode[] {
       link('unsplash', 'Unsplash', 'https://unsplash.com/'),
     ], 'other'),
     folder('mobile', 'Mobile bookmarks', [], 'mobile'),
-  ])];
+  ])]
 }
-const item = (i: string, x: number, y: number, w: number, h: number) => ({ i, x, y, w, h });
+const item = (i: string, x: number, y: number, w: number, h: number) => ({ i, x, y, w, h })
 export function demoData(): AppData {
   const layouts: Record<string, Layout> = {
     bar: [item('figma', 0, 0, 4, 4), item('linear', 4, 0, 2, 2), item('github', 4, 2, 2, 2), item('notion', 0, 4, 2, 2), item('gmail', 2, 4, 4, 2)],
@@ -54,8 +54,6 @@ export function demoData(): AppData {
     learning: [item('mdn', 0, 0, 4, 2), item('svelte', 0, 2, 2, 2), item('typescript', 2, 2, 2, 2), item('tailwind', 0, 4, 4, 2)],
     tools: [item('storybook', 0, 0, 2, 2), item('snapgrid', 0, 2, 2, 2)],
     other: [item('youtube', 0, 0, 4, 2), item('spotify', 0, 2, 2, 2), item('wikipedia', 2, 2, 2, 2), item('unsplash', 0, 4, 4, 2)],
-  };
-  return { ...emptyData(), layouts,
-    appearance: Object.fromEntries(Object.values(layouts).flatMap((layout) => layout.map((entry) => [entry.i, { size: sizeOf(entry) }]))),
-  };
+  }
+  return { ...emptyData(), layouts, appearance: Object.fromEntries(Object.values(layouts).flatMap(layout => layout.map(entry => [entry.i, { size: sizeOf(entry) }]))) }
 }

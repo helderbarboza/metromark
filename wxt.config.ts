@@ -1,5 +1,5 @@
-import { defineConfig } from 'wxt';
-import tailwindcss from '@tailwindcss/vite';
+import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'wxt'
 
 export default defineConfig({
   srcDir: 'src',
@@ -12,13 +12,15 @@ export default defineConfig({
     // Firefox has no equivalent scheme, so it stays permission-free there.
     permissions: browser === 'firefox' ? ['bookmarks', 'storage'] : ['bookmarks', 'storage', 'favicon'],
     icons: { 16: 'icons/16.png', 32: 'icons/32.png', 48: 'icons/48.png', 128: 'icons/128.png' },
-    ...(browser === 'firefox' ? { browser_specific_settings: {
-      gecko: {
-        id: 'metro-bookmarks@local.example',
-        strict_min_version: '140.0',
-        data_collection_permissions: { required: ['none'] },
-      },
-    } } : { minimum_chrome_version: '128' }),
+    ...(browser === 'firefox'
+      ? { browser_specific_settings: {
+          gecko: {
+            id: 'metro-bookmarks@local.example',
+            strict_min_version: '140.0',
+            data_collection_permissions: { required: ['none'] },
+          },
+        } }
+      : { minimum_chrome_version: '128' }),
   }),
   vite: () => ({ plugins: [tailwindcss()] }),
-});
+})

@@ -1,7 +1,7 @@
-import { icons as starter } from './starter-icons';
+import { icons as starter } from './starter-icons'
 
-const svg = (body: string, viewBox = '0 0 24 24') => `<svg viewBox="${viewBox}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${body}</svg>`;
-const stroke = (body: string) => svg(`<g stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">${body}</g>`);
+const svg = (body: string, viewBox = '0 0 24 24') => `<svg viewBox="${viewBox}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${body}</svg>`
+const stroke = (body: string) => svg(`<g stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">${body}</g>`)
 // UI chrome icons plus the single generic globe used as the tile favicon
 // fallback. Bookmark tiles otherwise render only real favicons.
 export const icons: Record<string, string> = {
@@ -25,6 +25,6 @@ export const icons: Record<string, string> = {
   reset: stroke('<path d="M4 11a8 8 0 1 1 1 6M4 4v7h7"/>'),
   desktop: starter.desktop,
   settings: starter.settings,
-};
-export const globeIcon = icons.globe;
-export const getIcon = (name: string) => icons[name] ?? icons.globe;
+}
+export const globeIcon = icons.globe
+export const getIcon = (name: string) => icons[name] ?? icons.globe

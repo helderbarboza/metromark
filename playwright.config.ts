@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: 'e2e',
@@ -11,5 +11,5 @@ export default defineConfig({
   projects: [
     { name: 'preview', testMatch: '**/preview.spec.ts' },
   ],
-  webServer: { command: 'npm run dev', url: 'http://127.0.0.1:5173', reuseExistingServer: !process.env.CI, timeout: 60_000 },
-});
+  webServer: { command: 'npm run dev', url: 'http://127.0.0.1:5173', reuseExistingServer: process.env.CI == null || process.env.CI === '', timeout: 60_000 },
+})

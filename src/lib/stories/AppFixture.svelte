@@ -1,15 +1,22 @@
-<script lang="ts">
-  import { onMount } from 'svelte';
-  import App from '../../App.svelte';
-  import { createPreviewClient } from '../adapters/preview';
-  import type { Settings } from '../types';
-  let { theme = 'midnight', compact = false }: { theme?: Settings['theme']; compact?: boolean } = $props();
-  const client = createPreviewClient(false);
-  let ready = $state(false);
+<script lang='ts'>
+  import type { Settings } from '../types'
+  import { onMount } from 'svelte'
+  import App from '../../App.svelte'
+  import { createPreviewClient } from '../adapters/preview'
+
+  const { theme = 'midnight', compact = false }: { theme?: Settings['theme'], compact?: boolean } = $props()
+  const client = createPreviewClient(false)
+  let ready = $state(false)
   onMount(() => {
-    let cancelled = false;
-    void client.execute({ type: 'settings.update', patch: { theme, density: compact ? 'compact' : 'comfortable', reducedMotion: true } }).then(() => { if (!cancelled) ready = true; });
-    return () => { cancelled = true; client.dispose(); };
-  });
+    let cancelled = false
+    void client.execute({ type: 'settings.update', patch: { theme, density: compact ? 'compact' : 'comfortable', reducedMotion: true } }).then(() => {
+      if (!cancelled)
+        ready = true
+    })
+    return () => {
+      cancelled = true
+      client.dispose()
+    }
+  })
 </script>
-<div style="width:100vw;height:100vh">{#if ready}<App {client} />{/if}</div>
+<div style='width:100vw;height:100vh'>{#if ready}<App {client} />{/if}</div>

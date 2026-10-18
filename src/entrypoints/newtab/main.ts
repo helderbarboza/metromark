@@ -1,6 +1,6 @@
-import { mount } from 'svelte';
-import App from '../../App.svelte';
-import { createNativeClient } from '../../lib/adapters/native';
-import '../../styles.css';
+import { mount } from 'svelte'
+import App from '../../App.svelte'
+import { createNativeClient } from '../../lib/adapters/native'
+import '../../styles.css'
 
-mount(App, { target: document.getElementById('app')!, props: { client: createNativeClient() } });
+mount(App, { target: document.getElementById('app')!, props: { client: createNativeClient() } })

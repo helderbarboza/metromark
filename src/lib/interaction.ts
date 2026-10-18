@@ -13,38 +13,40 @@
  */
 
 /** Distance before a touch drag means anything: reveals the selection check. */
-export const REVEAL_PX = 10;
+export const REVEAL_PX = 10
 /**
  * Distance before a tile is picked up for a move rather than only selected.
  * Doubles as the grid's drag activation threshold, so a release between
  * {@link REVEAL_PX} and this value can still select instead of moving.
  */
-export const DRAG_PX = 24;
+export const DRAG_PX = 24
 
 export interface Point {
-	x: number;
-	y: number;
+  x: number
+  y: number
 }
 
-export type CrossSlideState = 'idle' | 'armed' | 'dragging' | 'panning';
-export type ReleaseOutcome = 'open' | 'select' | 'ignore';
+export type CrossSlideState = 'idle' | 'armed' | 'dragging' | 'panning'
+export type ReleaseOutcome = 'open' | 'select' | 'ignore'
 
 export interface Gesture {
-	origin: Point;
-	state: CrossSlideState;
+  origin: Point
+  state: CrossSlideState
 }
 
-export const startGesture = (origin: Point): Gesture => ({ origin, state: 'idle' });
+export const startGesture = (origin: Point): Gesture => ({ origin, state: 'idle' })
 
 /** Classifies a touch position relative to where the gesture started. */
 export function crossSlideState(gesture: Gesture, point: Point): CrossSlideState {
-	const dx = point.x - gesture.origin.x;
-	const dy = point.y - gesture.origin.y;
-	const distance = Math.hypot(dx, dy);
-	if (distance < REVEAL_PX) return 'idle';
-	// Perpendicular to the pan direction: a horizontal swipe belongs to the canvas.
-	if (Math.abs(dx) > Math.abs(dy)) return 'panning';
-	return distance >= DRAG_PX ? 'dragging' : 'armed';
+  const dx = point.x - gesture.origin.x
+  const dy = point.y - gesture.origin.y
+  const distance = Math.hypot(dx, dy)
+  if (distance < REVEAL_PX)
+    return 'idle'
+  // Perpendicular to the pan direction: a horizontal swipe belongs to the canvas.
+  if (Math.abs(dx) > Math.abs(dy))
+    return 'panning'
+  return distance >= DRAG_PX ? 'dragging' : 'armed'
 }
 
 /**
@@ -52,16 +54,19 @@ export function crossSlideState(gesture: Gesture, point: Point): CrossSlideState
  * canvas owns a pan, and the grid owns a drag once it has started.
  */
 export function advanceGesture(gesture: Gesture, point: Point): Gesture {
-	if (gesture.state === 'panning' || gesture.state === 'dragging') return gesture;
-	const state = crossSlideState(gesture, point);
-	return state === gesture.state ? gesture : { ...gesture, state };
+  if (gesture.state === 'panning' || gesture.state === 'dragging')
+    return gesture
+  const state = crossSlideState(gesture, point)
+  return state === gesture.state ? gesture : { ...gesture, state }
 }
 
 /** What a pointer release means for the tile the gesture started on. */
 export function releaseOutcome(gesture: Gesture): ReleaseOutcome {
-	if (gesture.state === 'armed') return 'select';
-	if (gesture.state === 'idle') return 'open';
-	return 'ignore';
+  if (gesture.state === 'armed')
+    return 'select'
+  if (gesture.state === 'idle')
+    return 'open'
+  return 'ignore'
 }
 
 /**
@@ -72,5 +77,5 @@ export function releaseOutcome(gesture: Gesture): ReleaseOutcome {
  * `App.svelte`.
  */
 export function toggleSelection(current: string | null, id: string): string | null {
-	return current === id ? null : id;
+  return current === id ? null : id
 }
