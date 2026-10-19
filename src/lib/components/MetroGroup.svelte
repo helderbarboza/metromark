@@ -1,9 +1,8 @@
 <script lang='ts'>
-  import type { GroupView, Layout, TileView } from '../types'
+  import type { Compactor, GroupView, Layout, LayoutItem, TileView } from '../types'
   import {
     createGridContainer,
     createGridPlaceholder,
-    horizontalCompactor,
   } from '@snapgridjs/svelte'
   import { DRAG_PX } from '../interaction'
   import { cellsToPx, GAP, ROWS, sizeOf, usedCols } from '../layout'
@@ -59,34 +58,145 @@
   const visibleWidth = $derived(cellsToPx(cols, cell))
   const engineCols = $derived(Math.max(usedCols(layout) + 12, layout.length * 4 + 12, 24))
   const movable = $derived(draggable && group.writable)
+
+  function overlaps(a: LayoutItem, b: LayoutItem) {
+    return (
+      a.x < b.x + b.w
+      && a.x + a.w > b.x
+      && a.y < b.y + b.h
+      && a.y + a.h > b.y
+    )
+  }
+
+  /*
+    Start-screen-like packing:
+      1. find the first slot from the top of the first column,
+      2. continue down that column,
+      3. then create/use the next column to the right.
+
+    This is deliberately not SnapGrid's standard horizontal compactor:
+    that one packs items leftward, whereas this packs in Metro's
+    top-to-bottom, then left-to-right reading order.
+  */
+  function metroCompactor(maxRows: number): Compactor {
+    return {
+      type: null,
+      allowOverlap: false,
+
+      compact(layout: Layout, cols: number): Layout {
+        const packed: LayoutItem[] = layout
+          .filter(item => item.static)
+          .map(item => ({ ...item }))
+
+        const movable = layout
+          .filter(item => !item.static)
+          .sort((a, b) => a.x - b.x || a.y - b.y || a.i.localeCompare(b.i))
+
+        for (const item of movable) {
+          let position: { x: number, y: number } | undefined
+
+          // x outer + y inner is column-major placement.
+          for (let x = 0; x <= cols - item.w && !position; x += 1) {
+            for (let y = 0; y <= maxRows - item.h; y += 1) {
+              const candidate = { ...item, x, y }
+              if (!packed.some(placed => overlaps(candidate, placed))) {
+                position = { x, y }
+                break
+              }
+            }
+          }
+
+          packed.push(position ? { ...item, ...position } : { ...item })
+        }
+
+        return packed
+      },
+    }
+  }
+
   const container = createGridContainer(() => ({
+    /*
+    Must be stable and unique for this Start group.
+    This is valid if `group.id` has those properties.
+  */
     id: group.id,
+
+    // Controlled state: the parent owns and persists this.
     layout,
-    width: cellsToPx(engineCols, cell),
+
+    /*
+    Critical: if containerPadding is [0, 0], canvas width must be:
+
+    cols × cell + (cols - 1) × horizontal gap
+
+    Otherwise SnapGrid will stretch/shrink each calculated column.
+  */
+    width: cellsToPx(engineCols, cell, GAP),
+
     gridConfig: {
       cols: engineCols,
       rowHeight: cell,
       margin: [GAP, GAP],
       containerPadding: [0, 0],
+
+      /*
+      Derived from the usable tile canvas height:
+      floor((tileWellHeight + GAP) / (cell + GAP))
+
+      Do not tie this directly to the device’s raw 768/1080 resolution.
+    */
       maxRows: ROWS,
     },
-    compactor: horizontalCompactor,
-    isResizable: false,
+
+    /*
+    Do not use horizontalCompactor for Metro's column-major packing.
+    This compactor closes vertical capacity first, then uses a new
+    column to the right.
+  */
+    compactor: metroCompactor(ROWS),
+
     autoSize: false,
+    isResizable: false,
     isDraggable: movable,
-    // Tiles are always draggable, so the threshold has to leave room for the
-    // cross-slide selection band between REVEAL_PX and DRAG_PX (uwp8 pp. 76-80).
-    dragConfig: { threshold: DRAG_PX },
-    onLayoutChange: next => onLayoutChange(group.id, next),
-    onDragStart,
-    onDrag: (next) => {
-      liveCols = usedCols(next)
+
+    dragConfig: {
+      enabled: movable,
+      bounded: false,
+      snapToGrid: false,
+
+      /*
+      This only delays when SnapGrid claims the gesture as a drag.
+      Your separate cross-slide recognizer should own:
+        0 → REVEAL_PX: selection-band/reveal feedback
+        DRAG_PX+:     permit tile reordering
+    */
+      threshold: DRAG_PX,
     },
-    onDragStop: () => {
+
+    onLayoutChange: (next) => {
+      onLayoutChange(group.id, next)
+    },
+
+    onDragStart: (...args) => {
+      // Preserve enough canvas columns for the current drag.
+      liveCols = usedCols(layout)
+      onDragStart?.(...args)
+    },
+
+    onDrag: (previewLayout) => {
+      /*
+      Grow only while dragging. Do not shrink during a drag,
+      because that changes the canvas geometry under the pointer.
+    */
+      liveCols = Math.max(liveCols, usedCols(previewLayout))
+    },
+
+    onDragStop: (...args) => {
       liveCols = 0
-      onDragStop()
+      onDragStop?.(...args)
     },
   }))
+
   const placeholder = createGridPlaceholder(container.group)
   function href(tile: TileView) {
     try {
