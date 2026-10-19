@@ -54,9 +54,20 @@
   }: Props = $props()
 
   let liveCols = $state(0)
-  const cols = $derived(Math.max(usedCols(layout), liveCols, group.layout.length ? 2 : 4))
+
+  const MIN_GROUP_COLS = 2
+  const EMPTY_GROUP_COLS = 4
+  const ENGINE_COL_HEADROOM = 12
+  const MAX_TILE_COLS = 4
+  const MIN_ENGINE_COLS = 24
+
+  const cols = $derived(Math.max(usedCols(layout), liveCols, group.layout.length ? MIN_GROUP_COLS : EMPTY_GROUP_COLS))
   const visibleWidth = $derived(cellsToPx(cols, cell))
-  const engineCols = $derived(Math.max(usedCols(layout) + 12, layout.length * 4 + 12, 24))
+  const engineCols = $derived(Math.max(
+    usedCols(layout) + ENGINE_COL_HEADROOM,
+    layout.length * MAX_TILE_COLS + ENGINE_COL_HEADROOM,
+    MIN_ENGINE_COLS,
+  ))
   const movable = $derived(draggable && group.writable)
 
   function overlaps(a: LayoutItem, b: LayoutItem) {
@@ -337,7 +348,8 @@
 <style>
   .metro-group {
     flex: none;
-    transition: width 140ms ease;
+    --transition-duration: 140ms;
+    transition: width var(--transition-duration) ease;
   }
   .group-header {
     display: flex;
@@ -404,10 +416,10 @@
     text-decoration: none;
     color: inherit;
     transition:
-      left 140ms,
-      top 140ms,
-      width 140ms,
-      height 140ms;
+      left var(--transition-duration),
+      top var(--transition-duration),
+      width var(--transition-duration),
+      height var(--transition-duration);
   }
   .tile-slot:focus-visible {
     outline: 3px solid var(--accent);
