@@ -825,7 +825,7 @@
       </div>
     {:else}
       <SnapGridGroup>
-        <div class='flex w-max items-start gap-9 px-16 pb-7 max-lg:gap-7 max-lg:px-9 max-md:px-6'>
+        <div class='flex w-max items-center h-full gap-9 px-16 pb-7 max-lg:gap-7 max-lg:px-9 max-md:px-6'>
           {#each visibleGroups as group (group.id)}
             <MetroGroup
               {group}
