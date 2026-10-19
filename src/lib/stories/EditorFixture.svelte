@@ -3,6 +3,7 @@
   import type { Command, Snapshot } from '../types'
   import { onMount } from 'svelte'
   import { createPreviewClient } from '../adapters/preview'
+  import Button from '../components/Button.svelte'
   import Editor from '../components/Editor.svelte'
 
   const { kind = 'bookmark', id }: { kind?: DialogSpec['kind'], id?: string } = $props()
@@ -19,12 +20,13 @@
   })
 </script>
 <div style='width:100vw;height:100vh;background:var(--bg);padding:32px'>
-  <button class='button'
-          onclick={() => open = true}
-  >Open editor</button>
-  {#if snapshot && open}<Editor spec={{ kind, id, parentId: 'bar' }}
-                                {snapshot}
-                                onclose={() => open = false}
-                                oncommand={command}
-  />{/if}
+  <Button onclick={() => open = true}>Open editor</Button>
+  {#if snapshot && open}
+    <Editor
+      spec={{ kind, id, parentId: 'bar' }}
+      {snapshot}
+      onclose={() => open = false}
+      oncommand={command}
+    />
+  {/if}
 </div>

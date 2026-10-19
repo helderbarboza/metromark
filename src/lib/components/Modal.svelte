@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte'
   import { onMount } from 'svelte'
   import Icon from './Icon.svelte'
+  import IconButton from './IconButton.svelte'
 
   interface Props {
     title: string
@@ -51,7 +52,9 @@
         <div class='modal-eyebrow'>{eyebrow}</div>
         <h2>{title}</h2>
       </div>
-      <button class='icon-button' aria-label='Close dialog' onclick={onclose}><Icon name='close' size={18} /></button>
+      <IconButton label='Close dialog' onclick={onclose}>
+        <Icon name='close' size={18} />
+      </IconButton>
     </header>
     {@render children()}
   </div>
@@ -96,7 +99,7 @@
     letter-spacing: -1px;
     margin: 0;
   }
-  .modal-header .icon-button {
+  .modal-header :global(button.icon-button) {
     margin-right: -7px;
   }
   dialog.drawer {

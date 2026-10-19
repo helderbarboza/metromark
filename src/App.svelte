@@ -11,9 +11,11 @@
   } from './lib/types'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { onMount } from 'svelte'
+  import Button from './lib/components/Button.svelte'
   import ContextMenu from './lib/components/ContextMenu.svelte'
   import Editor from './lib/components/Editor.svelte'
   import Icon from './lib/components/Icon.svelte'
+  import IconButton from './lib/components/IconButton.svelte'
   import MetroAppBar from './lib/components/MetroAppBar.svelte'
   import MetroGroup from './lib/components/MetroGroup.svelte'
   import UndoToast from './lib/components/UndoToast.svelte'
@@ -786,7 +788,7 @@
   <!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
   <main
     id='canvas'
-    class='relative min-h-0 flex-1 overflow-auto scroll-smooth pt-4 outline-none scrollbar-none] [&::-webkit-scrollbar]:hidden 2xl:pt-6'
+    class='relative min-h-0 flex-1 overflow-auto scroll-smooth pt-4 outline-none scrollbar-none [&::-webkit-scrollbar]:hidden 2xl:pt-6'
     class:is-dragging={dragging}
     bind:this={scroller}
     onscroll={updateScroll}
@@ -821,7 +823,7 @@
         <p class='mb-6 px-5 text-xs leading-relaxed'>
           Nothing matches “{query}”. Try a title, website, or folder.
         </p>
-        <button class='button' onclick={() => (query = '')}>Clear search</button>
+        <Button onclick={() => (query = '')}>Clear search</Button>
       </div>
     {:else}
       <SnapGridGroup>
@@ -944,22 +946,22 @@
         {/if}
       </div>
       <div class='flex items-center gap-0.5'>
-        <button
-          class='icon-button h-7 w-6 rounded disabled:opacity-25'
-          aria-label='Scroll groups left'
+        <IconButton
+          label='Scroll groups left'
+          class='h-7 w-6 rounded disabled:opacity-25'
           disabled={!canScroll || scrollProgress < 0.01}
           onclick={() => scroll(-1)}
         >
           <Icon name='back' size={17} />
-        </button>
-        <button
-          class='icon-button h-7 w-6 rounded disabled:opacity-25'
-          aria-label='Scroll groups right'
+        </IconButton>
+        <IconButton
+          label='Scroll groups right'
+          class='h-7 w-6 rounded disabled:opacity-25'
           disabled={!canScroll || scrollProgress > 0.99}
           onclick={() => scroll(1)}
         >
           <Icon name='chevron' size={17} />
-        </button>
+        </IconButton>
       </div>
     </div>
   </footer>
@@ -1033,3 +1035,26 @@
     />
   {/if}
 </div>
+
+<style>
+  .is-dragging :global(.snapgrid-item:not([data-dragging]) .metro-tile) {
+    transform: scale(.93);
+    opacity: .85;
+  }
+  .is-dragging :global(.snapgrid-item[data-dragging]) {
+    z-index: 10;
+  }
+  .is-dragging :global(.snapgrid-item[data-dragging] .metro-tile) {
+    transform: scale(1.04);
+    opacity: .95;
+    box-shadow: 0 10px 30px #0007;
+  }
+  .reduced .is-dragging :global(.snapgrid-item .metro-tile) {
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .is-dragging :global(.snapgrid-item .metro-tile) {
+      transform: none;
+    }
+  }
+</style>

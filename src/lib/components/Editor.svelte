@@ -28,6 +28,7 @@
     projectGroups,
     tileFor,
   } from '../tree'
+  import Button from './Button.svelte'
   import Icon from './Icon.svelte'
   import Modal from './Modal.svelte'
 
@@ -259,25 +260,16 @@
       {#if confirmReset}
         <div class='reset-confirm'>
           <p>Reset layouts for every group?</p>
-          <button
-            class='button primary'
-            disabled={busy}
-            onclick={() => send({ type: 'layout.reset' })}
-          >
+          <Button variant='primary' disabled={busy} onclick={() => send({ type: 'layout.reset' })}>
             Reset with Undo
-          </button>
-          <button class='button' onclick={() => (confirmReset = false)}>
-            Cancel
-          </button>
+          </Button>
+          <Button onclick={() => (confirmReset = false)}>Cancel</Button>
         </div>
       {:else}
-        <button
-          class='button reset-button'
-          onclick={() => (confirmReset = true)}
-        >
+        <Button class='reset-button' onclick={() => (confirmReset = true)}>
           <Icon name='reset' size={15} />
           Reset tile layouts
-        </button>
+        </Button>
       {/if}
     </div>
     <div class='privacy-note'>
@@ -295,9 +287,9 @@
         <span>DEMO WORKSPACE</span>
         <p>This preview uses sample bookmarks, not your real browser data.</p>
         {#if confirmPreview}
-          <button class='button' disabled={busy} onclick={resetPreview}>
+          <Button disabled={busy} onclick={resetPreview}>
             Confirm demo reset
-          </button>
+          </Button>
         {:else}
           <button onclick={() => (confirmPreview = true)}>Restore sample bookmarks</button>
         {/if}
@@ -324,15 +316,11 @@
       <p class='form-error' role='alert'>{error}</p>
     {/if}
     <div class='dialog-actions'>
-      <button class='button' onclick={onclose}>Keep folder</button>
-      <button
-        class='button danger'
-        disabled={busy}
-        onclick={() => send({ type: 'node.remove', id: node.id })}
-      >
+      <Button onclick={onclose}>Keep folder</Button>
+      <Button variant='danger' disabled={busy} onclick={() => send({ type: 'node.remove', id: node.id })}>
         <Icon name='trash' size={15} />
         {busy ? 'Deleting…' : 'Delete folder'}
-      </button>
+      </Button>
     </div>
   {:else if spec.kind === 'copy'}
     <p class='dialog-description'>
@@ -348,7 +336,7 @@
       onfocus={event => event.currentTarget.select()}
     />
     <div class='dialog-actions'>
-      <button class='button primary' onclick={onclose}>Done</button>
+      <Button variant='primary' onclick={onclose}>Done</Button>
     </div>
   {:else}
     <form onsubmit={submit}>
@@ -478,9 +466,9 @@
         <p class='form-error' role='alert'>{error}</p>
       {/if}
       <div class='dialog-actions'>
-        <button class='button' type='button' onclick={onclose}> Cancel </button>
-        <button
-          class='button primary'
+        <Button type='button' onclick={onclose}> Cancel </Button>
+        <Button
+          variant='primary'
           type='submit'
           disabled={busy || ((spec.kind === 'move'
             || spec.kind === 'restore'
@@ -499,7 +487,7 @@
             : spec.kind === 'bookmark' && !node
             ? 'Add bookmark'
             : 'Save changes'}
-        </button>
+        </Button>
       </div>
     </form>
   {/if}
@@ -616,7 +604,7 @@
     background: var(--accent-ink);
     transform: translateX(13px);
   }
-  .reset-button {
+  :global(.reset-button) {
     width: 100%;
     margin-top: 15px;
     height: 37px;
@@ -629,7 +617,7 @@
     font-size: 11px;
     margin: 0 0 12px;
   }
-  .reset-confirm .button {
+  .reset-confirm :global(button.button) {
     height: 36px;
     font-size: 10px;
     margin-right: 5px;
@@ -731,5 +719,62 @@
   .delete-summary span {
     font-size: 11px;
     color: var(--muted);
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin: 0 0 21px;
+  }
+  .field-label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .field input:not([type=color]), .field select, .copy-input {
+    width: 100%;
+    height: 45px;
+    padding: 0 13px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 13px;
+    outline-offset: 1px;
+  }
+  .field input::placeholder {
+    color: var(--muted);
+    opacity: .6;
+  }
+  .field select {
+    padding-right: 28px;
+  }
+  .field-hint {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .form-error {
+    color: var(--danger);
+    font-size: 12px;
+    padding: 11px 13px;
+    border: 1px solid #ef979133;
+    background: #ef979108;
+    border-radius: 4px;
+    margin: 0 0 20px;
+    line-height: 1.6;
+  }
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 28px;
+  }
+  .dialog-description {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin: 0 0 26px;
   }
 </style>

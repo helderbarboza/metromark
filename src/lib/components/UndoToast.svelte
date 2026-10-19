@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { Notice } from '../types'
   import Icon from './Icon.svelte'
+  import IconButton from './IconButton.svelte'
 
   interface Props { notice: Notice, onundo?: () => void, onclose: () => void }
 
@@ -19,11 +20,9 @@
     aria-live='polite'
   >{notice.message}</span>
   {#if onundo}<button class='undo-button' onclick={onundo}><Icon name='undo' size={14} />Undo</button>{/if}
-  <button
-    class='icon-button toast-close'
-    aria-label='Dismiss notification'
-    onclick={onclose}
-  ><Icon name='close' size={14} /></button>
+  <IconButton label='Dismiss notification' class='toast-close' onclick={onclose}>
+    <Icon name='close' size={14} />
+  </IconButton>
 </div>
 
 <style>
@@ -69,7 +68,7 @@
     height: 26px;
     white-space: nowrap;
   }
-  .toast-close {
+  .toast :global(.icon-button.toast-close) {
     width: 25px;
     height: 25px;
     flex-shrink: 0;

@@ -17,3 +17,18 @@
   style:width='{size}px'
   style:height='{size}px'
 >{@html getIcon(name)}</span>
+
+<style>
+  .icon {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+</style>

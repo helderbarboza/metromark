@@ -42,6 +42,14 @@
     outline: none;
     animation: metro-splash-in 380ms cubic-bezier(0.1, 0.9, 0.2, 1) both;
   }
+  .icon {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
   .icon :global(svg) {
     width: 140px;
     height: 140px;

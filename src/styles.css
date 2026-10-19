@@ -72,36 +72,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 button:focus:not(:focus-visible) { outline: none; }
 ::selection { background: var(--accent); color: var(--accent-ink); }
 svg { width: 100%; height: 100%; display: block; }
-.icon { display: inline-flex; width: 18px; height: 18px; flex-shrink: 0; align-items: center; justify-content: center; }
-.icon svg { width: 100%; height: 100%; }
-.icon-button { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--muted); border: 1px solid transparent; border-radius: 6px; }
-.icon-button:hover { color: var(--text); background: var(--surface-hover); }
-.button { height: 42px; padding: 0 17px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; font-size: 12px; font-weight: 550; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--text); transition: background 140ms; white-space: nowrap; }
-.button:hover { background: var(--surface-hover); }
-.button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.button.primary:hover { filter: brightness(1.06); }
-.button.danger { background: #7c302f; border-color: #954541; color: #fff; }
-.button:disabled { opacity: .45; }
-.field { display: flex; flex-direction: column; gap: 9px; margin: 0 0 21px; }
-.field-label { color: var(--text); font-size: 12px; font-weight: 500; }
-.field input:not([type=color]), .field select, .copy-input { width: 100%; height: 45px; padding: 0 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; color: var(--text); font-size: 13px; outline-offset: 1px; }
-.field input::placeholder { color: var(--muted); opacity: .6; }
-.field select { padding-right: 28px; }
-.field-hint { color: var(--muted); font-size: 11px; line-height: 1.65; margin: 0; }
-.form-error { color: var(--danger); font-size: 12px; padding: 11px 13px; border: 1px solid #ef979133; background: #ef979108; border-radius: 4px; margin: 0 0 20px; line-height: 1.6; }
-.dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 28px; }
-.dialog-description { font-size: 13px; line-height: 1.8; color: var(--muted); margin: 0 0 26px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-/* While a tile is on the move the rest of the canvas recedes and the moving tile
-   lifts (metro-reference Start screen); the movement itself is the feedback, so
-   nothing extra is drawn during a pan (uwp8 p. 108). */
-.is-dragging .snapgrid-item:not([data-dragging]) .metro-tile { transform: scale(.93); opacity: .85; }
-.is-dragging .snapgrid-item[data-dragging] { z-index: 10; }
-.is-dragging .snapgrid-item[data-dragging] .metro-tile { transform: scale(1.04); opacity: .95; box-shadow: 0 10px 30px #0007; }
-.reduced .is-dragging .snapgrid-item .metro-tile { transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  .is-dragging .snapgrid-item .metro-tile { transform: none; }
-}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

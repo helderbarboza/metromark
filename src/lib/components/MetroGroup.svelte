@@ -10,6 +10,7 @@
   import { validateUrl } from '../tree'
   import GridTile from './GridTile.svelte'
   import Icon from './Icon.svelte'
+  import IconButton from './IconButton.svelte'
   import MetroTile from './MetroTile.svelte'
 
   interface Props {
@@ -197,13 +198,13 @@
         {/if}
       </div>
     </div>
-    <button
-      class='icon-button group-menu'
-      aria-label="Manage {group.title || 'unnamed group'}"
+    <IconButton
+      label="Manage {group.title || 'unnamed group'}"
+      class='group-menu'
       onclick={event => onContext(event, 'group', group.id)}
     >
       <Icon name='more' size={17} />
-    </button>
+    </IconButton>
   </header>
   <!-- Right-click only; standard keyboard management is provided by the labeled heading button. -->
   <div
@@ -333,15 +334,15 @@
     font-size: 11px;
     font-variant-numeric: tabular-nums;
   }
-  .group-menu {
+  .metro-group :global(.icon-button.group-menu) {
     width: 38px;
     height: 38px;
     border-radius: 3px;
     opacity: 0.85;
     flex-shrink: 0;
   }
-  .metro-group:hover .group-menu,
-  .group-menu:focus-visible {
+  .metro-group:hover :global(.icon-button.group-menu),
+  :global(.icon-button.group-menu):focus-visible {
     opacity: 1;
   }
   .metro-grid {
