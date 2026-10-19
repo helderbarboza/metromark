@@ -747,7 +747,7 @@
   class:reduced={snapshot?.settings.reducedMotion}
 >
   <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
-    <div class='flex items-center justify-between gap-5 border-b border-(--line) pb-3.5 max-sm:pb-2.5'>
+    <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
       <nav
         class='flex min-w-0 gap-1.5 overflow-x-auto p-0.5 scrollbar-thin'
         aria-label='Bookmark roots'
@@ -788,7 +788,7 @@
   <!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
   <main
     id='canvas'
-    class='relative min-h-0 flex-1 overflow-auto scroll-smooth pt-4 outline-none scrollbar-none [&::-webkit-scrollbar]:hidden 2xl:pt-6'
+    class='relative min-h-0 flex-1 overflow-auto scroll-smooth  outline-none scrollbar-none [&::-webkit-scrollbar]:hidden  '
     class:is-dragging={dragging}
     bind:this={scroller}
     onscroll={updateScroll}
@@ -827,7 +827,7 @@
       </div>
     {:else}
       <SnapGridGroup>
-        <div class='flex w-max items-center h-full gap-9 px-16 pb-7 max-lg:gap-7 max-lg:px-9 max-md:px-6'>
+        <div class='flex w-max items-center h-full gap-9 px-16 max-lg:gap-7 max-lg:px-9 max-md:px-6'>
           {#each visibleGroups as group (group.id)}
             <MetroGroup
               {group}
