@@ -1,8 +1,9 @@
 <script lang='ts'>
-  import type { Compactor, GroupView, Layout, LayoutItem, TileView } from '../types'
+  import type { GroupView, Layout, TileView } from '../types'
   import {
     createGridContainer,
     createGridPlaceholder,
+    horizontalCompactor,
   } from '@snapgridjs/svelte'
   import { DRAG_PX } from '../interaction'
   import { cellsToPx, GAP, ROWS, sizeOf, usedCols } from '../layout'
@@ -70,61 +71,6 @@
   ))
   const movable = $derived(draggable && group.writable)
 
-  function overlaps(a: LayoutItem, b: LayoutItem) {
-    return (
-      a.x < b.x + b.w
-      && a.x + a.w > b.x
-      && a.y < b.y + b.h
-      && a.y + a.h > b.y
-    )
-  }
-
-  /*
-    Start-screen-like packing:
-      1. find the first slot from the top of the first column,
-      2. continue down that column,
-      3. then create/use the next column to the right.
-
-    This is deliberately not SnapGrid's standard horizontal compactor:
-    that one packs items leftward, whereas this packs in Metro's
-    top-to-bottom, then left-to-right reading order.
-  */
-  function metroCompactor(maxRows: number): Compactor {
-    return {
-      type: null,
-      allowOverlap: false,
-
-      compact(layout: Layout, cols: number): Layout {
-        const packed: LayoutItem[] = layout
-          .filter(item => item.static)
-          .map(item => ({ ...item }))
-
-        const movable = layout
-          .filter(item => !item.static)
-          .sort((a, b) => a.x - b.x || a.y - b.y || a.i.localeCompare(b.i))
-
-        for (const item of movable) {
-          let position: { x: number, y: number } | undefined
-
-          // x outer + y inner is column-major placement.
-          for (let x = 0; x <= cols - item.w && !position; x += 1) {
-            for (let y = 0; y <= maxRows - item.h; y += 1) {
-              const candidate = { ...item, x, y }
-              if (!packed.some(placed => overlaps(candidate, placed))) {
-                position = { x, y }
-                break
-              }
-            }
-          }
-
-          packed.push(position ? { ...item, ...position } : { ...item })
-        }
-
-        return packed
-      },
-    }
-  }
-
   const container = createGridContainer(() => ({
     /*
     Must be stable and unique for this Start group.
@@ -159,12 +105,7 @@
       maxRows: ROWS,
     },
 
-    /*
-    Do not use horizontalCompactor for Metro's column-major packing.
-    This compactor closes vertical capacity first, then uses a new
-    column to the right.
-  */
-    compactor: metroCompactor(ROWS),
+    compactor: horizontalCompactor,
 
     autoSize: false,
     isResizable: false,
@@ -188,10 +129,10 @@
       onLayoutChange(group.id, next)
     },
 
-    onDragStart: (...args) => {
+    onDragStart: () => {
       // Preserve enough canvas columns for the current drag.
       liveCols = usedCols(layout)
-      onDragStart?.(...args)
+      onDragStart()
     },
 
     onDrag: (previewLayout) => {
@@ -202,9 +143,9 @@
       liveCols = Math.max(liveCols, usedCols(previewLayout))
     },
 
-    onDragStop: (...args) => {
+    onDragStop: () => {
       liveCols = 0
-      onDragStop?.(...args)
+      onDragStop()
     },
   }))
 
