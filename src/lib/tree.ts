@@ -84,7 +84,17 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
       tile.size = item ? sizeOf(item) : tile.size
       return [bookmark.id, tile]
     }))
-    result.push({ id: node.id, title: node.title || 'Untitled folder', path: currentPath, rootId, isSystem: isContainer(node, snapshot.tree), mutable: canModify(node, snapshot.tree), writable: !isManaged(node, nodes), layout, tiles })
+    result.push({
+      id: node.id,
+      title: node.title || 'Untitled folder',
+      path: currentPath,
+      rootId,
+      isSystem: isContainer(node, snapshot.tree),
+      mutable: canModify(node, snapshot.tree),
+      writable: !isManaged(node, nodes),
+      layout,
+      tiles,
+    })
     for (const child of node.children ?? []) {
       if (isFolder(child))
         walk(child, currentPath, rootId)
@@ -98,7 +108,19 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
     // Some imported/alternate API trees can expose real direct links; do not silently omit them.
     const links = (root.children ?? []).filter(isBookmark)
     if (links.length) {
-      result.unshift({ id: root.id, title: '', path: [], rootId: root.id, isSystem: true, mutable: false, writable: false, layout: reconcileLayout(links, snapshot.layouts[root.id], snapshot.appearance), tiles: Object.fromEntries(links.map(node => [node.id, tileFor(node, snapshot.appearance[node.id], snapshot.tree)])) })
+      result.unshift(
+        {
+          id: root.id,
+          title: '',
+          path: [],
+          rootId: root.id,
+          isSystem: true,
+          mutable: false,
+          writable: false,
+          layout: reconcileLayout(links, snapshot.layouts[root.id], snapshot.appearance),
+          tiles: Object.fromEntries(links.map(node => [node.id, tileFor(node, snapshot.appearance[node.id], snapshot.tree)])),
+        },
+      )
     }
   }
   return result
