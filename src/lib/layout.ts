@@ -1,7 +1,7 @@
 import type { Layout, LayoutItem } from '@snapgridjs/core'
 import type { Appearance, BookmarkNode, TileSize } from './types'
 
-export const ROWS = 6
+export const ROWS = 8
 export const GAP = 8
 export const SIZES: Record<TileSize, [number, number]> = {
   small: [1, 1],
