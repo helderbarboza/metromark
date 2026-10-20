@@ -779,6 +779,7 @@
 <ModeWatcher
   defaultMode='system'
   disableHeadScriptInjection
+  synchronousModeChanges
 />
 <span
   bind:this={themeColorProbe}

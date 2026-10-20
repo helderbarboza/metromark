@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { Snippet } from 'svelte'
   import type { MetroTileDef, TileSize } from '../types'
+  import { mode, theme } from 'mode-watcher'
   import { faviconRequestForTile } from '../icon-sources'
   import { resolveTileColors } from '../theme-colors'
   import FaviconIcon from './FaviconIcon.svelte'
@@ -27,14 +28,22 @@
     children,
   }: Props = $props()
 
-  const { bg: bgColor, fg: fgValue } = $derived(resolveTileColors(tile))
-  const fg = $derived(fgValue === 1 ? '#ffffff' : '#000000')
+  // Reactive colors that update when theme/mode changes
+  let colors = $state(resolveTileColors(tile))
+  const bgColor = $derived(colors.bg)
+  const fg = $derived(colors.fg === 1 ? '#ffffff' : '#000000')
+
+  // Update colors when theme/mode changes
+  $effect(() => {
+    // Read theme/mode to create reactive dependency
+    void mode.current
+    void theme.current
+    // Update colors when theme/mode changes
+    colors = resolveTileColors(tile)
+  })
+
   const showLive = $derived(Boolean(tile.faces?.length) && size !== 'small')
-  // The check is the selection mark (uwp8 pp. 80, 111) and doubles as the
-  // self-revealing preview while a cross-slide gesture is still armed.
   const checked = $derived(selected || revealed)
-  // Tiles render the site's original favicon, falling back to the generic
-  // globe when the page has no cached favicon or conversion fails.
   const faviconRequest = $derived(faviconRequestForTile(size))
   const requestSize = $derived(faviconRequest.requestSize)
   const convertSize = $derived(faviconRequest.requestSize)
@@ -171,13 +180,10 @@
     transform: perspective(600px) rotateX(var(--tilt-x, 0deg))
       rotateY(var(--tilt-y, 0deg)) scale(0.97);
   }
-  /* Selection reads as a shape, not only a color: inset outline plus a corner check. */
   .metro-tile.selected {
     outline: 3px solid var(--tile-fg);
     outline-offset: -3px;
   }
-  /* Self-revealing cross-slide (uwp8 p. 111): the tile slides down to show the
-  check it would get. */
   .metro-tile.revealed {
     transform: translateY(6px);
   }
@@ -260,7 +266,6 @@
   .metro-tile-large .tile-domain {
     font-size: 12px;
   }
-  /* Corner check: a triangle of the foreground color with the check cut from the tile color. */
   .tile-check {
     position: absolute;
     top: 0;
@@ -306,7 +311,6 @@
       transform: none;
     }
   }
-  /* The in-app reduced-motion setting disables the same press motion. */
   :global(.reduced) .metro-tile:active,
   :global(.reduced) .metro-tile.revealed,
   :global(.reduced) .metro-tile.revealed:active {

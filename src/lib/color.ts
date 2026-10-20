@@ -1,5 +1,4 @@
-export function foreground(bgColor: string) {
-  // Accepts "#RRGGBB", "RRGGBB", "#RGB", or [r, g, b] (0-255)
+export function foreground(bgColor: string | number[]): number {
   let r: number
   let g: number
   let b: number
@@ -7,22 +6,43 @@ export function foreground(bgColor: string) {
   if (Array.isArray(bgColor)) {
     [r, g, b] = bgColor
   }
-  else {
-    let hex = bgColor.replace('#', '')
-    if (hex.length === 3) {
-      hex = hex.split('').map(c => c + c).join('')
+  else if (typeof bgColor === 'string') {
+    const trimmed = bgColor.trim()
+    if (trimmed.length === 0) {
+      return 0
     }
-    r = Number.parseInt(hex.substring(0, 2), 16)
-    g = Number.parseInt(hex.substring(2, 4), 16)
-    b = Number.parseInt(hex.substring(4, 6), 16)
+    // Parse rgb(r, g, b) or rgba(r, g, b, a)
+    const rgbMatch = trimmed.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
+    if (rgbMatch) {
+      r = Number.parseInt(rgbMatch[1], 10)
+      g = Number.parseInt(rgbMatch[2], 10)
+      b = Number.parseInt(rgbMatch[3], 10)
+    }
+    else {
+      const hex = trimmed.replace('#', '')
+      if (hex.length === 0 || !/^[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(hex)) {
+        return 0
+      }
+      if (hex.length === 3) {
+        r = Number.parseInt(hex[0] + hex[0], 16)
+        g = Number.parseInt(hex[1] + hex[1], 16)
+        b = Number.parseInt(hex[2] + hex[2], 16)
+      }
+      else {
+        r = Number.parseInt(hex.substring(0, 2), 16)
+        g = Number.parseInt(hex.substring(2, 4), 16)
+        b = Number.parseInt(hex.substring(4, 6), 16)
+      }
+    }
+  }
+  else {
+    return 0
   }
 
-  // Normalize to 0-1
   r /= 255
   g /= 255
   b /= 255
 
-  // Linearize sRGB channels (gamma correction)
   const linearize = (channel: number) =>
     channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
 
@@ -30,9 +50,7 @@ export function foreground(bgColor: string) {
   const G = linearize(g)
   const B = linearize(b)
 
-  // Relative luminance (WCAG formula)
   const luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B
 
-  // Threshold derived from equal-contrast condition
-  return luminance > 0.179 ? 0 : 1 // 0 = black, 1 = white
+  return luminance > 0.179 ? 0 : 1
 }

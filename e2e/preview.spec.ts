@@ -272,3 +272,47 @@ test('touch cross-slide selects instead of launching, and picks the tile up past
   await expect(page.locator('.grid-placeholder')).toHaveCount(0)
   expect(popups).toEqual([])
 })
+
+test('theme accent foreground contrast adapts to mode and theme', async ({ page }) => {
+  await start(page)
+
+  // In metro-light (initial), Notion has colorIndex 3 -> base0B #6bb71f (bright green)
+  // which should produce black text.
+  const notion = link(page, 'Notion')
+  await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
+
+  // Figma has colorIndex 0 -> base08 #b72c1f (dark red) which should produce white text.
+  const figma = link(page, 'Figma')
+  await expect(figma.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+
+  // Switch to dark mode (metro-dark) via Appearance dialog
+  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
+  await page.getByRole('button', { name: 'Dark', exact: true }).click()
+  await page.keyboard.press('Escape')
+
+  // In metro-dark all accent colors are bright, so both tiles should have black text now.
+  await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(figma.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(0, 0, 0)')
+
+  // Switch back to light mode
+  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
+  await page.getByRole('button', { name: 'Light', exact: true }).click()
+  await page.keyboard.press('Escape')
+
+  // Back to metro-light: Notion black, Figma white.
+  await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(figma.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+
+  // Switch theme to one-light (another light theme with different accent colors)
+  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
+  await page.getByRole('button', { name: 'One Light', exact: true }).click()
+  await page.keyboard.press('Escape')
+
+  // In one-light, colorIndex 3 -> base0B #50a14f (green) -> black
+  // colorIndex 0 -> base08 #ca1243 (red) -> white
+  await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(figma.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+})
