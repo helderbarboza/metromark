@@ -55,7 +55,7 @@
       if (current !== runId)
         return
       convertedSrc = undefined
-      errorMessage = (error as Error).message
+      errorMessage = error instanceof Error ? error.message : String(error)
     }
     finally {
       if (current === runId)
@@ -75,7 +75,17 @@
 
   // Reconvert when Storybook controls change and the image is already ready.
   $effect(() => {
-    const signature = [size, tint, filled, bg, iconShape, preserveTransparency, clipGlyphToShape, src].join('|')
+    const signature = [
+      size,
+      tint,
+      filled,
+      bg,
+      iconShape,
+      preserveTransparency,
+      clipGlyphToShape,
+      src,
+    ].join('|')
+
     if (!signature)
       return
     if (img?.complete && img.naturalWidth > 0) {

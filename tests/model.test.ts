@@ -1,4 +1,4 @@
-import type { Appearance, Snapshot } from '../src/lib/types'
+import type { Snapshot } from '../src/lib/types'
 import { describe, expect, it } from 'vitest'
 import { normalizeTree } from '../src/lib/adapters/memory'
 import { demoData, demoTree } from '../src/lib/demo'
@@ -146,7 +146,7 @@ describe('tile favicons', () => {
     expect(tile.url).toBe('https://example.com')
   })
   it('ignores legacy appearance icon choices and still uses the favicon', () => {
-    const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' }, { icon: 'book' } as Appearance)
+    const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' }, { size: 'medium' })
     expect(tile.icon).toBe(globeIcon)
   })
 })

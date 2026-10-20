@@ -5,7 +5,12 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import EditorFixture from './EditorFixture.svelte'
 
-  const { Story } = defineMeta({ title: 'Metro/Bookmark editor', component: EditorFixture, tags: ['autodocs'], parameters: { layout: 'fullscreen' } })
+  const { Story } = defineMeta({
+    title: 'Metro/Bookmark editor',
+    component: EditorFixture,
+    tags: ['autodocs'],
+    parameters: { layout: 'fullscreen' },
+  })
 </script>
 <Story name='Add bookmark' />
 <Story

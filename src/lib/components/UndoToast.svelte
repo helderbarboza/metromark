@@ -13,13 +13,19 @@
 </script>
 
 <div class='toast' class:error={notice.tone === 'error'}>
-  <span class='toast-icon'><Icon name={notice.tone === 'error' ? 'close' : 'check'} size={16} /></span>
+  <span class='toast-icon'>
+    <Icon name={notice.tone === 'error' ? 'close' : 'check'} size={16} />
+  </span>
   <span
     class='toast-message'
     role='status'
     aria-live='polite'
   >{notice.message}</span>
-  {#if onundo}<button class='undo-button' onclick={onundo}><Icon name='undo' size={14} />Undo</button>{/if}
+  {#if onundo}
+    <button class='undo-button' onclick={onundo}>
+      <Icon name='undo' size={14} />Undo
+    </button>
+  {/if}
   <IconButton label='Dismiss notification' class='toast-close' onclick={onclose}>
     <Icon name='close' size={14} />
   </IconButton>

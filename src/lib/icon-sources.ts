@@ -5,6 +5,13 @@
 
 import type { TileSize } from './types'
 
+declare global {
+  interface Window {
+    chrome?: { runtime?: { getURL?: (path: string) => string } }
+    browser?: { runtime?: { getURL?: (path: string) => string } }
+  }
+}
+
 export type ConvertFailureKind = 'cors-taint' | 'load-failure' | 'unsupported-type' | 'unknown'
 
 /** Classify a converter failure so the UI can explain it instead of swallowing it. */
@@ -104,11 +111,7 @@ export function buildExtensionFaviconUrl(
 /** Resolve the `/_favicon/` base via the extension runtime when available. */
 function getExtensionFaviconBase(): string | null {
   try {
-    const scope = globalThis as {
-      chrome?: { runtime?: { getURL?: (path: string) => string } }
-      browser?: { runtime?: { getURL?: (path: string) => string } }
-    }
-    const getURL = scope.chrome?.runtime?.getURL ?? scope.browser?.runtime?.getURL
+    const getURL = window.chrome?.runtime?.getURL ?? window.browser?.runtime?.getURL
     if (!getURL)
       return null
     return getURL('/_favicon/')

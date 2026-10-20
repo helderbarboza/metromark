@@ -299,8 +299,8 @@
       showContext(event, 'tile', id)
       return
     }
-    selectionOrigin
-      = (event.target as HTMLElement).closest<HTMLElement>('a, button') ?? null
+    const target = event.target instanceof HTMLElement ? event.target : null
+    selectionOrigin = target?.closest<HTMLElement>('a, button') ?? null
     // Right-click always shows the commands for the tile it was pressed on; the
     // cross-slide gesture is what cancels a selection (uwp8 pp. 81-82).
     selectedId = id
@@ -321,8 +321,8 @@
   }
   /** Cross-slide selection from a touch or pen gesture (uwp8 pp. 79-80). */
   function selectByGesture(id: string, event: PointerEvent) {
-    selectionOrigin
-      = (event.target as HTMLElement).closest<HTMLElement>('a, button') ?? null
+    const target = event.target instanceof HTMLElement ? event.target : null
+    selectionOrigin = target?.closest<HTMLElement>('a, button') ?? null
     selectedId = toggleSelection(selectedId, id)
   }
   function clearSelection() {
@@ -342,13 +342,17 @@
     if (dragging)
       return
     // Activating a tile opens it; pressing anywhere else drops the selection (p. 82).
-    if ((event.target as HTMLElement).closest('[data-grid-id], .tile-slot'))
+    const target = event.target instanceof HTMLElement ? event.target : null
+    if (target?.closest('[data-grid-id], .tile-slot'))
       return
     clearSelection()
   }
   /** Searching replaces the grid with a filtered, non-interactive view. */
   function search(event: Event) {
-    query = (event.currentTarget as HTMLInputElement).value
+    const input = event.currentTarget instanceof HTMLInputElement ? event.currentTarget : null
+    if (input) {
+      query = input.value
+    }
     if (query.trim())
       clearSelection()
   }
@@ -357,9 +361,11 @@
     contextOrigin?.focus({ preventScroll: true })
   }
   function openMore(event: MouseEvent) {
-    const origin = event.currentTarget as HTMLElement
-    const rect = origin.getBoundingClientRect()
-    more = { x: rect.left, y: rect.top, origin }
+    const origin = event.currentTarget instanceof HTMLElement ? event.currentTarget : null
+    if (origin) {
+      const rect = origin.getBoundingClientRect()
+      more = { x: rect.left, y: rect.top, origin }
+    }
   }
   function closeMore() {
     const origin = more?.origin ?? null
@@ -373,8 +379,8 @@
   ) {
     event.preventDefault()
     event.stopPropagation()
-    contextOrigin
-      = (event.target as HTMLElement).closest<HTMLElement>('a, button') ?? null
+    const origin = event.target instanceof HTMLElement ? event.target : null
+    contextOrigin = origin?.closest<HTMLElement>('a, button') ?? null
     const rect = contextOrigin?.getBoundingClientRect()
     const keyboardOrButton
       = event.type === 'click' || (event.clientX === 0 && event.clientY === 0)
@@ -588,7 +594,8 @@
   function stageLayout(id: string, layout: Layout) {
     draftLayouts = { ...draftLayouts, [id]: layout }
     clearTimeout(layoutTimer)
-    // Source and destination callbacks belong to one gesture. Never treat source removal as deletion.
+    // Source and destination callbacks belong to one gesture. Never treat
+    // source removal as deletion.
     layoutTimer = setTimeout(() => {
       const committed = structuredClone(draftLayouts)
       void execute({ type: 'layout.commit', layouts: committed }).finally(
@@ -775,24 +782,44 @@
 />
 <span
   bind:this={themeColorProbe}
-  class='fixed size-px hidden pointer-events-none bg-(--bg)'
+  class='pointer-events-none fixed hidden size-px bg-(--bg)'
   aria-hidden='true'
 >
 </span>
 <div
-  class='flex h-dvh w-full flex-col overflow-hidden relative bg-(--bg) text-(--text)'
+  class='
+    relative flex h-dvh w-full flex-col overflow-hidden bg-(--bg) text-(--text)
+  '
   class:reduced={snapshot?.settings.reducedMotion}
 >
-  <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
-    <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
+  <header
+    class='
+      shrink-0 px-16 pt-8
+      max-lg:px-9
+      max-md:px-6 max-md:pt-6
+    '
+  >
+    <div
+      class='
+        flex items-center justify-between gap-5 pb-3.5
+        max-sm:pb-2.5
+      '
+    >
       <nav
-        class='flex min-w-0 gap-1.5 overflow-x-auto p-0.5 scrollbar-thin'
+        class='flex min-w-0 scrollbar-thin gap-1.5 overflow-x-auto p-0.5'
         aria-label='Bookmark roots'
       >
         <button
           class={rootFilter === 'all'
-            ? 'flex h-7 items-center gap-2 rounded bg-(--surface-hover) px-2 text-xs whitespace-nowrap text-(--text)'
-            : 'flex h-7 items-center gap-2 rounded bg-transparent px-2 text-xs whitespace-nowrap text-(--muted) hover:text-(--text)'}
+            ? `
+              flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2
+              text-xs whitespace-nowrap text-(--text)
+            `
+            : `
+              flex h-7 items-center gap-2 rounded-sm bg-transparent px-2 text-xs
+              whitespace-nowrap text-(--muted)
+              hover:text-(--text)
+            `}
           aria-pressed={rootFilter === 'all'}
           onclick={() => {
             rootFilter = 'all'
@@ -805,8 +832,15 @@
             : 'text-xs text-(--muted)'}
         >{bookmarkCount}</span></button>{#each roots as root (root.id)}<button
           class={rootFilter === root.id
-            ? 'flex h-7 items-center gap-2 rounded bg-(--surface-hover) px-2 text-xs whitespace-nowrap text-(--text)'
-            : 'flex h-7 items-center gap-2 rounded bg-transparent px-2 text-xs whitespace-nowrap text-(--muted) hover:text-(--text)'}
+            ? `
+              flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2
+              text-xs whitespace-nowrap text-(--text)
+            `
+            : `
+              flex h-7 items-center gap-2 rounded-sm bg-transparent px-2 text-xs
+              whitespace-nowrap text-(--muted)
+              hover:text-(--text)
+            `}
           aria-pressed={rootFilter === root.id}
           onclick={() => {
             rootFilter = root.id
@@ -825,7 +859,11 @@
   <!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
   <main
     id='canvas'
-    class='relative min-h-0 flex-1 overflow-auto scroll-smooth  outline-none scrollbar-none [&::-webkit-scrollbar]:hidden  '
+    class='
+      relative min-h-0 flex-1 scrollbar-none overflow-auto scroll-smooth
+      outline-none
+      [&::-webkit-scrollbar]:hidden
+    '
     class:is-dragging={dragging}
     bind:this={scroller}
     onscroll={updateScroll}
@@ -836,35 +874,60 @@
     tabindex='-1'
   >
     {#if !snapshot}
-      <div class='flex h-full min-h-60 w-full flex-col items-center justify-center text-center text-(--muted)'>
+      <div
+        class='
+          flex size-full min-h-60 flex-col items-center justify-center
+          text-center text-(--muted)
+        '
+      >
         {#if loadError}
           <Icon name='lock' size={28} />
-          <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
+          <h2 class='
+            mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
+          '
+          >
             Let's reconnect.
           </h2>
-          <p class='mb-6 px-5 text-xs leading-relaxed'>{loadError}</p>
+          <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
           <button class='button' onclick={() => window.location.reload()}>Reload page</button>
         {:else}
-          <span class='mb-5 size-6 animate-spin rounded-full border border-(--line) border-t-(--accent)'></span>
-          <p class='mb-6 px-5 text-xs leading-relaxed'>
+          <span
+            class='
+              mb-5 size-6 animate-spin rounded-full border border-(--line)
+              border-t-(--accent)
+            '
+          >
+          </span>
+          <p class='mb-6 px-5 text-xs/relaxed'>
             Finding your favorites…
           </p>
         {/if}
       </div>
     {:else if normalizedQuery && !visibleGroups.length}
-      <div class='flex h-full min-h-60 w-full flex-col items-center justify-center text-center text-(--muted)'>
+      <div
+        class='
+          flex size-full min-h-60 flex-col items-center justify-center
+          text-center text-(--muted)
+        '
+      >
         <Icon name='search' size={33} />
         <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
           No favorites found.
         </h2>
-        <p class='mb-6 px-5 text-xs leading-relaxed'>
+        <p class='mb-6 px-5 text-xs/relaxed'>
           Nothing matches “{query}”. Try a title, website, or folder.
         </p>
         <Button onclick={() => (query = '')}>Clear search</Button>
       </div>
     {:else}
       <SnapGridGroup>
-        <div class='flex w-max items-center h-full gap-9 px-16 max-lg:gap-7 max-lg:px-9 max-md:px-6'>
+        <div
+          class='
+            flex h-full w-max items-center gap-9 px-16
+            max-lg:gap-7 max-lg:px-9
+            max-md:px-6
+          '
+        >
           {#each visibleGroups as group (group.id)}
             <MetroGroup
               {group}
@@ -896,38 +959,77 @@
             />
           {/each}
           {#if !normalizedQuery && defaultFolder()}<div class='w-48 shrink-0'>
-            <div class='flex h-15 items-center pt-2.5 text-xs tracking-widest text-(--muted)'>
+            <div class='
+              flex h-15 items-center pt-2.5 text-xs tracking-widest
+              text-(--muted)
+            '
+            >
               A LITTLE MORE SPACE
             </div>
             <button
-              class='relative flex w-full flex-col items-center justify-center border border-dashed border-(--line) bg-transparent text-(--muted) transition-colors duration-150 hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)'
+              class='
+                relative flex w-full flex-col items-center justify-center border
+                border-dashed border-(--line) bg-transparent text-(--muted)
+                transition-colors duration-150
+                hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)
+              '
               style:height='{cellsToPx(ROWS, cell)}px'
               onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
             >
-              <span class='mb-5 flex size-12 items-center justify-center rounded-full border border-(--line)'>
+              <span
+                class='
+                  mb-5 flex size-12 items-center justify-center rounded-full
+                  border border-(--line)
+                '
+              >
                 <Icon name='plus' size={23} />
               </span>
-              <strong class='text-sm font-medium text-(--text)'>New group</strong><span class='mt-2 text-xs'>Create a bookmark folder</span>
+              <strong class='text-sm font-medium text-(--text)'>New group</strong>
+              <span class='mt-2 text-xs'>Create a bookmark folder</span>
               <span class='absolute top-4 right-4 opacity-60'><Icon name='arrow' size={16} /></span>
             </button>
-          </div>{/if}
-          {#if !visibleGroups.length && !normalizedQuery}<div class='flex h-full min-h-60 w-full flex-col items-center justify-center text-center text-(--muted)'>
-            <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
-              No bookmark folders available.
-            </h2>
-            <p class='mb-6 px-5 text-xs leading-relaxed'>
-              Create a writable browser bookmark folder to get started.
-            </p>
-          </div>{/if}
+          </div>
+          {/if}
+          {#if !visibleGroups.length && !normalizedQuery}
+            <div
+              class='
+                flex size-full min-h-60 flex-col items-center justify-center
+                text-center text-(--muted)
+              '
+            >
+              <h2 class='
+                mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
+              '
+              >
+                No bookmark folders available.
+              </h2>
+              <p class='mb-6 px-5 text-xs/relaxed'>
+                Create a writable browser bookmark folder to get started.
+              </p>
+            </div>{/if}
         </div>
       </SnapGridGroup>
     {/if}
   </main>
 
-  <footer class='flex min-h-16 shrink-0 items-center justify-between gap-5 px-16 pb-1.5 max-lg:px-9 max-md:px-6'>
+  <footer
+    class='
+      flex min-h-16 shrink-0 items-center justify-between gap-5 px-16 pb-1.5
+      max-lg:px-9
+      max-md:px-6
+    '
+  >
     <span role='status' class='sr-only'>{busy ? 'Saving changes…' : ''}</span>
     <div class='flex shrink-0 items-center'>
-      <label class='flex h-8 w-60 items-center gap-2.5 rounded border border-(--line) bg-(--surface) px-3 text-(--muted) focus-within:border-(--accent) max-lg:w-55 max-md:h-9 max-md:w-46'>
+      <label
+        class='
+          flex h-8 w-60 items-center gap-2.5 rounded-sm border border-(--line)
+          bg-(--surface) px-3 text-(--muted)
+          focus-within:border-(--accent)
+          max-lg:w-55
+          max-md:h-9 max-md:w-46
+        '
+      >
         <Icon name='search' size={17} />
         <input
           bind:this={searchInput}
@@ -938,7 +1040,11 @@
           placeholder='Find a bookmark…'
           autocomplete='off'
           spellcheck='false'
-          class='w-full min-w-0 bg-transparent p-0 text-xs text-(--text) outline-none placeholder:text-(--muted) [&::-webkit-search-cancel-button]:hidden'
+          class='
+            w-full min-w-0 bg-transparent p-0 text-xs text-(--text) outline-none
+            placeholder:text-(--muted)
+            [&::-webkit-search-cancel-button]:hidden
+          '
         />
         {#if query}
           <button
@@ -952,13 +1058,21 @@
             <Icon name='close' size={13} />
           </button>
         {:else}
-          <kbd class='flex h-5 w-4 items-center justify-center rounded border border-(--line) font-inherit text-xs'>/</kbd>
+          <kbd
+            class='
+              flex h-5 w-4 items-center justify-center rounded-sm border
+              border-(--line) font-[inherit] text-xs
+            '
+          >/</kbd>
         {/if}
       </label>
     </div>
     <div class='flex min-w-0 flex-1 items-center justify-center gap-5'>
       <nav
-        class='absolute left-1/2 flex -translate-x-1/2 gap-1.5 p-2.5 max-md:hidden'
+        class='
+          absolute left-1/2 flex -translate-x-1/2 gap-1.5 p-2.5
+          max-md:hidden
+        '
         aria-label='Jump to bookmark group'
       >
         {#each visibleGroups as group, index (group.id)}
@@ -975,17 +1089,29 @@
       </nav>
     </div>
     <div class='flex shrink-0 items-center gap-4'>
-      <div class='flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)'>
+      <div class='
+        flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)
+      '
+      >
         <span class='max-sm:hidden'>{bookmarkCount} bookmarks, {folderCount} folders</span>
         <span class='sm:hidden'>{bookmarkCount} / {folderCount}</span>
         {#if client.mode === 'preview'}
-          <span class='rounded border border-(--line) px-1.5 py-0.5 text-xs text-(--muted)' title='saved locally, not your real bookmarks'>Demo</span>
+          <span
+            class='
+              rounded-sm border border-(--line) px-1.5 py-0.5 text-xs
+              text-(--muted)
+            '
+            title='saved locally, not your real bookmarks'
+          >Demo</span>
         {/if}
       </div>
       <div class='flex items-center gap-0.5'>
         <IconButton
           label='Scroll groups left'
-          class='h-7 w-6 rounded disabled:opacity-25'
+          class='
+            h-7 w-6 rounded-sm
+            disabled:opacity-25
+          '
           disabled={!canScroll || scrollProgress < 0.01}
           onclick={() => scroll(-1)}
         >
@@ -993,7 +1119,10 @@
         </IconButton>
         <IconButton
           label='Scroll groups right'
-          class='h-7 w-6 rounded disabled:opacity-25'
+          class='
+            h-7 w-6 rounded-sm
+            disabled:opacity-25
+          '
           disabled={!canScroll || scrollProgress > 0.99}
           onclick={() => scroll(1)}
         >

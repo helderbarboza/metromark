@@ -20,7 +20,18 @@
     onblocked: (message: string) => void
   }
 
-  const { id, group, tile, selected, showDomains, preview, dragging, onselect, oncontextmenu, onblocked }: Props = $props()
+  const {
+    id,
+    group,
+    tile,
+    selected,
+    showDomains,
+    preview,
+    dragging,
+    onselect,
+    oncontextmenu,
+    onblocked,
+  }: Props = $props()
   // Snapgrid instances are keyed by immutable browser bookmark IDs.
   // svelte-ignore state_referenced_locally
   const item = createGridItem({ id, group })
@@ -104,7 +115,7 @@
 </script>
 
 <a
-  {@attach keyGuard}
+{@attach keyGuard}
   {@attach item.attach}
   style={item.style}
   class='grid-tile snapgrid-item'

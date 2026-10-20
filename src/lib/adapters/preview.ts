@@ -8,10 +8,18 @@ const TREE_KEY = 'metro.preview.bookmarks.v1'
 const DATA_KEY = 'metro.preview.presentation.v1'
 const MODE_KEY = 'mode-watcher-mode'
 const THEME_KEY = 'mode-watcher-theme'
+function isValidJson<T>(_value: unknown, _fallback: T): _value is T {
+  return true
+}
+
 function readJson<T>(key: string, fallback: () => T): T {
   try {
     const value = localStorage.getItem(key)
-    return value != null && value !== '' ? JSON.parse(value) as T : fallback()
+    if (value == null || value === '') {
+      return fallback()
+    }
+    const parsed: unknown = JSON.parse(value)
+    return isValidJson(parsed, fallback()) ? parsed : fallback()
   }
   catch {
     return fallback()

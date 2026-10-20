@@ -1,4 +1,5 @@
 import antfu from '@antfu/eslint-config'
+import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import storybook from 'eslint-plugin-storybook'
 import svelte from 'eslint-plugin-svelte'
 
@@ -23,14 +24,30 @@ export default antfu(
   },
   ...svelte.configs.recommended,
   ...storybook.configs['flat/recommended'],
+  {
+    plugins: { 'better-tailwindcss': betterTailwindcss },
+    rules: {
+      ...betterTailwindcss.configs['recommended-warn'].rules,
+      'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', { printWidth: 80, preferSingleLine: undefined, group: 'newLine', strictness: 'loose' }],
+    },
+    settings: {
+      'better-tailwindcss': { entryPoint: 'src/styles.css' },
+    },
+  },
+  {
+    files: ['src/lib/components/**'],
+    rules: {
+      'better-tailwindcss/no-unknown-classes': 'off',
+      'better-tailwindcss/no-conflicting-classes': 'off',
+    },
+  },
   // Tag formatting plus a width cap for long single-line markup.
   {
     files: ['**/*.svelte'],
     rules: {
       'svelte/max-attributes-per-line': ['error', { singleline: 3, multiline: 1 }],
-      'svelte/first-attribute-linebreak': ['error', { singleline: 'beside', multiline: 'below' }],
       'svelte/html-closing-bracket-new-line': ['error', { singleline: 'never', multiline: 'always' }],
-      'style/max-len': ['warn', { code: 160, tabWidth: 2, ignoreUrls: true }],
+      'style/max-len': ['warn', { code: 100, tabWidth: 2, ignoreUrls: true }],
     },
   },
   {

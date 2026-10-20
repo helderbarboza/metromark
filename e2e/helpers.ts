@@ -2,6 +2,24 @@ import type { Page } from '@playwright/test'
 import type { AppData, BookmarkNode } from '../src/lib/types'
 import { test as base, expect } from '@playwright/test'
 
+function isValidJson<T>(_value: unknown, _fallback: T): _value is T {
+  return true
+}
+
+function readJson<T>(key: string, fallback: T): T {
+  try {
+    const value = localStorage.getItem(key)
+    if (value == null || value === '') {
+      return fallback
+    }
+    const parsed: unknown = JSON.parse(value)
+    return isValidJson(parsed, fallback) ? parsed : fallback
+  }
+  catch {
+    return fallback
+  }
+}
+
 export const test = base.extend<{ noPageErrors: void }>({
   noPageErrors: [async ({ page }, use) => {
     const errors: string[] = []
@@ -15,8 +33,8 @@ export const group = (page: Page, title: string) => page.locator('.metro-group')
 export const link = (page: Page, title: string) => page.getByRole('link', { name: new RegExp(`^Open ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
 export const draggable = (page: Page, id: string) => page.locator(`a[data-grid-id="${id}"]`)
 export const appBar = (page: Page) => page.getByRole('toolbar')
-export const presentation = async (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('metro.preview.presentation.v1') ?? '{}') as AppData)
-export const tree = async (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('metro.preview.bookmarks.v1') ?? '[]') as BookmarkNode[])
+export const presentation = async (page: Page) => page.evaluate(() => readJson<AppData>('metro.preview.presentation.v1', { schema: 1, appearance: {}, layouts: {}, settings: { density: 'comfortable', showDomains: true, reducedMotion: false }, undos: [] }))
+export const tree = async (page: Page) => page.evaluate(() => readJson<BookmarkNode[]>('metro.preview.bookmarks.v1', []))
 export function flat(nodes: BookmarkNode[]): BookmarkNode[] {
   return nodes.flatMap(node => [node, ...flat(node.children ?? [])])
 }

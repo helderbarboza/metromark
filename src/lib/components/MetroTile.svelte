@@ -17,7 +17,15 @@
     children?: Snippet
   }
 
-  const { tile, size, selected = false, revealed = false, domain = '', showDomain = true, children }: Props = $props()
+  const {
+    tile,
+    size,
+    selected = false,
+    revealed = false,
+    domain = '',
+    showDomain = true,
+    children,
+  }: Props = $props()
 
   const { bg: bgColor, fg: fgValue } = $derived(resolveTileColors(tile))
   const fg = $derived(fgValue === 1 ? '#ffffff' : '#000000')
@@ -94,7 +102,10 @@
   {/if}
   {#if size !== 'small'}
     <div class='tile-label'>
-      <span class='tile-title'>{tile.title}</span>{#if showDomain && domain}<span class='tile-domain'>{` ${domain}`}</span>{/if}
+      <span class='tile-title'>{tile.title}</span>
+      {#if showDomain && domain}
+        <span class='tile-domain'>{` ${domain}`}</span>
+      {/if}
     </div>
   {/if}
   {#if checked}<span
@@ -109,7 +120,9 @@
 
 {#if tile.color}
   <div
-    class='metro-tile metro-tile-{size}'
+    class='
+      metro-tile
+      metro-tile-{size}'
     class:selected
     class:revealed
     style:background={tile.color}
@@ -121,7 +134,10 @@
   </div>
 {:else}
   <div
-    class='metro-tile metro-tile-{size} tile-accent-{tile.colorIndex}'
+    class='
+      metro-tile
+      metro-tile-{size}
+      tile-accent-{tile.colorIndex}'
     class:selected
     class:revealed
     style:--tile-color={bgColor}
@@ -160,7 +176,8 @@
     outline: 3px solid var(--tile-fg);
     outline-offset: -3px;
   }
-  /* Self-revealing cross-slide (uwp8 p. 111): the tile slides down to show the check it would get. */
+  /* Self-revealing cross-slide (uwp8 p. 111): the tile slides down to show the
+  check it would get. */
   .metro-tile.revealed {
     transform: translateY(6px);
   }

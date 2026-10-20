@@ -14,7 +14,14 @@
     fallback?: string
   }
 
-  const { pageUrl, tint = '#ffffff', requestSize = 64, convertSize = 64, scaleFactor = 1, fallback = '' }: Props = $props()
+  const {
+    pageUrl,
+    tint = '#ffffff',
+    requestSize = 64,
+    convertSize = 64,
+    scaleFactor = 1,
+    fallback = '',
+  }: Props = $props()
 
   let converted = $state<string | null>(null)
   let failed = $state(false)

@@ -45,12 +45,19 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof MetroTile>)}
-  <div style='display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:32px;background:var(--bg);min-height:100vh'>
+  <div
+    style='display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:32px;
+      background:var(--bg);min-height:100vh'
+  >
     {#each staticTiles as tile (tile.id)}
       <a
         href={tile.href}
         aria-label={label(tile, args.showDomain ?? true)}
-        style='display:block;width:{cellsToPx(SIZES[tile.size][0], 68)}px;height:{cellsToPx(SIZES[tile.size][1], 68)}px;text-decoration:none'
+        style='
+          display:block;
+          width:{cellsToPx(SIZES[tile.size][0], 68)}px;
+            height:{cellsToPx(SIZES[tile.size][1], 68)}px;
+            text-decoration:none'
       >
         <MetroTile
           tile={{ title: tile.title, colorIndex: tile.colorIndex, url: tile.href, icon: globeIcon }}

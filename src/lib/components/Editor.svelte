@@ -21,7 +21,13 @@
   import { setMode, systemPrefersMode, theme, userPrefersMode } from 'mode-watcher'
   import { onMount } from 'svelte'
   import { getThemeAccentColors } from '../theme-colors'
-  import { DARK_THEMES, getThemeSelections, isOneOf, LIGHT_THEMES, setThemeForMode } from '../theme-picker'
+  import {
+    DARK_THEMES,
+    getThemeSelections,
+    isOneOf,
+    LIGHT_THEMES,
+    setThemeForMode,
+  } from '../theme-picker'
   import { tileFor } from '../tile'
   import {
     countBookmarks,
@@ -150,7 +156,11 @@
           return send({
             type: 'tile.appearance',
             id: node.id,
-            patch: { size, colorIndex: colorIndex === -1 ? undefined : colorIndex, color: customColor },
+            patch: {
+              size,
+              colorIndex: colorIndex === -1 ? undefined : colorIndex,
+              color: customColor,
+            },
           })
         }
         break
@@ -185,6 +195,8 @@
 
     selections = getThemeSelections()
   }
+
+  const themeGroupsEntries = [['light', LIGHT_THEMES], ['dark', DARK_THEMES]] as const
 </script>
 
 <Modal
@@ -221,7 +233,7 @@
     <div class='setting-section'>
       <h3>Canvas</h3>
       <div class='theme-groups'>
-        {#each ([['light', LIGHT_THEMES], ['dark', DARK_THEMES]] as const) as [mode, modeTheme] (modeTheme)}
+        {#each themeGroupsEntries as [mode, modeTheme] (modeTheme)}
           <div class='theme-group'>
             <h4 class='capitalize'>{mode} theme</h4>
             <div class='themes'>
@@ -233,24 +245,38 @@
                   aria-pressed={selected}
                   onclick={() => chooseTheme(mode, theme)}
                 >
-                  <span data-theme={theme} class="flex flex-row px-2 py-3 gap-2 bg-(--bg) theme-preview {mode === 'dark' ? 'dark' : ''}">
-                    <span class='flex flex-col w-full'>
-                      <span class='text-(--text) text-[0.625rem] pb-0.5 leading-none'>Daily</span>
-                      <span class='grid grid-flow-col grid-rows-[repeat(4,0.5rem)] auto-cols-2 gap-px min-h-6'>
-                        <span class='bg-(--base08) col-span-2 row-span-2'></span>
-                        <span class='bg-(--base09) col-span-2'></span>
+                  <span
+                    data-theme={theme}
+                    class="
+                      theme-preview flex flex-row gap-2 bg-(--bg) px-2 py-3
+                      {mode === 'dark'
+                        ? `dark`
+                        : ''}"
+                  >
+                    <span class='flex w-full flex-col'>
+                      <span class='
+                        pb-0.5 text-[0.625rem] leading-none text-(--text)
+                      '
+                      >Daily</span>
+                      <span class='
+                        grid min-h-6 auto-cols-2 grid-flow-col
+                        grid-rows-[repeat(4,0.5rem)] gap-px
+                      '
+                      >
+                        <span class='col-span-2 row-span-2 bg-(--base08)'></span>
+                        <span class='col-span-2 bg-(--base09)'></span>
                         <span class='bg-(--base0A)'></span>
-                        <span class='bg-(--base0B) col-span-2'></span>
-                        <span class='bg-(--base0C) '></span>
-                        <span class='bg-(--base0D) col-span-2 row-span-2'></span>
+                        <span class='col-span-2 bg-(--base0B)'></span>
+                        <span class='bg-(--base0C)'></span>
+                        <span class='col-span-2 row-span-2 bg-(--base0D)'></span>
                         <span class='bg-(--base0E)'></span>
-                        <span class='bg-(--base0F) '></span>
+                        <span class='bg-(--base0F)'></span>
                         <span class='bg-(--base08)'></span>
-                        <span class='bg-(--base09) '></span>
+                        <span class='bg-(--base09)'></span>
                         <span class='bg-(--base0A)'></span>
                         <span class='bg-(--base0B)'></span>
-                        <span class='bg-(--base0C) col-span-2'></span>
-                        <span class='bg-(--base0D) col-span-2'></span>
+                        <span class='col-span-2 bg-(--base0C)'></span>
+                        <span class='col-span-2 bg-(--base0D)'></span>
                         <span class='bg-(--base0E)'></span>
                         <span class='bg-(--base0F)'></span>
                         <span class='bg-(--base08)'></span>
@@ -258,38 +284,52 @@
                       </span>
                     </span>
 
-                    <span class='flex flex-col w-full'>
-                      <span class='text-(--text) text-[0.625rem] pb-0.5 leading-none'>Work</span>
-                      <span class='grid grid-flow-col grid-rows-[repeat(4,0.5rem)] auto-cols-2 gap-px min-h-6'>
-                        <span class='bg-(--base08) col-span-2 row-span-2'></span>
-                        <span class='bg-(--base09) col-span-2'></span>
+                    <span class='flex w-full flex-col'>
+                      <span class='
+                        pb-0.5 text-[0.625rem] leading-none text-(--text)
+                      '
+                      >Work</span>
+                      <span class='
+                        grid min-h-6 auto-cols-2 grid-flow-col
+                        grid-rows-[repeat(4,0.5rem)] gap-px
+                      '
+                      >
+                        <span class='col-span-2 row-span-2 bg-(--base08)'></span>
+                        <span class='col-span-2 bg-(--base09)'></span>
                         <span class='bg-(--base0A)'></span>
-                        <span class='bg-(--base0B) col-span-2'></span>
+                        <span class='col-span-2 bg-(--base0B)'></span>
                         <span class='bg-(--base0C)'></span>
                         <span class='bg-(--base0D)'></span>
-                        <span class='bg-(--base0E) col-span-2'></span>
+                        <span class='col-span-2 bg-(--base0E)'></span>
                         <span class='bg-(--base0F)'></span>
                         <span class='bg-(--base08)'></span>
                         <span class='bg-(--base09)'></span>
                       </span>
                     </span>
-                    <span class='flex flex-col w-full'>
-                      <span class='text-(--text) text-[0.625rem] pb-0.5 leading-none'>Projects</span>
-                      <span class='grid grid-flow-col grid-rows-[repeat(4,0.5rem)] auto-cols-2 gap-px min-h-6'>
-                        <span class='bg-(--base0C) col-span-2'></span>
+                    <span class='flex w-full flex-col'>
+                      <span class='
+                        pb-0.5 text-[0.625rem] leading-none text-(--text)
+                      '
+                      >Projects</span>
+                      <span class='
+                        grid min-h-6 auto-cols-2 grid-flow-col
+                        grid-rows-[repeat(4,0.5rem)] gap-px
+                      '
+                      >
+                        <span class='col-span-2 bg-(--base0C)'></span>
                         <span class='bg-(--base0D)'></span>
                         <span class='bg-(--base0E)'></span>
-                        <span class='bg-(--base0F) col-span-2'></span>
-                        <span class='bg-(--base08) '></span>
-                        <span class='bg-(--base09) col-span-2'></span>
-                        <span class='bg-(--base0A) col-span-2 row-span-2'></span>
+                        <span class='col-span-2 bg-(--base0F)'></span>
+                        <span class='bg-(--base08)'></span>
+                        <span class='col-span-2 bg-(--base09)'></span>
+                        <span class='col-span-2 row-span-2 bg-(--base0A)'></span>
                         <span class='bg-(--base0B)'></span>
-                        <span class='bg-(--base0C) '></span>
-                        <span class='bg-(--base0D) '></span>
-                        <span class='bg-(--base0E) '></span>
+                        <span class='bg-(--base0C)'></span>
+                        <span class='bg-(--base0D)'></span>
+                        <span class='bg-(--base0E)'></span>
                         <span class='bg-(--base0F)'></span>
                         <span class='bg-(--base08)'></span>
-                        <span class='bg-(--base09) '></span>
+                        <span class='bg-(--base09)'></span>
                         <span class='bg-(--base0A)'></span>
                         <span class='bg-(--base0B)'></span>
                       </span>
@@ -413,7 +453,11 @@
     {/if}
     <div class='dialog-actions'>
       <Button onclick={onclose}>Keep folder</Button>
-      <Button variant='danger' disabled={busy} onclick={() => send({ type: 'node.remove', id: node.id })}>
+      <Button
+        variant='danger'
+        disabled={busy}
+        onclick={() => send({ type: 'node.remove', id: node.id })}
+      >
         <Icon name='trash' size={15} />
         {busy ? 'Deleting…' : 'Delete folder'}
       </Button>
@@ -482,7 +526,10 @@
           destination to restore this item.
         </p>
       {/if}
-      {#if (spec.kind === 'bookmark' && !node) || spec.kind === 'folder' || spec.kind === 'move' || spec.kind === 'restore'}
+      {#if ((spec.kind === 'bookmark' && !node)
+        || spec.kind === 'folder'
+        || spec.kind === 'move'
+        || spec.kind === 'restore')}
         <label class='field'>
           <span class='field-label' id={`${uid}-folder-label`}>
             {spec.kind === 'folder' ? 'Create inside' : 'Folder'}
@@ -514,7 +561,8 @@
       </div>{/if}
       {#if spec.kind === 'appearance' && tile}
         <p class='dialog-description'>
-          A little personality for <strong class='text-(--text)'>{tile.title}</strong>. Appearance changes are local; the bookmark itself stays untouched.
+          A little personality for <strong class='text-(--text)'>{tile.title}</strong>.
+          Appearance changes are local; the bookmark itself stays untouched.
         </p>
         <label class='field'>
           <span class='field-label' id={`${uid}-size-label`}>Tile size</span>
@@ -593,8 +641,7 @@
           disabled={busy || ((spec.kind === 'move'
             || spec.kind === 'restore'
             || spec.kind === 'folder'
-            || (spec.kind === 'bookmark' && !node))
-          && !parentId)}
+            || (spec.kind === 'bookmark' && !node)) && !parentId)}
         >
           {busy
             ? 'Saving…'

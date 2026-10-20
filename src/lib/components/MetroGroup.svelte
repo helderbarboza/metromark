@@ -6,7 +6,18 @@
     horizontalCompactor,
   } from '@snapgridjs/svelte'
   import { DRAG_PX } from '../interaction'
-  import { cellsToPx, EMPTY_GROUP_COLS, ENGINE_COL_HEADROOM, GAP, MAX_TILE_COLS, MIN_ENGINE_COLS, MIN_GROUP_COLS, ROWS, sizeOf, usedCols } from '../layout'
+  import {
+    cellsToPx,
+    EMPTY_GROUP_COLS,
+    ENGINE_COL_HEADROOM,
+    GAP,
+    MAX_TILE_COLS,
+    MIN_ENGINE_COLS,
+    MIN_GROUP_COLS,
+    ROWS,
+    sizeOf,
+    usedCols,
+  } from '../layout'
   import { safeUrl, validateUrl } from '../url'
   import GridTile from './GridTile.svelte'
   import Icon from './Icon.svelte'
@@ -57,7 +68,12 @@
 
   let liveCols = $state(0)
 
-  const cols = $derived(Math.max(usedCols(layout), liveCols, group.layout.length ? MIN_GROUP_COLS : EMPTY_GROUP_COLS))
+  const cols = $derived(Math.max(
+    usedCols(layout),
+    liveCols,
+    group.layout.length ? MIN_GROUP_COLS : EMPTY_GROUP_COLS,
+  ))
+
   const visibleWidth = $derived(cellsToPx(cols, cell))
   const engineCols = $derived(Math.max(
     usedCols(layout) + ENGINE_COL_HEADROOM,
@@ -197,7 +213,7 @@
   </header>
   <!-- Right-click only; standard keyboard management is provided by the labeled heading button. -->
   <div
-    {@attach container.attach}
+{@attach container.attach}
     style='{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell)}px;'
     class='metro-grid'
     role='group'

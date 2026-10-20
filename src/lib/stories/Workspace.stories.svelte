@@ -3,11 +3,19 @@
   import { expect, userEvent } from 'storybook/test'
   import AppFixture from './AppFixture.svelte'
 
-  const { Story } = defineMeta({ title: 'Metro/Workspace', component: AppFixture, tags: ['autodocs'], parameters: { layout: 'fullscreen' } })
+  const { Story } = defineMeta({
+    title: 'Metro/Workspace',
+    component: AppFixture,
+    tags: ['autodocs'],
+    parameters: { layout: 'fullscreen' },
+  })
 </script>
+
 <Story
   name='Midnight'
-  play={async ({ canvas }) => { await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible() }}
+  play={async ({ canvas }) => {
+    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
+  }}
 />
 <Story
   name='Catppuccin Latte'

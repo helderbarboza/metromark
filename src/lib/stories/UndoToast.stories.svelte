@@ -7,7 +7,17 @@
   import UndoToast from '../components/UndoToast.svelte'
 
   const undo = fn()
-  const { Story } = defineMeta({ title: 'Metro/Undo and notifications', component: UndoToast, tags: ['autodocs'], parameters: { layout: 'fullscreen' }, args: { notice: { message: '“Figma” deleted', undoId: 'story-only' }, onundo: undo, onclose: fn() } })
+  const { Story } = defineMeta({
+    title: 'Metro/Undo and notifications',
+    component: UndoToast,
+    tags: ['autodocs'],
+    parameters: { layout: 'fullscreen' },
+    args: {
+      notice: { message: '“Figma” deleted', undoId: 'story-only' },
+      onundo: undo,
+      onclose: fn(),
+    },
+  })
 </script>
 <Story
   name='Destructive action'
@@ -18,5 +28,11 @@
 />
 <Story
   name='Conflict'
-  args={{ notice: { message: 'This bookmark was edited elsewhere. Undo would overwrite that change.', tone: 'error' }, onundo: undefined }}
+  args={{
+    notice: {
+      message: 'This bookmark was edited elsewhere. Undo would overwrite that change.',
+      tone: 'error',
+    },
+    onundo: undefined,
+  }}
 />

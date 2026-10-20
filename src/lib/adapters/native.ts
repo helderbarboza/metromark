@@ -1,4 +1,4 @@
-import type { AppData, BookmarkNode, BookmarkPort, Client, Command, CommandResult, CreateNode, Snapshot } from '../types'
+import type { AppData, BookmarkPort, Client, Command, CommandResult, Snapshot } from '../types'
 import { browser } from 'wxt/browser'
 import { validateUrl } from '../url.js'
 import { normalizeTree } from './memory'
@@ -10,8 +10,7 @@ export function nativeBookmarks(): BookmarkPort {
     async getTree() { return normalizeTree(await browser.bookmarks.getTree()) },
     async create(details) {
       // Firefox alone supports the separator type. Existing separators are preserved on subtree Undo.
-      const create = browser.bookmarks.create as unknown as (details: CreateNode) => Promise<BookmarkNode>
-      return create(details)
+      return browser.bookmarks.create(details)
     },
     async update(id, changes) { return browser.bookmarks.update(id, changes) },
     async move(id, destination) { return browser.bookmarks.move(id, destination) },
@@ -30,9 +29,19 @@ export function nativeBookmarks(): BookmarkPort {
     },
   }
 }
+function isAppData(value: unknown): value is AppData {
+  return typeof value === 'object' && value !== null
+}
+
 export function nativePersistence() {
   return {
-    async read() { return (await browser.storage.local.get(STORAGE_KEY))[STORAGE_KEY] as AppData | undefined },
+    async read() {
+      const result: unknown = (await browser.storage.local.get(STORAGE_KEY))[STORAGE_KEY]
+      if (result === undefined) {
+        return undefined
+      }
+      return isAppData(result) ? result : undefined
+    },
     async write(data: AppData) { await browser.storage.local.set({ [STORAGE_KEY]: data }) },
   }
 }

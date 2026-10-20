@@ -16,7 +16,18 @@
     onclear: () => void
   }
 
-  const { title, size, writable, focusRequest = 0, onresize, onedit, ondelete, onmove, onmore, onclear }: Props = $props()
+  const {
+    title,
+    size,
+    writable,
+    focusRequest = 0,
+    onresize,
+    onedit,
+    ondelete,
+    onmove,
+    onmore,
+    onclear,
+  }: Props = $props()
   let bar = $state<HTMLDivElement | null>(null)
   // Selection commands sit on the far left (uwp8 p. 120); a keyboard selection
   // moves focus into the bar so the commands are reachable with Tab.

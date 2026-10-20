@@ -31,7 +31,10 @@ const ENV_PREFIX = 'METRO_'
 export function loadSettings(env: Record<string, string | undefined> = import.meta.env): Settings {
   const fromEnv: Partial<Settings> = {}
   if (env[`${ENV_PREFIX}DENSITY`] !== undefined) {
-    fromEnv.density = env[`${ENV_PREFIX}DENSITY`] as Settings['density']
+    const density = env[`${ENV_PREFIX}DENSITY`]
+    if (density === 'comfortable' || density === 'compact') {
+      fromEnv.density = density
+    }
   }
   if (env[`${ENV_PREFIX}SHOW_DOMAINS`] !== undefined) {
     fromEnv.showDomains = env[`${ENV_PREFIX}SHOW_DOMAINS`] === 'true'

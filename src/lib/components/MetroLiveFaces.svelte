@@ -18,7 +18,16 @@
     scaleFactor?: 1 | 2
   }
 
-  const { faces, icon = '', period = 6000, faviconPageUrl, tint = '#ffffff', fallbackIcon = '', requestSize = 64, scaleFactor = 2 }: Props = $props()
+  const {
+    faces,
+    icon = '',
+    period = 6000,
+    faviconPageUrl,
+    tint = '#ffffff',
+    fallbackIcon = '',
+    requestSize = 64,
+    scaleFactor = 2,
+  }: Props = $props()
 
   // index -1 = the icon face
   const count = $derived(faces.length + 1)

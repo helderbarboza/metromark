@@ -24,8 +24,10 @@ export function cellsToPx(n: number, cell: number, gap = GAP): number {
   return Math.max(0, n * cell + (n - 1) * gap)
 }
 
+const TILE_SIZES: TileSize[] = ['small', 'medium', 'wide', 'large']
+
 export function sizeOf(item: Pick<LayoutItem, 'w' | 'h'>): TileSize {
-  return (Object.keys(SIZES) as TileSize[]).find(size => SIZES[size][0] === item.w && SIZES[size][1] === item.h) ?? 'medium'
+  return TILE_SIZES.find(size => SIZES[size][0] === item.w && SIZES[size][1] === item.h) ?? 'medium'
 }
 
 export function overlaps(a: LayoutItem, b: LayoutItem): boolean {

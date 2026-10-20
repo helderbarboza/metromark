@@ -35,7 +35,19 @@ const DEFAULTS: ThemeSelections = {
 }
 
 export function isOneOf<T extends string>(value: unknown, values: readonly T[]): value is T {
-  return typeof value === 'string' && values.includes(value as T)
+  if (typeof value !== 'string') {
+    return false
+  }
+  for (const v of values) {
+    if (v === value) {
+      return true
+    }
+  }
+  return false
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 function loadSelections(): ThemeSelections {
@@ -44,13 +56,12 @@ function loadSelections(): ThemeSelections {
 
   try {
     const saved: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
-    if (typeof saved !== 'object' || saved === null)
+    if (!isRecord(saved))
       return { ...DEFAULTS }
 
-    const record = saved as Record<string, unknown>
     return {
-      light: isOneOf(record.light, LIGHT_THEMES) ? record.light : DEFAULTS.light,
-      dark: isOneOf(record.dark, DARK_THEMES) ? record.dark : DEFAULTS.dark,
+      light: isOneOf(saved.light, LIGHT_THEMES) ? saved.light : DEFAULTS.light,
+      dark: isOneOf(saved.dark, DARK_THEMES) ? saved.dark : DEFAULTS.dark,
     }
   }
   catch {
