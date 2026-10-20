@@ -1,4 +1,4 @@
-import type { AppData, BookmarkNode, Client } from '../types'
+import type { AppData, BookmarkNode, Client, Settings } from '../types'
 import { BookmarkCoordinator } from '../coordinator'
 import { demoData, demoTree } from '../demo'
 import { validateUrl } from '../url.js'
@@ -17,7 +17,7 @@ function readJson<T>(key: string, fallback: () => T): T {
     return fallback()
   }
 }
-export function createPreviewClient(persistent = true): Client {
+export function createPreviewClient(settings: Settings, persistent = true): Client {
   const bookmarks = new MemoryBookmarks(persistent ? readJson<BookmarkNode[]>(TREE_KEY, demoTree) : demoTree(), persistent ? tree => localStorage.setItem(TREE_KEY, JSON.stringify(tree)) : undefined)
   const memory = new MemoryPersistence(demoData())
   const persistence = persistent
@@ -26,7 +26,7 @@ export function createPreviewClient(persistent = true): Client {
         async write(data: AppData) { localStorage.setItem(DATA_KEY, JSON.stringify(data)) },
       }
     : memory
-  let coordinator = new BookmarkCoordinator(bookmarks, persistence, 'preview')
+  let coordinator = new BookmarkCoordinator(bookmarks, persistence, settings, 'preview')
   const clients = new Set<(snapshot: Awaited<ReturnType<typeof coordinator.snapshot>>) => void>()
   const notify = (snapshot: Awaited<ReturnType<typeof coordinator.snapshot>>) => {
     for (const listener of clients) listener(snapshot)
@@ -40,7 +40,7 @@ export function createPreviewClient(persistent = true): Client {
     if (event.key === DATA_KEY) {
       coordinator.dispose()
       unsubscribe()
-      coordinator = new BookmarkCoordinator(bookmarks, persistence, 'preview')
+      coordinator = new BookmarkCoordinator(bookmarks, persistence, settings, 'preview')
       unsubscribe = coordinator.subscribe(() => {
         void coordinator.snapshot().then(notify)
       })
@@ -75,7 +75,7 @@ export function createPreviewClient(persistent = true): Client {
       bookmarks.replace(demoTree())
       if (!persistent)
         memory.data = demoData()
-      coordinator = new BookmarkCoordinator(bookmarks, persistence, 'preview')
+      coordinator = new BookmarkCoordinator(bookmarks, persistence, settings, 'preview')
       unsubscribe = coordinator.subscribe(() => {
         void coordinator.snapshot().then(notify)
       })

@@ -5,9 +5,10 @@
   import { createPreviewClient } from '../adapters/preview'
   import Button from '../components/Button.svelte'
   import Editor from '../components/Editor.svelte'
+  import { SETTINGS_DEFAULTS } from '../config'
 
   const { kind = 'bookmark', id }: { kind?: DialogSpec['kind'], id?: string } = $props()
-  const client = createPreviewClient(false)
+  const client = createPreviewClient(SETTINGS_DEFAULTS)
   let snapshot = $state.raw<Snapshot | null>(null)
   let open = $state(true)
   async function command(command: Command) {

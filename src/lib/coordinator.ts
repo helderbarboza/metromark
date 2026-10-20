@@ -18,24 +18,20 @@ import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectG
 import { validateUrl } from './url.js'
 
 export const UNDO_TTL = 30_000
-export const DEFAULT_SETTINGS: Settings = {
-  density: 'comfortable',
-  showDomains: true,
-  reducedMotion: false,
-}
-export function emptyData(): AppData {
+
+export function emptyData(settings: Settings): AppData {
   return {
     schema: 1,
     appearance: {},
     layouts: {},
-    settings: { ...DEFAULT_SETTINGS },
+    settings: { ...settings },
     undos: [],
   }
 }
 
 /** A single writer for bookmark commands and extension metadata. No UI or DOM dependency. */
 export class BookmarkCoordinator {
-  private data = emptyData()
+  private data: AppData
   private tree: BookmarkNode[] = []
   private revision = 0
   private tail: Promise<unknown> = Promise.resolve()
@@ -48,8 +44,10 @@ export class BookmarkCoordinator {
   constructor(
     private bookmarks: BookmarkPort,
     private persistence: PersistencePort,
+    private readonly settings: Settings,
     readonly mode: 'preview' | 'extension' = 'extension',
   ) {
+    this.data = emptyData(settings)
     // Registration is synchronous, before the first asynchronous read.
     this.unsubscribe = bookmarks.onChange(() => {
       clearTimeout(this.timer)
@@ -67,7 +65,7 @@ export class BookmarkCoordinator {
     this.ready = this.exclusive(async () => {
       const stored = await persistence.read()
       if (stored?.schema === 1)
-        this.data = { ...emptyData(), ...stored, settings: { ...DEFAULT_SETTINGS, ...stored.settings } }
+        this.data = { ...emptyData(this.settings), ...stored, settings: { ...this.settings, ...stored.settings } }
       await this.refresh()
       if (this.recoverPrepared())
         await this.save()

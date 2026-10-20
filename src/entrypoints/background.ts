@@ -2,10 +2,13 @@ import type { Command } from '../lib/types'
 import { browser } from 'wxt/browser'
 import { defineBackground } from 'wxt/utils/define-background'
 import { MESSAGE_SCOPE, nativeBookmarks, nativePersistence } from '../lib/adapters/native'
+import { loadSettings } from '../lib/config'
 import { BookmarkCoordinator } from '../lib/coordinator'
 
+const settings = loadSettings()
+
 export default defineBackground(() => {
-  const coordinator = new BookmarkCoordinator(nativeBookmarks(), nativePersistence())
+  const coordinator = new BookmarkCoordinator(nativeBookmarks(), nativePersistence(), settings)
   coordinator.subscribe(() => {
     void browser.runtime.sendMessage({ scope: MESSAGE_SCOPE, kind: 'changed' }).catch(() => undefined)
   })

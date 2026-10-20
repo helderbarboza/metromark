@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MemoryBookmarks, MemoryPersistence } from '../src/lib/adapters/memory'
+import { SETTINGS_DEFAULTS } from '../src/lib/config'
 import { BookmarkCoordinator, UNDO_TTL } from '../src/lib/coordinator'
 import { demoData, demoTree } from '../src/lib/demo'
 import { flatten, indexTree, isBookmark, projectGroups } from '../src/lib/tree'
@@ -8,7 +9,7 @@ const coordinators: BookmarkCoordinator[] = []
 function fixture() {
   const bookmarks = new MemoryBookmarks(demoTree())
   const storage = new MemoryPersistence(demoData())
-  const coordinator = new BookmarkCoordinator(bookmarks, storage, 'preview')
+  const coordinator = new BookmarkCoordinator(bookmarks, storage, SETTINGS_DEFAULTS, 'preview')
   coordinators.push(coordinator)
   return { bookmarks, storage, coordinator }
 }
@@ -123,7 +124,7 @@ describe('durable Undo', () => {
     const result = await coordinator.execute({ type: 'node.remove', id: 'figma' })
     coordinator.dispose()
     storage.data!.undos[0].phase = 'prepared'
-    const next = new BookmarkCoordinator(bookmarks, storage, 'preview')
+    const next = new BookmarkCoordinator(bookmarks, storage, SETTINGS_DEFAULTS, 'preview')
     coordinators.push(next)
     const snapshot = await next.snapshot()
     expect(snapshot.undos[0].id).toBe(result.notice!.undoId)

@@ -1,4 +1,5 @@
 import type { AppData, BookmarkNode, Layout } from './types'
+import { SETTINGS_DEFAULTS } from './config'
 import { emptyData } from './coordinator'
 
 const link = (id: string, title: string, url: string): BookmarkNode => ({ id, title, url })
@@ -58,5 +59,5 @@ export function demoData(): AppData {
   const appearance: Record<string, { size: 'small' | 'medium' | 'wide' | 'large', colorIndex: number }> = Object.fromEntries(allIds.map((id, idx) => [id, { size: 'medium' as const, colorIndex: idx % 8 }]))
   // Override figma to large (4x4 in layout)
   appearance.figma = { size: 'large', colorIndex: appearance.figma.colorIndex }
-  return { ...emptyData(), layouts, appearance }
+  return { ...emptyData(SETTINGS_DEFAULTS), layouts, appearance }
 }

@@ -32,7 +32,8 @@
     "@snapgridjs/core": "0.10.0",
     "@snapgridjs/svelte": "0.10.0",
     "mode-watcher": "^1.1.0",
-    "svelte": "5.57.2"
+    "svelte": "5.57.2",
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.5.1",

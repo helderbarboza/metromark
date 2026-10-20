@@ -1,3 +1,4 @@
+import process from 'node:process'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'wxt'
 
@@ -22,5 +23,12 @@ export default defineConfig({
         } }
       : { minimum_chrome_version: '128' }),
   }),
-  vite: () => ({ plugins: [tailwindcss()] }),
+  vite: () => ({
+    define: {
+      'import.meta.env.METRO_DENSITY': JSON.stringify(process.env.METRO_DENSITY),
+      'import.meta.env.METRO_SHOW_DOMAINS': JSON.stringify(process.env.METRO_SHOW_DOMAINS),
+      'import.meta.env.METRO_REDUCED_MOTION': JSON.stringify(process.env.METRO_REDUCED_MOTION),
+    },
+    plugins: [tailwindcss()],
+  }),
 })
