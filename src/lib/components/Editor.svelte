@@ -18,15 +18,15 @@
 
 <script lang='ts'>
   import type { Command, Settings, Snapshot, TileSize } from '../types'
-  import { setMode, systemPrefersMode, userPrefersMode } from 'mode-watcher'
+  import { setMode, systemPrefersMode, theme, userPrefersMode } from 'mode-watcher'
   import { onMount } from 'svelte'
   import { DARK_THEMES, getThemeSelections, isOneOf, LIGHT_THEMES, setThemeForMode } from '../theme-picker'
   import {
     countBookmarks,
     flatten,
+    getThemeAccentColors,
     indexTree,
     isFolder,
-    PALETTE,
     projectGroups,
     tileFor,
   } from '../tree'
@@ -66,7 +66,8 @@
   let url = $state('')
   let parentId = $state('')
   let size = $state<TileSize>('medium')
-  let color = $state(PALETTE[0])
+  let colorIndex = $state(0)
+  let customColor = $state('')
   let busy = $state(false)
   let error = $state('')
   let confirmReset = $state(false)
@@ -76,7 +77,12 @@
     url = node?.url ?? ''
     parentId = spec.parentId ?? node?.parentId ?? folders[0]?.id ?? ''
     size = tile?.size ?? 'medium'
-    color = tile?.color ?? PALETTE[0]
+    colorIndex = tile?.colorIndex ?? 0
+    customColor = tile?.color ?? ''
+  })
+  const themeColors = $derived.by(() => {
+    void theme.current
+    return getThemeAccentColors()
   })
   const title = $derived(
     spec.kind === 'bookmark'
@@ -144,7 +150,7 @@
           return send({
             type: 'tile.appearance',
             id: node.id,
-            patch: { size, color },
+            patch: { size, colorIndex: colorIndex === -1 ? undefined : colorIndex, color: customColor },
           })
         }
         break
@@ -215,56 +221,89 @@
     <div class='setting-section'>
       <h3>Canvas</h3>
       <div class='theme-groups'>
-        <div class='theme-group'>
-          <h4>Light theme</h4>
-          <div class='themes'>
-            {#each LIGHT_THEMES as theme (theme)}
-              {@const selected = selections.light === theme}
-              <button
-                class='theme-option'
-                class:chosen={selected}
-                aria-pressed={selected}
-                onclick={() => chooseTheme('light', theme)}
-              >
-                <span class='theme-preview bg-(--bg)' data-theme={theme}>
-                  <span class='bg-(--accent)'></span>
-                  <span class='bg-(--accent-ink)'></span>
-                  <span class='bg-(--text)'></span>
-                  <span class='bg-(--muted)'></span>
-                </span>
-                <span class='theme-name'>
-                  {theme}
-                  {#if selected}<Icon name='check' size={12} />{/if}
-                </span>
-              </button>
-            {/each}
+        {#each ([['light', LIGHT_THEMES], ['dark', DARK_THEMES]] as const) as [mode, modeTheme] (modeTheme)}
+          <div class='theme-group'>
+            <h4 class='capitalize'>{mode} theme</h4>
+            <div class='themes'>
+              {#each modeTheme as theme (theme)}
+                {@const selected = selections[mode] === theme}
+                <button
+                  class='theme-option'
+                  class:chosen={selected}
+                  aria-pressed={selected}
+                  onclick={() => chooseTheme(mode, theme)}
+                >
+                  <span data-theme={theme} class="flex flex-row px-2 py-3 gap-2 bg-(--bg) theme-preview {mode === 'dark' ? 'dark' : ''}">
+                    <span class='flex flex-col w-full'>
+                      <span class='text-(--text) text-[0.625rem] pb-0.5 leading-none'>Daily</span>
+                      <span class='grid grid-flow-col grid-rows-[repeat(4,0.5rem)] auto-cols-2 gap-px min-h-6'>
+                        <span class='bg-(--base08) col-span-2 row-span-2'></span>
+                        <span class='bg-(--base09) col-span-2'></span>
+                        <span class='bg-(--base0A)'></span>
+                        <span class='bg-(--base0B) col-span-2'></span>
+                        <span class='bg-(--base0C) '></span>
+                        <span class='bg-(--base0D) col-span-2 row-span-2'></span>
+                        <span class='bg-(--base0E)'></span>
+                        <span class='bg-(--base0F) '></span>
+                        <span class='bg-(--base08)'></span>
+                        <span class='bg-(--base09) '></span>
+                        <span class='bg-(--base0A)'></span>
+                        <span class='bg-(--base0B)'></span>
+                        <span class='bg-(--base0C) col-span-2'></span>
+                        <span class='bg-(--base0D) col-span-2'></span>
+                        <span class='bg-(--base0E)'></span>
+                        <span class='bg-(--base0F)'></span>
+                        <span class='bg-(--base08)'></span>
+                        <span class='bg-(--base09)'></span>
+                      </span>
+                    </span>
+
+                    <span class='flex flex-col w-full'>
+                      <span class='text-(--text) text-[0.625rem] pb-0.5 leading-none'>Work</span>
+                      <span class='grid grid-flow-col grid-rows-[repeat(4,0.5rem)] auto-cols-2 gap-px min-h-6'>
+                        <span class='bg-(--base08) col-span-2 row-span-2'></span>
+                        <span class='bg-(--base09) col-span-2'></span>
+                        <span class='bg-(--base0A)'></span>
+                        <span class='bg-(--base0B) col-span-2'></span>
+                        <span class='bg-(--base0C)'></span>
+                        <span class='bg-(--base0D)'></span>
+                        <span class='bg-(--base0E) col-span-2'></span>
+                        <span class='bg-(--base0F)'></span>
+                        <span class='bg-(--base08)'></span>
+                        <span class='bg-(--base09)'></span>
+                      </span>
+                    </span>
+                    <span class='flex flex-col w-full'>
+                      <span class='text-(--text) text-[0.625rem] pb-0.5 leading-none'>Projects</span>
+                      <span class='grid grid-flow-col grid-rows-[repeat(4,0.5rem)] auto-cols-2 gap-px min-h-6'>
+                        <span class='bg-(--base0C) col-span-2'></span>
+                        <span class='bg-(--base0D)'></span>
+                        <span class='bg-(--base0E)'></span>
+                        <span class='bg-(--base0F) col-span-2'></span>
+                        <span class='bg-(--base08) '></span>
+                        <span class='bg-(--base09) col-span-2'></span>
+                        <span class='bg-(--base0A) col-span-2 row-span-2'></span>
+                        <span class='bg-(--base0B)'></span>
+                        <span class='bg-(--base0C) '></span>
+                        <span class='bg-(--base0D) '></span>
+                        <span class='bg-(--base0E) '></span>
+                        <span class='bg-(--base0F)'></span>
+                        <span class='bg-(--base08)'></span>
+                        <span class='bg-(--base09) '></span>
+                        <span class='bg-(--base0A)'></span>
+                        <span class='bg-(--base0B)'></span>
+                      </span>
+                    </span>
+                  </span>
+                  <span class='theme-name'>
+                    {theme}
+                    {#if selected}<Icon name='check' size={12} />{/if}
+                  </span>
+                </button>
+              {/each}
+            </div>
           </div>
-        </div>
-        <div class='theme-group'>
-          <h4>Dark theme</h4>
-          <div class='themes'>
-            {#each DARK_THEMES as theme (theme)}
-              {@const selected = selections.dark === theme}
-              <button
-                class='theme-option'
-                class:chosen={selected}
-                aria-pressed={selected}
-                onclick={() => chooseTheme('dark', theme)}
-              >
-                <span class='dark theme-preview bg-(--bg)' data-theme={theme}>
-                  <span class='bg-(--accent)'></span>
-                  <span class='bg-(--accent-ink)'></span>
-                  <span class='bg-(--text)'></span>
-                  <span class='bg-(--muted)'></span>
-                </span>
-                <span class='theme-name'>
-                  {theme}
-                  {#if selected}<Icon name='check' size={12} />{/if}
-                </span>
-              </button>
-            {/each}
-          </div>
-        </div>
+        {/each}
       </div>
     </div>
     <div class='setting-section'>
@@ -496,26 +535,50 @@
             role='group'
             aria-labelledby='tile-color-label'
           >
-            {#each PALETTE as swatch (swatch)}
+            {#each themeColors as swatch, i (i)}
               <button
                 type='button'
                 style:background={swatch}
-                class:chosen={color.toLowerCase() === swatch}
-                aria-label='Use color {swatch}'
-                aria-pressed={color.toLowerCase() === swatch}
-                onclick={() => (color = swatch)}
+                class:chosen={!customColor && colorIndex === i}
+                aria-label='Use theme color {i + 1}'
+                aria-pressed={!customColor && colorIndex === i}
+                onclick={() => {
+                  customColor = ''
+                  colorIndex = i
+                }}
               >
-                {#if color.toLowerCase() === swatch}
+                {#if !customColor && colorIndex === i}
                   <Icon name='check' size={16} />
                 {/if}
               </button>
             {/each}
-            <input
-              type='color'
-              bind:value={color}
-              aria-label='Custom tile color'
-              title='Custom color'
-            />
+            <button
+              type='button'
+              style:background={customColor || 'var(--surface)'}
+              class:chosen={!!customColor}
+              aria-label='Custom color'
+              aria-pressed={!!customColor}
+              onclick={() => {
+                if (!customColor) {
+                  customColor = '#000000'
+                  colorIndex = -1
+                }
+              }}
+            >
+              {#if customColor}
+                <Icon name='check' size={16} />
+              {:else}
+                <Icon name='plus' size={16} />
+              {/if}
+            </button>
+            {#if customColor}
+              <input
+                type='color'
+                bind:value={customColor}
+                aria-label='Custom tile color'
+                title='Custom color'
+              />
+            {/if}
           </div>
         </div>
       {/if}
@@ -587,13 +650,6 @@
   }
   .theme-option.chosen {
     border-color: var(--accent);
-  }
-  .theme-preview {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    height: 63px;
-    padding: 12px 19px;
   }
   .theme-name {
     display: flex;

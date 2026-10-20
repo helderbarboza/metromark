@@ -13,7 +13,7 @@
     title: 'Metro/Bookmark tile',
     component: MetroTile,
     tags: ['autodocs'],
-    args: { tile: { title: 'Figma', color: '#af572f', url: 'https://figma.com', icon: globeIcon }, size: 'medium', domain: 'figma.com', showDomain: true },
+    args: { tile: { title: 'Figma', colorIndex: 0, url: 'https://figma.com', icon: globeIcon }, size: 'medium', domain: 'figma.com', showDomain: true },
     argTypes: { size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] }, selected: { control: 'boolean' }, revealed: { control: 'boolean' } },
   })
 </script>
@@ -28,7 +28,7 @@
   name='Small'
   args={{ size: 'small' }}
   {template}
-/>
+ />
 <Story
   name='Medium'
   {template}
@@ -36,34 +36,34 @@
     await expect(canvas.getByRole('link', { name: /^Open Figma/ })).toBeVisible()
     await expect(canvas.getByText('figma.com')).toBeVisible()
   }}
-/>
+ />
 <Story
   name='Wide'
-  args={{ size: 'wide', tile: { title: 'Gmail', color: '#a44f4c', url: 'https://mail.google.com', icon: globeIcon }, domain: 'mail.google.com' }}
+  args={{ size: 'wide', tile: { title: 'Gmail', colorIndex: 3, url: 'https://mail.google.com', icon: globeIcon }, domain: 'mail.google.com' }}
   {template}
-/>
+ />
 <Story
   name='Large'
   args={{ size: 'large' }}
   {template}
-/>
+ />
 <Story
   name='Selected'
   args={{ selected: true }}
   {template}
-/>
+ />
 <Story
   name='Self-revealing'
   args={{ revealed: true }}
   {template}
-/>
+ />
 <Story
   name='Long title'
-  args={{ tile: { title: 'A bookmark with a very long but completely safe title', color: '#3b546e', url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }}
+  args={{ tile: { title: 'A bookmark with a very long but completely safe title', colorIndex: 2, url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }}
   {template}
-/>
+ />
 <Story
   name='Without icon'
-  args={{ tile: { title: 'A quiet bookmark', color: '#3b546e', url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }}
+  args={{ tile: { title: 'A quiet bookmark', colorIndex: 2, url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }}
   {template}
-/>
+ />

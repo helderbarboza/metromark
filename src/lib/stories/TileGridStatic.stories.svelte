@@ -13,17 +13,17 @@
   interface StaticTile {
     id: string
     title: string
-    color: string
+    colorIndex: number
     domain: string
     href: string
     size: TileSize
   }
 
   const staticTiles: StaticTile[] = [
-    { id: 'slack', title: 'Slack', color: '#845576', domain: 'slack.com', href: 'https://slack.com', size: 'small' },
-    { id: 'figma', title: 'Figma', color: '#af572f', domain: 'figma.com', href: 'https://figma.com', size: 'medium' },
-    { id: 'gmail', title: 'Gmail', color: '#a44f4c', domain: 'mail.google.com', href: 'https://mail.google.com', size: 'wide' },
-    { id: 'notion', title: 'Notion', color: '#586857', domain: 'notion.so', href: 'https://notion.so', size: 'large' },
+    { id: 'slack', title: 'Slack', colorIndex: 0, domain: 'slack.com', href: 'https://slack.com', size: 'small' },
+    { id: 'figma', title: 'Figma', colorIndex: 1, domain: 'figma.com', href: 'https://figma.com', size: 'medium' },
+    { id: 'gmail', title: 'Gmail', colorIndex: 2, domain: 'mail.google.com', href: 'https://mail.google.com', size: 'wide' },
+    { id: 'notion', title: 'Notion', colorIndex: 3, domain: 'notion.so', href: 'https://notion.so', size: 'large' },
   ]
 
   const { Story } = defineMeta({
@@ -32,7 +32,7 @@
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },
     args: {
-      tile: { title: 'Figma', color: '#af572f', url: 'https://figma.com', icon: globeIcon },
+      tile: { title: 'Figma', colorIndex: 1, url: 'https://figma.com', icon: globeIcon },
       size: 'medium',
       domain: 'figma.com',
       showDomain: true,
@@ -53,7 +53,7 @@
         style='display:block;width:{cellsToPx(SIZES[tile.size][0], 68)}px;height:{cellsToPx(SIZES[tile.size][1], 68)}px;text-decoration:none'
       >
         <MetroTile
-          tile={{ title: tile.title, color: tile.color, url: tile.href, icon: globeIcon }}
+          tile={{ title: tile.title, colorIndex: tile.colorIndex, url: tile.href, icon: globeIcon }}
           size={tile.size}
           domain={tile.domain}
           showDomain={args.showDomain ?? true}

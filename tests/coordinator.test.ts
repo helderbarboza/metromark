@@ -79,8 +79,8 @@ describe('commands and synchronization', () => {
   it('resizes tiles and persists metadata without modifying the bookmark', async () => {
     const { coordinator, bookmarks } = fixture()
     const update = vi.spyOn(bookmarks, 'update')
-    const result = await coordinator.execute({ type: 'tile.appearance', id: 'figma', patch: { size: 'small', color: '#123456' } })
-    expect(result.snapshot.appearance.figma).toEqual({ size: 'small', color: '#123456' })
+    const result = await coordinator.execute({ type: 'tile.appearance', id: 'figma', patch: { size: 'small', colorIndex: 3, color: '#123456' } })
+    expect(result.snapshot.appearance.figma).toEqual({ size: 'small', colorIndex: 3, color: '#123456' })
     expect(update).not.toHaveBeenCalled()
   })
 })
@@ -88,7 +88,7 @@ describe('commands and synchronization', () => {
 describe('durable Undo', () => {
   it('immediately deletes and restores a bookmark under a new ID with its appearance', async () => {
     const { coordinator } = fixture()
-    await coordinator.execute({ type: 'tile.appearance', id: 'figma', patch: { color: '#123456' } })
+    await coordinator.execute({ type: 'tile.appearance', id: 'figma', patch: { colorIndex: 3, color: '#123456' } })
     const deleted = await coordinator.execute({ type: 'node.remove', id: 'figma' })
     expect(indexTree(deleted.snapshot.tree).has('figma')).toBe(false)
     expect(deleted.snapshot.undos).toHaveLength(1)

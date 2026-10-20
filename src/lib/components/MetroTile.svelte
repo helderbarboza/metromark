@@ -1,7 +1,9 @@
 <script lang='ts'>
   import type { Snippet } from 'svelte'
   import type { MetroTileDef, TileSize } from '../types'
+  import { theme } from 'mode-watcher'
   import { faviconRequestForTile } from '../icon-sources'
+  import { getThemeAccentColors } from '../tree'
   import FaviconIcon from './FaviconIcon.svelte'
   import Icon from './Icon.svelte'
   import MetroLiveFaces from './MetroLiveFaces.svelte'
@@ -17,22 +19,46 @@
   }
 
   const { tile, size, selected = false, revealed = false, domain = '', showDomain = true, children }: Props = $props()
+
+  // sRGB to linear conversion constants
+  const SRGB_THRESHOLD = 0.04045
+  const SRGB_DIVISOR = 12.92
+  const SRGB_OFFSET = 0.055
+  const SRGB_SCALE = 1.055
+  const GAMMA = 2.4
+
+  // Luminance coefficients (ITU-R BT.709)
+  const LUM_R = 0.2126
+  const LUM_G = 0.7152
+  const LUM_B = 0.0722
+
+  // WCAG contrast ratio constants
+  const CONTRAST_NUMERATOR = 1.05
+  const CONTRAST_DENOMINATOR_OFFSET = 0.05
+  const CONTRAST_THRESHOLD_AA = 2
+
   function foreground(color: string): string {
     if (!/^#[0-9a-f]{6}$/i.test(color))
       return '#ffffff'
     const channels = [1, 3, 5]
       .map(start => parseInt(color.slice(start, start + 2), 16) / 255)
       .map(channel =>
-        channel <= 0.04045
-          ? channel / 12.92
-          : ((channel + 0.055) / 1.055) ** 2.4,
+        channel <= SRGB_THRESHOLD
+          ? channel / SRGB_DIVISOR
+          : ((channel + SRGB_OFFSET) / SRGB_SCALE) ** GAMMA,
       )
-    const luminance
-      = 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
-    return 1.05 / (luminance + 0.05) >= 4.5 ? '#ffffff' : '#000000'
+    const luminance = LUM_R * channels[0] + LUM_G * channels[1] + LUM_B * channels[2]
+    return CONTRAST_NUMERATOR / (luminance + CONTRAST_DENOMINATOR_OFFSET) >= CONTRAST_THRESHOLD_AA ? '#ffffff' : '#000000'
   }
+
+  // Get the effective background color for fg computation (custom color or theme accent)
+  const themeColors = $derived.by(() => {
+    void theme.current
+    return getThemeAccentColors()
+  })
+  const bgColor = $derived(tile.color ?? themeColors[tile.colorIndex] ?? '#000000')
   const showLive = $derived(Boolean(tile.faces?.length) && size !== 'small')
-  const fg = $derived(foreground(tile.color))
+  const fg = $derived(foreground(bgColor))
   // The check is the selection mark (uwp8 pp. 80, 111) and doubles as the
   // self-revealing preview while a cross-slide gesture is still armed.
   const checked = $derived(selected || revealed)
@@ -77,15 +103,7 @@
   }
 </script>
 
-<div
-  class='metro-tile metro-tile-{size}'
-  class:selected
-  class:revealed
-  style:background={tile.color}
-  style:--tile-color={tile.color}
-  style:--tile-fg={fg}
-  {@attach tilt}
->
+{#snippet tileContent()}
   {#if children}
     {@render children()}
   {:else if showLive}
@@ -124,7 +142,32 @@
     class='tile-badge'
     aria-hidden='true'
   >{tile.badge}</span>{/if}
-</div>
+{/snippet}
+
+{#if tile.color}
+  <div
+    class='metro-tile metro-tile-{size}'
+    class:selected
+    class:revealed
+    style:background={tile.color}
+    style:--tile-color={bgColor}
+    style:--tile-fg={fg}
+    {@attach tilt}
+  >
+    {@render tileContent()}
+  </div>
+{:else}
+  <div
+    class='metro-tile metro-tile-{size} tile-accent-{tile.colorIndex}'
+    class:selected
+    class:revealed
+    style:--tile-color={bgColor}
+    style:--tile-fg={fg}
+    {@attach tilt}
+  >
+    {@render tileContent()}
+  </div>
+{/if}
 
 <style>
   .metro-tile {

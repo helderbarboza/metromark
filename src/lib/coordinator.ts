@@ -314,8 +314,13 @@ export class BookmarkCoordinator {
             throw new Error('Choose a supported tile size.')
           patch.size = command.patch.size
         }
+        if (command.patch.colorIndex !== undefined) {
+          if (command.patch.colorIndex < 0 || command.patch.colorIndex > 7)
+            throw new Error('Color index must be 0-7.')
+          patch.colorIndex = command.patch.colorIndex
+        }
         if (command.patch.color !== undefined) {
-          if (!/^#[0-9a-f]{6}$/i.test(command.patch.color))
+          if (command.patch.color !== '' && !/^#[0-9a-f]{6}$/i.test(command.patch.color))
             throw new Error('Use a six-digit hex color.')
           patch.color = command.patch.color
         }

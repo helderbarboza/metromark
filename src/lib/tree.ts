@@ -2,7 +2,16 @@ import type { Appearance, BookmarkNode, GroupView, Snapshot, TileView } from './
 import { globeIcon } from './icons'
 import { reconcileLayout, sizeOf } from './layout'
 
-export const PALETTE = ['#af572f', '#6559b4', '#32767d', '#4b6eaa', '#767148', '#9b526b', '#53774f', '#a14e47']
+const FALLBACK_PALETTE = ['#af572f', '#6559b4', '#32767d', '#4b6eaa', '#767148', '#9b526b', '#53774f', '#a14e47']
+const ACCENT_KEYS = ['base08', 'base09', 'base0A', 'base0B', 'base0C', 'base0D', 'base0E', 'base0F']
+
+export function getThemeAccentColors(): string[] {
+  if (typeof document === 'undefined')
+    return FALLBACK_PALETTE
+  const styles = getComputedStyle(document.documentElement)
+  return ACCENT_KEYS.map((key, i) => styles.getPropertyValue(`--${key}`).trim() || FALLBACK_PALETTE[i])
+}
+
 export const isBookmark = (node: BookmarkNode) => typeof node.url === 'string' && node.type !== 'separator'
 export const isFolder = (node: BookmarkNode) => !isBookmark(node) && node.type !== 'separator'
 export function flatten(tree: BookmarkNode[]): BookmarkNode[] {
@@ -42,7 +51,7 @@ export function canModify(node: BookmarkNode, tree: BookmarkNode[]): boolean {
 export function canAddTo(node: BookmarkNode, tree: BookmarkNode[]): boolean {
   return isFolder(node) && Boolean(node.parentId) && !isManaged(node, indexTree(tree))
 }
-export function website(url: string): { domain: string, color: string } {
+export function website(url: string): { domain: string, colorIndex: number } {
   let domain: string
   try {
     domain = new URL(url).hostname.replace(/^www\./, '') || new URL(url).protocol.replace(':', '')
@@ -51,7 +60,7 @@ export function website(url: string): { domain: string, color: string } {
     domain = 'bookmark'
   }
   const hash = [...domain].reduce((n, letter) => (n * 31 + letter.charCodeAt(0)) >>> 0, 0)
-  return { domain, color: PALETTE[hash % PALETTE.length] }
+  return { domain, colorIndex: hash % 8 }
 }
 export function tileFor(node: BookmarkNode, appearance: Appearance = {}, tree?: BookmarkNode[]): TileView {
   const site = website(node.url ?? '')
@@ -63,7 +72,8 @@ export function tileFor(node: BookmarkNode, appearance: Appearance = {}, tree?: 
     url: node.url ?? '',
     domain: site.domain,
     size: appearance.size ?? 'medium',
-    color: appearance.color ?? site.color,
+    colorIndex: appearance.colorIndex ?? site.colorIndex,
+    color: appearance.color,
     icon: globeIcon,
     writable: tree ? canModify(node, tree) : true,
   }

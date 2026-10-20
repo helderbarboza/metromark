@@ -4,7 +4,7 @@ export type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
 
 export type TileSize = 'small' | 'medium' | 'wide' | 'large'
 export interface MetroFace { big?: string | number, title?: string, lines?: string[], background?: string }
-export interface MetroTileDef { title: string, color: string, icon?: string, badge?: string | number, faces?: MetroFace[], period?: number, url?: string }
+export interface MetroTileDef { title: string, colorIndex: number, color?: string, icon?: string, badge?: string | number, faces?: MetroFace[], period?: number, url?: string }
 
 export interface BookmarkNode {
   id: string
@@ -19,7 +19,7 @@ export interface BookmarkNode {
   children?: BookmarkNode[]
 }
 export interface CreateNode { parentId: string, title?: string, url?: string, index?: number, type?: 'separator' }
-export interface Appearance { size?: TileSize, color?: string }
+export interface Appearance { size?: TileSize, colorIndex?: number, color?: string }
 export type ThemeName =
   | 'one-light'
   | 'github'

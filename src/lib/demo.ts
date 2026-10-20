@@ -55,5 +55,9 @@ export function demoData(): AppData {
     tools: [item('storybook', 0, 0, 2, 2), item('snapgrid', 0, 2, 2, 2)],
     other: [item('youtube', 0, 0, 4, 2), item('spotify', 0, 2, 2, 2), item('wikipedia', 2, 2, 2, 2), item('unsplash', 0, 4, 4, 2)],
   }
-  return { ...emptyData(), layouts, appearance: Object.fromEntries(Object.values(layouts).flatMap(layout => layout.map(entry => [entry.i, { size: sizeOf(entry) }]))) }
+  const allIds = Object.values(layouts).flatMap(layout => layout.map(entry => entry.i))
+  const appearance: Record<string, { size: 'small' | 'medium' | 'wide' | 'large', colorIndex: number }> = Object.fromEntries(allIds.map((id, idx) => [id, { size: 'medium' as const, colorIndex: idx % 8 }]))
+  // Override figma to large (4x4 in layout)
+  appearance.figma = { size: 'large', colorIndex: appearance.figma.colorIndex }
+  return { ...emptyData(), layouts, appearance }
 }
