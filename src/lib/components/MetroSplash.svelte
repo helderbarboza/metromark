@@ -5,6 +5,8 @@
 -->
 <script lang='ts'>
   import type { MetroTileDef } from '../types'
+  import { foreground } from '../color'
+  import { getThemeAccentColors } from '../tree'
 
   interface Props {
     tile: MetroTileDef
@@ -13,11 +15,16 @@
   }
 
   const { tile, hint = 'Click or press Esc to return to Start', onClose }: Props = $props()
+
+  const themeColors = $derived.by(() => getThemeAccentColors())
+  const bgColor = $derived(tile.color || themeColors[tile.colorIndex] || '#000000')
+  const fg = $derived(foreground(bgColor) === 1 ? '#ffffff' : '#000000')
 </script>
 
 <div
   class='metro-splash'
-  style:background={tile.color}
+  style:background={bgColor}
+  style:--tile-fg={fg}
   role='button'
   tabindex='0'
   onclick={() => onClose?.()}
@@ -38,7 +45,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: var(--tile-fg);
     outline: none;
     animation: metro-splash-in 380ms cubic-bezier(0.1, 0.9, 0.2, 1) both;
   }
