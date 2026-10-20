@@ -5,7 +5,9 @@ import { demoData, demoTree } from '../src/lib/demo'
 import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '../src/lib/icon-sources'
 import { globeIcon } from '../src/lib/icons'
 import { overlaps, reconcileLayout, usedCols, validateLayout } from '../src/lib/layout'
-import { canAddTo, canModify, flatten, indexTree, isBookmark, projectGroups, tileFor, validateUrl } from '../src/lib/tree'
+import { tileFor } from '../src/lib/tile'
+import { canAddTo, canModify, flatten, indexTree, isBookmark, projectGroups } from '../src/lib/tree'
+import { validateUrl } from '../src/lib/url'
 
 const fixture = (): Snapshot => ({ ...demoData(), tree: normalizeTree(demoTree()), revision: 0, mode: 'preview', undos: [] })
 

@@ -1,7 +1,7 @@
 import type { AppData, BookmarkNode, Client } from '../types'
 import { BookmarkCoordinator } from '../coordinator'
 import { demoData, demoTree } from '../demo'
-import { validateUrl } from '../tree'
+import { validateUrl } from '../url.js'
 import { MemoryBookmarks, MemoryPersistence } from './memory'
 
 const TREE_KEY = 'metro.preview.bookmarks.v1'

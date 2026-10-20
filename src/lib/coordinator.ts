@@ -14,7 +14,8 @@ import type {
   UndoRecord,
 } from './types'
 import { freePosition, reconcileLayout, SIZES, validateLayout } from './layout'
-import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups, validateUrl } from './tree'
+import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from './tree'
+import { validateUrl } from './url.js'
 
 export const UNDO_TTL = 30_000
 export const DEFAULT_SETTINGS: Settings = {

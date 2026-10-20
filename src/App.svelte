@@ -1,18 +1,18 @@
 <script lang='ts'>
   import type { MenuItem } from './lib/components/ContextMenu.svelte'
   import type { DialogSpec } from './lib/components/Editor.svelte'
+  import type { ThemeMode } from './lib/theme-picker'
   import type {
     Client,
     Command,
     Layout,
     Notice,
     Snapshot,
-    ThemeName,
     TileSize,
   } from './lib/types'
   import { SnapGridGroup } from '@snapgridjs/svelte'
-  import { mode, ModeWatcher, setTheme, theme } from 'mode-watcher'
-  import { onMount, untrack } from 'svelte'
+  import { mode, ModeWatcher, theme } from 'mode-watcher'
+  import { onMount } from 'svelte'
   import Button from './lib/components/Button.svelte'
   import ContextMenu from './lib/components/ContextMenu.svelte'
   import Editor from './lib/components/Editor.svelte'
@@ -23,7 +23,7 @@
   import UndoToast from './lib/components/UndoToast.svelte'
   import { toggleSelection } from './lib/interaction'
   import { cellsToPx, GAP, reconcileLayout, ROWS } from './lib/layout'
-  import { applyThemeForMode, getThemeSelections, type ThemeMode } from './lib/theme-picker'
+  import { applyThemeForMode } from './lib/theme-picker'
   import {
     countBookmarks,
     flatten,
@@ -258,7 +258,8 @@
 
   $effect(() => {
     const resolvedMode = mode.current
-    if (!resolvedMode || resolvedMode === lastAppliedMode) return
+    if (!resolvedMode || resolvedMode === lastAppliedMode)
+      return
     lastAppliedMode = resolvedMode
     applyThemeForMode(resolvedMode)
   })

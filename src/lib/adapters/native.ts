@@ -1,6 +1,6 @@
 import type { AppData, BookmarkNode, BookmarkPort, Client, Command, CommandResult, CreateNode, Snapshot } from '../types'
 import { browser } from 'wxt/browser'
-import { validateUrl } from '../tree'
+import { validateUrl } from '../url.js'
 import { normalizeTree } from './memory'
 
 export const MESSAGE_SCOPE = 'metro-bookmarks/v1'

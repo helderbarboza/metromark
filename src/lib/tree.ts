@@ -1,16 +1,6 @@
-import type { Appearance, BookmarkNode, GroupView, Snapshot, TileView } from './types'
-import { globeIcon } from './icons'
-import { reconcileLayout, sizeOf } from './layout'
-
-const FALLBACK_PALETTE = ['#af572f', '#6559b4', '#32767d', '#4b6eaa', '#767148', '#9b526b', '#53774f', '#a14e47']
-const ACCENT_KEYS = ['base08', 'base09', 'base0A', 'base0B', 'base0C', 'base0D', 'base0E', 'base0F']
-
-export function getThemeAccentColors(): string[] {
-  if (typeof document === 'undefined')
-    return FALLBACK_PALETTE
-  const styles = getComputedStyle(document.documentElement)
-  return ACCENT_KEYS.map((key, i) => styles.getPropertyValue(`--${key}`).trim() || FALLBACK_PALETTE[i])
-}
+import type { BookmarkNode, GroupView, Snapshot } from './types'
+import { reconcileLayout, sizeOf } from './layout-constants'
+import { tileFor } from './tile'
 
 export const isBookmark = (node: BookmarkNode) => typeof node.url === 'string' && node.type !== 'separator'
 export const isFolder = (node: BookmarkNode) => !isBookmark(node) && node.type !== 'separator'
@@ -31,6 +21,9 @@ export function pathFor(id: string, nodes: Map<string, BookmarkNode>): string[] 
   }
   return path
 }
+export function formatGroupPath(path: string[]): string {
+  return path.length > 1 ? `${path.slice(0, -1).join(' / ')} /` : 'BROWSER ROOT'
+}
 export function isManaged(node: BookmarkNode, nodes: Map<string, BookmarkNode>): boolean {
   const seen = new Set<string>()
   let cursor: BookmarkNode | undefined = node
@@ -50,33 +43,6 @@ export function canModify(node: BookmarkNode, tree: BookmarkNode[]): boolean {
 }
 export function canAddTo(node: BookmarkNode, tree: BookmarkNode[]): boolean {
   return isFolder(node) && Boolean(node.parentId) && !isManaged(node, indexTree(tree))
-}
-export function website(url: string): { domain: string, colorIndex: number } {
-  let domain: string
-  try {
-    domain = new URL(url).hostname.replace(/^www\./, '') || new URL(url).protocol.replace(':', '')
-  }
-  catch {
-    domain = 'bookmark'
-  }
-  const hash = [...domain].reduce((n, letter) => (n * 31 + letter.charCodeAt(0)) >>> 0, 0)
-  return { domain, colorIndex: hash % 8 }
-}
-export function tileFor(node: BookmarkNode, appearance: Appearance = {}, tree?: BookmarkNode[]): TileView {
-  const site = website(node.url ?? '')
-  // Every tile renders the site's original favicon (see FaviconIcon) and
-  // falls back to the single generic globe when no favicon is available.
-  return {
-    id: node.id,
-    title: node.title || site.domain,
-    url: node.url ?? '',
-    domain: site.domain,
-    size: appearance.size ?? 'medium',
-    colorIndex: appearance.colorIndex ?? site.colorIndex,
-    color: appearance.color,
-    icon: globeIcon,
-    writable: tree ? canModify(node, tree) : true,
-  }
 }
 export function projectGroups(snapshot: Snapshot): GroupView[] {
   const nodes = indexTree(snapshot.tree)
@@ -115,7 +81,6 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
       if (isFolder(container))
         walk(container, [], container.id)
     }
-    // Some imported/alternate API trees can expose real direct links; do not silently omit them.
     const links = (root.children ?? []).filter(isBookmark)
     if (links.length) {
       result.unshift(
@@ -134,24 +99,5 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
     }
   }
   return result
-}
-export function validateUrl(value: string): string {
-  const url = value.trim()
-  if (!url)
-    throw new Error('Enter a website address.')
-  let parsed: URL
-  try {
-    parsed = new URL(url)
-  }
-  catch {
-    throw new Error('Use a complete address, such as https://example.com.')
-  }
-  if (['javascript:', 'data:', 'vbscript:', 'blob:'].includes(parsed.protocol)) {
-    throw new Error('Executable and data URLs cannot be launched from this privileged extension page.')
-  }
-  if (!['http:', 'https:', 'file:', 'ftp:', 'mailto:', 'tel:', 'chrome:', 'about:', 'moz-extension:', 'chrome-extension:'].includes(parsed.protocol)) {
-    throw new Error('This address uses an unsupported URL scheme.')
-  }
-  return url
 }
 export const countBookmarks = (node: BookmarkNode) => flatten([node]).filter(isBookmark).length

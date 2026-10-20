@@ -1,4 +1,4 @@
-import type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
+import type { Layout, LayoutItem } from '@snapgridjs/core'
 
 export type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
 
@@ -20,19 +20,19 @@ export interface BookmarkNode {
 }
 export interface CreateNode { parentId: string, title?: string, url?: string, index?: number, type?: 'separator' }
 export interface Appearance { size?: TileSize, colorIndex?: number, color?: string }
-export type ThemeName =
-  | 'one-light'
-  | 'github'
-  | 'solarized-light'
-  | 'tokyo-night-light'
-  | 'catppuccin-latte'
-  | 'one-dark'
-  | 'github-dark'
-  | 'solarized-dark'
-  | 'tokyo-night-dark'
-  | 'catppuccin-mocha'
-  | 'catppuccin-macchiato'
-  | 'catppuccin-frappe'
+export type ThemeName
+  = | 'one-light'
+    | 'github'
+    | 'solarized-light'
+    | 'tokyo-night-light'
+    | 'catppuccin-latte'
+    | 'one-dark'
+    | 'github-dark'
+    | 'solarized-dark'
+    | 'tokyo-night-dark'
+    | 'catppuccin-mocha'
+    | 'catppuccin-macchiato'
+    | 'catppuccin-frappe'
 export interface Settings {
   density: 'comfortable' | 'compact'
   showDomains: boolean

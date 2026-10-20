@@ -1,6 +1,5 @@
 import type { AppData, BookmarkNode, Layout } from './types'
 import { emptyData } from './coordinator'
-import { sizeOf } from './layout'
 
 const link = (id: string, title: string, url: string): BookmarkNode => ({ id, title, url })
 const folder = (id: string, title: string, children: BookmarkNode[], folderType?: string): BookmarkNode => ({ id, title, children, folderType })

@@ -1,10 +1,8 @@
 <script lang='ts'>
   import type { Snippet } from 'svelte'
   import type { MetroTileDef, TileSize } from '../types'
-  import { theme } from 'mode-watcher'
-  import { foreground } from '../color'
   import { faviconRequestForTile } from '../icon-sources'
-  import { getThemeAccentColors } from '../tree'
+  import { resolveTileColors } from '../theme-colors'
   import FaviconIcon from './FaviconIcon.svelte'
   import Icon from './Icon.svelte'
   import MetroLiveFaces from './MetroLiveFaces.svelte'
@@ -21,14 +19,9 @@
 
   const { tile, size, selected = false, revealed = false, domain = '', showDomain = true, children }: Props = $props()
 
-  // Get the effective background color for fg computation (custom color or theme accent)
-  const themeColors = $derived.by(() => {
-    void theme.current
-    return getThemeAccentColors()
-  })
-  const bgColor = $derived(tile.color || themeColors[tile.colorIndex] || '#000000')
+  const { bg: bgColor, fg: fgValue } = $derived(resolveTileColors(tile))
+  const fg = $derived(fgValue === 1 ? '#ffffff' : '#000000')
   const showLive = $derived(Boolean(tile.faces?.length) && size !== 'small')
-  const fg = $derived(foreground(bgColor) === 1 ? '#ffffff' : '#000000')
   // The check is the selection mark (uwp8 pp. 80, 111) and doubles as the
   // self-revealing preview while a cross-slide gesture is still armed.
   const checked = $derived(selected || revealed)

@@ -4,7 +4,7 @@
   import { createGridItem } from '@snapgridjs/svelte'
   import { advanceGesture, releaseOutcome, startGesture } from '../interaction'
   import { sizeOf } from '../layout'
-  import { validateUrl } from '../tree'
+  import { safeUrl, validateUrl } from '../url'
   import MetroTile from './MetroTile.svelte'
 
   interface Props {
@@ -30,15 +30,7 @@
   let swallowClick = false
   const revealed = $derived(!dragging && gesture?.state === 'armed')
   // Unsupported addresses stay in the tree but must never be launched (see validateUrl).
-  function safeHref(url: string): string {
-    try {
-      return validateUrl(url)
-    }
-    catch {
-      return '#'
-    }
-  }
-  const href = $derived(safeHref(tile.url))
+  const href = $derived(safeUrl(tile.url))
 
   function pointerdown(event: PointerEvent) {
     swallowClick = false

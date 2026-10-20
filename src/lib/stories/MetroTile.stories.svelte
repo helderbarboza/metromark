@@ -28,7 +28,7 @@
   name='Small'
   args={{ size: 'small' }}
   {template}
- />
+/>
 <Story
   name='Medium'
   {template}
@@ -36,34 +36,34 @@
     await expect(canvas.getByRole('link', { name: /^Open Figma/ })).toBeVisible()
     await expect(canvas.getByText('figma.com')).toBeVisible()
   }}
- />
+/>
 <Story
   name='Wide'
   args={{ size: 'wide', tile: { title: 'Gmail', colorIndex: 3, url: 'https://mail.google.com', icon: globeIcon }, domain: 'mail.google.com' }}
   {template}
- />
+/>
 <Story
   name='Large'
   args={{ size: 'large' }}
   {template}
- />
+/>
 <Story
   name='Selected'
   args={{ selected: true }}
   {template}
- />
+/>
 <Story
   name='Self-revealing'
   args={{ revealed: true }}
   {template}
- />
+/>
 <Story
   name='Long title'
   args={{ tile: { title: 'A bookmark with a very long but completely safe title', colorIndex: 2, url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }}
   {template}
- />
+/>
 <Story
   name='Without icon'
   args={{ tile: { title: 'A quiet bookmark', colorIndex: 2, url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }}
   {template}
- />
+/>

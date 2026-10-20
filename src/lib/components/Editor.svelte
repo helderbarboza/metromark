@@ -20,15 +20,15 @@
   import type { Command, Settings, Snapshot, TileSize } from '../types'
   import { setMode, systemPrefersMode, theme, userPrefersMode } from 'mode-watcher'
   import { onMount } from 'svelte'
+  import { getThemeAccentColors } from '../theme-colors'
   import { DARK_THEMES, getThemeSelections, isOneOf, LIGHT_THEMES, setThemeForMode } from '../theme-picker'
+  import { tileFor } from '../tile'
   import {
     countBookmarks,
     flatten,
-    getThemeAccentColors,
     indexTree,
     isFolder,
     projectGroups,
-    tileFor,
   } from '../tree'
   import Button from './Button.svelte'
   import Icon from './Icon.svelte'

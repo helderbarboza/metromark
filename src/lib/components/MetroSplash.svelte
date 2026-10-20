@@ -6,7 +6,7 @@
 <script lang='ts'>
   import type { MetroTileDef } from '../types'
   import { foreground } from '../color'
-  import { getThemeAccentColors } from '../tree'
+  import { getThemeAccentColors } from '../theme-colors'
 
   interface Props {
     tile: MetroTileDef
