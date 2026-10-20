@@ -20,8 +20,20 @@ export interface BookmarkNode {
 }
 export interface CreateNode { parentId: string, title?: string, url?: string, index?: number, type?: 'separator' }
 export interface Appearance { size?: TileSize, color?: string }
+export type ThemeName =
+  | 'one-light'
+  | 'github'
+  | 'solarized-light'
+  | 'tokyo-night-light'
+  | 'catppuccin-latte'
+  | 'one-dark'
+  | 'github-dark'
+  | 'solarized-dark'
+  | 'tokyo-night-dark'
+  | 'catppuccin-mocha'
+  | 'catppuccin-macchiato'
+  | 'catppuccin-frappe'
 export interface Settings {
-  theme: 'midnight' | 'dusk' | 'forest' | 'paper'
   density: 'comfortable' | 'compact'
   showDomains: boolean
   reducedMotion: boolean

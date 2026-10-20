@@ -18,7 +18,9 @@
 
 <script lang='ts'>
   import type { Command, Settings, Snapshot, TileSize } from '../types'
+  import { setMode, systemPrefersMode, userPrefersMode } from 'mode-watcher'
   import { onMount } from 'svelte'
+  import { DARK_THEMES, getThemeSelections, isOneOf, LIGHT_THEMES, setThemeForMode } from '../theme-picker'
   import {
     countBookmarks,
     flatten,
@@ -161,14 +163,22 @@
     onclose()
   }
 
-  const themes = [
-    { id: 'midnight', name: 'Midnight', bg: '#101216', tile: '#af572f' },
-    { id: 'dusk', name: 'Dusk', bg: '#201b2b', tile: '#856bb1' },
-    { id: 'forest', name: 'Forest', bg: '#15211e', tile: '#53774f' },
-    { id: 'paper', name: 'Paper', bg: '#eeece8', tile: '#af572f' },
-  ] as const
-
   const densities = ['comfortable', 'compact'] as const
+
+  const modes = ['system', 'light', 'dark'] as const
+
+  let selections = $state(getThemeSelections())
+
+  function chooseTheme(targetMode: 'light' | 'dark', newTheme: string): void {
+    if (targetMode === 'light' && isOneOf(newTheme, LIGHT_THEMES)) {
+      setThemeForMode('light', newTheme)
+    }
+    else if (targetMode === 'dark' && isOneOf(newTheme, DARK_THEMES)) {
+      setThemeForMode('dark', newTheme)
+    }
+
+    selections = getThemeSelections()
+  }
 </script>
 
 <Modal
@@ -186,28 +196,75 @@
       A familiar feeling. A space that's entirely yours.
     </p>
     <div class='setting-section'>
-      <h3>Canvas</h3>
-      <div class='themes'>
-        {#each themes as theme (theme.id)}
+      <h3>Mode</h3>
+      <div class='segmented'>
+        {#each modes as modeOption (modeOption)}
           <button
-            class='theme-option'
-            class:chosen={snapshot.settings.theme === theme.id}
-            aria-pressed={snapshot.settings.theme === theme.id}
-            disabled={busy}
-            onclick={() => setting({ theme: theme.id })}
+            class:chosen={userPrefersMode.current === modeOption}
+            aria-pressed={userPrefersMode.current === modeOption}
+            onclick={() => setMode(modeOption)}
           >
-            <span class='theme-preview' style:background={theme.bg}>
-              <span style:background={theme.tile}></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-            <span class='theme-name'>{theme.name}{#if snapshot.settings.theme === theme.id}<Icon
-              name='check'
-              size={12}
-            />{/if}</span>
+            {modeOption}
+            {#if modeOption === 'system'}
+              <p>({systemPrefersMode.current})</p>
+            {/if}
           </button>
         {/each}
+      </div>
+    </div>
+    <div class='setting-section'>
+      <h3>Canvas</h3>
+      <div class='theme-groups'>
+        <div class='theme-group'>
+          <h4>Light theme</h4>
+          <div class='themes'>
+            {#each LIGHT_THEMES as theme (theme)}
+              {@const selected = selections.light === theme}
+              <button
+                class='theme-option'
+                class:chosen={selected}
+                aria-pressed={selected}
+                onclick={() => chooseTheme('light', theme)}
+              >
+                <span class='theme-preview bg-(--bg)' data-theme={theme}>
+                  <span class='bg-(--accent)'></span>
+                  <span class='bg-(--accent-ink)'></span>
+                  <span class='bg-(--text)'></span>
+                  <span class='bg-(--muted)'></span>
+                </span>
+                <span class='theme-name'>
+                  {theme}
+                  {#if selected}<Icon name='check' size={12} />{/if}
+                </span>
+              </button>
+            {/each}
+          </div>
+        </div>
+        <div class='theme-group'>
+          <h4>Dark theme</h4>
+          <div class='themes'>
+            {#each DARK_THEMES as theme (theme)}
+              {@const selected = selections.dark === theme}
+              <button
+                class='theme-option'
+                class:chosen={selected}
+                aria-pressed={selected}
+                onclick={() => chooseTheme('dark', theme)}
+              >
+                <span class='dark theme-preview bg-(--bg)' data-theme={theme}>
+                  <span class='bg-(--accent)'></span>
+                  <span class='bg-(--accent-ink)'></span>
+                  <span class='bg-(--text)'></span>
+                  <span class='bg-(--muted)'></span>
+                </span>
+                <span class='theme-name'>
+                  {theme}
+                  {#if selected}<Icon name='check' size={12} />{/if}
+                </span>
+              </button>
+            {/each}
+          </div>
+        </div>
       </div>
     </div>
     <div class='setting-section'>
@@ -466,7 +523,7 @@
         <p class='form-error' role='alert'>{error}</p>
       {/if}
       <div class='dialog-actions'>
-        <Button type='button' onclick={onclose}> Cancel </Button>
+        <Button type='button' onclick={onclose}>Cancel</Button>
         <Button
           variant='primary'
           type='submit'
@@ -474,7 +531,7 @@
             || spec.kind === 'restore'
             || spec.kind === 'folder'
             || (spec.kind === 'bookmark' && !node))
-            && !parentId)}
+          && !parentId)}
         >
           {busy
             ? 'Saving…'
@@ -502,6 +559,19 @@
     font-weight: 550;
     margin: 0 0 13px;
   }
+  .theme-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .theme-group h4 {
+    font-size: 11px;
+    font-weight: 550;
+    margin: 0 0 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
   .themes {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -524,16 +594,6 @@
     gap: 5px;
     height: 63px;
     padding: 12px 19px;
-  }
-  .theme-preview span {
-    background: #748171;
-    opacity: 0.8;
-  }
-  .theme-preview span:nth-child(3) {
-    background: #6e63a8;
-  }
-  .theme-preview span:nth-child(4) {
-    background: #486e85;
   }
   .theme-name {
     display: flex;

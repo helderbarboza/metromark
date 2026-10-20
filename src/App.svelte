@@ -7,10 +7,12 @@
     Layout,
     Notice,
     Snapshot,
+    ThemeName,
     TileSize,
   } from './lib/types'
   import { SnapGridGroup } from '@snapgridjs/svelte'
-  import { onMount } from 'svelte'
+  import { mode, ModeWatcher, setTheme, theme } from 'mode-watcher'
+  import { onMount, untrack } from 'svelte'
   import Button from './lib/components/Button.svelte'
   import ContextMenu from './lib/components/ContextMenu.svelte'
   import Editor from './lib/components/Editor.svelte'
@@ -21,6 +23,7 @@
   import UndoToast from './lib/components/UndoToast.svelte'
   import { toggleSelection } from './lib/interaction'
   import { cellsToPx, GAP, reconcileLayout, ROWS } from './lib/layout'
+  import { applyThemeForMode, getThemeSelections, type ThemeMode } from './lib/theme-picker'
   import {
     countBookmarks,
     flatten,
@@ -248,6 +251,30 @@
     void visibleGroups
     void cell
     requestAnimationFrame(updateScroll)
+  })
+
+  let themeColorProbe: HTMLSpanElement
+  let lastAppliedMode = $state<ThemeMode | null>(null)
+
+  $effect(() => {
+    const resolvedMode = mode.current
+    if (!resolvedMode || resolvedMode === lastAppliedMode) return
+    lastAppliedMode = resolvedMode
+    applyThemeForMode(resolvedMode)
+  })
+
+  $effect(() => {
+    const activeTheme = theme.current
+    if (!activeTheme || !themeColorProbe)
+      return
+
+    const color = getComputedStyle(themeColorProbe).backgroundColor
+    if (!color || color === 'rgba(0, 0, 0, 0)')
+      return
+
+    document
+      .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+      ?.setAttribute('content', color)
   })
 
   function defaultFolder() {
@@ -741,9 +768,18 @@
 </script>
 
 <svelte:window onkeydown={key} />
+<ModeWatcher
+  defaultMode='system'
+  disableHeadScriptInjection
+/>
+<span
+  bind:this={themeColorProbe}
+  class='fixed size-px hidden pointer-events-none bg-(--bg)'
+  aria-hidden='true'
+>
+</span>
 <div
-  class="theme-{snapshot?.settings.theme
-    ?? 'midnight'} flex h-dvh w-full flex-col overflow-hidden relative bg-(--bg) text-(--text)"
+  class='flex h-dvh w-full flex-col overflow-hidden relative bg-(--bg) text-(--text)'
   class:reduced={snapshot?.settings.reducedMotion}
 >
   <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>

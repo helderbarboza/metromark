@@ -1,5 +1,6 @@
-<script module
-        lang='ts'
+<script
+  module
+  lang='ts'
 >
   import type { ComponentProps } from 'svelte'
   import type { TileSize } from '../types'
@@ -51,10 +52,11 @@
         aria-label={label(tile, args.showDomain ?? true)}
         style='display:block;width:{cellsToPx(SIZES[tile.size][0], 68)}px;height:{cellsToPx(SIZES[tile.size][1], 68)}px;text-decoration:none'
       >
-        <MetroTile tile={{ title: tile.title, color: tile.color, url: tile.href, icon: globeIcon }}
-                   size={tile.size}
-                   domain={tile.domain}
-                   showDomain={args.showDomain ?? true}
+        <MetroTile
+          tile={{ title: tile.title, color: tile.color, url: tile.href, icon: globeIcon }}
+          size={tile.size}
+          domain={tile.domain}
+          showDomain={args.showDomain ?? true}
         />
       </a>
     {/each}

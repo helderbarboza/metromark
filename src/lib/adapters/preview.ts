@@ -6,6 +6,8 @@ import { MemoryBookmarks, MemoryPersistence } from './memory'
 
 const TREE_KEY = 'metro.preview.bookmarks.v1'
 const DATA_KEY = 'metro.preview.presentation.v1'
+const MODE_KEY = 'mode-watcher-mode'
+const THEME_KEY = 'mode-watcher-theme'
 function readJson<T>(key: string, fallback: () => T): T {
   try {
     const value = localStorage.getItem(key)
@@ -65,6 +67,8 @@ export function createPreviewClient(persistent = true): Client {
       if (persistent) {
         localStorage.removeItem(TREE_KEY)
         localStorage.removeItem(DATA_KEY)
+        localStorage.removeItem(MODE_KEY)
+        localStorage.removeItem(THEME_KEY)
       }
       coordinator.dispose()
       unsubscribe()

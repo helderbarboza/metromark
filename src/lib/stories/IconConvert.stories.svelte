@@ -1,5 +1,6 @@
-<script module
-        lang='ts'
+<script
+  module
+  lang='ts'
 >
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
@@ -39,12 +40,15 @@
     await expect(await canvas.findByAltText('Converted icon')).toBeVisible()
   }}
 />
-<Story name='Outline variant'
-       args={{ filled: false }}
+<Story
+  name='Outline variant'
+  args={{ filled: false }}
 />
-<Story name='Circle clip'
-       args={{ iconShape: 0 }}
+<Story
+  name='Circle clip'
+  args={{ iconShape: 0 }}
 />
-<Story name='Rounded rect'
-       args={{ iconShape: 1 }}
+<Story
+  name='Rounded rect'
+  args={{ iconShape: 1 }}
 />

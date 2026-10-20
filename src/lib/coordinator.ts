@@ -18,7 +18,6 @@ import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectG
 
 export const UNDO_TTL = 30_000
 export const DEFAULT_SETTINGS: Settings = {
-  theme: 'midnight',
   density: 'comfortable',
   showDomains: true,
   reducedMotion: false,
@@ -368,8 +367,6 @@ export class BookmarkCoordinator {
       }
       case 'settings.update': {
         const patch = command.patch
-        if (patch.theme !== undefined && !['midnight', 'dusk', 'forest', 'paper'].includes(patch.theme))
-          throw new Error('Invalid theme.')
         if (patch.density !== undefined && !['comfortable', 'compact'].includes(patch.density))
           throw new Error('Invalid density.')
         if (patch.showDomains !== undefined && typeof patch.showDomains !== 'boolean')

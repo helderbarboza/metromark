@@ -1,5 +1,6 @@
-<script module
-        lang='ts'
+<script
+  module
+  lang='ts'
 >
   import type { Layout } from '@snapgridjs/core'
   import type { ComponentProps } from 'svelte'

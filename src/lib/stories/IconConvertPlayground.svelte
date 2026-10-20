@@ -86,25 +86,28 @@
 
 <div class='flex items-start gap-4'>
   <figure class='m-0'>
-    <img bind:this={img}
-         {src}
-         alt='Original icon'
-         onload={handleLoad}
-         onerror={handleError}
-         class='size-16'
+    <img
+      bind:this={img}
+      {src}
+      alt='Original icon'
+      onload={handleLoad}
+      onerror={handleError}
+      class='size-16'
     />
     <figcaption class='text-xs'>Original</figcaption>
   </figure>
 
   {#if converting}
-    <p class='text-sm'
-       aria-live='polite'
+    <p
+      class='text-sm'
+      aria-live='polite'
     >Converting…</p>
   {:else if convertedSrc}
     <figure class='m-0'>
-      <img src={convertedSrc}
-           alt='Converted icon'
-           class='size-16'
+      <img
+        src={convertedSrc}
+        alt='Converted icon'
+        class='size-16'
       />
       <figcaption class='text-xs'>Converted</figcaption>
     </figure>
@@ -112,7 +115,8 @@
 </div>
 
 {#if errorMessage}
-  <p role='alert'
-     class='text-sm'
+  <p
+    role='alert'
+    class='text-sm'
   >Conversion failed: {errorMessage}</p>
 {/if}

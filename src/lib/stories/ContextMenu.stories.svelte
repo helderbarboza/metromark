@@ -1,5 +1,6 @@
-<script module
-        lang='ts'
+<script
+  module
+  lang='ts'
 >
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn, userEvent } from 'storybook/test'
@@ -18,16 +19,18 @@
     ] },
   })
 </script>
-<Story name='Tile actions'
-       play={async ({ canvas }) => {
-         await userEvent.click(canvas.getByRole('menuitem', { name: 'Edit bookmark' }))
-         await expect(edit).toHaveBeenCalled()
-       }}
+<Story
+  name='Tile actions'
+  play={async ({ canvas }) => {
+    await userEvent.click(canvas.getByRole('menuitem', { name: 'Edit bookmark' }))
+    await expect(edit).toHaveBeenCalled()
+  }}
 />
-<Story name='Protected folder'
-       args={{ title: 'Bookmarks bar', subtitle: 'Browser-owned root', size: undefined, onresize: undefined, items: [
-         { label: 'Add bookmark here', icon: 'plus', action: fn() },
-         { label: 'Rename folder', icon: 'edit', action: fn(), disabled: true },
-         { label: 'Delete folder', icon: 'trash', action: fn(), danger: true, disabled: true },
-       ] }}
+<Story
+  name='Protected folder'
+  args={{ title: 'Bookmarks bar', subtitle: 'Browser-owned root', size: undefined, onresize: undefined, items: [
+    { label: 'Add bookmark here', icon: 'plus', action: fn() },
+    { label: 'Rename folder', icon: 'edit', action: fn(), disabled: true },
+    { label: 'Delete folder', icon: 'trash', action: fn(), danger: true, disabled: true },
+  ] }}
 />
