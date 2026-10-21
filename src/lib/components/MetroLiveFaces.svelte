@@ -16,6 +16,7 @@
     fallbackIcon?: string
     requestSize?: number
     scaleFactor?: 1 | 2
+    iconClass?: string
   }
 
   const {
@@ -27,6 +28,7 @@
     fallbackIcon = '',
     requestSize = 64,
     scaleFactor = 2,
+    iconClass = '',
   }: Props = $props()
 
   // index -1 = the icon face
@@ -58,7 +60,11 @@
 
 {#snippet face(i: number)}
   {#if i === 0}
-    <div class='metro-tile-icon'>
+    <div class={`
+      metro-tile-icon
+      ${iconClass}
+    `}
+    >
       {#if faviconPageUrl}
         <FaviconIcon
           pageUrl={faviconPageUrl}
@@ -132,9 +138,6 @@
     font-size: 40px;
     font-weight: 200;
     line-height: 1.05;
-  }
-  :global(.metro-tile-large) .big {
-    font-size: 64px;
   }
   .title {
     font-size: 16px;

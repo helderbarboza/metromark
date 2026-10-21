@@ -1,3 +1,101 @@
+<script lang='ts' module>
+  import { tv } from 'tailwind-variants'
+
+  export const tileVariants = tv({
+    slots: {
+      root: `
+        metro-tile relative size-full overflow-hidden bg-(--tile-bg) font-sans
+        text-(--tile-fg) transition-[transform,outline-color,box-shadow,opacity]
+        duration-160 ease-[cubic-bezier(0.1,0.9,0.2,1)]
+        hover:outline-2 hover:-outline-offset-2 hover:outline-(--tile-fg)/35
+        in-[.reduced]:active:transform-none
+        motion-reduce:transition-none
+        motion-reduce:active:transform-none
+      `,
+      icon: 'metro-tile-icon absolute inset-0 flex items-center justify-center',
+      label: 'absolute inset-x-3 bottom-2.5 flex flex-col gap-0.5 text-left',
+      title: 'truncate text-xs leading-[1.35] font-semibold',
+      domain: 'truncate text-[11px] leading-[1.35] font-normal opacity-[.85]',
+      check: `
+        absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pt-px
+        pr-0.5 text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
+      `,
+      badge: `
+        absolute top-2.5 left-3 flex h-[22px] min-w-[22px] items-center
+        justify-center rounded-[11px] bg-(--tile-fg) px-1.5 text-xs leading-none
+        font-semibold text-(--tile-bg)
+      `,
+    },
+    variants: {
+      size: {
+        small: {
+          root: 'metro-tile-small',
+          icon: `
+            pb-0
+            [&_img]:size-[26px]
+            [&_svg]:size-[26px]
+          `,
+          check: 'size-[18px]',
+        },
+        medium: {
+          root: 'metro-tile-medium',
+          icon: `
+            pb-6
+            [&_img]:size-[44px]
+            [&_svg]:size-[44px]
+          `,
+        },
+        wide: {
+          root: 'metro-tile-wide',
+          icon: `
+            pb-6
+            [&_img]:size-[48px]
+            [&_svg]:size-[48px]
+          `,
+        },
+        large: {
+          root: 'metro-tile-large',
+          icon: `
+            pb-[26px]
+            [&_img]:size-[80px]
+            [&_svg]:size-[80px]
+          `,
+          label: 'inset-x-3.5 bottom-3',
+          title: 'text-[15px]',
+          domain: 'text-xs',
+        },
+      },
+      selected: {
+        true: {
+          root: `
+            selected outline-[3px] outline-offset-[-3px] outline-(--tile-fg)
+            hover:outline-[3px] hover:outline-offset-[-3px]
+            hover:outline-(--tile-fg)
+          `,
+        },
+      },
+      revealed: {
+        false: {
+          root: `
+            active:transform-[perspective(600px)_rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))_scale(.97)]
+          `,
+        },
+        true: {
+          root: `
+            revealed translate-y-[6px]
+            active:transform-[translateY(6px)_perspective(600px)_rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))_scale(.97)]
+          `,
+        },
+      },
+    },
+    defaultVariants: {
+      size: 'medium',
+      selected: false,
+      revealed: false,
+    },
+  })
+</script>
+
 <script lang='ts'>
   import type { Snippet } from 'svelte'
   import type { MetroTileDef, TileSize } from '../types'
@@ -49,6 +147,8 @@
   const convertSize = $derived(faviconRequest.requestSize)
   const scaleFactor = $derived(faviconRequest.scaleFactor)
 
+  const ui = $derived(tileVariants({ size, selected, revealed }))
+
   // Metro "tilt": the tile leans away from where you press it. Purely decorative
   // press feedback (uwp8 p. 108); CSS drops it under reduced motion. Attached
   // imperatively so the visual wrapper needs no interactive ARIA role.
@@ -96,9 +196,15 @@
       fallbackIcon={tile.icon ?? ''}
       {requestSize}
       {scaleFactor}
+      iconClass={ui.icon()}
     />
   {:else}
-    <div class='metro-tile-icon' aria-hidden='true'>
+    <div class={`
+      metro-tile-icon
+      ${ui.icon()}
+    `}
+         aria-hidden='true'
+    >
       <FaviconIcon
         pageUrl={tile.url ?? ''}
         tint={fg}
@@ -110,210 +216,28 @@
     </div>
   {/if}
   {#if size !== 'small'}
-    <div class='tile-label'>
-      <span class='tile-title'>{tile.title}</span>
+    <div class={ui.label()}>
+      <span class={ui.title()}>{tile.title}</span>
       {#if showDomain && domain}
-        <span class='tile-domain'>{` ${domain}`}</span>
+        <span class={ui.domain()}>{` ${domain}`}</span>
       {/if}
     </div>
   {/if}
   {#if checked}<span
-    class='tile-check'
+    class={ui.check()}
     aria-hidden='true'
   ><Icon name='check' size={size === 'small' ? 9 : 12} /></span>{/if}
   {#if tile.badge !== undefined}<span
-    class='tile-badge'
+    class={ui.badge()}
     aria-hidden='true'
   >{tile.badge}</span>{/if}
 {/snippet}
 
-{#if tile.color}
-  <div
-    class='
-      metro-tile
-      metro-tile-{size}'
-    class:selected
-    class:revealed
-    style:background={tile.color}
-    style:--tile-color={bgColor}
-    style:--tile-fg={fg}
-    {@attach tilt}
-  >
-    {@render tileContent()}
-  </div>
-{:else}
-  <div
-    class='
-      metro-tile
-      metro-tile-{size}
-      tile-accent-{tile.colorIndex}'
-    class:selected
-    class:revealed
-    style:--tile-color={bgColor}
-    style:--tile-fg={fg}
-    {@attach tilt}
-  >
-    {@render tileContent()}
-  </div>
-{/if}
-
-<style>
-  .metro-tile {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-    color: var(--tile-fg);
-    font-family: var(--font-sans);
-    transform-origin: center;
-    transition:
-      transform 160ms cubic-bezier(0.1, 0.9, 0.2, 1),
-      outline-color 130ms,
-      box-shadow 160ms,
-      opacity 160ms;
-  }
-  .metro-tile:hover {
-    outline: 2px solid color-mix(in srgb, var(--tile-fg) 35%, transparent);
-    outline-offset: -2px;
-  }
-  .metro-tile:active {
-    transform: perspective(600px) rotateX(var(--tilt-x, 0deg))
-      rotateY(var(--tilt-y, 0deg)) scale(0.97);
-  }
-  .metro-tile.selected {
-    outline: 3px solid var(--tile-fg);
-    outline-offset: -3px;
-  }
-  .metro-tile.revealed {
-    transform: translateY(6px);
-  }
-  .metro-tile.revealed:active {
-    transform: translateY(6px) perspective(600px) rotateX(var(--tilt-x, 0deg))
-      rotateY(var(--tilt-y, 0deg)) scale(0.97);
-  }
-  :global(.metro-tile-icon) {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 24px;
-  }
-  :global(.metro-tile-icon svg),
-  :global(.metro-tile-icon img) {
-    width: 44px;
-    height: 44px;
-  }
-  .metro-tile-small .metro-tile-icon {
-    padding-bottom: 0;
-  }
-  .metro-tile-small .metro-tile-icon :global(svg),
-  .metro-tile-small .metro-tile-icon :global(img) {
-    width: 26px;
-    height: 26px;
-  }
-  .metro-tile-wide .metro-tile-icon {
-    padding-bottom: 24px;
-  }
-  .metro-tile-wide .metro-tile-icon :global(svg),
-  .metro-tile-wide .metro-tile-icon :global(img) {
-    width: 48px;
-    height: 48px;
-  }
-  .metro-tile-large .metro-tile-icon {
-    padding-bottom: 26px;
-  }
-  .metro-tile-large .metro-tile-icon :global(svg),
-  .metro-tile-large .metro-tile-icon :global(img) {
-    width: 80px;
-    height: 80px;
-  }
-  .tile-label {
-    position: absolute;
-    left: 12px;
-    right: 12px;
-    bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    gap: 2px;
-  }
-  .tile-title {
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.35;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .tile-domain {
-    font-size: 11px;
-    font-weight: 400;
-    line-height: 1.35;
-    opacity: 0.85;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .metro-tile-large .tile-label {
-    left: 14px;
-    right: 14px;
-    bottom: 12px;
-  }
-  .metro-tile-large .tile-title {
-    font-size: 15px;
-  }
-  .metro-tile-large .tile-domain {
-    font-size: 12px;
-  }
-  .tile-check {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 26px;
-    height: 26px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: 1px 2px 0 0;
-    background: var(--tile-fg);
-    clip-path: polygon(100% 0, 0 0, 100% 100%);
-    color: var(--tile-color);
-  }
-  .metro-tile-small .tile-check {
-    width: 18px;
-    height: 18px;
-  }
-  .tile-badge {
-    position: absolute;
-    left: 12px;
-    top: 10px;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 11px;
-    background: var(--tile-fg);
-    color: var(--tile-color);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .metro-tile {
-      transition: none;
-    }
-    .metro-tile:active,
-    .metro-tile.revealed,
-    .metro-tile.revealed:active {
-      transform: none;
-    }
-  }
-  :global(.reduced) .metro-tile:active,
-  :global(.reduced) .metro-tile.revealed,
-  :global(.reduced) .metro-tile.revealed:active {
-    transform: none;
-  }
-</style>
+<div
+  class={ui.root()}
+  style:--tile-bg={bgColor}
+  style:--tile-fg={fg}
+  {@attach tilt}
+>
+  {@render tileContent()}
+</div>

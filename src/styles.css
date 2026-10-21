@@ -435,14 +435,6 @@
   --base0F: #eebebe;
 }
 
-.tile-accent-0 { background: var(--base08); }
-.tile-accent-1 { background: var(--base09); }
-.tile-accent-2 { background: var(--base0A); }
-.tile-accent-3 { background: var(--base0B); }
-.tile-accent-4 { background: var(--base0C); }
-.tile-accent-5 { background: var(--base0D); }
-.tile-accent-6 { background: var(--base0E); }
-.tile-accent-7 { background: var(--base0F); }
 .reduced * {
   animation: none !important;
   transition: none !important;
