@@ -42,6 +42,7 @@
 <dialog
   bind:this={element}
   class:drawer
+  class='backdrop:bg-black/40 backdrop:backdrop-blur-[1px]'
   aria-label={title}
   oncancel={cancel}
   onpointerdown={backdrop}
@@ -72,10 +73,6 @@
     margin: auto;
     box-shadow: var(--shadow);
     overflow: auto;
-  }
-  dialog::backdrop {
-    background: #05070bc4;
-    backdrop-filter: blur(6px);
   }
   .modal-content {
     padding: 29px 30px 30px;
