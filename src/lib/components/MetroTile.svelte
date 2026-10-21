@@ -183,7 +183,12 @@
   }
 </script>
 
-{#snippet tileContent()}
+<div
+  class={ui.root()}
+  style:--tile-bg={bgColor}
+  style:--tile-fg={fg}
+  {@attach tilt}
+>
   {#if children}
     {@render children()}
   {:else if showLive}
@@ -223,21 +228,12 @@
       <span class={ui.title()}>{tile.title}</span>
     </div>
   {/if}
-  {#if checked}<span
-    class={ui.check()}
-    aria-hidden='true'
-  ><Icon name='check' size={size === 'small' ? 9 : 12} /></span>{/if}
-  {#if tile.badge !== undefined}<span
-    class={ui.badge()}
-    aria-hidden='true'
-  >{tile.badge}</span>{/if}
-{/snippet}
-
-<div
-  class={ui.root()}
-  style:--tile-bg={bgColor}
-  style:--tile-fg={fg}
-  {@attach tilt}
->
-  {@render tileContent()}
+  {#if checked}
+    <span class={ui.check()} aria-hidden='true'>
+      <Icon name='check' size={size === 'small' ? 9 : 12} />
+    </span>
+  {/if}
+  {#if tile.badge !== undefined}
+    <span class={ui.badge()} aria-hidden='true'>{tile.badge}</span>
+  {/if}
 </div>

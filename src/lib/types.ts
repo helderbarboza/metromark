@@ -3,8 +3,22 @@ import type { Layout, LayoutItem } from '@snapgridjs/core'
 export type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
 
 export type TileSize = 'small' | 'medium' | 'wide' | 'large'
-export interface MetroFace { big?: string | number, title?: string, lines?: string[], background?: string }
-export interface MetroTileDef { title: string, colorIndex: number, color?: string, icon?: string, badge?: string | number, faces?: MetroFace[], period?: number, url?: string }
+export interface MetroFace {
+  big?: string | number
+  title?: string
+  lines?: string[]
+  background?: string
+}
+export interface MetroTileDef {
+  title: string
+  colorIndex: number
+  color?: string
+  icon?: string
+  badge?: string | number
+  faces?: MetroFace[]
+  period?: number
+  url?: string
+}
 
 export interface BookmarkNode {
   id: string
@@ -18,7 +32,13 @@ export interface BookmarkNode {
   syncing?: boolean
   children?: BookmarkNode[]
 }
-export interface CreateNode { parentId: string, title?: string, url?: string, index?: number, type?: 'separator' }
+export interface CreateNode {
+  parentId: string
+  title?: string
+  url?: string
+  index?: number
+  type?: 'separator'
+}
 export interface Appearance { size?: TileSize, colorIndex?: number, color?: string }
 export type ThemeName
   = | 'one-light'
@@ -54,10 +74,30 @@ export interface UndoRecord {
   phase: 'prepared' | 'committed'
   expiresAt: number
   payload:
-    | { kind: 'delete', backup: DeletedBackup, restored?: Record<string, string>, destination?: string }
-    | { kind: 'move', nodeId: string, oldParent: string, oldIndex: number, expectedParent: string, position?: LayoutItem }
-    | { kind: 'update', nodeId: string, before: { title: string, url?: string }, after: { title: string, url?: string } }
-    | { kind: 'layouts', before: Record<string, Layout> }
+    | {
+      kind: 'delete'
+      backup: DeletedBackup
+      restored?: Record<string, string>
+      destination?: string
+    }
+    | {
+      kind: 'move'
+      nodeId: string
+      oldParent: string
+      oldIndex: number
+      expectedParent: string
+      position?: LayoutItem
+    }
+    | {
+      kind: 'update'
+      nodeId: string
+      before: { title: string, url?: string }
+      after: { title: string, url?: string }
+    }
+    | {
+      kind: 'layouts'
+      before: Record<string, Layout>
+    }
 }
 export interface AppData {
   schema: 1
@@ -66,7 +106,12 @@ export interface AppData {
   settings: Settings
   undos: UndoRecord[]
 }
-export interface UndoSummary { id: string, label: string, expiresAt: number, needsDestination: boolean }
+export interface UndoSummary {
+  id: string
+  label: string
+  expiresAt: number
+  needsDestination: boolean
+}
 export interface Snapshot {
   tree: BookmarkNode[]
   appearance: Record<string, Appearance>
@@ -115,7 +160,10 @@ export interface BookmarkPort {
   remove: (id: string, recursive: boolean) => Promise<void>
   onChange: (listener: () => void) => () => void
 }
-export interface PersistencePort { read: () => Promise<AppData | undefined>, write: (data: AppData) => Promise<void> }
+export interface PersistencePort {
+  read: () => Promise<AppData | undefined>
+  write: (data: AppData) => Promise<void>
+}
 export interface Client {
   mode: 'preview' | 'extension'
   snapshot: () => Promise<Snapshot>

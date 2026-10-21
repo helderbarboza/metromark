@@ -39,16 +39,18 @@
       failed = true
       return
     }
-    loadConvertedFavicon(url, ink, requested, target, scale).then(
-      (dataUrl) => {
-        if (!cancelled)
-          converted = dataUrl
-      },
-      () => {
-        if (!cancelled)
-          failed = true
-      },
-    )
+    loadConvertedFavicon(url, ink, requested, target, scale)
+      .then(
+        (dataUrl) => {
+          if (!cancelled)
+            converted = dataUrl
+        },
+        () => {
+          if (!cancelled)
+            failed = true
+        },
+      )
+
     return () => {
       cancelled = true
     }
