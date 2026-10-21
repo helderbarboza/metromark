@@ -52,5 +52,5 @@ export function foreground(bgColor: string | number[]): number {
 
   const luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B
 
-  return luminance > 0.179 ? 0 : 1
+  return luminance > (0.179 * 3) ? 0 : 1
 }
