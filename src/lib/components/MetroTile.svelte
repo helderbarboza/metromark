@@ -13,7 +13,7 @@
         motion-reduce:active:transform-none
       `,
       icon: 'metro-tile-icon absolute inset-0 flex items-center justify-center',
-      label: 'absolute inset-x-3 bottom-2.5 flex flex-col gap-0.5 text-left',
+      label: 'absolute inset-x-2.5 bottom-1.5 flex flex-col gap-0.5 text-left',
       title: 'truncate text-xs leading-[1.35] font-semibold',
       domain: 'truncate text-[11px] leading-[1.35] font-normal opacity-[.85]',
       check: `
@@ -217,10 +217,10 @@
   {/if}
   {#if size !== 'small'}
     <div class={ui.label()}>
-      <span class={ui.title()}>{tile.title}</span>
       {#if showDomain && domain}
         <span class={ui.domain()}>{` ${domain}`}</span>
       {/if}
+      <span class={ui.title()}>{tile.title}</span>
     </div>
   {/if}
   {#if checked}<span
