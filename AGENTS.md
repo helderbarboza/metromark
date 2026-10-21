@@ -100,6 +100,7 @@ npm run package           # Package existing production builds into release/
 
 npm run check             # Svelte/TypeScript diagnostics
 npm run lint              # ESLint
+npm run lint:fix          # ESLint and auto-fix fixable issues
 npm test                  # Domain/coordinator unit tests
 npm run test:stories       # Storybook browser/accessibility cases
 npm run test:e2e           # Playwright preview interactions
