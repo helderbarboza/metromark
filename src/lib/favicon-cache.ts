@@ -12,6 +12,9 @@ const MAX_CONVERT_SIZE = 128
 const convertedCache = new Map<string, string>()
 const pendingCache = new Map<string, Promise<string>>()
 
+const faviconCache = new Map<string, string>()
+const faviconPendingCache = new Map<string, Promise<string>>()
+
 /** Load a page's cached favicon and convert it to a Metro-tint silhouette. */
 export async function loadConvertedFavicon(
   pageUrl: string,
@@ -55,6 +58,47 @@ export async function loadConvertedFavicon(
   pendingCache.set(key, task)
   task.catch(() => {}).finally(() => {
     pendingCache.delete(key)
+  })
+  return task
+}
+
+/** Load a page's cached favicon as a regular data URL (no Metro conversion). */
+export async function loadFavicon(
+  pageUrl: string,
+  requestSize: number,
+  convertSize: number,
+  scaleFactor: 1 | 2 = 1,
+): Promise<string> {
+  const key = `${pageUrl}|${requestSize}|${convertSize}|${scaleFactor}`
+  const hit = faviconCache.get(key)
+  if (hit != null)
+    return Promise.resolve(hit)
+  const pending = faviconPendingCache.get(key)
+  if (pending)
+    return pending
+  const task = (async () => {
+    const source = buildExtensionFaviconUrl(pageUrl, requestSize, undefined, scaleFactor)
+    if (source == null)
+      throw new Error('No cached favicon available.')
+    const img = await loadImage(source)
+    const native = img.naturalWidth > 0 ? img.naturalWidth : convertSize
+    const target = Math.max(16, Math.min(MAX_CONVERT_SIZE, native))
+    const canvas = document.createElement('canvas')
+    canvas.width = target
+    canvas.height = target
+    const ctx = canvas.getContext('2d')
+    if (!ctx)
+      throw new Error('2d canvas context is not available')
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(img, 0, 0, target, target)
+    const dataUrl = canvas.toDataURL('image/png')
+    faviconCache.set(key, dataUrl)
+    return dataUrl
+  })()
+  faviconPendingCache.set(key, task)
+  task.catch(() => {}).finally(() => {
+    faviconPendingCache.delete(key)
   })
   return task
 }
