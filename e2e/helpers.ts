@@ -40,7 +40,7 @@ export function flat(nodes: BookmarkNode[]): BookmarkNode[] {
 }
 export async function start(page: Page) {
   await page.goto('/')
-  await expect(link(page, 'Figma')).toBeVisible()
+  await expect(link(page, 'Steam')).toBeVisible()
 }
 /** Tiles select on right-click (uwp8 p. 158); commands then come from the app bar. */
 export async function rightClick(page: Page, title: string) {

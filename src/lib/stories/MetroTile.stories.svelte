@@ -13,7 +13,7 @@
     title: 'Metro/Bookmark tile',
     component: MetroTile,
     tags: ['autodocs'],
-    args: { tile: { title: 'Figma', colorIndex: 0, url: 'https://figma.com', icon: globeIcon }, size: 'medium', domain: 'figma.com', showDomain: true },
+    args: { tile: { title: 'Steam', colorIndex: 0, url: 'https://store.steampowered.com/', icon: globeIcon }, size: 'medium', domain: 'store.steampowered.com', showDomain: true },
     argTypes: {
       size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] },
       selected: { control: 'boolean' },
@@ -23,7 +23,7 @@
 </script>
 {#snippet template(args: ComponentProps<typeof MetroTile>)}
   <a
-    href='https://figma.com'
+    href='https://store.steampowered.com/'
     aria-label="Open {args.tile.title}{args.showDomain && args.size !== 'small'
       ? ` ${args.domain}`
       : ''}"
@@ -43,8 +43,8 @@
   name='Medium'
   {template}
   play={async ({ canvas }) => {
-    await expect(canvas.getByRole('link', { name: /^Open Figma/ })).toBeVisible()
-    await expect(canvas.getByText('figma.com')).toBeVisible()
+    await expect(canvas.getByRole('link', { name: /^Open Steam/ })).toBeVisible()
+    await expect(canvas.getByText('store.steampowered.com')).toBeVisible()
   }}
 />
 <Story

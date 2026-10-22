@@ -4,8 +4,8 @@ test('flat ancestry, separate roots, launcher tiles, and background context-menu
   await start(page)
   await expect(page.locator('.metro-group')).toHaveCount(7)
   await expect(group(page, 'Tools').locator('.group-path')).toHaveText('Bookmarks bar / Learning /')
-  await expect(link(page, 'Figma')).toHaveAttribute('href', 'https://www.figma.com/')
-  await expect(link(page, 'Figma').locator('.metro-tile-large')).toHaveCount(1)
+  await expect(link(page, 'Steam')).toHaveAttribute('href', 'https://store.steampowered.com/')
+  await expect(link(page, 'Steam').locator('.metro-tile-large')).toHaveCount(1)
   await page.getByRole('button', { name: /^Other bookmarks/ }).click()
   await expect(page.locator('.metro-group')).toHaveCount(1)
   await expect(page.locator('a.tile-slot')).toHaveCount(4)
@@ -173,7 +173,7 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await start(second)
   const secondErrors: string[] = []
   second.on('pageerror', error => secondErrors.push(error.message))
-  await rightClick(page, 'Figma')
+  await rightClick(page, 'Steam')
   await page.getByRole('button', { name: 'Edit selected bookmark' }).click()
   await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('QA across tabs')
   await page.getByRole('dialog').getByRole('button', { name: 'Save changes' }).click()
@@ -205,17 +205,17 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
 
 test('right-click and keyboard selection open the app bar; Escape and the canvas clear it', async ({ page }) => {
   await start(page)
-  const figma = link(page, 'Figma')
+  const steam = link(page, 'Steam')
   const bar = appBar(page)
-  await figma.click({ button: 'right' })
+  await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
-  await expect(bar).toContainText('Figma')
+  await expect(bar).toContainText('Steam')
   await expect(page.locator('.metro-tile.selected')).toHaveCount(1)
   // Right-clicking the same tile again keeps its commands open instead of toggling them away.
-  await figma.click({ button: 'right' })
+  await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
   // Commands that are not bar commands live in the bar's overflow menu.
-  await moreActions(page, 'Figma')
+  await moreActions(page, 'Steam')
   await expect(page.getByRole('menuitem', { name: 'Open in new tab', exact: true })).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(page.getByRole('menu')).toHaveCount(0)
@@ -224,17 +224,17 @@ test('right-click and keyboard selection open the app bar; Escape and the canvas
   await page.keyboard.press('Escape')
   await expect(bar).toHaveCount(0)
   await expect(page.locator('.metro-tile.selected')).toHaveCount(0)
-  await expect(figma).toBeFocused()
+  await expect(steam).toBeFocused()
   // The keyboard path moves focus into the bar so its commands are reachable.
-  await figma.focus()
+  await steam.focus()
   await page.keyboard.press('Shift+F10')
   await expect(bar).toBeVisible()
   await expect(page.getByRole('button', { name: 'Edit selected bookmark' })).toBeFocused()
   await page.keyboard.press('Escape')
   await expect(bar).toHaveCount(0)
-  await expect(figma).toBeFocused()
+  await expect(steam).toBeFocused()
   // Pressing the canvas drops the selection too.
-  await figma.click({ button: 'right' })
+  await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
   await page.locator('#canvas').click({ position: { x: 25, y: 20 } })
   await expect(bar).toHaveCount(0)
@@ -242,7 +242,7 @@ test('right-click and keyboard selection open the app bar; Escape and the canvas
 
 test('touch cross-slide selects instead of launching, and picks the tile up past the drag threshold', async ({ page }) => {
   await start(page)
-  const tile = link(page, 'Figma')
+  const tile = link(page, 'Steam')
   const box = (await tile.boundingBox())!
   const x = Math.round(box.x + box.width / 2)
   const y = Math.round(box.y + box.height / 2)
@@ -281,9 +281,9 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   const notion = link(page, 'Notion')
   await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
 
-  // Figma has colorIndex 0 -> base08 #b72c1f (dark red) which should produce white text.
-  const figma = link(page, 'Figma')
-  await expect(figma.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  // Steam has colorIndex 0 -> base08 #b72c1f (dark red) which should produce white text.
+  const steam = link(page, 'Steam')
+  await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch to dark mode (metro-dark) via Appearance dialog
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -293,7 +293,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
 
   // In metro-dark all accent colors are bright, so both tiles should have black text now.
   await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(figma.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(0, 0, 0)')
 
   // Switch back to light mode
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -301,9 +301,9 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await page.getByRole('button', { name: 'Light', exact: true }).click()
   await page.keyboard.press('Escape')
 
-  // Back to metro-light: Notion black, Figma white.
+  // Back to metro-light: Notion black, Steam white.
   await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(figma.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch theme to one-light (another light theme with different accent colors)
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -314,5 +314,5 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   // In one-light, colorIndex 3 -> base0B #50a14f (green) -> black
   // colorIndex 0 -> base08 #ca1243 (red) -> white
   await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(figma.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
 })

@@ -1,5 +1,16 @@
 import type { Preview } from '@storybook/svelte'
+import steamFaviconUrl from './steam-favicon.ico?url'
 import '../src/styles.css'
+
+// Storybook has no browser favicon cache (the web preview has no extension
+// runtime), so point tile icons at one fixed sample favicon. The normal
+// conversion pipeline still tints it and falls back to the bundled SVG if
+// loading fails. Source: https://store.steampowered.com/favicon.ico
+const storybookFavicon = new URL(steamFaviconUrl, window.location.href).href
+window.chrome = {
+  ...window.chrome,
+  runtime: { getURL: () => storybookFavicon },
+}
 
 const preview: Preview = {
   parameters: {

@@ -26,7 +26,7 @@ describe('bookmark tree projection', () => {
     const nodes = indexTree(tree)
     expect(canModify(nodes.get('bar')!, tree)).toBe(false)
     expect(canAddTo(nodes.get('bar')!, tree)).toBe(true)
-    expect(canModify(nodes.get('figma')!, tree)).toBe(true)
+    expect(canModify(nodes.get('steam')!, tree)).toBe(true)
     expect(canAddTo(nodes.get('root')!, tree)).toBe(false)
   })
   it('inherits managed read-only restrictions', () => {
@@ -38,7 +38,7 @@ describe('bookmark tree projection', () => {
   it('distinguishes duplicate titles and URLs using bookmark IDs', () => {
     const state = fixture()
     const bar = indexTree(state.tree).get('bar')!
-    bar.children!.push({ id: 'duplicate', parentId: 'bar', title: 'Figma', url: 'https://www.figma.com/' })
+    bar.children!.push({ id: 'duplicate', parentId: 'bar', title: 'Steam', url: 'https://store.steampowered.com/' })
     expect(projectGroups(state)[0].layout).toHaveLength(6)
     expect(Object.keys(projectGroups(state)[0].tiles)).toContain('duplicate')
   })

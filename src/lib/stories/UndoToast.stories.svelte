@@ -13,7 +13,7 @@
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },
     args: {
-      notice: { message: '“Figma” deleted', undoId: 'story-only' },
+      notice: { message: '“Steam” deleted', undoId: 'story-only' },
       onundo: undo,
       onclose: fn(),
     },
