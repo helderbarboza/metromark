@@ -96,7 +96,7 @@
     Math.max(
       34,
       Math.min(
-        snapshot?.settings.density === 'compact' ? 54 : 68,
+        snapshot?.settings.density === 'compact' ? 54 : 56,
         Math.floor((viewportHeight - 279 - (ROWS - 1) * GAP) / ROWS),
       ),
     ),

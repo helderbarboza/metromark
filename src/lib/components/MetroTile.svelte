@@ -12,10 +12,13 @@
         motion-reduce:transition-none
         motion-reduce:active:transform-none
       `,
-      icon: 'metro-tile-icon absolute inset-0 flex items-center justify-center',
+      icon: `
+        metro-tile-icon absolute inset-0 flex items-center justify-center
+        **:blur-[0.5px] **:[image-rendering:smooth]
+      `,
       label: 'absolute inset-x-2.5 bottom-1.5 flex flex-col gap-0.5 text-left',
-      title: 'truncate text-xs leading-[1.35] font-semibold',
-      domain: 'truncate text-[11px] leading-[1.35] font-normal opacity-[.85]',
+      title: 'truncate text-xs leading-[1.35] font-normal',
+      domain: 'truncate text-[10px] leading-[1.35] font-normal opacity-[.7]',
       check: `
         absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pt-px
         pr-0.5 text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
@@ -32,8 +35,8 @@
           root: 'metro-tile-small',
           icon: `
             pb-0
-            [&_img]:size-[26px]
-            [&_svg]:size-[26px]
+            [&_img]:size-[32px]
+            [&_svg]:size-[32px]
           `,
           check: 'size-[18px]',
         },
@@ -41,16 +44,16 @@
           root: 'metro-tile-medium',
           icon: `
             pb-6
-            [&_img]:size-[44px]
-            [&_svg]:size-[44px]
+            [&_img]:size-[56px]
+            [&_svg]:size-[56px]
           `,
         },
         wide: {
           root: 'metro-tile-wide',
           icon: `
             pb-6
-            [&_img]:size-[48px]
-            [&_svg]:size-[48px]
+            [&_img]:size-[64px]
+            [&_svg]:size-[64px]
           `,
         },
         large: {
@@ -60,9 +63,6 @@
             [&_img]:size-[80px]
             [&_svg]:size-[80px]
           `,
-          label: 'inset-x-3.5 bottom-3',
-          title: 'text-[15px]',
-          domain: 'text-xs',
         },
       },
       selected: {
