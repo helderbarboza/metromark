@@ -12,7 +12,7 @@
   import { globeIcon } from '../icons'
 
   const tiles: Record<string, TileView> = {
-    figma: { id: 'figma', title: 'Figma', url: 'https://figma.com', domain: 'figma.com', icon: globeIcon, colorIndex: 0, size: 'medium', writable: true },
+    steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', icon: globeIcon, colorIndex: 0, size: 'medium', writable: true },
     github: { id: 'github', title: 'GitHub', url: 'https://github.com', domain: 'github.com', icon: globeIcon, colorIndex: 1, size: 'medium', writable: true },
     gmail: { id: 'gmail', title: 'Gmail', url: 'https://mail.google.com', domain: 'mail.google.com', icon: globeIcon, colorIndex: 2, size: 'wide', writable: true },
     notion: { id: 'notion', title: 'Notion', url: 'https://notion.so', domain: 'notion.so', icon: globeIcon, colorIndex: 3, size: 'large', writable: true },
@@ -21,7 +21,7 @@
   }
 
   const layout: Layout = [
-    { i: 'figma', x: 0, y: 0, w: 2, h: 2 },
+    { i: 'steam', x: 0, y: 0, w: 2, h: 2 },
     { i: 'github', x: 2, y: 0, w: 2, h: 2 },
     { i: 'gmail', x: 0, y: 2, w: 4, h: 2 },
     { i: 'notion', x: 4, y: 0, w: 4, h: 4 },
@@ -102,7 +102,7 @@
   {template}
   play={async ({ canvas }) => {
     await expect(await canvas.findByRole('heading', { name: 'Design' })).toBeVisible()
-    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
     await expect(await canvas.findByRole('link', { name: /^Open Gmail/ })).toBeVisible()
     await expect(canvas.getByText('mail.google.com')).toBeVisible()
   }}
@@ -124,17 +124,17 @@
   {template}
   play={async ({ canvas }) => {
     await expect(await canvas.findByRole('heading', { name: 'Bookmarks bar' })).toBeVisible()
-    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
     await expect(canvas.queryByRole('button', { name: 'Add a bookmark' })).not.toBeInTheDocument()
   }}
 />
 
 <Story
   name='Selection'
-  args={{ selectedId: 'figma' }}
+  args={{ selectedId: 'steam' }}
   {template}
   play={async ({ canvas, canvasElement }) => {
-    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
     await expect(canvasElement.querySelectorAll('.metro-tile.selected')).toHaveLength(1)
   }}
 />
@@ -143,8 +143,8 @@
   name='Tiles are always draggable'
   {template}
   play={async ({ canvas, canvasElement }) => {
-    const tile = await canvas.findByRole('link', { name: /^Open Figma/ })
-    await expect(tile).toHaveAttribute('data-grid-id', 'figma')
+    const tile = await canvas.findByRole('link', { name: /^Open Steam/ })
+    await expect(tile).toHaveAttribute('data-grid-id', 'steam')
     // Native link dragging must stay off so the pointer gesture belongs to the grid.
     await expect(tile).toHaveAttribute('draggable', 'false')
     await expect(canvasElement.querySelectorAll('.snapgrid-item')).toHaveLength(6)
@@ -156,8 +156,8 @@
   args={{ showDomains: false }}
   {template}
   play={async ({ canvas }) => {
-    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
-    await expect(canvas.queryByText('figma.com')).not.toBeInTheDocument()
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
+    await expect(canvas.queryByText('store.steampowered.com')).not.toBeInTheDocument()
     await expect(canvas.queryByText('mail.google.com')).not.toBeInTheDocument()
   }}
 />

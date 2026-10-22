@@ -14,7 +14,7 @@
 <Story
   name='Midnight'
   play={async ({ canvas }) => {
-    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
   }}
 />
 <Story
@@ -29,8 +29,8 @@
   name='Search interaction'
   play={async ({ canvas }) => {
     const input = await canvas.findByRole('searchbox', { name: 'Search bookmarks' })
-    await userEvent.type(input, 'Figma')
-    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
+    await userEvent.type(input, 'Steam')
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
     await expect(canvas.queryByRole('link', { name: /^Open Slack/ })).not.toBeInTheDocument()
   }}
 />

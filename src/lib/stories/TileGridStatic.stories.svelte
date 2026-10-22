@@ -21,7 +21,7 @@
 
   const staticTiles: StaticTile[] = [
     { id: 'slack', title: 'Slack', colorIndex: 0, domain: 'slack.com', href: 'https://slack.com', size: 'small' },
-    { id: 'figma', title: 'Figma', colorIndex: 1, domain: 'figma.com', href: 'https://figma.com', size: 'medium' },
+    { id: 'steam', title: 'Steam', colorIndex: 1, domain: 'store.steampowered.com', href: 'https://store.steampowered.com/', size: 'medium' },
     { id: 'gmail', title: 'Gmail', colorIndex: 2, domain: 'mail.google.com', href: 'https://mail.google.com', size: 'wide' },
     { id: 'notion', title: 'Notion', colorIndex: 3, domain: 'notion.so', href: 'https://notion.so', size: 'large' },
   ]
@@ -32,9 +32,9 @@
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },
     args: {
-      tile: { title: 'Figma', colorIndex: 1, url: 'https://figma.com', icon: globeIcon },
+      tile: { title: 'Steam', colorIndex: 1, url: 'https://store.steampowered.com/', icon: globeIcon },
       size: 'medium',
-      domain: 'figma.com',
+      domain: 'store.steampowered.com',
       showDomain: true,
     },
   })
@@ -74,11 +74,11 @@
   name='All presets'
   {template}
   play={async ({ canvas }) => {
-    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
     await expect(await canvas.findByRole('link', { name: /^Open Gmail/ })).toBeVisible()
     await expect(await canvas.findByRole('link', { name: /^Open Notion/ })).toBeVisible()
     await expect(await canvas.findByRole('link', { name: 'Open Slack' })).toBeVisible()
-    await expect(canvas.getByText('figma.com')).toBeVisible()
+    await expect(canvas.getByText('store.steampowered.com')).toBeVisible()
     await expect(canvas.getByText('mail.google.com')).toBeVisible()
   }}
 />
@@ -88,8 +88,8 @@
   args={{ showDomain: false }}
   {template}
   play={async ({ canvas }) => {
-    await expect(await canvas.findByRole('link', { name: /^Open Figma/ })).toBeVisible()
-    await expect(canvas.queryByText('figma.com')).not.toBeInTheDocument()
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
+    await expect(canvas.queryByText('store.steampowered.com')).not.toBeInTheDocument()
     await expect(canvas.queryByText('mail.google.com')).not.toBeInTheDocument()
   }}
 />

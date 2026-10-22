@@ -15,7 +15,7 @@
 <Story name='Add bookmark' />
 <Story
   name='Edit bookmark'
-  args={{ id: 'figma' }}
+  args={{ id: 'steam' }}
 />
 <Story
   name='Create folder'
@@ -23,7 +23,7 @@
 />
 <Story
   name='Customize tile'
-  args={{ kind: 'appearance', id: 'figma' }}
+  args={{ kind: 'appearance', id: 'steam' }}
 />
 <Story
   name='Delete folder confirmation'
@@ -31,7 +31,7 @@
 />
 <Story
   name='Move bookmark'
-  args={{ kind: 'move', id: 'figma' }}
+  args={{ kind: 'move', id: 'steam' }}
 />
 <Story
   name='Settings drawer'

@@ -21,24 +21,24 @@ afterEach(() => {
 describe('commands and synchronization', () => {
   it('edits the browser bookmark and safely undoes the edit', async () => {
     const { coordinator } = fixture()
-    const result = await coordinator.execute({ type: 'node.update', id: 'figma', title: 'Design files', url: 'https://figma.com/files' })
-    expect(indexTree(result.snapshot.tree).get('figma')?.title).toBe('Design files')
+    const result = await coordinator.execute({ type: 'node.update', id: 'steam', title: 'Design files', url: 'https://store.steampowered.com/files' })
+    expect(indexTree(result.snapshot.tree).get('steam')?.title).toBe('Design files')
     const restored = await coordinator.execute({ type: 'undo', id: result.notice!.undoId! })
-    expect(indexTree(restored.snapshot.tree).get('figma')?.title).toBe('Figma')
+    expect(indexTree(restored.snapshot.tree).get('steam')?.title).toBe('Steam')
   })
   it('observes external bookmark manager changes without writing them back', async () => {
     const { bookmarks, coordinator } = fixture()
     await coordinator.ready
-    await bookmarks.update('figma', { title: 'Externally edited' })
-    expect(indexTree((await coordinator.snapshot()).tree).get('figma')?.title).toBe('Externally edited')
+    await bookmarks.update('steam', { title: 'Externally edited' })
+    expect(indexTree((await coordinator.snapshot()).tree).get('steam')?.title).toBe('Externally edited')
   })
   it('moves a bookmark between real folders', async () => {
     const { coordinator } = fixture()
-    const result = await coordinator.execute({ type: 'node.move', id: 'figma', parentId: 'work' })
-    expect(indexTree(result.snapshot.tree).get('figma')?.parentId).toBe('work')
-    expect(projectGroups(result.snapshot).find(group => group.id === 'work')?.tiles.figma.size).toBe('large')
+    const result = await coordinator.execute({ type: 'node.move', id: 'steam', parentId: 'work' })
+    expect(indexTree(result.snapshot.tree).get('steam')?.parentId).toBe('work')
+    expect(projectGroups(result.snapshot).find(group => group.id === 'work')?.tiles.steam.size).toBe('large')
     const undo = await coordinator.execute({ type: 'undo', id: result.notice!.undoId! })
-    expect(indexTree(undo.snapshot.tree).get('figma')?.parentId).toBe('bar')
+    expect(indexTree(undo.snapshot.tree).get('steam')?.parentId).toBe('bar')
   })
   it('does not reorder native bookmarks when the visual layout changes', async () => {
     const { coordinator, bookmarks } = fixture()
@@ -53,13 +53,13 @@ describe('commands and synchronization', () => {
     const groups = projectGroups(await coordinator.snapshot())
     const source = groups[0]
     const destination = groups[1]
-    const moving = source.layout.find(entry => entry.i === 'figma')!
+    const moving = source.layout.find(entry => entry.i === 'steam')!
     const result = await coordinator.execute({ type: 'layout.commit', layouts: {
-      bar: source.layout.filter(entry => entry.i !== 'figma'),
+      bar: source.layout.filter(entry => entry.i !== 'steam'),
       work: [...destination.layout, { ...moving, x: 4, y: 0 }],
     } })
     expect(move).toHaveBeenCalledTimes(1)
-    expect(indexTree(result.snapshot.tree).get('figma')?.parentId).toBe('work')
+    expect(indexTree(result.snapshot.tree).get('steam')?.parentId).toBe('work')
   })
   it('keeps empty source folders after moving their last bookmark', async () => {
     const { coordinator } = fixture()
@@ -80,8 +80,8 @@ describe('commands and synchronization', () => {
   it('resizes tiles and persists metadata without modifying the bookmark', async () => {
     const { coordinator, bookmarks } = fixture()
     const update = vi.spyOn(bookmarks, 'update')
-    const result = await coordinator.execute({ type: 'tile.appearance', id: 'figma', patch: { size: 'small', colorIndex: 3, color: '#123456' } })
-    expect(result.snapshot.appearance.figma).toEqual({ size: 'small', colorIndex: 3, color: '#123456' })
+    const result = await coordinator.execute({ type: 'tile.appearance', id: 'steam', patch: { size: 'small', colorIndex: 3, color: '#123456' } })
+    expect(result.snapshot.appearance.steam).toEqual({ size: 'small', colorIndex: 3, color: '#123456' })
     expect(update).not.toHaveBeenCalled()
   })
 })
@@ -89,13 +89,13 @@ describe('commands and synchronization', () => {
 describe('durable Undo', () => {
   it('immediately deletes and restores a bookmark under a new ID with its appearance', async () => {
     const { coordinator } = fixture()
-    await coordinator.execute({ type: 'tile.appearance', id: 'figma', patch: { colorIndex: 3, color: '#123456' } })
-    const deleted = await coordinator.execute({ type: 'node.remove', id: 'figma' })
-    expect(indexTree(deleted.snapshot.tree).has('figma')).toBe(false)
+    await coordinator.execute({ type: 'tile.appearance', id: 'steam', patch: { colorIndex: 3, color: '#123456' } })
+    const deleted = await coordinator.execute({ type: 'node.remove', id: 'steam' })
+    expect(indexTree(deleted.snapshot.tree).has('steam')).toBe(false)
     expect(deleted.snapshot.undos).toHaveLength(1)
     const restored = await coordinator.execute({ type: 'undo', id: deleted.notice!.undoId! })
-    const newNode = flatten(restored.snapshot.tree).find(node => node.title === 'Figma')!
-    expect(newNode.id).not.toBe('figma')
+    const newNode = flatten(restored.snapshot.tree).find(node => node.title === 'Steam')!
+    expect(newNode.id).not.toBe('steam')
     expect(restored.snapshot.appearance[newNode.id]?.color).toBe('#123456')
     expect(restored.snapshot.layouts.bar.some(entry => entry.i === newNode.id)).toBe(true)
   })
@@ -115,13 +115,13 @@ describe('durable Undo', () => {
     await coordinator.ready
     vi.spyOn(storage, 'write').mockRejectedValue(new Error('Storage quota exceeded'))
     const remove = vi.spyOn(bookmarks, 'remove')
-    await expect(coordinator.execute({ type: 'node.remove', id: 'figma' })).rejects.toThrow('Storage quota')
+    await expect(coordinator.execute({ type: 'node.remove', id: 'steam' })).rejects.toThrow('Storage quota')
     expect(remove).not.toHaveBeenCalled()
-    expect(indexTree(await bookmarks.getTree()).has('figma')).toBe(true)
+    expect(indexTree(await bookmarks.getTree()).has('steam')).toBe(true)
   })
   it('recovers a prepared record after a background restart', async () => {
     const { coordinator, bookmarks, storage } = fixture()
-    const result = await coordinator.execute({ type: 'node.remove', id: 'figma' })
+    const result = await coordinator.execute({ type: 'node.remove', id: 'steam' })
     coordinator.dispose()
     storage.data!.undos[0].phase = 'prepared'
     const next = new BookmarkCoordinator(bookmarks, storage, SETTINGS_DEFAULTS, 'preview')
@@ -129,14 +129,14 @@ describe('durable Undo', () => {
     const snapshot = await next.snapshot()
     expect(snapshot.undos[0].id).toBe(result.notice!.undoId)
     await next.execute({ type: 'undo', id: snapshot.undos[0].id })
-    expect(flatten((await next.snapshot()).tree).some(node => node.title === 'Figma')).toBe(true)
+    expect(flatten((await next.snapshot()).tree).some(node => node.title === 'Steam')).toBe(true)
   })
   it('refuses to overwrite newer external edits', async () => {
     const { coordinator, bookmarks } = fixture()
-    const edited = await coordinator.execute({ type: 'node.update', id: 'figma', title: 'First change' })
-    await bookmarks.update('figma', { title: 'Newer external change' })
+    const edited = await coordinator.execute({ type: 'node.update', id: 'steam', title: 'First change' })
+    await bookmarks.update('steam', { title: 'Newer external change' })
     await expect(coordinator.execute({ type: 'undo', id: edited.notice!.undoId! })).rejects.toThrow('edited elsewhere')
-    expect(indexTree(await bookmarks.getTree()).get('figma')?.title).toBe('Newer external change')
+    expect(indexTree(await bookmarks.getTree()).get('steam')?.title).toBe('Newer external change')
   })
   it('allows choosing a recovery destination if the original parent was deleted', async () => {
     const { coordinator, bookmarks } = fixture()
@@ -148,7 +148,7 @@ describe('durable Undo', () => {
   })
   it('expires Undo using timestamps, not a background timer', async () => {
     const { coordinator } = fixture()
-    const deleted = await coordinator.execute({ type: 'node.remove', id: 'figma' })
+    const deleted = await coordinator.execute({ type: 'node.remove', id: 'steam' })
     vi.useFakeTimers()
     vi.setSystemTime(Date.now() + UNDO_TTL + 1)
     await expect(coordinator.execute({ type: 'undo', id: deleted.notice!.undoId! })).rejects.toThrow('expired')
@@ -157,7 +157,7 @@ describe('durable Undo', () => {
     const { coordinator } = fixture()
     const reset = await coordinator.execute({ type: 'layout.reset' })
     expect(reset.snapshot.layouts).toEqual({})
-    expect(reset.snapshot.appearance.figma.size).toBe('large')
+    expect(reset.snapshot.appearance.steam.size).toBe('large')
     const undone = await coordinator.execute({ type: 'undo', id: reset.notice!.undoId! })
     expect(undone.snapshot.layouts.bar).toHaveLength(5)
   })

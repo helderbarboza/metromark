@@ -15,8 +15,8 @@
     args: {
       x: 32,
       y: 32,
-      title: 'Figma',
-      subtitle: 'figma.com',
+      title: 'Steam',
+      subtitle: 'store.steampowered.com',
       onclose: fn(),
       size: 'large',
       onresize: fn(),

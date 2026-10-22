@@ -7,7 +7,7 @@ const folder = (id: string, title: string, children: BookmarkNode[], folderType?
 export function demoTree(): BookmarkNode[] {
   return [folder('root', '', [
     folder('bar', 'Bookmarks bar', [
-      link('figma', 'Figma', 'https://www.figma.com/'),
+      link('steam', 'Steam', 'https://store.steampowered.com/'),
       link('linear', 'Linear', 'https://linear.app/'),
       link('github', 'GitHub', 'https://github.com/'),
       link('notion', 'Notion', 'https://www.notion.so/'),
@@ -48,7 +48,7 @@ export function demoTree(): BookmarkNode[] {
 const item = (i: string, x: number, y: number, w: number, h: number) => ({ i, x, y, w, h })
 export function demoData(): AppData {
   const layouts: Record<string, Layout> = {
-    bar: [item('figma', 0, 0, 4, 4), item('linear', 4, 0, 2, 2), item('github', 4, 2, 2, 2), item('notion', 0, 4, 2, 2), item('gmail', 2, 4, 4, 2)],
+    bar: [item('steam', 0, 0, 4, 4), item('linear', 4, 0, 2, 2), item('github', 4, 2, 2, 2), item('notion', 0, 4, 2, 2), item('gmail', 2, 4, 4, 2)],
     work: [item('slack', 0, 0, 4, 2), item('drive', 0, 2, 2, 2), item('calendar', 2, 2, 2, 2), item('meet', 0, 4, 4, 2)],
     inspiration: [item('pinterest', 0, 0, 4, 4), item('arena', 4, 0, 2, 2), item('dribbble', 4, 2, 2, 2), item('behance', 0, 4, 4, 2), item('layers', 4, 4, 2, 2)],
     learning: [item('mdn', 0, 0, 4, 2), item('svelte', 0, 2, 2, 2), item('typescript', 2, 2, 2, 2), item('tailwind', 0, 4, 4, 2)],
@@ -57,7 +57,7 @@ export function demoData(): AppData {
   }
   const allIds = Object.values(layouts).flatMap(layout => layout.map(entry => entry.i))
   const appearance: Record<string, { size: 'small' | 'medium' | 'wide' | 'large', colorIndex: number }> = Object.fromEntries(allIds.map((id, idx) => [id, { size: 'medium' as const, colorIndex: idx % 8 }]))
-  // Override figma to large (4x4 in layout)
-  appearance.figma = { size: 'large', colorIndex: appearance.figma.colorIndex }
+  // Override steam to large (4x4 in layout)
+  appearance.steam = { size: 'large', colorIndex: appearance.steam.colorIndex }
   return { ...emptyData(SETTINGS_DEFAULTS), layouts, appearance }
 }
