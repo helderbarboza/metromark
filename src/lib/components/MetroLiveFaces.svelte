@@ -9,21 +9,17 @@
 
   interface Props {
     faces: MetroFace[]
-    icon?: string
     period?: number
     faviconPageUrl?: string
     tint?: string
-    fallbackIcon?: string
     iconClass?: string
   }
 
   const {
     faces,
-    icon = '',
     period = 6000,
     faviconPageUrl,
     tint = '#ffffff',
-    fallbackIcon = '',
     iconClass = '',
   }: Props = $props()
 
@@ -61,16 +57,10 @@
       ${iconClass}
     `}
     >
-      {#if faviconPageUrl}
-        <FaviconIcon
-          pageUrl={faviconPageUrl}
-          tint={tint}
-          fallback={fallbackIcon || icon}
-        />
-      {:else}
-        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-        {@html icon}
-      {/if}
+      <FaviconIcon
+        pageUrl={faviconPageUrl ?? ''}
+        tint={tint}
+      />
     </div>
   {:else}
     {@const f = faces[i - 1]}

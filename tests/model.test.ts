@@ -3,9 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { normalizeTree } from '../src/lib/adapters/memory'
 import { demoData, demoTree } from '../src/lib/demo'
 import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '../src/lib/icon-sources'
-import { globeIcon } from '../src/lib/icons'
 import { overlaps, reconcileLayout, usedCols, validateLayout } from '../src/lib/layout'
-import { tileFor } from '../src/lib/tile'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, projectGroups } from '../src/lib/tree'
 import { validateUrl } from '../src/lib/url'
 
@@ -139,14 +137,5 @@ describe('tile favicons', () => {
     expect(isFaviconEligible('http://example.com')).toBe(true)
     expect(isFaviconEligible('javascript:alert(1)')).toBe(false)
     expect(isFaviconEligible('')).toBe(false)
-  })
-  it('falls back to the generic globe icon when no favicon is available', () => {
-    const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' })
-    expect(tile.icon).toBe(globeIcon)
-    expect(tile.url).toBe('https://example.com')
-  })
-  it('ignores legacy appearance icon choices and still uses the favicon', () => {
-    const tile = tileFor({ id: 'a', parentId: 'bar', title: 'Example', url: 'https://example.com' }, { size: 'medium' })
-    expect(tile.icon).toBe(globeIcon)
   })
 })

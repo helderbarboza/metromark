@@ -30,8 +30,6 @@
   onclick={() => onClose?.()}
   onkeydown={e => (e.key === 'Enter' || e.key === ' ') && onClose?.()}
 >
-  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-  <div class='icon'>{@html tile.icon ?? ''}</div>
   <div class='title'>{tile.title}</div>
   {#if hint}<div class='hint'>{hint}</div>{/if}
 </div>
@@ -48,18 +46,6 @@
     color: var(--tile-fg);
     outline: none;
     animation: metro-splash-in 380ms cubic-bezier(0.1, 0.9, 0.2, 1) both;
-  }
-  .icon {
-    display: inline-flex;
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-  }
-  .icon :global(svg) {
-    width: 140px;
-    height: 140px;
   }
   .title {
     margin-top: 18px;

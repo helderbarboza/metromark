@@ -7,7 +7,6 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
   import MetroTile from '../components/MetroTile.svelte'
-  import { globeIcon } from '../icons'
   import { cellsToPx, SIZES } from '../layout'
 
   interface StaticTile {
@@ -32,7 +31,7 @@
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },
     args: {
-      tile: { title: 'Steam', colorIndex: 1, url: 'https://store.steampowered.com/', icon: globeIcon },
+      tile: { title: 'Steam', colorIndex: 1, url: 'https://store.steampowered.com/' },
       size: 'medium',
       domain: 'store.steampowered.com',
       showDomain: true,
@@ -60,7 +59,7 @@
             text-decoration:none'
       >
         <MetroTile
-          tile={{ title: tile.title, colorIndex: tile.colorIndex, url: tile.href, icon: globeIcon }}
+          tile={{ title: tile.title, colorIndex: tile.colorIndex, url: tile.href }}
           size={tile.size}
           domain={tile.domain}
           showDomain={args.showDomain ?? true}

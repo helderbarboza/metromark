@@ -189,11 +189,9 @@
   {:else if showLive}
     <MetroLiveFaces
       faces={tile.faces ?? []}
-      icon={tile.icon}
       period={tile.period}
       faviconPageUrl={tile.url}
       tint={fg}
-      fallbackIcon={tile.icon ?? ''}
       iconClass={ui.icon()}
     />
   {:else}
@@ -206,7 +204,6 @@
       <FaviconIcon
         pageUrl={tile.url ?? ''}
         tint={fg}
-        fallback={tile.icon ?? ''}
       />
     </div>
   {/if}
