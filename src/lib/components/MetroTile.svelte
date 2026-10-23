@@ -100,7 +100,6 @@
   import type { Snippet } from 'svelte'
   import type { MetroTileDef, TileSize } from '../types'
   import { mode, theme } from 'mode-watcher'
-  import { faviconRequestForTile } from '../icon-sources'
   import { resolveTileColors } from '../theme-colors'
   import FaviconIcon from './FaviconIcon.svelte'
   import Icon from './Icon.svelte'
@@ -127,7 +126,7 @@
   }: Props = $props()
 
   // Reactive colors that update when theme/mode changes
-  let colors = $state(resolveTileColors(tile))
+  let colors = $derived(resolveTileColors(tile))
   const bgColor = $derived(colors.bg)
   const fg = $derived(colors.fg === 1 ? '#ffffff' : '#000000')
 
@@ -142,10 +141,6 @@
 
   const showLive = $derived(Boolean(tile.faces?.length) && size !== 'small')
   const checked = $derived(selected || revealed)
-  const faviconRequest = $derived(faviconRequestForTile(size))
-  const requestSize = $derived(faviconRequest.requestSize)
-  const convertSize = $derived(faviconRequest.requestSize)
-  const scaleFactor = $derived(faviconRequest.scaleFactor)
 
   const ui = $derived(tileVariants({ size, selected, revealed }))
 
@@ -199,8 +194,6 @@
       faviconPageUrl={tile.url}
       tint={fg}
       fallbackIcon={tile.icon ?? ''}
-      {requestSize}
-      {scaleFactor}
       iconClass={ui.icon()}
     />
   {:else}
@@ -213,9 +206,6 @@
       <FaviconIcon
         pageUrl={tile.url ?? ''}
         tint={fg}
-        {requestSize}
-        {convertSize}
-        {scaleFactor}
         fallback={tile.icon ?? ''}
       />
     </div>

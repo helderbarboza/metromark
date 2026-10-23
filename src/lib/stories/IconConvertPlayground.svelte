@@ -3,7 +3,7 @@
   import { cssColorToArgb, processIconImage } from '../icon-convert'
 
   interface Props {
-    size?: number
+    previewSize?: number
     tint?: string
     filled?: boolean
     bg?: string
@@ -14,14 +14,14 @@
   }
 
   const {
-    size = 32,
+    previewSize = 64,
     tint = '#ff0000',
     filled = true,
     bg = '#ffffff',
     iconShape = -1,
     preserveTransparency = false,
     clipGlyphToShape = false,
-    src = '/icons/fitgirl.png',
+    src = '/icons/128.png',
   }: Props = $props()
 
   let img = $state<HTMLImageElement>()
@@ -38,7 +38,6 @@
     errorMessage = undefined
     try {
       const result = await processIconImage(img, {
-        sizePx: Math.round(size),
         tintArgb: cssColorToArgb(tint),
         bgArgb: cssColorToArgb(bg),
         filled,
@@ -76,7 +75,6 @@
   // Reconvert when Storybook controls change and the image is already ready.
   $effect(() => {
     const signature = [
-      size,
       tint,
       filled,
       bg,
@@ -117,7 +115,7 @@
       <img
         src={convertedSrc}
         alt='Converted icon'
-        class='size-16'
+        style='width: {previewSize}px; height: {previewSize}px;'
       />
       <figcaption class='text-xs'>Converted</figcaption>
     </figure>

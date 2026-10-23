@@ -119,11 +119,11 @@ describe('tile favicons', () => {
     expect(clampFaviconSize(8)).toBe(16)
   })
   it('appends the density probe only at 2x', () => {
-    expect(buildExtensionFaviconUrl('https://example.com', 64, base, 2)).toContain('scale_factor=2x')
-    expect(buildExtensionFaviconUrl('https://example.com', 64, base)).not.toContain('scale_factor')
+    expect(buildExtensionFaviconUrl('https://example.com', 64, base, 2)).toContain('scaleFactor=2x')
+    expect(buildExtensionFaviconUrl('https://example.com', 64, base)).not.toContain('scaleFactor')
   })
   it('maps tile sizes to favicon requests', () => {
-    expect(faviconRequestForTile('small')).toEqual({ requestSize: 32, scaleFactor: 1 })
+    expect(faviconRequestForTile('small')).toEqual({ requestSize: 64, scaleFactor: 2 })
     expect(faviconRequestForTile('medium')).toEqual({ requestSize: 64, scaleFactor: 2 })
     expect(faviconRequestForTile('wide')).toEqual({ requestSize: 64, scaleFactor: 2 })
     expect(faviconRequestForTile('large')).toEqual({ requestSize: 64, scaleFactor: 2 })

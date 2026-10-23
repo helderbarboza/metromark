@@ -62,14 +62,12 @@ export function clampFaviconSize(size: number): number {
 }
 
 /**
- * Favicon request parameters per tile size. Small tiles stay at 1x; larger
- * tiles probe the legacy `scale_factor=2x` parameter for a denser bitmap.
- * The parameter is undocumented for the MV3 `/_favicon/` endpoint and is
- * ignored harmlessly where unsupported (callers convert at whatever bitmap
- * the browser actually decodes).
+ * Always request the highest supported resolution (64 DIP × 2× scale = 128px).
+ * The `tileSize` parameter is ignored and kept only for backward compatibility.
+ * Chromium's `/_favicon/` parser reads `scaleFactor` (camelCase), not `scale_factor`.
  */
-export function faviconRequestForTile(tileSize: TileSize): { requestSize: number, scaleFactor: 1 | 2 } {
-  return tileSize === 'small' ? { requestSize: 32, scaleFactor: 1 } : { requestSize: 64, scaleFactor: 2 }
+export function faviconRequestForTile(_tileSize?: TileSize): { requestSize: number, scaleFactor: 1 | 2 } {
+  return { requestSize: 64, scaleFactor: 2 }
 }
 
 /**
@@ -104,7 +102,7 @@ export function buildExtensionFaviconUrl(
   url.searchParams.set('pageUrl', parsed.href)
   url.searchParams.set('size', String(clampFaviconSize(size)))
   if (scaleFactor === 2)
-    url.searchParams.set('scale_factor', '2x')
+    url.searchParams.set('scaleFactor', '2x')
   return url.toString()
 }
 
