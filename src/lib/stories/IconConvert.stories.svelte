@@ -11,7 +11,7 @@
     component: IconConvertPlayground,
     tags: ['autodocs'],
     args: {
-      size: 64,
+      previewSize: 64,
       tint: '#ff0000',
       filled: true,
       bg: '#ffffff',
@@ -21,7 +21,7 @@
       src: '/icons/128.png',
     },
     argTypes: {
-      size: { control: { type: 'number', min: 16, max: 128, step: 8 } },
+      previewSize: { control: { type: 'number', min: 16, max: 128, step: 8 } },
       tint: { control: 'color' },
       filled: { control: 'boolean' },
       bg: { control: 'color' },

@@ -32,8 +32,8 @@ describe('classifyConvertError', () => {
 
 describe('buildChromeFaviconUrl', () => {
   it('builds a sized cache URL for http(s) pages', () => {
-    expect(buildChromeFaviconUrl('https://example.com')).toBe('chrome://favicon/size/64@1x/https://example.com/')
-    expect(buildChromeFaviconUrl('http://example.com/', 32)).toBe('chrome://favicon/size/32@1x/http://example.com/')
+    expect(buildChromeFaviconUrl('https://example.com')).toBe('chrome://favicon2/size/64@1x/https://example.com/')
+    expect(buildChromeFaviconUrl('http://example.com/', 32)).toBe('chrome://favicon2/size/32@1x/http://example.com/')
   })
   it('clamps sizes into range', () => {
     expect(buildChromeFaviconUrl('https://example.com', 512)).toContain('/size/64@1x/')

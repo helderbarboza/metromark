@@ -14,8 +14,6 @@
     faviconPageUrl?: string
     tint?: string
     fallbackIcon?: string
-    requestSize?: number
-    scaleFactor?: 1 | 2
     iconClass?: string
   }
 
@@ -26,8 +24,6 @@
     faviconPageUrl,
     tint = '#ffffff',
     fallbackIcon = '',
-    requestSize = 64,
-    scaleFactor = 2,
     iconClass = '',
   }: Props = $props()
 
@@ -69,9 +65,6 @@
         <FaviconIcon
           pageUrl={faviconPageUrl}
           tint={tint}
-          {requestSize}
-          convertSize={requestSize}
-          {scaleFactor}
           fallback={fallbackIcon || icon}
         />
       {:else}

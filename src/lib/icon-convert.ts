@@ -24,8 +24,6 @@ export type IconImageSource
 export type IconOutputKind = 'canvas' | 'dataURL' | 'blob'
 
 export interface ProcessIconOptions {
-  /** Output tile size in px. */
-  sizePx: number
   /** 0xAARRGGBB tint color. */
   tintArgb: number
   /** 0xAARRGGBB background color (needed if filled=true). */
@@ -73,7 +71,6 @@ export async function processIconImage(
   options: ProcessIconOptions,
 ): Promise<HTMLCanvasElement | string | Blob | null> {
   const {
-    sizePx,
     tintArgb,
     bgArgb = 0xFF000000,
     iconShapeId = -1,
@@ -86,14 +83,16 @@ export async function processIconImage(
   // 1. Normalize input into a drawable element
   const drawable = await loadDrawable(imageSource)
 
-  // 2. Draw into a canvas at the working size (source bitmap equivalent)
-  const srcCanvas = createCanvas(sizePx, sizePx)
-  get2dContext(srcCanvas).drawImage(drawable, 0, 0, sizePx, sizePx)
+  // 2. Get intrinsic dimensions of the source
+  const { width, height } = getDrawableSize(drawable)
 
-  // 3. Run the pipeline
+  // 3. Draw into a canvas at intrinsic size (1:1)
+  const srcCanvas = createCanvas(width, height)
+  get2dContext(srcCanvas).drawImage(drawable, 0, 0, width, height)
+
+  // 4. Run the pipeline
   const resultCanvas = renderType3LuminanceSilhouette(
     srcCanvas,
-    sizePx,
     tintArgb,
     bgArgb,
     iconShapeId,
@@ -102,7 +101,7 @@ export async function processIconImage(
     preserveTransparency,
   )
 
-  // 4. Return in whatever shape the caller needs
+  // 5. Return in whatever shape the caller needs
   switch (output) {
     case 'dataURL':
       return resultCanvas.toDataURL('image/png')
@@ -164,11 +163,29 @@ function get2dContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 }
 
 // ---------------------------------------------------------------------------
+// Canvas size helpers
+// ---------------------------------------------------------------------------
+function getDrawableSize(drawable: DrawableImage): { width: number, height: number } {
+  if (drawable instanceof HTMLImageElement) {
+    const w = drawable.naturalWidth || drawable.width
+    const h = drawable.naturalHeight || drawable.height
+    if (w <= 0 || h <= 0)
+      throw new Error('Image has 0 px dimensions (naturalWidth/naturalHeight).')
+    return { width: w, height: h }
+  }
+  if (drawable instanceof HTMLCanvasElement || drawable instanceof ImageBitmap) {
+    if (drawable.width <= 0 || drawable.height <= 0)
+      throw new Error('Canvas/ImageBitmap has 0 px dimensions.')
+    return { width: drawable.width, height: drawable.height }
+  }
+  throw new Error('Unsupported drawable type for size extraction.')
+}
+
+// ---------------------------------------------------------------------------
 // renderType3LuminanceSilhouette — public entry point
 // ---------------------------------------------------------------------------
 export function renderType3LuminanceSilhouette(
   src: HTMLCanvasElement,
-  sizePx: number,
   tintArgb: number,
   bgArgb: number,
   iconShapeId: IconShape,
@@ -176,23 +193,15 @@ export function renderType3LuminanceSilhouette(
   clipGlyphToShape = false,
   preserveTransparency = false,
 ): HTMLCanvasElement {
-  const size = Math.max(1, sizePx)
-
   if (filled) {
-    const glyphSize = Math.max(1, Math.floor(size * FILLED_GLYPH_SCALE))
-    const rawSil = renderLuminanceSilhouette(
-      src,
-      glyphSize,
-      tintArgb,
-      preserveTransparency,
-    )
+    const rawSil = renderLuminanceSilhouette(src, tintArgb, preserveTransparency)
     const sil = clipGlyphToShape
       ? clipCanvasToIconShape(rawSil, iconShapeId)
       : rawSil
-    return invertToFilledTile(sil, sizePx, tintArgb, bgArgb, iconShapeId)
+    return invertToFilledTile(sil, tintArgb, bgArgb, iconShapeId)
   }
   else {
-    const sil = renderLuminanceSilhouette(src, size, tintArgb, preserveTransparency)
+    const sil = renderLuminanceSilhouette(src, tintArgb, preserveTransparency)
     return clipCanvasToIconShape(sil, iconShapeId)
   }
 }
@@ -202,23 +211,18 @@ export function renderType3LuminanceSilhouette(
 //   Turns an arbitrary icon image into a flat 2-tone silhouette based
 //   on a luminance threshold computed from the icon's own min/max luminance.
 //   Reads from the source canvas but only writes to a new canvas, so the
-//   input is never mutated.
+//   input is never mutated. Output preserves the source dimensions.
 // ---------------------------------------------------------------------------
 export function renderLuminanceSilhouette(
   srcCanvas: HTMLCanvasElement,
-  sizePx: number,
   tintArgb: number,
   preserveTransparency = false,
 ): HTMLCanvasElement {
-  const size = Math.max(1, sizePx)
+  const width = srcCanvas.width
+  const height = srcCanvas.height
 
-  const scaled
-    = srcCanvas.width !== size || srcCanvas.height !== size
-      ? scaleCanvas(srcCanvas, size, size)
-      : srcCanvas
-
-  const ctx = get2dContext(scaled)
-  const imgData = ctx.getImageData(0, 0, size, size)
+  const ctx = get2dContext(srcCanvas)
+  const imgData = ctx.getImageData(0, 0, width, height)
   const data = imgData.data // RGBA bytes
 
   // Pass 1: find luminance range among "opaque enough" pixels.
@@ -279,7 +283,7 @@ export function renderLuminanceSilhouette(
     }
   }
 
-  const out = createCanvas(size, size)
+  const out = createCanvas(width, height)
   get2dContext(out).putImageData(imgData, 0, 0)
   return out
 }
@@ -291,11 +295,12 @@ export function clipCanvasToIconShape(
   // -1 and 2 mean "no clip".
   if (iconShapeId === -1 || iconShapeId === 2)
     return canvas
-  const size = canvas.width
-  const out = createCanvas(size, size)
+  const width = canvas.width
+  const height = canvas.height
+  const out = createCanvas(width, height)
   const ctx = get2dContext(out)
   ctx.save()
-  tracePathForShape(ctx, iconShapeId, size)
+  tracePathForShape(ctx, iconShapeId, width, height)
   ctx.clip()
   ctx.drawImage(canvas, 0, 0)
   ctx.restore()
@@ -306,32 +311,34 @@ export function clipCanvasToIconShape(
 // invertToFilledTile
 //   Fills the whole tile with the tint color, then stamps the (inverted,
 //   bg-colored) glyph silhouette into the center, finally clips to shape.
+//   Output preserves the source dimensions.
 // ---------------------------------------------------------------------------
 export function invertToFilledTile(
   silhouetteCanvas: HTMLCanvasElement,
-  sizePx: number,
   tintArgb: number,
   bgArgb: number,
   iconShapeId: IconShape,
 ): HTMLCanvasElement {
-  const size = Math.max(1, sizePx)
-  const glyphSize = Math.max(1, Math.floor(size * FILLED_GLYPH_SCALE))
+  const width = silhouetteCanvas.width
+  const height = silhouetteCanvas.height
 
-  const glyph
-    = silhouetteCanvas.width !== glyphSize
-      || silhouetteCanvas.height !== glyphSize
-      ? scaleCanvas(silhouetteCanvas, glyphSize, glyphSize)
-      : silhouetteCanvas
+  // Scale glyph proportionally to fit within glyphSize box based on shorter side
+  const glyphSize = Math.max(1, Math.floor(Math.min(width, height) * FILLED_GLYPH_SCALE))
+  const scale = glyphSize / Math.max(width, height)
+  const glyphWidth = Math.max(1, Math.round(width * scale))
+  const glyphHeight = Math.max(1, Math.round(height * scale))
 
-  const tile = createCanvas(size, size)
+  const glyph = scaleCanvas(silhouetteCanvas, glyphWidth, glyphHeight)
+
+  const tile = createCanvas(width, height)
   const ctx = get2dContext(tile)
 
   // drawColor(tintArgb)
   ctx.fillStyle = colorToCss(tintArgb)
-  ctx.fillRect(0, 0, size, size)
+  ctx.fillRect(0, 0, width, height)
 
-  const left = (size - glyphSize) / 2
-  const top = (size - glyphSize) / 2
+  const left = (width - glyphWidth) / 2
+  const top = (height - glyphHeight) / 2
 
   // PorterDuffColorFilter(bgArgb, SRC_IN) applied to the glyph before compositing
   const recoloredGlyph = applyColorSrcIn(glyph, bgArgb)
@@ -419,17 +426,20 @@ export function cssColorToArgb(css: string): number {
 function tracePathForShape(
   ctx: CanvasRenderingContext2D,
   shapeId: 0 | 1,
-  size: number,
+  width: number,
+  height: number,
 ): void {
   ctx.beginPath()
   switch (shapeId) {
-    case 0: // circle
-      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2)
+    case 0: { // circle
+      const radius = Math.min(width, height) / 2
+      ctx.arc(width / 2, height / 2, radius, 0, Math.PI * 2)
       break
+    }
     case 1: {
       // squircle-ish (rounded rect approximation)
-      const r = size * 0.3
-      roundedRectPath(ctx, 0, 0, size, size, r)
+      const r = Math.min(width, height) * 0.3
+      roundedRectPath(ctx, 0, 0, width, height, r)
       break
     }
   }
