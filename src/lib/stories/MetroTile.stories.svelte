@@ -6,14 +6,13 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
   import MetroTile from '../components/MetroTile.svelte'
-  import { globeIcon } from '../icons'
   import { cellsToPx, SIZES } from '../layout'
 
   const { Story } = defineMeta({
     title: 'Metro/Bookmark tile',
     component: MetroTile,
     tags: ['autodocs'],
-    args: { tile: { title: 'Steam', colorIndex: 0, url: 'https://store.steampowered.com/', icon: globeIcon }, size: 'medium', domain: 'store.steampowered.com', showDomain: true },
+    args: { tile: { title: 'Steam', colorIndex: 0, url: 'https://store.steampowered.com/' }, size: 'medium', domain: 'store.steampowered.com', showDomain: true },
     argTypes: {
       size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] },
       selected: { control: 'boolean' },
@@ -49,7 +48,7 @@
 />
 <Story
   name='Wide'
-  args={{ size: 'wide', tile: { title: 'Gmail', colorIndex: 3, url: 'https://mail.google.com', icon: globeIcon }, domain: 'mail.google.com' }}
+  args={{ size: 'wide', tile: { title: 'Gmail', colorIndex: 3, url: 'https://mail.google.com' }, domain: 'mail.google.com' }}
   {template}
 />
 <Story
@@ -69,11 +68,11 @@
 />
 <Story
   name='Long title'
-  args={{ tile: { title: 'A bookmark with a very long but completely safe title', colorIndex: 2, url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }}
+  args={{ tile: { title: 'A bookmark with a very long but completely safe title', colorIndex: 2, url: 'https://example.com' }, domain: 'example.com' }}
   {template}
 />
 <Story
   name='Without icon'
-  args={{ tile: { title: 'A quiet bookmark', colorIndex: 2, url: 'https://example.com', icon: globeIcon }, domain: 'example.com' }}
+  args={{ tile: { title: 'A quiet bookmark', colorIndex: 2, url: 'https://example.com' }, domain: 'example.com' }}
   {template}
 />

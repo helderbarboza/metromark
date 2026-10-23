@@ -13,7 +13,6 @@ export interface MetroTileDef {
   title: string
   colorIndex: number
   color?: string
-  icon?: string
   badge?: string | number
   faces?: MetroFace[]
   period?: number

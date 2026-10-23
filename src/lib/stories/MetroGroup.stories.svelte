@@ -9,15 +9,14 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn } from 'storybook/test'
   import MetroGroup from '../components/MetroGroup.svelte'
-  import { globeIcon } from '../icons'
 
   const tiles: Record<string, TileView> = {
-    steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', icon: globeIcon, colorIndex: 0, size: 'medium', writable: true },
-    github: { id: 'github', title: 'GitHub', url: 'https://github.com', domain: 'github.com', icon: globeIcon, colorIndex: 1, size: 'medium', writable: true },
-    gmail: { id: 'gmail', title: 'Gmail', url: 'https://mail.google.com', domain: 'mail.google.com', icon: globeIcon, colorIndex: 2, size: 'wide', writable: true },
-    notion: { id: 'notion', title: 'Notion', url: 'https://notion.so', domain: 'notion.so', icon: globeIcon, colorIndex: 3, size: 'large', writable: true },
-    drive: { id: 'drive', title: 'Drive', url: 'https://drive.google.com', domain: 'drive.google.com', icon: globeIcon, colorIndex: 4, size: 'medium', writable: true },
-    slack: { id: 'slack', title: 'Slack', url: 'https://slack.com', domain: 'slack.com', icon: globeIcon, colorIndex: 5, size: 'small', writable: true },
+    steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true },
+    github: { id: 'github', title: 'GitHub', url: 'https://github.com', domain: 'github.com', colorIndex: 1, size: 'medium', writable: true },
+    gmail: { id: 'gmail', title: 'Gmail', url: 'https://mail.google.com', domain: 'mail.google.com', colorIndex: 2, size: 'wide', writable: true },
+    notion: { id: 'notion', title: 'Notion', url: 'https://notion.so', domain: 'notion.so', colorIndex: 3, size: 'large', writable: true },
+    drive: { id: 'drive', title: 'Drive', url: 'https://drive.google.com', domain: 'drive.google.com', colorIndex: 4, size: 'medium', writable: true },
+    slack: { id: 'slack', title: 'Slack', url: 'https://slack.com', domain: 'slack.com', colorIndex: 5, size: 'small', writable: true },
   }
 
   const layout: Layout = [
