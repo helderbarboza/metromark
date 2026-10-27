@@ -426,14 +426,14 @@
       return [
         {
           label: 'Open in new tab',
-          icon: 'external',
+          icon: 'openTab',
           action: () => {
             void open(tile.url, 'tab')
           },
         },
         {
           label: 'Open in new window',
-          icon: 'desktop',
+          icon: 'openWindow',
           action: () => {
             void open(tile.url, 'window')
           },
@@ -453,7 +453,7 @@
         },
         {
           label: 'Customize tile',
-          icon: 'arrange',
+          icon: 'customize',
           action: () => edit({ kind: 'appearance', id: tile.id }),
         },
         {
@@ -465,7 +465,7 @@
         },
         {
           label: 'Delete bookmark',
-          icon: 'trash',
+          icon: 'delete',
           separator: true,
           danger: true,
           disabled: !tile.writable,
@@ -480,7 +480,7 @@
       return [
         {
           label: 'Add bookmark here',
-          icon: 'plus',
+          icon: 'addBookmark',
           disabled: !group?.writable,
           action: () => edit({ kind: 'bookmark', parentId: node.id }),
         },
@@ -505,7 +505,7 @@
         },
         {
           label: 'Delete folder',
-          icon: 'trash',
+          icon: 'delete',
           separator: true,
           danger: true,
           disabled: !group?.mutable,
@@ -519,7 +519,7 @@
     return [
       {
         label: 'Add bookmark',
-        icon: 'plus',
+        icon: 'addBookmark',
         disabled: !parentId,
         action: () => edit({ kind: 'bookmark', parentId }),
       },
@@ -538,10 +538,10 @@
             separator: true,
             action: () => clearSelection(),
           },
-        ]),
+        ] satisfies MenuItem[]),
       {
         label: 'Search bookmarks',
-        icon: 'search',
+        icon: 'searchBookmarks',
         action: () => searchInput.focus(),
       },
       {
@@ -561,14 +561,14 @@
     return [
       {
         label: 'Open in new tab',
-        icon: 'external',
+        icon: 'openTab',
         action: () => {
           void open(tile.url, 'tab')
         },
       },
       {
         label: 'Open in new window',
-        icon: 'desktop',
+        icon: 'openWindow',
         action: () => {
           void open(tile.url, 'window')
         },
@@ -582,7 +582,7 @@
       },
       {
         label: 'Customize tile',
-        icon: 'arrange',
+        icon: 'customize',
         separator: true,
         action: () => edit({ kind: 'appearance', id: tile.id }),
       },
@@ -874,143 +874,140 @@
     aria-label='Bookmark tile canvas'
     tabindex='-1'
   >
-    {#if !snapshot}
-      <div
-        class='
-          flex size-full min-h-60 flex-col items-center justify-center
-          text-center text-(--muted)
-        '
-      >
-        {#if loadError}
-          <Icon name='lock' size={28} />
+    <div class='flex h-full flex-row items-center'>
+      {#if !snapshot}
+        <div
+          class='
+            flex size-full min-h-60 flex-col items-center justify-center
+            text-center text-(--muted)
+          '
+        >
+          {#if loadError}
+            <Icon name='lock' size={28} />
+            <h2 class='
+              mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
+            '
+            >
+              Let's reconnect.
+            </h2>
+            <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
+            <button class='button' onclick={() => window.location.reload()}>Reload page</button>
+          {:else}
+            <span
+              class='
+                mb-5 size-6 animate-spin rounded-full border border-(--line)
+                border-t-(--accent)
+              '
+            >
+            </span>
+            <p class='mb-6 px-5 text-xs/relaxed'>
+              Finding your favorites…
+            </p>
+          {/if}
+        </div>
+      {:else if normalizedQuery && !visibleGroups.length}
+        <div
+          class='
+            flex size-full min-h-60 flex-col items-center justify-center border
+          '
+        >
+          <Icon name='searchBookmarks' size={33} />
           <h2 class='
             mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
           '
           >
-            Let's reconnect.
+            No favorites found.
           </h2>
-          <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
-          <button class='button' onclick={() => window.location.reload()}>Reload page</button>
-        {:else}
-          <span
+          <p class='mb-6 px-5 text-xs/relaxed'>
+            Nothing matches “{query}”. Try a title, website, or folder.
+          </p>
+          <Button onclick={() => (query = '')}>Clear search</Button>
+        </div>
+      {:else}
+        <SnapGridGroup>
+          <div
             class='
-              mb-5 size-6 animate-spin rounded-full border border-(--line)
-              border-t-(--accent)
+              flex h-fit w-max items-end gap-9 px-16
+              max-lg:gap-7 max-lg:px-9
+              max-md:px-6
             '
           >
-          </span>
-          <p class='mb-6 px-5 text-xs/relaxed'>
-            Finding your favorites…
-          </p>
-        {/if}
-      </div>
-    {:else if normalizedQuery && !visibleGroups.length}
-      <div
-        class='
-          flex size-full min-h-60 flex-col items-center justify-center
-          text-center text-(--muted)
-        '
-      >
-        <Icon name='search' size={33} />
-        <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
-          No favorites found.
-        </h2>
-        <p class='mb-6 px-5 text-xs/relaxed'>
-          Nothing matches “{query}”. Try a title, website, or folder.
-        </p>
-        <Button onclick={() => (query = '')}>Clear search</Button>
-      </div>
-    {:else}
-      <SnapGridGroup>
-        <div
-          class='
-            flex h-full w-max items-center gap-9 px-16
-            max-lg:gap-7 max-lg:px-9
-            max-md:px-6
-          '
-        >
-          {#each visibleGroups as group (group.id)}
-            <MetroGroup
-              {group}
-              layout={draftLayouts[group.id] ?? group.layout}
-              tiles={allTiles}
-              {cell}
-              draggable={!normalizedQuery}
-              {dragging}
-              {selectedId}
-              showDomains={snapshot.settings.showDomains}
-              preview={client.mode === 'preview'}
-              onLayoutChange={stageLayout}
-              onDragStart={() => {
-                dragging = true
-                // A tile on the way to another group must not keep the app bar (uwp8 p. 82).
-                selectedId = null
-                selectionOrigin = null
-                // An in-flight smooth scroll would fight the drag and keep the canvas
-                // moving under the pointer, so stop it and hold scrolling still.
-                cancelSmoothScroll()
-                if (scroller)
-                  scroller.style.scrollBehavior = 'auto'
-              }}
-              onDragStop={dragStop}
-              onSelect={selectByGesture}
-              onContext={contextFor}
-              onAdd={parentId => edit({ kind: 'bookmark', parentId })}
-              onBlocked={message => showNotice({ message, tone: 'error' })}
-            />
-          {/each}
-          {#if !normalizedQuery && defaultFolder()}<div class='w-48 shrink-0'>
-            <div class='
-              flex h-15 items-center pt-2.5 text-xs tracking-widest
-              text-(--muted)
-            '
-            >
-              A LITTLE MORE SPACE
-            </div>
-            <button
-              class='
-                relative flex w-full flex-col items-center justify-center border
-                border-dashed border-(--line) bg-transparent text-(--muted)
-                transition-colors duration-150
-                hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)
-              '
-              style:height='{cellsToPx(ROWS, cell)}px'
-              onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
-            >
-              <span
+            {#each visibleGroups as group (group.id)}
+              <MetroGroup
+                {group}
+                layout={draftLayouts[group.id] ?? group.layout}
+                tiles={allTiles}
+                {cell}
+                draggable={!normalizedQuery}
+                {dragging}
+                {selectedId}
+                showDomains={snapshot.settings.showDomains}
+                preview={client.mode === 'preview'}
+                onLayoutChange={stageLayout}
+                onDragStart={() => {
+                  dragging = true
+                  // A tile on the way to another group must not keep the app bar (uwp8 p. 82).
+                  selectedId = null
+                  selectionOrigin = null
+                  // An in-flight smooth scroll would fight the drag and keep the canvas
+                  // moving under the pointer, so stop it and hold scrolling still.
+                  cancelSmoothScroll()
+                  if (scroller)
+                    scroller.style.scrollBehavior = 'auto'
+                }}
+                onDragStop={dragStop}
+                onSelect={selectByGesture}
+                onContext={contextFor}
+                onAdd={parentId => edit({ kind: 'bookmark', parentId })}
+                onBlocked={message => showNotice({ message, tone: 'error' })}
+              />
+            {/each}
+            {#if !normalizedQuery && defaultFolder()}<div class='flex w-48 shrink-0 justify-end'>
+              <button
                 class='
-                  mb-5 flex size-12 items-center justify-center rounded-full
-                  border border-(--line)
+                  relative flex w-full flex-col items-center justify-center
+                  border border-dashed border-(--line) bg-transparent
+                  text-(--muted) transition-colors duration-150
+                  hover:border-(--muted) hover:bg-(--surface)
+                  hover:text-(--text)
+                '
+                style:height='{cellsToPx(ROWS, cell)}px'
+                onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
+              >
+                <span
+                  class='
+                    mb-5 flex size-12 items-center justify-center rounded-full
+                    border border-(--line)
+                  '
+                >
+                  <Icon name='addFolder' size={23} />
+                </span>
+                <strong class='text-sm font-medium text-(--text)'>New group</strong>
+                <span class='mt-2 text-xs'>Create a bookmark folder</span>
+              </button>
+            </div>
+            {/if}
+            {#if !visibleGroups.length && !normalizedQuery}
+              <div
+                class='
+                  flex size-full min-h-60 flex-col items-center justify-center
+                  text-center text-(--muted)
                 '
               >
-                <Icon name='plus' size={23} />
-              </span>
-              <strong class='text-sm font-medium text-(--text)'>New group</strong>
-              <span class='mt-2 text-xs'>Create a bookmark folder</span>
-              <span class='absolute top-4 right-4 opacity-60'><Icon name='arrow' size={16} /></span>
-            </button>
+                <h2 class='
+                  mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
+                '
+                >
+                  No bookmark folders available.
+                </h2>
+                <p class='mb-6 px-5 text-xs/relaxed'>
+                  Create a writable browser bookmark folder to get started.
+                </p>
+              </div>{/if}
           </div>
-          {/if}
-          {#if !visibleGroups.length && !normalizedQuery}
-            <div
-              class='
-                flex size-full min-h-60 flex-col items-center justify-center
-                text-center text-(--muted)
-              '
-            >
-              <h2 class='
-                mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
-              '
-              >
-                No bookmark folders available.
-              </h2>
-              <p class='mb-6 px-5 text-xs/relaxed'>
-                Create a writable browser bookmark folder to get started.
-              </p>
-            </div>{/if}
-        </div>
-      </SnapGridGroup>
-    {/if}
+        </SnapGridGroup>
+      {/if}
+    </div>
   </main>
 
   <footer
@@ -1031,7 +1028,7 @@
           max-md:h-9 max-md:w-46
         '
       >
-        <Icon name='search' size={17} />
+        <Icon name='searchBookmarks' size={17} />
         <input
           bind:this={searchInput}
           value={query}
@@ -1116,7 +1113,7 @@
           disabled={!canScroll || scrollProgress < 0.01}
           onclick={() => scroll(-1)}
         >
-          <Icon name='back' size={17} />
+          <Icon name='arrowLeft' size={17} />
         </IconButton>
         <IconButton
           label='Scroll groups right'
@@ -1127,7 +1124,7 @@
           disabled={!canScroll || scrollProgress > 0.99}
           onclick={() => scroll(1)}
         >
-          <Icon name='chevron' size={17} />
+          <Icon name='arrowRight' size={17} />
         </IconButton>
       </div>
     </div>

@@ -21,9 +21,9 @@
       size: 'large',
       onresize: fn(),
       items: [
-        { label: 'Open in new tab', icon: 'external', action: fn() },
+        { label: 'Open in new tab', icon: 'openTab', action: fn() },
         { label: 'Edit bookmark', icon: 'edit', action: edit },
-        { label: 'Delete bookmark', icon: 'trash', action: fn(), danger: true, separator: true },
+        { label: 'Delete bookmark', icon: 'delete', action: fn(), danger: true, separator: true },
       ],
     },
   })
@@ -43,9 +43,9 @@
     size: undefined,
     onresize: undefined,
     items: [
-      { label: 'Add bookmark here', icon: 'plus', action: fn() },
+      { label: 'Add bookmark here', icon: 'addBookmark', action: fn() },
       { label: 'Rename folder', icon: 'edit', action: fn(), disabled: true },
-      { label: 'Delete folder', icon: 'trash', action: fn(), danger: true, disabled: true },
+      { label: 'Delete folder', icon: 'delete', action: fn(), danger: true, disabled: true },
     ],
   }}
 />

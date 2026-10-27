@@ -73,7 +73,7 @@
       aria-label='Delete selected bookmark'
       onclick={ondelete}
     >
-      <Icon name='trash' size={15} />
+      <Icon name='delete' size={15} />
     </button>
   </div>
   <div class='size-options'>

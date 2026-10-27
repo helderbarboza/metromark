@@ -14,7 +14,7 @@
       `,
       icon: `
         metro-tile-icon absolute inset-0 flex items-center justify-center
-        **:blur-[0.5px] **:[image-rendering:smooth]
+        **:[image-rendering:smooth]
       `,
       label: 'absolute inset-x-2.5 bottom-1.5 flex flex-col gap-0.5 text-left',
       title: 'truncate text-xs leading-[1.35] font-normal',

@@ -57,7 +57,7 @@
     await expect(button.querySelector('svg')).toBeInTheDocument()
   }}
 >
-  <Icon name='trash' size={18} />
+  <Icon name='delete' size={18} />
   Delete folder
 </Story>
 
@@ -94,6 +94,6 @@
     await expect(button).toHaveClass('button')
   }}
 >
-  <Icon name='plus' size={18} />
+  <Icon name='addBookmark' size={18} />
   Add bookmark
 </Story>

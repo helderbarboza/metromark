@@ -284,7 +284,7 @@
             class='empty-add'
             onclick={() => onAdd(group.id)}
           >
-            <Icon name='plus' size={15} />Add a bookmark
+            <Icon name='addBookmark' size={15} />Add a bookmark
           </button>
         {/if}
       </div>

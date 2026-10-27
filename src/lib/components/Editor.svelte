@@ -403,7 +403,7 @@
         </div>
       {:else}
         <Button class='reset-button' onclick={() => (confirmReset = true)}>
-          <Icon name='reset' size={15} />
+          <Icon name='refresh' size={15} />
           Reset tile layouts
         </Button>
       {/if}
@@ -458,7 +458,7 @@
         disabled={busy}
         onclick={() => send({ type: 'node.remove', id: node.id })}
       >
-        <Icon name='trash' size={15} />
+        <Icon name='delete' size={15} />
         {busy ? 'Deleting…' : 'Delete folder'}
       </Button>
     </div>
@@ -616,7 +616,7 @@
               {#if customColor}
                 <Icon name='check' size={16} />
               {:else}
-                <Icon name='plus' size={16} />
+                <Icon name='add' size={16} />
               {/if}
             </button>
             {#if customColor}
