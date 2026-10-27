@@ -99,15 +99,20 @@
 <div class='mb-[29px]'>
   <div class='flex flex-col'>
     <label class='mb-[23px] flex items-center justify-between gap-[15px] text-[11px]'>
-      <span>Show website addresses<small class='mt-[7px] block text-[10px] text-(--muted)'>A little context below each title.</small></span>
+      <span>
+        Show website addresses
+        <small class='mt-[7px] block text-[10px] text-(--muted)'>
+          A little context below each title.
+        </small>
+      </span>
       <input
         type='checkbox'
         role='switch'
         checked={settings.showDomains}
         disabled={command.busy}
         class='
-          h-[18px] w-[31px] shrink-0 cursor-pointer appearance-none
-          rounded-[20px] bg-(--line) p-[3px]
+          h-[18px] w-[31px] shrink-0 cursor-pointer appearance-none rounded-[20px]
+          bg-(--line) p-[3px]
           before:block before:size-3 before:rounded-full before:bg-(--muted)
           before:transition-transform before:duration-130
           checked:bg-(--accent)
@@ -117,15 +122,20 @@
       />
     </label>
     <label class='mb-[23px] flex items-center justify-between gap-[15px] text-[11px]'>
-      <span>Reduce motion<small class='mt-[7px] block text-[10px] text-(--muted)'>A quieter, more instant experience.</small></span>
+      <span>
+        Reduce motion
+        <small class='mt-[7px] block text-[10px] text-(--muted)'>
+          A quieter, more instant experience.
+        </small>
+      </span>
       <input
         type='checkbox'
         role='switch'
         checked={settings.reducedMotion}
         disabled={command.busy}
         class='
-          h-[18px] w-[31px] shrink-0 cursor-pointer appearance-none
-          rounded-[20px] bg-(--line) p-[3px]
+          h-[18px] w-[31px] shrink-0 cursor-pointer appearance-none rounded-[20px]
+          bg-(--line) p-[3px]
           before:block before:size-3 before:rounded-full before:bg-(--muted)
           before:transition-transform before:duration-130
           checked:bg-(--accent)
@@ -146,7 +156,11 @@
   {#if confirmReset}
     <div class='mt-[14px]'>
       <p class='mb-3 text-[11px]'>Reset layouts for every group?</p>
-      <Button variant='primary' disabled={command.busy} onclick={() => send({ type: 'layout.reset' })}>
+      <Button
+        variant='primary'
+        disabled={command.busy}
+        onclick={() => send({ type: 'layout.reset' })}
+      >
         Reset with Undo
       </Button>
       <Button class='mr-[5px]' onclick={() => (confirmReset = false)}>Cancel</Button>
@@ -217,7 +231,10 @@
         Confirm demo reset
       </Button>
     {:else}
-      <button class='bg-transparent p-0 text-[10px] text-(--accent)' onclick={() => (confirmPreview = true)}>
+      <button
+        class='bg-transparent p-0 text-[10px] text-(--accent)'
+        onclick={() => (confirmPreview = true)}
+      >
         Restore sample bookmarks
       </button>
     {/if}

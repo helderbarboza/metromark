@@ -95,8 +95,8 @@
       placeholder='A name you’ll recognize'
       autocomplete='off'
       class='
-        h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px]
-        text-[13px] text-(--text) outline-offset-1
+        h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px] text-[13px]
+        text-(--text) outline-offset-1
         placeholder:text-(--muted) placeholder:opacity-60
       '
     />
@@ -110,8 +110,8 @@
       autocomplete='url'
       spellcheck='false'
       class='
-        h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px]
-        text-[13px] text-(--text) outline-offset-1
+        h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px] text-[13px]
+        text-(--text) outline-offset-1
         placeholder:text-(--muted) placeholder:opacity-60
       '
     />
@@ -120,12 +120,7 @@
     <FolderSelect folders={folders} bind:value={parentId} label='Folder' />
   {/if}
   {#if node}
-    <div
-      class='
-        mb-[21px] flex items-center gap-2 text-[10px] leading-[1.7]
-        text-(--muted)
-      '
-    >
+    <div class='mb-[21px] flex items-center gap-2 text-[10px] leading-[1.7] text-(--muted)'>
       <Icon name='folder' size={14} />
       <span>{currentGroup?.path.join(' / ')}</span>
     </div>

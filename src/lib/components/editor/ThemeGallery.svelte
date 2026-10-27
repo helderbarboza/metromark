@@ -1,5 +1,11 @@
 <script lang='ts'>
-  import { DARK_THEMES, getThemeSelections, isOneOf, LIGHT_THEMES, setThemeForMode } from '../../theme-picker'
+  import {
+    DARK_THEMES,
+    getThemeSelections,
+    isOneOf,
+    LIGHT_THEMES,
+    setThemeForMode,
+  } from '../../theme-picker'
   import Icon from '../Icon.svelte'
   import ThemePreview from './ThemePreview.svelte'
 
@@ -24,8 +30,7 @@
     <div>
       <h4
         class='
-          mb-[10px] text-[11px] font-[550] tracking-[0.5px] text-(--muted)
-          uppercase
+          mb-[10px] text-[11px] font-[550] tracking-[0.5px] text-(--muted) uppercase
         '
       >{mode} theme</h4>
       <div class='grid grid-cols-2 gap-[10px]'>
@@ -34,17 +39,14 @@
           <button
             type='button'
             class='
-              overflow-hidden rounded-sm border border-(--line) bg-transparent
-              text-left
+              overflow-hidden rounded-sm border border-(--line) bg-transparent text-left
               aria-pressed:border-(--accent)
             '
             aria-pressed={selected}
             onclick={() => chooseTheme(mode, theme)}
           >
             <ThemePreview {theme} {mode} />
-            <span
-              class='flex items-center justify-between px-[11px] py-[9px] text-[10px]'
-            >
+            <span class='flex items-center justify-between px-[11px] py-[9px] text-[10px]'>
               {theme}
               {#if selected}<Icon name='check' size={12} />{/if}
             </span>

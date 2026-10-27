@@ -28,7 +28,7 @@ export default antfu(
     plugins: { 'better-tailwindcss': betterTailwindcss },
     rules: {
       ...betterTailwindcss.configs['recommended-warn'].rules,
-      'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', { printWidth: 80, preferSingleLine: undefined, group: 'newLine', strictness: 'loose' }],
+      'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', { printWidth: 90, preferSingleLine: true, group: 'newLine', strictness: 'loose' }],
     },
     settings: {
       'better-tailwindcss': { entryPoint: 'src/styles.css' },
@@ -46,6 +46,7 @@ export default antfu(
     files: ['**/*.svelte'],
     rules: {
       'svelte/max-attributes-per-line': ['error', { singleline: 3, multiline: 1 }],
+      'svelte/first-attribute-linebreak': ['error', { multiline: 'below', singleline: 'beside' }],
       'svelte/html-closing-bracket-new-line': ['error', { singleline: 'never', multiline: 'always' }],
       'style/max-len': ['warn', { code: 100, tabWidth: 2, ignoreUrls: true }],
     },

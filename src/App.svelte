@@ -799,24 +799,11 @@
 >
 </span>
 <div
-  class='
-    relative flex h-dvh w-full flex-col overflow-hidden bg-(--bg) text-(--text)
-  '
+  class='relative flex h-dvh w-full flex-col overflow-hidden bg-(--bg) text-(--text)'
   class:reduced={snapshot?.settings.reducedMotion}
 >
-  <header
-    class='
-      shrink-0 px-16 pt-8
-      max-lg:px-9
-      max-md:px-6 max-md:pt-6
-    '
-  >
-    <div
-      class='
-        flex items-center justify-between gap-5 pb-3.5
-        max-sm:pb-2.5
-      '
-    >
+  <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
+    <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
       <nav
         class='flex min-w-0 scrollbar-thin gap-1.5 overflow-x-auto p-0.5'
         aria-label='Bookmark roots'
@@ -824,8 +811,8 @@
         <button
           class={rootFilter === 'all'
             ? `
-              flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2
-              text-xs whitespace-nowrap text-(--text)
+              flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2 text-xs
+              whitespace-nowrap text-(--text)
             `
             : `
               flex h-7 items-center gap-2 rounded-sm bg-transparent px-2 text-xs
@@ -845,8 +832,8 @@
         >{bookmarkCount}</span></button>{#each roots as root (root.id)}<button
           class={rootFilter === root.id
             ? `
-              flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2
-              text-xs whitespace-nowrap text-(--text)
+              flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2 text-xs
+              whitespace-nowrap text-(--text)
             `
             : `
               flex h-7 items-center gap-2 rounded-sm bg-transparent px-2 text-xs
@@ -872,8 +859,7 @@
   <main
     id='canvas'
     class='
-      relative min-h-0 flex-1 scrollbar-none overflow-auto scroll-smooth
-      outline-none
+      relative min-h-0 flex-1 scrollbar-none overflow-auto scroll-smooth outline-none
       [&::-webkit-scrollbar]:hidden
     '
     class:is-dragging={dragging}
@@ -889,20 +875,19 @@
       {#if !snapshot}
         <div
           class='
-            flex size-full min-h-60 flex-col items-center justify-center
-            text-center text-(--muted)
+            flex size-full min-h-60 flex-col items-center justify-center text-center
+            text-(--muted)
           '
         >
           {#if loadError}
             <Icon name='lock' size={28} />
-            <h2 class='
-              mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
-            '
-            >
+            <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
               Let's reconnect.
             </h2>
             <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
-            <button class='button' onclick={() => window.location.reload()}>Reload page</button>
+            <button onclick={() => window.location.reload()}>
+              Reload page
+            </button>
           {:else}
             <span
               class='
@@ -917,16 +902,9 @@
           {/if}
         </div>
       {:else if normalizedQuery && !visibleGroups.length}
-        <div
-          class='
-            flex size-full min-h-60 flex-col items-center justify-center border
-          '
-        >
+        <div class='flex size-full min-h-60 flex-col items-center justify-center border'>
           <Icon name='searchBookmarks' size={33} />
-          <h2 class='
-            mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
-          '
-          >
+          <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
             No favorites found.
           </h2>
           <p class='mb-6 px-5 text-xs/relaxed'>
@@ -976,19 +954,18 @@
             {#if !normalizedQuery && defaultFolder()}<div class='flex w-48 shrink-0 justify-end'>
               <button
                 class='
-                  relative flex w-full flex-col items-center justify-center
-                  border border-dashed border-(--line) bg-transparent
-                  text-(--muted) transition-colors duration-150
-                  hover:border-(--muted) hover:bg-(--surface)
-                  hover:text-(--text)
+                  relative flex w-full flex-col items-center justify-center border
+                  border-dashed border-(--line) bg-transparent text-(--muted)
+                  transition-colors duration-150
+                  hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)
                 '
                 style:height='{cellsToPx(ROWS, cell)}px'
                 onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
               >
                 <span
                   class='
-                    mb-5 flex size-12 items-center justify-center rounded-full
-                    border border-(--line)
+                    mb-5 flex size-12 items-center justify-center rounded-full border
+                    border-(--line)
                   '
                 >
                   <Icon name='addFolder' size={23} />
@@ -1001,14 +978,11 @@
             {#if !visibleGroups.length && !normalizedQuery}
               <div
                 class='
-                  flex size-full min-h-60 flex-col items-center justify-center
-                  text-center text-(--muted)
+                  flex size-full min-h-60 flex-col items-center justify-center text-center
+                  text-(--muted)
                 '
               >
-                <h2 class='
-                  mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)
-                '
-                >
+                <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
                   No bookmark folders available.
                 </h2>
                 <p class='mb-6 px-5 text-xs/relaxed'>
@@ -1069,8 +1043,8 @@
         {:else}
           <kbd
             class='
-              flex h-5 w-4 items-center justify-center rounded-sm border
-              border-(--line) font-[inherit] text-xs
+              flex h-5 w-4 items-center justify-center rounded-sm border border-(--line)
+              font-[inherit] text-xs
             '
           >/</kbd>
         {/if}
@@ -1078,10 +1052,7 @@
     </div>
     <div class='flex min-w-0 flex-1 items-center justify-center gap-5'>
       <nav
-        class='
-          absolute left-1/2 flex -translate-x-1/2 gap-1.5 p-2.5
-          max-md:hidden
-        '
+        class='absolute left-1/2 flex -translate-x-1/2 gap-1.5 p-2.5 max-md:hidden'
         aria-label='Jump to bookmark group'
       >
         {#each visibleGroups as group, index (group.id)}
@@ -1098,17 +1069,13 @@
       </nav>
     </div>
     <div class='flex shrink-0 items-center gap-4'>
-      <div class='
-        flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)
-      '
-      >
+      <div class='flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)'>
         <span class='max-sm:hidden'>{bookmarkCount} bookmarks, {folderCount} folders</span>
         <span class='sm:hidden'>{bookmarkCount} / {folderCount}</span>
         {#if client.mode === 'preview'}
           <span
             class='
-              rounded-sm border border-(--line) px-1.5 py-0.5 text-xs
-              text-(--muted)
+              rounded-sm border border-(--line) px-1.5 py-0.5 text-xs text-(--muted)
             '
             title='saved locally, not your real bookmarks'
           >Demo</span>
@@ -1117,10 +1084,7 @@
       <div class='flex items-center gap-0.5'>
         <IconButton
           label='Scroll groups left'
-          class='
-            h-7 w-6 rounded-sm
-            disabled:opacity-25
-          '
+          class='h-7 w-6 rounded-sm disabled:opacity-25'
           disabled={!canScroll || scrollProgress < 0.01}
           onclick={() => scroll(-1)}
         >
@@ -1128,10 +1092,7 @@
         </IconButton>
         <IconButton
           label='Scroll groups right'
-          class='
-            h-7 w-6 rounded-sm
-            disabled:opacity-25
-          '
+          class='h-7 w-6 rounded-sm disabled:opacity-25'
           disabled={!canScroll || scrollProgress > 0.99}
           onclick={() => scroll(1)}
         >

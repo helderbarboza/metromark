@@ -52,10 +52,11 @@
 
 {#snippet face(i: number)}
   {#if i === 0}
-    <div class={`
-      metro-tile-icon
-      ${iconClass}
-    `}
+    <div
+      class={`
+        metro-tile-icon
+        ${iconClass}
+      `}
     >
       <FaviconIcon
         pageUrl={faviconPageUrl ?? ''}

@@ -20,57 +20,40 @@
       title: 'truncate text-xs leading-[1.35] font-normal',
       domain: 'truncate text-[10px] leading-[1.35] font-normal opacity-[.7]',
       check: `
-        absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pt-px
-        pr-0.5 text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
+        absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pt-px pr-0.5
+        text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
       `,
       badge: `
-        absolute top-2.5 left-3 flex h-[22px] min-w-[22px] items-center
-        justify-center rounded-[11px] bg-(--tile-fg) px-1.5 text-xs leading-none
-        font-semibold text-(--tile-bg)
+        absolute top-2.5 left-3 flex h-[22px] min-w-[22px] items-center justify-center
+        rounded-[11px] bg-(--tile-fg) px-1.5 text-xs leading-none font-semibold
+        text-(--tile-bg)
       `,
     },
     variants: {
       size: {
         small: {
           root: 'metro-tile-small',
-          icon: `
-            pb-0
-            [&_img]:size-[32px]
-            [&_svg]:size-[32px]
-          `,
+          icon: `pb-0 [&_img]:size-[32px] [&_svg]:size-[32px]`,
           check: 'size-[18px]',
         },
         medium: {
           root: 'metro-tile-medium',
-          icon: `
-            pb-6
-            [&_img]:size-[56px]
-            [&_svg]:size-[56px]
-          `,
+          icon: `pb-6 [&_img]:size-[56px] [&_svg]:size-[56px]`,
         },
         wide: {
           root: 'metro-tile-wide',
-          icon: `
-            pb-6
-            [&_img]:size-[64px]
-            [&_svg]:size-[64px]
-          `,
+          icon: `pb-6 [&_img]:size-[64px] [&_svg]:size-[64px]`,
         },
         large: {
           root: 'metro-tile-large',
-          icon: `
-            pb-[26px]
-            [&_img]:size-[80px]
-            [&_svg]:size-[80px]
-          `,
+          icon: `pb-[26px] [&_img]:size-[80px] [&_svg]:size-[80px]`,
         },
       },
       selected: {
         true: {
           root: `
             selected outline-[3px] outline-offset-[-3px] outline-(--tile-fg)
-            hover:outline-[3px] hover:outline-offset-[-3px]
-            hover:outline-(--tile-fg)
+            hover:outline-[3px] hover:outline-offset-[-3px] hover:outline-(--tile-fg)
           `,
         },
       },
@@ -195,11 +178,12 @@
       iconClass={ui.icon()}
     />
   {:else}
-    <div class={`
-      metro-tile-icon
-      ${ui.icon()}
-    `}
-         aria-hidden='true'
+    <div
+      class={`
+        metro-tile-icon
+        ${ui.icon()}
+      `}
+      aria-hidden='true'
     >
       <FaviconIcon
         pageUrl={tile.url ?? ''}
