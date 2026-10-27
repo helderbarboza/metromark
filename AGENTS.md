@@ -11,7 +11,7 @@ Metro Bookmarks is a Chrome/Firefox extension that replaces the new-tab page wit
 ### Required stack
 
 - Svelte 5 with runes and TypeScript.
-- Tailwind CSS 4 through its Vite integration.
+- Tailwind CSS 4 through its Vite integration. Use Tailwind utility classes for all new and changed styles.
 - ESLint; **do not introduce or run Prettier**.
 - WXT for Chrome and Firefox Manifest V3 builds.
 - Snapgrid for tile arrangement.
@@ -77,6 +77,7 @@ Put bookmark mutations behind coordinator commands. Keep browser API details in 
 ## UI and accessibility
 
 - Use Svelte runes for reactive state and clean up subscriptions, listeners, timers, and animation callbacks.
+- Use Tailwind utilities for new or changed styles. Do not add a new CSS rule or `<style>` block when a Tailwind utility can express the style. Use theme tokens and arbitrary values such as `border-(--line)`, `text-(--muted)`, and `pt-[22px]`. Keep existing CSS only when a utility cannot express the requirement; state the reason in a comment.
 - Preserve keyboard operation, visible focus, dialog focus handling, menu navigation, and drag cancellation.
 - Accessible names must include visible labels, including displayed domain text where applicable.
 - Give form controls clear labels; connect explanatory hints with `aria-describedby` rather than folding hints into control names.

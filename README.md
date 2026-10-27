@@ -24,6 +24,7 @@ The live web preview is an isolated **demo workspace**; it cannot access your re
 - Receives native bookmark changes in open new tabs and writes management changes back to the actual browser tree.
 - Selecting a tile (right-click, the menu key or Shift+F10) opens an app bar with its edit, move, delete and size commands; group and background right-clicks open context menus. Creation, editing, folder management, moving, customization and deletion are available directly on the new-tab page.
 - Offers **30-second Undo** for deletion, moves, bookmark edits and layout resets. Folder deletion backs up the entire subtree and remaps recreated bookmark IDs on restoration.
+- Provides a confirmed factory reset for Metro appearance, settings and theme. It keeps all browser bookmarks.
 - Stores appearance and tile placement separately from the browser's bookmarks.
 - Includes title/URL/path search, browser-container filtering, horizontal group navigation, four themes, two densities and reduced-motion settings.
 

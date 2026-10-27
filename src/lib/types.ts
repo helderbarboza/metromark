@@ -147,6 +147,7 @@ export type Command
     | { type: 'tile.appearance', id: string, patch: Appearance }
     | { type: 'layout.commit', layouts: Record<string, Layout> }
     | { type: 'layout.reset' }
+    | { type: 'factory.reset' }
     | { type: 'settings.update', patch: Partial<Settings> }
     | { type: 'undo', id: string, parentId?: string }
 export interface Notice { message: string, undoId?: string, tone?: 'success' | 'error' | 'info' }

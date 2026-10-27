@@ -17,7 +17,7 @@ const faviconPendingCache = new Map<string, Promise<string>>()
 const dominantCache = new Map<string, Rgb>()
 
 /** The longest time to wait for a local favicon before keeping the hashed accent. */
-const DOMINANT_TIMEOUT = 1500
+const DOMINANT_TIMEOUT = 5000
 
 /** Load a page's cached favicon and convert it to a Metro-tint silhouette. */
 export async function loadConvertedFavicon(
@@ -145,7 +145,25 @@ async function loadDominantFaviconColor(pageUrl: string): Promise<Rgb | null> {
     return dominant
   }
   catch {
-    return null
+    // Retry once after a short delay for transient load failures.
+    await new Promise(resolve => setTimeout(resolve, 250))
+    try {
+      const img = await loadImageBefore(source, DOMINANT_TIMEOUT)
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth > 0 ? img.naturalWidth : 64
+      canvas.height = img.naturalHeight > 0 ? img.naturalHeight : 64
+      const ctx = canvas.getContext('2d')
+      if (!ctx)
+        return null
+      ctx.drawImage(img, 0, 0)
+      const dominant = extractDominantColor(ctx.getImageData(0, 0, canvas.width, canvas.height).data)
+      if (dominant)
+        dominantCache.set(key, dominant)
+      return dominant
+    }
+    catch {
+      return null
+    }
   }
 }
 

@@ -78,6 +78,7 @@
   let busy = $state(false)
   let error = $state('')
   let confirmReset = $state(false)
+  let confirmFactory = $state(false)
   let confirmPreview = $state(false)
   let disposed = false
   onDestroy(() => {
@@ -428,6 +429,42 @@
         </Button>
       {/if}
     </div>
+    <div class='setting-section border-t border-(--line) pt-[22px]'>
+      <h3>Factory reset</h3>
+      <p class='mx-0 mt-0 mb-[15px] text-[11px] leading-[1.65] text-(--muted)'>
+        Reset tile colors, sizes, placements, and display options. This also
+        resets your theme and mode and clears Undo history. Your bookmarks
+        stay. This cannot be undone.
+      </p>
+      {#if confirmFactory}
+        <div class='reset-confirm'>
+          <p>Reset Metro to factory defaults?</p>
+          <Button disabled={busy} onclick={() => (confirmFactory = false)}>
+            Cancel
+          </Button>
+          <Button
+            variant='danger'
+            disabled={busy}
+            onclick={() => send({ type: 'factory.reset' })}
+          >
+            <Icon name='refresh' size={15} />
+            Reset Metro
+          </Button>
+        </div>
+      {:else}
+        <Button
+          class='reset-button'
+          disabled={busy}
+          onclick={() => (confirmFactory = true)}
+        >
+          <Icon name='refresh' size={15} />
+          Factory reset
+        </Button>
+      {/if}
+    </div>
+    {#if error}
+      <p class='form-error' role='alert'>{error}</p>
+    {/if}
     <div class='privacy-note'>
       <Icon name='lock' size={17} />
       <div>

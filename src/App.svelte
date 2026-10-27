@@ -23,7 +23,7 @@
   import UndoToast from './lib/components/UndoToast.svelte'
   import { toggleSelection } from './lib/interaction'
   import { cellsToPx, GAP, reconcileLayout, ROWS } from './lib/layout'
-  import { applyThemeForMode } from './lib/theme-picker'
+  import { applyThemeForMode, resetThemePreferences } from './lib/theme-picker'
   import {
     countBookmarks,
     flatten,
@@ -173,6 +173,17 @@
     busy = true
     try {
       const result = await client.execute(command)
+      if (command.type === 'factory.reset') {
+        clearTimeout(layoutTimer)
+        draftLayouts = {}
+        try {
+          resetThemePreferences()
+        }
+        catch (error) {
+          // The stored bookmark data is already reset. Theme changes are best-effort.
+          console.error('Theme reset failed:', error)
+        }
+      }
       applySnapshot(result.snapshot)
       if (result.notice) {
         showNotice(
