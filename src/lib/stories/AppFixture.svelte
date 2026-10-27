@@ -10,8 +10,10 @@
     theme = 'catppuccin-mocha',
     compact = false,
   }: { theme?: ThemeName, compact?: boolean } = $props()
-  const density = compact ? 'compact' : 'comfortable'
-  const client = createPreviewClient({ ...SETTINGS_DEFAULTS, density, reducedMotion: true })
+  const density = $derived(compact ? 'compact' : 'comfortable')
+  const client = $derived(
+    createPreviewClient({ ...SETTINGS_DEFAULTS, density, reducedMotion: true }),
+  )
   let ready = $state(false)
   onMount(() => {
     let cancelled = false

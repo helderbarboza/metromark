@@ -65,7 +65,7 @@
     await expect(button).toHaveAttribute('aria-label', 'Add bookmark')
   }}
 >
-  <Icon name='plus' size={18} />
+  <Icon name='addBookmark' size={18} />
 </Story>
 
 <Story

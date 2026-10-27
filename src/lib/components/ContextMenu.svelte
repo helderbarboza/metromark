@@ -1,7 +1,9 @@
 <script module lang='ts'>
+  import type { IconName } from '../icons'
+
   export interface MenuItem {
     label: string
-    icon: string
+    icon: IconName
     action: () => void
     disabled?: boolean
     danger?: boolean
@@ -121,15 +123,20 @@
     <div class='menu-separator' role='separator'></div>
     <div class='size-label'>TILE SIZE</div>
     <div class='sizes'>
-      {#each sizes as preset (preset)}<button
-        class:current={size === preset}
-        role='menuitem'
-        aria-label='Resize to {preset}'
-        onclick={() => resize(preset)}
-      ><span class='
-        size-box
-        {preset}'
-      ></span><span>{preset}</span></button>{/each}
+      {#each sizes as preset (preset)}
+        <button
+          class:current={size === preset}
+          role='menuitem'
+          aria-label='Resize to {preset}'
+          onclick={() => resize(preset)}
+        >
+          <span class='
+            size-box
+            {preset}'
+          ></span>
+          <span>{preset}</span>
+        </button>
+      {/each}
     </div>
   {/if}
 </div>
