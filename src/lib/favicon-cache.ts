@@ -3,14 +3,21 @@
 // Converted silhouettes are never persisted: the browser favicon cache is
 // local and reconversion on reload is cheap.
 
+import type { Rgb } from './dominant-color'
+import { extractDominantColor, nearestSwatchIndex } from './dominant-color'
 import { cssColorToArgb, processIconImage } from './icon-convert'
-import { buildExtensionFaviconUrl } from './icon-sources'
+import { buildExtensionFaviconUrl, isFaviconEligible } from './icon-sources'
 
 const convertedCache = new Map<string, string>()
 const pendingCache = new Map<string, Promise<string>>()
 
 const faviconCache = new Map<string, string>()
 const faviconPendingCache = new Map<string, Promise<string>>()
+
+const dominantCache = new Map<string, Rgb>()
+
+/** The longest time to wait for a local favicon before keeping the hashed accent. */
+const DOMINANT_TIMEOUT = 1500
 
 /** Load a page's cached favicon and convert it to a Metro-tint silhouette. */
 export async function loadConvertedFavicon(
@@ -93,6 +100,72 @@ export async function loadFavicon(
     faviconPendingCache.delete(key)
   })
   return task
+}
+
+/**
+ * Pick the theme swatch nearest to the favicon's dominant color.
+ * Returns undefined when the favicon is unavailable, has no usable color,
+ * or the palette is empty. Never throws; callers keep the hashed accent.
+ */
+export async function suggestAccentIndex(
+  pageUrl: string,
+  swatches: string[],
+): Promise<number | undefined> {
+  const dominant = await loadDominantFaviconColor(pageUrl)
+  if (dominant == null)
+    return undefined
+  return nearestSwatchIndex(dominant, swatches)
+}
+
+/** Read and sample a page's cached favicon, caching only successful colors. */
+async function loadDominantFaviconColor(pageUrl: string): Promise<Rgb | null> {
+  const key = pageUrl.trim()
+  const hit = dominantCache.get(key)
+  if (hit != null)
+    return hit
+  if (!isFaviconEligible(key))
+    return null
+
+  const source = buildExtensionFaviconUrl(key, 64, undefined, 2)
+  if (source == null)
+    return null
+
+  try {
+    const img = await loadImageBefore(source, DOMINANT_TIMEOUT)
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth > 0 ? img.naturalWidth : 64
+    canvas.height = img.naturalHeight > 0 ? img.naturalHeight : 64
+    const ctx = canvas.getContext('2d')
+    if (!ctx)
+      return null
+    ctx.drawImage(img, 0, 0)
+    const dominant = extractDominantColor(ctx.getImageData(0, 0, canvas.width, canvas.height).data)
+    if (dominant)
+      dominantCache.set(key, dominant)
+    return dominant
+  }
+  catch {
+    return null
+  }
+}
+
+async function loadImageBefore(source: string, timeout: number): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error('The favicon took too long to load.')),
+      timeout,
+    )
+    loadImage(source).then(
+      (image) => {
+        clearTimeout(timer)
+        resolve(image)
+      },
+      (error: unknown) => {
+        clearTimeout(timer)
+        reject(error)
+      },
+    )
+  })
 }
 
 async function loadImage(source: string): Promise<HTMLImageElement> {
