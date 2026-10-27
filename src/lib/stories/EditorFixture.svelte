@@ -7,7 +7,13 @@
   import Editor from '../components/Editor.svelte'
   import { SETTINGS_DEFAULTS } from '../config'
 
-  const { kind = 'bookmark', id, undoId }: { kind?: DialogSpec['kind'], id?: string, undoId?: string } = $props()
+  interface Props {
+    kind?: DialogSpec['kind']
+    id?: string
+    undoId?: string
+  }
+
+  const { kind = 'bookmark', id, undoId }: Props = $props()
   const client = createPreviewClient(SETTINGS_DEFAULTS)
   let snapshot = $state.raw<Snapshot | null>(null)
   let open = $state(true)

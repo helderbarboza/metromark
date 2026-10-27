@@ -73,8 +73,8 @@
         bind:value={size}
         data-initial-focus
         class='
-          h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px]
-          pr-7 text-[13px] text-(--text) outline-offset-1
+          h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px] pr-7
+          text-[13px] text-(--text) outline-offset-1
         '
       >
         {#each ['small', 'medium', 'wide', 'large'] as preset (preset)}

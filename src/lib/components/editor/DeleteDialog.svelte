@@ -34,14 +34,15 @@
 </p>
 <div
   class='
-    mb-[21px] flex items-center gap-[15px] rounded-sm border border-(--line)
-    bg-(--bg) p-5
+    mb-[21px] flex items-center gap-[15px] rounded-sm border border-(--line) bg-(--bg) p-5
   '
 >
   <Icon name='folder' size={24} />
   <div>
     <strong class='mb-[5px] block text-[13px] font-medium'>{countBookmarks(node)} bookmarks</strong>
-    <span class='text-[11px] text-(--muted)'>{flatten([node]).filter(isFolder).length - 1} nested folders</span>
+    <span class='text-[11px] text-(--muted)'>
+      {flatten([node]).filter(isFolder).length - 1} nested folders
+    </span>
   </div>
 </div>
 <p class='m-0 text-[11px] leading-[1.65] text-(--muted)'>

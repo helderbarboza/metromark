@@ -80,8 +80,7 @@
       <span class='pb-0.5 text-[0.5rem] leading-none text-(--text)'>{board.label}</span>
       <span
         class='
-          grid min-h-6 auto-cols-2 grid-flow-col grid-rows-[repeat(4,0.5rem)]
-          gap-px
+          grid min-h-6 auto-cols-2 grid-flow-col grid-rows-[repeat(4,0.5rem)] gap-px
         '
       >
         {#each board.tiles as tile, i (i)}

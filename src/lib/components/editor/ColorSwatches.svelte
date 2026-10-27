@@ -51,8 +51,7 @@
       aria-pressed={!!customColor}
       class='
         flex size-[31px] items-center justify-center rounded-[3px] text-white
-        aria-pressed:outline-2 aria-pressed:outline-offset-2
-        aria-pressed:outline-(--text)
+        aria-pressed:outline-2 aria-pressed:outline-offset-2 aria-pressed:outline-(--text)
       '
       onclick={() => {
         if (!customColor) {
@@ -74,8 +73,8 @@
         aria-label='Custom tile color'
         title='Custom color'
         class='
-          size-8 cursor-pointer rounded-[3px] border border-(--line)
-          bg-transparent p-[2px]
+          size-8 cursor-pointer rounded-[3px] border border-(--line) bg-transparent
+          p-[2px]
         '
       />
     {/if}

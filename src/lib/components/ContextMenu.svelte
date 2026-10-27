@@ -130,9 +130,10 @@
           aria-label='Resize to {preset}'
           onclick={() => resize(preset)}
         >
-          <span class='
-            size-box
-            {preset}'
+          <span
+            class='
+              size-box
+              {preset}'
           ></span>
           <span>{preset}</span>
         </button>
