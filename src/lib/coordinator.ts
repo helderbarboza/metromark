@@ -395,6 +395,11 @@ export class BookmarkCoordinator {
         this.data.layouts = {}
         return { message: 'Tile layouts reset to bookmark order.', undoId: undo.id }
       }
+      case 'factory.reset': {
+        // Restore Metro presentation data only. Native bookmarks stay untouched.
+        this.data = emptyData(this.settings)
+        return { message: 'Metro reset to factory defaults. Your bookmarks were not changed.' }
+      }
       case 'undo': return this.undo(command.id, command.parentId)
       default: throw new Error('Unknown bookmark command.')
     }

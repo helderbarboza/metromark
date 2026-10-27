@@ -316,3 +316,47 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
   await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
 })
+
+test('factory reset restores Metro defaults and keeps sample bookmarks', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' })
+  await page.goto('/')
+  await expect(draggable(page, 'steam')).toBeVisible()
+  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
+  await page.getByRole('button', { name: 'compact', exact: true }).click()
+  await page.getByRole('button', { name: /one-light$/ }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'one-light')
+
+  await page.getByRole('button', { name: 'Factory reset', exact: true }).click()
+  await expect(page.getByText('Reset Metro to factory defaults?')).toBeVisible()
+  await page.getByRole('button', { name: 'Reset Metro', exact: true }).click()
+
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page.locator('.toast-message')).toContainText('Metro reset to factory defaults')
+  await expect(page.getByRole('button', { name: 'Undo', exact: true })).toHaveCount(0)
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'metro-light')
+  await expect(draggable(page, 'steam')).toBeVisible()
+  const saved = await page.evaluate(() => {
+    const value: unknown = JSON.parse(localStorage.getItem('metro.preview.presentation.v1') ?? '{}')
+    if (
+      typeof value !== 'object'
+      || value === null
+      || !('appearance' in value)
+      || !('layouts' in value)
+      || !('undos' in value)
+      || !('settings' in value)
+    ) {
+      throw new Error('Missing presentation data.')
+    }
+    return {
+      appearance: value.appearance,
+      layouts: value.layouts,
+      undos: value.undos,
+      settings: value.settings,
+    }
+  })
+  expect(saved.appearance).toEqual({})
+  expect(saved.layouts).toEqual({})
+  expect(saved.undos).toEqual([])
+  expect(saved.settings).toEqual({ density: 'comfortable', showDomains: true, reducedMotion: false })
+})

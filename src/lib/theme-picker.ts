@@ -1,4 +1,4 @@
-import { mode, setTheme } from 'mode-watcher'
+import { mode, setMode, setTheme, systemPrefersMode } from 'mode-watcher'
 
 export const LIGHT_THEMES = [
   'metro-light',
@@ -134,4 +134,13 @@ export function applyThemeForMode(resolvedMode: ThemeMode | undefined = mode.cur
       // Ignore storage errors
     }
   }
+}
+
+/** Restore the default mode and theme selections. */
+export function resetThemePreferences(): void {
+  selections = { ...DEFAULTS }
+  setMode('system')
+  const resolvedMode = systemPrefersMode.current ?? 'light'
+  applyThemeForMode(resolvedMode)
+  saveSelections()
 }

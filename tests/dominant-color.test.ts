@@ -67,6 +67,11 @@ describe('nearestSwatchIndex', () => {
     expect(nearestSwatchIndex([240, 20, 20], ['#f00', '#0f0'])).toBe(0)
   })
 
+  it('maps a purple-blue favicon to a blue swatch', () => {
+    const palette = ['#ca1243', '#d75f00', '#c18401', '#50a14f', '#0184bc', '#4078f2', '#a626a4', '#986801']
+    expect(nearestSwatchIndex([100, 124, 233], palette)).toBe(5)
+  })
+
   it('skips invalid swatches', () => {
     expect(nearestSwatchIndex([20, 250, 20], ['not-a-color', '#00ff00'])).toBe(1)
   })
