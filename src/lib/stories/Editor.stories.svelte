@@ -34,6 +34,18 @@
   args={{ kind: 'move', id: 'steam' }}
 />
 <Story
+  name='Rename folder'
+  args={{ kind: 'rename', id: 'learning' }}
+/>
+<Story
+  name='Copy website address'
+  args={{ kind: 'copy', id: 'steam' }}
+/>
+<Story
+  name='Restore to folder'
+  args={{ kind: 'restore', undoId: 'demo' }}
+/>
+<Story
   name='Settings drawer'
   args={{ kind: 'settings' }}
 />

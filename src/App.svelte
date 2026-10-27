@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { MenuItem } from './lib/components/ContextMenu.svelte'
-  import type { DialogSpec } from './lib/components/Editor.svelte'
+  import type { DialogSpec } from './lib/components/editor/dialog-spec'
   import type { ThemeMode } from './lib/theme-picker'
   import type {
     Client,

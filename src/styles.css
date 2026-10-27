@@ -448,7 +448,6 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 button, input, select { color: inherit; }
-button { border: 0; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 button:focus:not(:focus-visible) { outline: none; }
 ::selection { background: var(--accent); color: var(--accent-ink); }

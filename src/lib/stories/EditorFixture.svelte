@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import type { DialogSpec } from '../components/Editor.svelte'
+  import type { DialogSpec } from '../components/editor/dialog-spec'
   import type { Command, Snapshot } from '../types'
   import { onMount } from 'svelte'
   import { createPreviewClient } from '../adapters/preview'
@@ -7,7 +7,7 @@
   import Editor from '../components/Editor.svelte'
   import { SETTINGS_DEFAULTS } from '../config'
 
-  const { kind = 'bookmark', id }: { kind?: DialogSpec['kind'], id?: string } = $props()
+  const { kind = 'bookmark', id, undoId }: { kind?: DialogSpec['kind'], id?: string, undoId?: string } = $props()
   const client = createPreviewClient(SETTINGS_DEFAULTS)
   let snapshot = $state.raw<Snapshot | null>(null)
   let open = $state(true)
@@ -24,7 +24,7 @@
   <Button onclick={() => open = true}>Open editor</Button>
   {#if snapshot && open}
     <Editor
-      spec={{ kind, id, parentId: 'bar' }}
+      spec={{ kind, id, parentId: 'bar', undoId }}
       {snapshot}
       onclose={() => open = false}
       oncommand={command}
