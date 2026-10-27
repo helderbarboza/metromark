@@ -19,7 +19,8 @@
 <script lang='ts'>
   import type { Command, Settings, Snapshot, TileSize } from '../types'
   import { setMode, systemPrefersMode, theme, userPrefersMode } from 'mode-watcher'
-  import { onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
+  import { suggestAccentIndex } from '../favicon-cache'
   import { getThemeAccentColors } from '../theme-colors'
   import {
     DARK_THEMES,
@@ -78,6 +79,10 @@
   let error = $state('')
   let confirmReset = $state(false)
   let confirmPreview = $state(false)
+  let disposed = false
+  onDestroy(() => {
+    disposed = true
+  })
   onMount(() => {
     name = node?.title ?? ''
     url = node?.url ?? ''
@@ -134,13 +139,19 @@
   }
   async function submit(event: SubmitEvent) {
     event.preventDefault()
+    if (busy)
+      return
     switch (spec.kind) {
-      case 'bookmark':
-        return send(
-          node
-            ? { type: 'node.update', id: node.id, title: name, url }
-            : { type: 'bookmark.create', parentId, title: name, url },
-        )
+      case 'bookmark': {
+        if (node)
+          return send({ type: 'node.update', id: node.id, title: name, url })
+        busy = true
+        const colorIndex = await suggestedAccent(url)
+        if (disposed)
+          return
+        busy = false
+        return send({ type: 'bookmark.create', parentId, title: name, url, colorIndex })
+      }
       case 'folder':
         return send({ type: 'folder.create', parentId, title: name })
       case 'rename':
@@ -172,6 +183,15 @@
   }
   async function setting(patch: Partial<Settings>) {
     await send({ type: 'settings.update', patch }, false)
+  }
+  /** Never block bookmark creation when the favicon has no usable color. */
+  async function suggestedAccent(value: string): Promise<number | undefined> {
+    try {
+      return await suggestAccentIndex(value, themeColors)
+    }
+    catch {
+      return undefined
+    }
   }
   async function resetPreview() {
     busy = true

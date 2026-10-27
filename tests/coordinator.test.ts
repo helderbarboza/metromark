@@ -86,6 +86,29 @@ describe('commands and synchronization', () => {
   })
 })
 
+describe('bookmark creation', () => {
+  it('stores the suggested swatch index without a custom color', async () => {
+    const { coordinator, storage } = fixture()
+    const result = await coordinator.execute({ type: 'bookmark.create', parentId: 'bar', title: 'Example', url: 'https://example.com', colorIndex: 5 })
+    const created = flatten(result.snapshot.tree).find(node => node.url === 'https://example.com')!
+    expect(result.snapshot.appearance[created.id]).toEqual({ colorIndex: 5 })
+    expect(result.snapshot.appearance[created.id]?.color).toBeUndefined()
+    expect(storage.data?.appearance[created.id]).toEqual({ colorIndex: 5 })
+  })
+  it('keeps the hashed accent when no swatch is available', async () => {
+    const { coordinator } = fixture()
+    const result = await coordinator.execute({ type: 'bookmark.create', parentId: 'bar', title: 'Example', url: 'https://example.com' })
+    const created = flatten(result.snapshot.tree).find(node => node.url === 'https://example.com')!
+    expect(result.snapshot.appearance[created.id]).toBeUndefined()
+  })
+  it('rejects an invalid color index before creating the bookmark', async () => {
+    const { coordinator, bookmarks } = fixture()
+    const create = vi.spyOn(bookmarks, 'create')
+    await expect(coordinator.execute({ type: 'bookmark.create', parentId: 'bar', title: 'Example', url: 'https://example.com', colorIndex: 8 })).rejects.toThrow('Color index')
+    expect(create).not.toHaveBeenCalled()
+  })
+})
+
 describe('durable Undo', () => {
   it('immediately deletes and restores a bookmark under a new ID with its appearance', async () => {
     const { coordinator } = fixture()

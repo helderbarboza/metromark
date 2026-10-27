@@ -29,6 +29,13 @@ export function emptyData(settings: Settings): AppData {
   }
 }
 
+/** Validate a theme swatch index. Custom colors stay outside this range. */
+function checkedColorIndex(value: number): number {
+  if (!Number.isInteger(value) || value < 0 || value > 7)
+    throw new Error('Color index must be 0-7.')
+  return value
+}
+
 /** A single writer for bookmark commands and extension metadata. No UI or DOM dependency. */
 export class BookmarkCoordinator {
   private data: AppData
@@ -233,7 +240,11 @@ export class BookmarkCoordinator {
     switch (command.type) {
       case 'bookmark.create': {
         this.destination(command.parentId)
-        await this.bookmarks.create({ parentId: command.parentId, title: this.title(command.title), url: validateUrl(command.url) })
+        if (command.colorIndex !== undefined)
+          checkedColorIndex(command.colorIndex)
+        const created = await this.bookmarks.create({ parentId: command.parentId, title: this.title(command.title), url: validateUrl(command.url) })
+        if (command.colorIndex !== undefined)
+          this.data.appearance[created.id] = { ...this.data.appearance[created.id], colorIndex: command.colorIndex }
         return { message: 'Bookmark added. A new favorite, right at home.' }
       }
       case 'folder.create': {
@@ -314,9 +325,7 @@ export class BookmarkCoordinator {
           patch.size = command.patch.size
         }
         if (command.patch.colorIndex !== undefined) {
-          if (command.patch.colorIndex < 0 || command.patch.colorIndex > 7)
-            throw new Error('Color index must be 0-7.')
-          patch.colorIndex = command.patch.colorIndex
+          patch.colorIndex = checkedColorIndex(command.patch.colorIndex)
         }
         if (command.patch.color !== undefined) {
           if (command.patch.color !== '' && !/^#[0-9a-f]{6}$/i.test(command.patch.color))

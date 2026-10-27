@@ -139,7 +139,7 @@ export interface GroupView {
   tiles: Record<string, TileView>
 }
 export type Command
-  = | { type: 'bookmark.create', parentId: string, title: string, url: string }
+  = | { type: 'bookmark.create', parentId: string, title: string, url: string, colorIndex?: number }
     | { type: 'folder.create', parentId: string, title: string }
     | { type: 'node.update', id: string, title: string, url?: string }
     | { type: 'node.move', id: string, parentId: string }
