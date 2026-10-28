@@ -152,7 +152,7 @@
     display: block;
     text-decoration: none;
     color: inherit;
-    cursor: grab;
+    cursor: default;
   }
   /* Dragging needs `touch-action: none`, which the grid sets in the tile's inline
      style. Narrowing it (for example to `pan-x`) makes the browser claim the gesture,
