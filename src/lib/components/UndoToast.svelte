@@ -3,80 +3,53 @@
   import Icon from './Icon.svelte'
   import IconButton from './IconButton.svelte'
 
-  interface Props { notice: Notice, onundo?: () => void, onclose: () => void }
+  interface Props {
+    notice: Notice
+    onundo?: () => void
+    onclose: () => void
+  }
 
-  const {
-    notice,
-    onundo,
-    onclose,
-  }: Props = $props()
+  const { notice, onundo, onclose }: Props = $props()
 </script>
 
-<div class='toast' class:error={notice.tone === 'error'}>
-  <span class='toast-icon'>
+<div
+  data-testid='toast'
+  class='
+    fixed bottom-[78px] left-1/2 z-80 flex max-w-[calc(100vw-32px)] -translate-x-1/2
+    items-center gap-3 rounded-md border border-(--line) bg-(--surface) py-[11px] pr-3
+    pl-4 text-(--text) shadow-(--shadow)
+  '
+>
+  <span
+    data-testid='toast-icon'
+    class='flex {notice.tone === 'error' ? 'text-(--danger)' : 'text-[#99b594]'}'
+  >
     <Icon name={notice.tone === 'error' ? 'close' : 'check'} size={16} />
   </span>
   <span
-    class='toast-message'
+    data-testid='toast-message'
+    class='max-w-[420px] text-[11px] leading-[1.6]'
     role='status'
     aria-live='polite'
   >{notice.message}</span>
   {#if onundo}
-    <button class='undo-button' onclick={onundo}>
+    <button
+      data-testid='undo-button'
+      class='
+        ml-1 flex h-[26px] items-center gap-1.5 border-l border-(--line) bg-transparent
+        pr-[13px] pl-4 text-[11px] whitespace-nowrap text-(--accent)
+      '
+      onclick={onundo}
+    >
       <Icon name='undo' size={14} />Undo
     </button>
   {/if}
-  <IconButton label='Dismiss notification' class='toast-close' onclick={onclose}>
+  <IconButton
+    label='Dismiss notification'
+    data-testid='toast-close'
+    class='size-[25px]! shrink-0'
+    onclick={onclose}
+  >
     <Icon name='close' size={14} />
   </IconButton>
 </div>
-
-<style>
-  .toast {
-    position: fixed;
-    bottom: 78px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    max-width: calc(100vw - 32px);
-    padding: 11px 12px 11px 16px;
-    border: 1px solid var(--line);
-    background: var(--surface);
-    color: var(--text);
-    border-radius: 6px;
-    box-shadow: var(--shadow);
-    z-index: 80;
-  }
-  .toast-icon {
-    color: #99b594;
-    display: flex;
-  }
-  .toast.error .toast-icon {
-    color: var(--danger);
-  }
-  .toast-message {
-    font-size: 11px;
-    line-height: 1.6;
-    max-width: 420px;
-  }
-  .undo-button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    border-left: 1px solid var(--line);
-    padding: 0 13px 0 16px;
-    margin-left: 4px;
-    background: transparent;
-    color: var(--accent);
-    font-size: 11px;
-    height: 26px;
-    white-space: nowrap;
-  }
-  .toast :global(.icon-button.toast-close) {
-    width: 25px;
-    height: 25px;
-    flex-shrink: 0;
-  }
-</style>
