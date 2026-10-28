@@ -1,3 +1,16 @@
+<script lang='ts' module>
+  import { cn } from '$lib/utils'
+  import { tv } from 'tailwind-variants'
+
+  export const iconButtonVariants = tv({
+    base: `
+      inline-flex size-[38px] items-center justify-center rounded-[6px] border
+      border-transparent bg-transparent text-(--muted)
+      hover:bg-(--surface-hover) hover:text-(--text)
+    `,
+  })
+</script>
+
 <script lang='ts'>
   import type { Snippet } from 'svelte'
   import type { HTMLButtonAttributes } from 'svelte/elements'
@@ -16,7 +29,7 @@
     ...rest
   }: Props = $props()
 
-  const classes = $derived(['icon-button', className].filter(Boolean).join(' '))
+  const classes = $derived(cn(iconButtonVariants(), className))
 </script>
 
 <button
@@ -24,24 +37,7 @@
   aria-label={label}
   {type}
   {...rest}
+  data-slot='button'
 >
   {@render children()}
 </button>
-
-<style>
-  .icon-button {
-    width: 38px;
-    height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid transparent;
-    border-radius: 6px;
-  }
-  .icon-button:hover {
-    color: var(--text);
-    background: var(--surface-hover);
-  }
-</style>

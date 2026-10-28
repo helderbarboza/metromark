@@ -26,7 +26,6 @@
     const button = canvas.getByRole('button', { name: 'Close dialog' })
     await expect(button).toBeInTheDocument()
     await expect(button).toHaveAttribute('aria-label', 'Close dialog')
-    await expect(button).toHaveClass('icon-button')
     await userEvent.click(button)
     await expect(clickFn).toHaveBeenCalled()
   }}
@@ -73,7 +72,6 @@
   args={{ label: 'Close', class: 'toast-close' }}
   play={async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Close' })
-    await expect(button).toHaveClass('icon-button')
     await expect(button).toHaveClass('toast-close')
   }}
 >

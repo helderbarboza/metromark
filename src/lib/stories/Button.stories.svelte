@@ -91,7 +91,6 @@
   play={async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Add bookmark' })
     await expect(button.querySelector('svg')).toBeInTheDocument()
-    await expect(button).toHaveClass('button')
   }}
 >
   <Icon name='addBookmark' size={18} />

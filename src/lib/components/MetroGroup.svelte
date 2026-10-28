@@ -343,15 +343,15 @@
     font-size: 11px;
     font-variant-numeric: tabular-nums;
   }
-  .metro-group :global(.icon-button.group-menu) {
+  .metro-group :global(.group-menu) {
     width: 38px;
     height: 38px;
     border-radius: 3px;
     opacity: 0.85;
     flex-shrink: 0;
   }
-  .metro-group:hover :global(.icon-button.group-menu),
-  :global(.icon-button.group-menu):focus-visible {
+  .metro-group:hover :global(.group-menu),
+  :global(.group-menu):focus-visible {
     opacity: 1;
   }
   .metro-grid {

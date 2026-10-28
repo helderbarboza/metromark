@@ -1,11 +1,36 @@
+<script lang='ts' module>
+  import type { VariantProps } from 'tailwind-variants'
+  import { cn } from '$lib/utils'
+  import { tv } from 'tailwind-variants'
+
+  export const buttonVariants = tv({
+    base: `
+      inline-flex h-[42px] shrink-0 items-center justify-center gap-[9px] rounded-[5px]
+      border border-(--line) bg-(--surface) px-[17px] text-[12px] font-[550]
+      whitespace-nowrap text-(--text) transition-[background] duration-140
+      hover:bg-(--surface-hover)
+      disabled:opacity-45
+    `,
+    variants: {
+      variant: {
+        primary: `
+          primary border-(--accent) bg-(--accent) text-(--accent-ink)
+          hover:bg-(--accent) hover:brightness-[1.06]
+        `,
+        danger: 'danger border-[#954541] bg-[#7c302f] text-white hover:bg-[#7c302f]',
+      },
+    },
+  })
+
+  export type ButtonVariant = VariantProps<typeof buttonVariants>['variant']
+</script>
+
 <script lang='ts'>
   import type { Snippet } from 'svelte'
   import type { HTMLButtonAttributes } from 'svelte/elements'
 
-  type Variant = 'primary' | 'danger'
-
   interface Props extends HTMLButtonAttributes {
-    variant?: Variant
+    variant?: ButtonVariant
     children: Snippet
   }
 
@@ -16,52 +41,13 @@
     type = 'button',
     ...rest
   }: Props = $props()
-
-  const classes = $derived(['button', variant, className].filter(Boolean).join(' '))
 </script>
 
 <button
-  class={classes}
+  class={cn(buttonVariants({ variant }), className)}
   {type}
   {...rest}
+  data-slot='button'
 >
   {@render children()}
 </button>
-
-<style>
-  .button {
-    height: 42px;
-    padding: 0 17px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    font-size: 12px;
-    font-weight: 550;
-    border: 1px solid var(--line);
-    border-radius: 5px;
-    background: var(--surface);
-    color: var(--text);
-    transition: background 140ms;
-    white-space: nowrap;
-  }
-  .button:hover {
-    background: var(--surface-hover);
-  }
-  .button.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-ink);
-  }
-  .button.primary:hover {
-    filter: brightness(1.06);
-  }
-  .button.danger {
-    background: #7c302f;
-    border-color: #954541;
-    color: #fff;
-  }
-  .button:disabled {
-    opacity: .45;
-  }
-</style>
