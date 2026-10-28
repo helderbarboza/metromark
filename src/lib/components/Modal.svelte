@@ -52,13 +52,13 @@
   oncancel={cancel}
   onpointerdown={backdrop}
 >
-  <div class='px-[30px] pt-[29px] pb-[30px] max-[480px]:p-6'>
-    <header class='mb-[26px] flex items-center justify-between gap-[10px]'>
+  <div class='px-7.5 pt-7.25 pb-7.5 max-[480px]:p-6'>
+    <header class='mb-6.5 flex items-center justify-between gap-2.5'>
       <div>
         <div class='mb-2 text-[8px] tracking-[1.7px] text-(--muted)'>{eyebrow}</div>
         <h2 class='m-0 text-[26px] font-[450] tracking-[-1px]'>{title}</h2>
       </div>
-      <IconButton class='mr-[-7px]' label='Close dialog' onclick={onclose}>
+      <IconButton class='-mr-1.75' label='Close dialog' onclick={onclose}>
         <Icon name='close' size={18} />
       </IconButton>
     </header>

@@ -62,18 +62,18 @@
 
 <form onsubmit={submit}>
   {#if tile}
-    <p class='mb-[26px] text-[13px] leading-[1.8] text-(--muted)'>
+    <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
       A little personality for <strong class='text-(--text)'>{tile.title}</strong>.
       Appearance changes are local; the bookmark itself stays untouched.
     </p>
-    <label class='mb-[21px] flex flex-col gap-[9px]'>
+    <label class='mb-5.25 flex flex-col gap-2.25'>
       <span class='text-[12px] font-medium text-(--text)' id='tile-size-label'>Tile size</span>
       <select
         aria-labelledby='tile-size-label'
         bind:value={size}
         data-initial-focus
         class='
-          h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px] pr-7
+          h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 pr-7
           text-[13px] text-(--text) outline-offset-1
         '
       >

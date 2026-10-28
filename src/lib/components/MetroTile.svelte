@@ -24,7 +24,7 @@
         text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
       `,
       badge: `
-        absolute top-2.5 left-3 flex h-[22px] min-w-[22px] items-center justify-center
+        absolute top-2.5 left-3 flex h-5.5 min-w-5.5 items-center justify-center
         rounded-[11px] bg-(--tile-fg) px-1.5 text-xs leading-none font-semibold
         text-(--tile-bg)
       `,
@@ -33,20 +33,20 @@
       size: {
         small: {
           root: 'metro-tile-small',
-          icon: `pb-0 [&_img]:size-[32px] [&_svg]:size-[32px]`,
-          check: 'size-[18px]',
+          icon: `pb-0 [&_img]:size-8 [&_svg]:size-8`,
+          check: 'size-4.5',
         },
         medium: {
           root: 'metro-tile-medium',
-          icon: `pb-6 [&_img]:size-[56px] [&_svg]:size-[56px]`,
+          icon: `pb-6 [&_img]:size-14 [&_svg]:size-14`,
         },
         wide: {
           root: 'metro-tile-wide',
-          icon: `pb-6 [&_img]:size-[64px] [&_svg]:size-[64px]`,
+          icon: `pb-6 [&_img]:size-16 [&_svg]:size-16`,
         },
         large: {
           root: 'metro-tile-large',
-          icon: `pb-[26px] [&_img]:size-[80px] [&_svg]:size-[80px]`,
+          icon: `pb-6.5 [&_img]:size-20 [&_svg]:size-20`,
         },
       },
       selected: {
@@ -65,7 +65,7 @@
         },
         true: {
           root: `
-            revealed translate-y-[6px]
+            revealed translate-y-1.5
             active:transform-[translateY(6px)_perspective(600px)_rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))_scale(.97)]
           `,
         },

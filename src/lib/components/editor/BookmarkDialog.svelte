@@ -80,12 +80,12 @@
 </script>
 
 <form onsubmit={submit}>
-  <p class='mb-[26px] text-[13px] leading-[1.8] text-(--muted)'>
+  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
     {node
       ? 'Edit the real bookmark. Your tile arrangement stays right where it is.'
       : 'Save something worth coming back to.'}
   </p>
-  <label class='mb-[21px] flex flex-col gap-[9px]'>
+  <label class='mb-5.25 flex flex-col gap-2.25'>
     <span class='text-[12px] font-medium text-(--text)'>Title</span>
     <input
       data-initial-focus
@@ -95,13 +95,13 @@
       placeholder='A name you’ll recognize'
       autocomplete='off'
       class='
-        h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px] text-[13px]
+        h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 text-[13px]
         text-(--text) outline-offset-1
         placeholder:text-(--muted) placeholder:opacity-60
       '
     />
   </label>
-  <label class='mb-[21px] flex flex-col gap-[9px]'>
+  <label class='mb-5.25 flex flex-col gap-2.25'>
     <span class='text-[12px] font-medium text-(--text)'>Website address</span>
     <input
       bind:value={url}
@@ -110,7 +110,7 @@
       autocomplete='url'
       spellcheck='false'
       class='
-        h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px] text-[13px]
+        h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 text-[13px]
         text-(--text) outline-offset-1
         placeholder:text-(--muted) placeholder:opacity-60
       '
@@ -120,7 +120,7 @@
     <FolderSelect folders={folders} bind:value={parentId} label='Folder' />
   {/if}
   {#if node}
-    <div class='mb-[21px] flex items-center gap-2 text-[10px] leading-[1.7] text-(--muted)'>
+    <div class='mb-5.25 flex items-center gap-2 text-[10px] leading-[1.7] text-(--muted)'>
       <Icon name='folder' size={14} />
       <span>{currentGroup?.path.join(' / ')}</span>
     </div>

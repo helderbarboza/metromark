@@ -49,7 +49,7 @@
 </script>
 
 <form onsubmit={submit}>
-  <p class='mb-[26px] text-[13px] leading-[1.8] text-(--muted)'>
+  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
     {#if isRestore}
       The original folder is no longer available. Choose a writable
       destination to restore this item.

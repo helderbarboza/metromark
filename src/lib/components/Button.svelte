@@ -5,8 +5,8 @@
 
   export const buttonVariants = tv({
     base: `
-      inline-flex h-[42px] shrink-0 items-center justify-center gap-[9px] rounded-[5px]
-      border border-(--line) bg-(--surface) px-[17px] text-[12px] font-[550]
+      inline-flex h-10.5 shrink-0 items-center justify-center gap-2.25 rounded-[5px]
+      border border-(--line) bg-(--surface) px-4.25 text-[12px] font-[550]
       whitespace-nowrap text-(--text) transition-[background] duration-140
       hover:bg-(--surface-hover)
       disabled:opacity-45

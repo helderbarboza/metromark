@@ -51,12 +51,12 @@
 </script>
 
 <form onsubmit={submit}>
-  <p class='mb-[26px] text-[13px] leading-[1.8] text-(--muted)'>
+  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
     {isRename
       ? 'Only this folder’s name changes. Descendant group paths update automatically.'
       : 'A bookmark folder becomes a tile group. Nested folders get their own group, too.'}
   </p>
-  <label class='mb-[21px] flex flex-col gap-[9px]'>
+  <label class='mb-5.25 flex flex-col gap-2.25'>
     <span class='text-[12px] font-medium text-(--text)'>Folder name</span>
     <input
       data-initial-focus
@@ -66,7 +66,7 @@
       placeholder='e.g. Weekend reading'
       autocomplete='off'
       class='
-        h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px] text-[13px]
+        h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 text-[13px]
         text-(--text) outline-offset-1
         placeholder:text-(--muted) placeholder:opacity-60
       '
