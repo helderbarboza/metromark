@@ -332,7 +332,7 @@ test('factory reset restores Metro defaults and keeps sample bookmarks', async (
   await page.getByRole('button', { name: 'Reset Metro', exact: true }).click()
 
   await expect(page.getByRole('dialog')).toHaveCount(0)
-  await expect(page.locator('.toast-message')).toContainText('Metro reset to factory defaults')
+  await expect(page.locator('[data-testid="toast-message"]')).toContainText('Metro reset to factory defaults')
   await expect(page.getByRole('button', { name: 'Undo', exact: true })).toHaveCount(0)
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'metro-light')
   await expect(draggable(page, 'steam')).toBeVisible()
