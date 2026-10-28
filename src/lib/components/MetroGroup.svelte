@@ -18,6 +18,7 @@
     usedCols,
   } from '$lib/layout'
   import { safeUrl, validateUrl } from '$lib/url'
+  import { cn } from '$lib/utils'
   import {
     createGridContainer,
     createGridPlaceholder,
@@ -184,21 +185,31 @@
 </script>
 
 <section
-  class='metro-group'
   data-testid='metro-group'
+  class='
+    group ease flex-none transition-[width] duration-140
+    motion-reduce:transition-none
+  '
   style:width='{visibleWidth}px'
   aria-label={group.path.join(' / ') || 'Ungrouped bookmarks'}
 >
-  <header class='group-header'>
-    <div class='group-heading'>
-      <div class='group-path' data-testid='group-path'>
+  <header class='flex h-15 items-end justify-between gap-2 pb-4.25'>
+    <div class='min-w-0'>
+      <div
+        class='mb-1.5 truncate text-[11px] tracking-[1.1px] text-(--muted) uppercase'
+        data-testid='group-path'
+      >
         {group.path.length > 1
           ? `${group.path.slice(0, -1).join(' / ')} /`
           : 'BROWSER ROOT'}
       </div>
-      <div class='group-name-line'>
-        <h2>{group.title}</h2>
-        <span class='group-count'>{String(layout.length).padStart(2, '0')}</span>
+      <div class='flex items-center gap-2.75'>
+        <h2 class='m-0 truncate text-[16px] leading-[1.1] font-semibold text-(--text)'>
+          {group.title}
+        </h2>
+        <span class='text-[11px] text-(--muted) tabular-nums'>
+          {String(layout.length).padStart(2, '0')}
+        </span>
         {#if !group.writable}
           <Icon name='lock' size={12} />
         {/if}
@@ -206,21 +217,26 @@
     </div>
     <IconButton
       label="Manage {group.title || 'unnamed group'}"
-      class='group-menu'
+      class='
+        size-9.5 shrink-0 rounded-[3px] opacity-[.85]
+        group-hover:opacity-100
+        focus-visible:opacity-100
+      '
       onclick={event => onContext(event, 'group', group.id)}
     >
       <Icon name='more' size={17} />
     </IconButton>
   </header>
-  <!-- Right-click only; standard keyboard management is provided by the labeled heading button. -->
   <div
 {@attach container.attach}
     style='{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell)}px;'
-    class='metro-grid'
+    class={cn(
+      'relative',
+      container.isDropTarget && 'outline outline-offset-[6px] outline-(--accent)',
+    )}
     data-testid='metro-grid'
     role='group'
     aria-label="Tiles in {group.path.join(' / ')}"
-    class:drop-target={container.isDropTarget}
     oncontextmenu={event => onContext(event, 'canvas', group.id)}
   >
     {#each layout as entry (entry.i)}
@@ -241,8 +257,14 @@
           />
         {:else}
           <a
-            class='tile-slot'
             data-testid='tile-slot'
+            class='
+              ease absolute block text-inherit no-underline
+              transition-[left,top,width,height] duration-140
+              focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
+              focus-visible:outline-(--accent)
+              motion-reduce:transition-none
+            '
             href={href(tile)}
             target={preview ? '_blank' : undefined}
             rel='noopener noreferrer'
@@ -271,21 +293,34 @@
     {/each}
     {#if placeholder.current}
       <div
-        class='grid-placeholder'
         data-testid='grid-placeholder'
+        class='
+          pointer-events-none absolute z-0
+          bg-[color-mix(in_srgb,var(--accent)_16%,transparent)] outline outline-(--accent)
+          outline-dashed
+        '
         aria-hidden='true'
         style={placeholder.current.style}
       >
       </div>
     {/if}
     {#if !layout.length}
-      <div class='empty-group'>
+      <div
+        class='
+          flex h-full flex-col items-center justify-center border border-dashed
+          border-(--line) text-(--muted)
+        '
+      >
         <Icon name='folder' size={30} />
-        <h3>Nothing here. Yet.</h3>
-        <p>A little room for your next favorite.</p>
+        <h3 class='mt-4 mb-2.25 text-[16px] font-semibold text-(--text)'>Nothing here. Yet.</h3>
+        <p class='m-0 text-[12px]'>A little room for your next favorite.</p>
         {#if group.writable}
           <button
-            class='empty-add'
+            class='
+              mt-6.5 inline-flex items-center gap-1.75 rounded-[3px] border
+              border-(--line) bg-(--surface) px-3 py-2.25 text-[11px] text-(--text)
+              hover:bg-(--surface-hover)
+            '
             onclick={() => onAdd(group.id)}
           >
             <Icon name='addBookmark' size={15} />Add a bookmark
@@ -295,133 +330,3 @@
     {/if}
   </div>
 </section>
-
-<style>
-  .metro-group {
-    flex: none;
-    --transition-duration: 140ms;
-    transition: width var(--transition-duration) ease;
-  }
-  .group-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    height: 60px;
-    padding-bottom: 17px;
-    gap: 8px;
-  }
-  .group-heading {
-    min-width: 0;
-  }
-  .group-path {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 1.1px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    margin-bottom: 6px;
-  }
-  .group-name-line {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-  }
-  h2 {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.1;
-    color: var(--text);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .group-count {
-    color: var(--muted);
-    font-size: 11px;
-    font-variant-numeric: tabular-nums;
-  }
-  .metro-group :global(.group-menu) {
-    width: 38px;
-    height: 38px;
-    border-radius: 3px;
-    opacity: 0.85;
-    flex-shrink: 0;
-  }
-  .metro-group:hover :global(.group-menu),
-  :global(.group-menu):focus-visible {
-    opacity: 1;
-  }
-  .metro-grid {
-    position: relative;
-  }
-  .metro-grid.drop-target {
-    outline: 1px solid var(--accent);
-    outline-offset: 6px;
-  }
-  .tile-slot {
-    position: absolute;
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    transition:
-      left var(--transition-duration),
-      top var(--transition-duration),
-      width var(--transition-duration),
-      height var(--transition-duration);
-  }
-  .tile-slot:focus-visible {
-    outline: 3px solid var(--accent);
-    outline-offset: 3px;
-    z-index: 2;
-  }
-  .grid-placeholder {
-    position: absolute;
-    background: color-mix(in srgb, var(--accent) 16%, transparent);
-    outline: 1px dashed var(--accent);
-    z-index: 0;
-    pointer-events: none;
-  }
-  .empty-group {
-    border: 1px dashed var(--line);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-  }
-  .empty-group h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
-    margin: 16px 0 9px;
-  }
-  .empty-group p {
-    font-size: 12px;
-    margin: 0;
-  }
-  .empty-add {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 12px;
-    margin-top: 26px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    font-size: 11px;
-    color: var(--text);
-    border-radius: 3px;
-  }
-  .empty-add:hover {
-    background: var(--surface-hover);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .metro-group,
-    .tile-slot {
-      transition: none;
-    }
-  }
-</style>
