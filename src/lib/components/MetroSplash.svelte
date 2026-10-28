@@ -4,9 +4,9 @@
   MetroStart) to close.
 -->
 <script lang='ts'>
-  import type { MetroTileDef } from '../types'
-  import { foreground } from '../color'
-  import { getThemeAccentColors } from '../theme-colors'
+  import type { MetroTileDef } from '$lib/types'
+  import { foreground } from '$lib/color'
+  import { getThemeAccentColors } from '$lib/theme-colors'
 
   interface Props {
     tile: MetroTileDef

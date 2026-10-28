@@ -1,5 +1,5 @@
-import type { MenuItem } from './components/ContextMenu.svelte'
-import type { BookmarkNode, GroupView, TileView } from './types'
+import type { MenuItem } from '$lib/components/ContextMenu.svelte'
+import type { BookmarkNode, GroupView, TileView } from '$lib/types'
 
 export interface MenuCallbacks {
   open: (url: string, disposition: 'tab' | 'window') => void

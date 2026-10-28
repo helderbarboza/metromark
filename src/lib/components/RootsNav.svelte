@@ -1,6 +1,6 @@
 <script lang='ts'>
-  import type { BookmarkNode } from '../types'
-  import { countBookmarks } from '../tree'
+  import type { BookmarkNode } from '$lib/types'
+  import { countBookmarks } from '$lib/tree'
 
   interface Props {
     roots: BookmarkNode[]

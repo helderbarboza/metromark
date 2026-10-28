@@ -12,10 +12,10 @@ import type {
   Settings,
   Snapshot,
   UndoRecord,
-} from './types'
-import { freePosition, reconcileLayout, SIZES, validateLayout } from './layout'
-import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from './tree'
-import { validateUrl } from './url.js'
+} from '$lib/types'
+import { freePosition, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
+import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
+import { validateUrl } from '$lib/url.js'
 
 export const UNDO_TTL = 30_000
 

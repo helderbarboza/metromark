@@ -1,6 +1,6 @@
-import type { Appearance, BookmarkNode, TileView } from './types'
-import { website } from './tree-utils.js'
-import { canModify } from './tree.js'
+import type { Appearance, BookmarkNode, TileView } from '$lib/types'
+import { website } from '$lib/tree-utils.js'
+import { canModify } from '$lib/tree.js'
 
 export function tileFor(node: BookmarkNode, appearance: Appearance = {}, tree?: BookmarkNode[]): TileView {
   const site = website(node.url ?? '')

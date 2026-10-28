@@ -2,9 +2,9 @@
   module
   lang='ts'
 >
+  import ContextMenu from '$lib/components/ContextMenu.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn, userEvent } from 'storybook/test'
-  import ContextMenu from '../components/ContextMenu.svelte'
 
   const edit = fn()
   const { Story } = defineMeta({

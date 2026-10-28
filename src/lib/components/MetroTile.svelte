@@ -80,13 +80,13 @@
 </script>
 
 <script lang='ts'>
+  import type { MetroTileDef, TileSize } from '$lib/types'
   import type { Snippet } from 'svelte'
-  import type { MetroTileDef, TileSize } from '../types'
+  import FaviconIcon from '$lib/components/FaviconIcon.svelte'
+  import Icon from '$lib/components/Icon.svelte'
+  import MetroLiveFaces from '$lib/components/MetroLiveFaces.svelte'
+  import { resolveTileColors } from '$lib/theme-colors'
   import { mode, theme } from 'mode-watcher'
-  import { resolveTileColors } from '../theme-colors'
-  import FaviconIcon from './FaviconIcon.svelte'
-  import Icon from './Icon.svelte'
-  import MetroLiveFaces from './MetroLiveFaces.svelte'
 
   interface Props {
     tile: MetroTileDef

@@ -1,11 +1,27 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "paths": {
+      "$lib": [
+        "src/lib"
+      ],
+      "$lib/*": [
+        "src/lib/*"
+      ]
+    },
     "resolveJsonModule": true,
-    "types": ["vite/client", "node"],
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "allowJs": true,
     "checkJs": false,
     "strict": true,
@@ -15,6 +31,18 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*", ".storybook/**/*.ts", "tests/**/*.ts", "e2e/**/*.ts", "*.ts"],
-  "exclude": ["node_modules", ".output", ".wxt", "storybook-static", "dist"]
+  "include": [
+    "src/**/*",
+    ".storybook/**/*.ts",
+    "tests/**/*.ts",
+    "e2e/**/*.ts",
+    "*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".output",
+    ".wxt",
+    "storybook-static",
+    "dist"
+  ]
 }

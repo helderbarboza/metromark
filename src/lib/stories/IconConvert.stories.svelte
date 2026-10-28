@@ -2,9 +2,9 @@
   module
   lang='ts'
 >
+  import IconConvertPlayground from '$lib/stories/IconConvertPlayground.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
-  import IconConvertPlayground from './IconConvertPlayground.svelte'
 
   const { Story } = defineMeta({
     title: 'Metro/Icon convert playground',

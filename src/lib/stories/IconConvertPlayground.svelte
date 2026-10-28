@@ -1,6 +1,6 @@
 <script lang='ts'>
-  import type { IconShape } from '../icon-convert'
-  import { cssColorToArgb, processIconImage } from '../icon-convert'
+  import type { IconShape } from '$lib/icon-convert'
+  import { cssColorToArgb, processIconImage } from '$lib/icon-convert'
 
   interface Props {
     previewSize?: number

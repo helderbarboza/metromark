@@ -1,8 +1,8 @@
-import type { AppData, BookmarkNode, Client, Settings } from '../types'
-import { BookmarkCoordinator } from '../coordinator'
-import { demoData, demoTree } from '../demo'
-import { validateUrl } from '../url.js'
-import { MemoryBookmarks, MemoryPersistence } from './memory'
+import type { AppData, BookmarkNode, Client, Settings } from '$lib/types'
+import { MemoryBookmarks, MemoryPersistence } from '$lib/adapters/memory'
+import { BookmarkCoordinator } from '$lib/coordinator'
+import { demoData, demoTree } from '$lib/demo'
+import { validateUrl } from '$lib/url.js'
 
 const TREE_KEY = 'metro.preview.bookmarks.v1'
 const DATA_KEY = 'metro.preview.presentation.v1'

@@ -1,4 +1,4 @@
-import type { Appearance, BookmarkNode, Layout, LayoutItem, TileSize } from './types'
+import type { Appearance, BookmarkNode, Layout, LayoutItem, TileSize } from '$lib/types'
 
 export const ROWS = 8
 export const GAP = 8

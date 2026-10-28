@@ -1,7 +1,7 @@
 <script lang='ts'>
-  import type { Notice } from '../types'
-  import Icon from './Icon.svelte'
-  import IconButton from './IconButton.svelte'
+  import type { Notice } from '$lib/types'
+  import Icon from '$lib/components/Icon.svelte'
+  import IconButton from '$lib/components/IconButton.svelte'
 
   interface Props {
     notice: Notice

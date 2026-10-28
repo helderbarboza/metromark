@@ -4,8 +4,8 @@
   Each new face slides up from the bottom and pushes the old one out.
 -->
 <script lang='ts'>
-  import type { MetroFace } from '../types'
-  import FaviconIcon from './FaviconIcon.svelte'
+  import type { MetroFace } from '$lib/types'
+  import FaviconIcon from '$lib/components/FaviconIcon.svelte'
 
   interface Props {
     faces: MetroFace[]

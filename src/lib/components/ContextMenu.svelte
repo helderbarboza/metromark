@@ -1,5 +1,5 @@
 <script module lang='ts'>
-  import type { IconName } from '../icons'
+  import type { IconName } from '$lib/icons'
 
   export interface MenuItem {
     label: string
@@ -12,9 +12,9 @@
 </script>
 
 <script lang='ts'>
-  import type { TileSize } from '../types'
+  import type { TileSize } from '$lib/types'
+  import Icon from '$lib/components/Icon.svelte'
   import { onMount } from 'svelte'
-  import Icon from './Icon.svelte'
 
   interface Props {
     x: number

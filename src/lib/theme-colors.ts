@@ -1,4 +1,4 @@
-import { foreground } from './color.js'
+import { foreground } from '$lib/color.js'
 
 const FALLBACK_PALETTE = ['#af572f', '#6559b4', '#32767d', '#4b6eaa', '#767148', '#9b526b', '#53774f', '#a14e47']
 const ACCENT_KEYS = ['base08', 'base09', 'base0A', 'base0B', 'base0C', 'base0D', 'base0E', 'base0F']

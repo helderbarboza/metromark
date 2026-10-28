@@ -1,6 +1,6 @@
 <script lang='ts'>
-  import Button from '../Button.svelte'
-  import DialogActions from './DialogActions.svelte'
+  import Button from '$lib/components/Button.svelte'
+  import DialogActions from '$lib/components/editor/DialogActions.svelte'
 
   const { url, onclose }: { url: string, onclose: () => void } = $props()
 </script>

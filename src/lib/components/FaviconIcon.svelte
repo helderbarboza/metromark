@@ -1,7 +1,7 @@
 <script lang='ts'>
+  import { loadConvertedFavicon } from '$lib/favicon-cache'
+  import { icons } from '$lib/icons'
   import OfflineIcon from '@iconify/svelte/dist/OfflineIcon.svelte'
-  import { loadConvertedFavicon } from '../favicon-cache'
-  import { icons } from '../icons'
   // Tile icon: the browser's local favicon cache, converted to a Metro-tint
   // silhouette, with the bundled globe while converting and whenever the page
   // has no cached favicon or conversion fails. Custom icon choices bypass this

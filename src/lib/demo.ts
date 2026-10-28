@@ -1,6 +1,6 @@
-import type { AppData, BookmarkNode, Layout } from './types'
-import { SETTINGS_DEFAULTS } from './config'
-import { emptyData } from './coordinator'
+import type { AppData, BookmarkNode, Layout } from '$lib/types'
+import { SETTINGS_DEFAULTS } from '$lib/config'
+import { emptyData } from '$lib/coordinator'
 
 const link = (id: string, title: string, url: string): BookmarkNode => ({ id, title, url })
 const folder = (id: string, title: string, children: BookmarkNode[], folderType?: string): BookmarkNode => ({ id, title, children, folderType })

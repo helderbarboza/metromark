@@ -2,13 +2,13 @@
   module
   lang='ts'
 >
+  import type { GroupView, TileView } from '$lib/types'
   import type { Layout } from '@snapgridjs/core'
   import type { ComponentProps } from 'svelte'
-  import type { GroupView, TileView } from '../types'
+  import MetroGroup from '$lib/components/MetroGroup.svelte'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn } from 'storybook/test'
-  import MetroGroup from '../components/MetroGroup.svelte'
 
   const tiles: Record<string, TileView> = {
     steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true },

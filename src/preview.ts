@@ -1,7 +1,7 @@
+import { createPreviewClient } from '$lib/adapters/preview'
+import { loadSettings } from '$lib/config'
 import { mount } from 'svelte'
 import App from './App.svelte'
-import { createPreviewClient } from './lib/adapters/preview'
-import { loadSettings } from './lib/config'
 import './styles.css'
 
 const settings = loadSettings()

@@ -1,6 +1,6 @@
 <script lang='ts'>
-  import type { TileSize } from '../types'
-  import Icon from './Icon.svelte'
+  import type { TileSize } from '$lib/types'
+  import Icon from '$lib/components/Icon.svelte'
 
   interface Props {
     title: string

@@ -1,6 +1,6 @@
+import { foreground } from '$lib/color.js'
+import { resolveTileColors } from '$lib/theme-colors.js'
 import { describe, expect, it } from 'vitest'
-import { foreground } from '../src/lib/color.js'
-import { resolveTileColors } from '../src/lib/theme-colors.js'
 
 describe('foreground', () => {
   it('returns black (0) for bright colors', () => {

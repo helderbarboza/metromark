@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest'
 import {
   buildChromeFaviconUrl,
   classifyConvertError,
   failureHint,
   validateIconRemoteUrl,
   validateUploadFile,
-} from '../src/lib/icon-sources'
+} from '$lib/icon-sources'
+import { describe, expect, it } from 'vitest'
 
 describe('classifyConvertError', () => {
   it('maps canvas taint to cors-taint', () => {

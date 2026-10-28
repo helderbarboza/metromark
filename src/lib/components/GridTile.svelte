@@ -1,11 +1,11 @@
 <script lang='ts'>
-  import type { Gesture } from '../interaction'
-  import type { TileView } from '../types'
+  import type { Gesture } from '$lib/interaction'
+  import type { TileView } from '$lib/types'
+  import MetroTile from '$lib/components/MetroTile.svelte'
+  import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
+  import { sizeOf } from '$lib/layout'
+  import { safeUrl, validateUrl } from '$lib/url'
   import { createGridItem } from '@snapgridjs/svelte'
-  import { advanceGesture, releaseOutcome, startGesture } from '../interaction'
-  import { sizeOf } from '../layout'
-  import { safeUrl, validateUrl } from '../url'
-  import MetroTile from './MetroTile.svelte'
 
   interface Props {
     id: string

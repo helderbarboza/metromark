@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import type { GroupView } from '../../types'
+  import type { GroupView } from '$lib/types'
 
   let {
     folders,

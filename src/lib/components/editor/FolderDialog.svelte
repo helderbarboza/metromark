@@ -1,13 +1,13 @@
 <script lang='ts'>
-  import type { BookmarkNode, Command, Snapshot } from '../../types'
-  import type { DialogSpec } from './dialog-spec'
+  import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+  import type { BookmarkNode, Command, Snapshot } from '$lib/types'
+  import Button from '$lib/components/Button.svelte'
+  import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
+  import { writableGroups } from '$lib/components/editor/dialog-spec'
+  import DialogActions from '$lib/components/editor/DialogActions.svelte'
+  import DialogError from '$lib/components/editor/DialogError.svelte'
+  import FolderSelect from '$lib/components/editor/FolderSelect.svelte'
   import { onMount } from 'svelte'
-  import Button from '../Button.svelte'
-  import { createDialogCommand } from './dialog-command.svelte'
-  import { writableGroups } from './dialog-spec'
-  import DialogActions from './DialogActions.svelte'
-  import DialogError from './DialogError.svelte'
-  import FolderSelect from './FolderSelect.svelte'
 
   const {
     spec,

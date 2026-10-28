@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import {
   advanceGesture,
   crossSlideState,
@@ -7,7 +6,8 @@ import {
   REVEAL_PX,
   startGesture,
   toggleSelection,
-} from '../src/lib/interaction'
+} from '$lib/interaction'
+import { describe, expect, it } from 'vitest'
 
 const origin = { x: 100, y: 100 }
 const gestureAt = (x: number, y: number) => advanceGesture(startGesture(origin), { x, y })

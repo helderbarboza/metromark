@@ -2,10 +2,10 @@
   module
   lang='ts'
 >
+  import Icon from '$lib/components/Icon.svelte'
+  import IconButton from '$lib/components/IconButton.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn, userEvent } from 'storybook/test'
-  import Icon from '../components/Icon.svelte'
-  import IconButton from '../components/IconButton.svelte'
 
   const clickFn = fn()
 

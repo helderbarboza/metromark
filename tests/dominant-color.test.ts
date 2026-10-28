@@ -1,5 +1,5 @@
+import { extractDominantColor, nearestSwatchIndex, rgbToOklab } from '$lib/dominant-color'
 import { describe, expect, it } from 'vitest'
-import { extractDominantColor, nearestSwatchIndex, rgbToOklab } from '../src/lib/dominant-color'
 
 type Pixel = [number, number, number, number]
 

@@ -1,7 +1,7 @@
 <script module lang='ts'>
+  import AppFixture from '$lib/stories/AppFixture.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, userEvent } from 'storybook/test'
-  import AppFixture from './AppFixture.svelte'
 
   const { Story } = defineMeta({
     title: 'Metro/Workspace',
