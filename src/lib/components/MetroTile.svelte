@@ -87,7 +87,7 @@
   import type { Snippet } from 'svelte'
   import FaviconIcon from '$lib/components/FaviconIcon.svelte'
   import Icon from '$lib/components/Icon.svelte'
-  import MetroLiveFaces from '$lib/components/MetroLiveFaces.svelte'
+
   import { resolveTileColors } from '$lib/theme-colors'
   import { mode, theme } from 'mode-watcher'
 
@@ -125,7 +125,6 @@
     colors = resolveTileColors(tile)
   })
 
-  const showLive = $derived(Boolean(tile.faces?.length) && size !== 'small')
   const checked = $derived(selected || revealed)
 
   const ui = $derived(tileVariants({ size, selected, revealed }))
@@ -175,14 +174,6 @@
 >
   {#if children}
     {@render children()}
-  {:else if showLive}
-    <MetroLiveFaces
-      faces={tile.faces ?? []}
-      period={tile.period}
-      faviconPageUrl={tile.url}
-      tint={fg}
-      iconClass={ui.icon()}
-    />
   {:else}
     <div
       class={`

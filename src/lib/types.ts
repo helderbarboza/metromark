@@ -3,19 +3,11 @@ import type { Layout, LayoutItem } from '@snapgridjs/core'
 export type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
 
 export type TileSize = 'small' | 'medium' | 'wide' | 'large'
-export interface MetroFace {
-  big?: string | number
-  title?: string
-  lines?: string[]
-  background?: string
-}
 export interface MetroTileDef {
   title: string
   colorIndex: number
   color?: string
   badge?: string | number
-  faces?: MetroFace[]
-  period?: number
   url?: string
 }
 
