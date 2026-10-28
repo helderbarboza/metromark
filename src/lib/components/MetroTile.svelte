@@ -163,6 +163,9 @@
 
 <div
   class={ui.root()}
+  data-testid='metro-tile'
+  data-size={size}
+  data-selected={selected || undefined}
   style:--tile-bg={bgColor}
   style:--tile-fg={fg}
   {@attach tilt}
