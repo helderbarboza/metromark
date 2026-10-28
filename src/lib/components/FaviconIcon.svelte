@@ -27,13 +27,8 @@
     aria-hidden='true'
     draggable='false'
     decoding='async'
+    class='[image-rendering:auto]'
   />
 {:catch}
   <OfflineIcon icon={icons.globe} aria-hidden='true' />
 {/await}
-
-<style>
-  img {
-    image-rendering: -webkit-optimize-contrast;
-  }
-</style>
