@@ -1,5 +1,4 @@
 <script lang='ts'>
-  import type { MenuItem } from './lib/components/ContextMenu.svelte'
   import type { DialogSpec } from './lib/components/editor/dialog-spec'
   import type { ThemeMode } from './lib/theme-picker'
   import type {
@@ -17,15 +16,16 @@
   import ContextMenu from './lib/components/ContextMenu.svelte'
   import Editor from './lib/components/Editor.svelte'
   import Icon from './lib/components/Icon.svelte'
-  import IconButton from './lib/components/IconButton.svelte'
   import MetroAppBar from './lib/components/MetroAppBar.svelte'
   import MetroGroup from './lib/components/MetroGroup.svelte'
+  import RootsNav from './lib/components/RootsNav.svelte'
   import UndoToast from './lib/components/UndoToast.svelte'
+  import WorkspaceFooter from './lib/components/WorkspaceFooter.svelte'
   import { toggleSelection } from './lib/interaction'
   import { cellsToPx, GAP, reconcileLayout, ROWS } from './lib/layout'
+  import { buildAppBarMenuItems, buildMenuItems } from './lib/menus'
   import { applyThemeForMode, resetThemePreferences } from './lib/theme-picker'
   import {
-    countBookmarks,
     flatten,
     indexTree,
     isBookmark,
@@ -48,7 +48,7 @@
   let now = $state(Date.now())
   let viewportHeight = $state(800)
   let scroller = $state<HTMLElement | null>(null)
-  let searchInput: HTMLInputElement
+  let searchInput = $state<HTMLInputElement | null>(null)
   let scrollProgress = $state(0)
   let canScroll = $state(false)
   let activeGroup = $state(0)
@@ -289,6 +289,15 @@
       ?.setAttribute('content', color)
   })
 
+  function selectRoot(id: string) {
+    rootFilter = id
+    cancelSmoothScroll()
+    scroller?.scrollTo({ left: 0 })
+  }
+  function handleSearch() {
+    if (query.trim())
+      clearSelection()
+  }
   function defaultFolder() {
     return (
       groups.find(group => group.id === rootFilter && group.writable)?.id
@@ -358,15 +367,6 @@
       return
     clearSelection()
   }
-  /** Searching replaces the grid with a filtered, non-interactive view. */
-  function search(event: Event) {
-    const input = event.currentTarget instanceof HTMLInputElement ? event.currentTarget : null
-    if (input) {
-      query = input.value
-    }
-    if (query.trim())
-      clearSelection()
-  }
   function closeContext() {
     context = null
     contextOrigin?.focus({ preventScroll: true })
@@ -428,177 +428,39 @@
       edit({ kind: 'copy', id })
     }
   }
-  const menuItems = $derived.by((): MenuItem[] => {
-    if (!context)
-      return []
-    const node = nodes.get(context.id)
-    const tile = contextTile
-    if (context.target === 'tile' && tile) {
-      return [
-        {
-          label: 'Open in new tab',
-          icon: 'openTab',
-          action: () => {
-            void open(tile.url, 'tab')
-          },
-        },
-        {
-          label: 'Open in new window',
-          icon: 'openWindow',
-          action: () => {
-            void open(tile.url, 'window')
-          },
-        },
-        {
-          label: 'Edit bookmark',
-          icon: 'edit',
-          separator: true,
-          disabled: !tile.writable,
-          action: () => edit({ kind: 'bookmark', id: tile.id }),
-        },
-        {
-          label: 'Move to folder',
-          icon: 'folder',
-          disabled: !tile.writable,
-          action: () => edit({ kind: 'move', id: tile.id }),
-        },
-        {
-          label: 'Customize tile',
-          icon: 'customize',
-          action: () => edit({ kind: 'appearance', id: tile.id }),
-        },
-        {
-          label: 'Copy website address',
-          icon: 'copy',
-          action: () => {
-            void copy(tile.id)
-          },
-        },
-        {
-          label: 'Delete bookmark',
-          icon: 'delete',
-          separator: true,
-          danger: true,
-          disabled: !tile.writable,
-          action: () => {
-            void execute({ type: 'node.remove', id: tile.id })
-          },
-        },
-      ]
-    }
-    if (context.target === 'group' && node) {
-      const group = groups.find(group => group.id === node.id)
-      return [
-        {
-          label: 'Add bookmark here',
-          icon: 'addBookmark',
-          disabled: !group?.writable,
-          action: () => edit({ kind: 'bookmark', parentId: node.id }),
-        },
-        {
-          label: 'Create child folder',
-          icon: 'folder',
-          disabled: !group?.writable,
-          action: () => edit({ kind: 'folder', parentId: node.id }),
-        },
-        {
-          label: 'Rename folder',
-          icon: 'edit',
-          separator: true,
-          disabled: !group?.mutable,
-          action: () => edit({ kind: 'rename', id: node.id }),
-        },
-        {
-          label: 'Move folder',
-          icon: 'folder',
-          disabled: !group?.mutable,
-          action: () => edit({ kind: 'move', id: node.id }),
-        },
-        {
-          label: 'Delete folder',
-          icon: 'delete',
-          separator: true,
-          danger: true,
-          disabled: !group?.mutable,
-          action: () => edit({ kind: 'delete', id: node.id }),
-        },
-      ]
-    }
-    const parentId
-      = groups.find(group => group.id === context?.id && group.writable)?.id
-        ?? defaultFolder()
-    return [
-      {
-        label: 'Add bookmark',
-        icon: 'addBookmark',
-        disabled: !parentId,
-        action: () => edit({ kind: 'bookmark', parentId }),
+  const menuItems = $derived(
+    buildMenuItems({
+      context,
+      contextTile,
+      node: context ? nodes.get(context.id) : undefined,
+      group: context?.target === 'group'
+        ? groups.find(item => item.id === context?.id)
+        : undefined,
+      groups,
+      selectedId,
+      defaultFolder: defaultFolder(),
+      callbacks: {
+        open,
+        edit,
+        copy,
+        execute,
+        clearSelection,
+        focusSearch: () => searchInput?.focus(),
       },
-      {
-        label: 'Create folder / group',
-        icon: 'folder',
-        disabled: !parentId,
-        action: () => edit({ kind: 'folder', parentId }),
-      },
-      ...(!selectedId
-        ? []
-        : [
-          {
-            label: 'Clear selection',
-            icon: 'close',
-            separator: true,
-            action: () => clearSelection(),
-          },
-        ] satisfies MenuItem[]),
-      {
-        label: 'Search bookmarks',
-        icon: 'searchBookmarks',
-        action: () => searchInput.focus(),
-      },
-      {
-        label: 'Appearance & settings',
-        icon: 'settings',
-        separator: true,
-        action: () => edit({ kind: 'settings' }),
-      },
-    ]
-  })
+    }),
+  )
   // Commands that stay off the app bar itself live in a menu opened from one of
   // its buttons (uwp8 p. 157), so they are not duplicated as bar commands.
-  const appBarMenuItems = $derived.by((): MenuItem[] => {
-    const tile = selectedTile
-    if (!tile)
-      return []
-    return [
-      {
-        label: 'Open in new tab',
-        icon: 'openTab',
-        action: () => {
-          void open(tile.url, 'tab')
-        },
-      },
-      {
-        label: 'Open in new window',
-        icon: 'openWindow',
-        action: () => {
-          void open(tile.url, 'window')
-        },
-      },
-      {
-        label: 'Copy website address',
-        icon: 'copy',
-        action: () => {
-          void copy(tile.id)
-        },
-      },
-      {
-        label: 'Customize tile',
-        icon: 'customize',
-        separator: true,
-        action: () => edit({ kind: 'appearance', id: tile.id }),
-      },
-    ]
-  })
+  const appBarMenuItems = $derived(
+    buildAppBarMenuItems(selectedTile, {
+      open,
+      edit,
+      copy,
+      execute,
+      clearSelection,
+      focusSearch: () => searchInput?.focus(),
+    }),
+  )
   function resizeTile(id: string, size: TileSize) {
     void execute({ type: 'tile.appearance', id, patch: { size } })
   }
@@ -757,7 +619,7 @@
         || ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k'))
     ) {
       event.preventDefault()
-      searchInput.focus()
+      searchInput?.focus()
     }
     if (
       !input
@@ -804,54 +666,12 @@
 >
   <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
     <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
-      <nav
-        class='flex min-w-0 scrollbar-thin gap-1.5 overflow-x-auto p-0.5'
-        aria-label='Bookmark roots'
-      >
-        <button
-          class={rootFilter === 'all'
-            ? `
-              flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2 text-xs
-              whitespace-nowrap text-(--text)
-            `
-            : `
-              flex h-7 items-center gap-2 rounded-sm bg-transparent px-2 text-xs
-              whitespace-nowrap text-(--muted)
-              hover:text-(--text)
-            `}
-          aria-pressed={rootFilter === 'all'}
-          onclick={() => {
-            rootFilter = 'all'
-            cancelSmoothScroll()
-            scroller?.scrollTo({ left: 0 })
-          }}
-        >All bookmarks <span
-          class={rootFilter === 'all'
-            ? 'text-xs text-(--accent)'
-            : 'text-xs text-(--muted)'}
-        >{bookmarkCount}</span></button>{#each roots as root (root.id)}<button
-          class={rootFilter === root.id
-            ? `
-              flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2 text-xs
-              whitespace-nowrap text-(--text)
-            `
-            : `
-              flex h-7 items-center gap-2 rounded-sm bg-transparent px-2 text-xs
-              whitespace-nowrap text-(--muted)
-              hover:text-(--text)
-            `}
-          aria-pressed={rootFilter === root.id}
-          onclick={() => {
-            rootFilter = root.id
-            cancelSmoothScroll()
-            scroller?.scrollTo({ left: 0 })
-          }}
-        >{root.title}<span
-          class={rootFilter === root.id
-            ? 'text-xs text-(--accent)'
-            : 'text-xs text-(--muted)'}
-        >{countBookmarks(root)}</span></button>{/each}
-      </nav>
+      <RootsNav
+        {roots}
+        {rootFilter}
+        {bookmarkCount}
+        onSelect={selectRoot}
+      />
     </div>
   </header>
 
@@ -995,112 +815,21 @@
     </div>
   </main>
 
-  <footer
-    class='
-      flex min-h-16 shrink-0 items-center justify-between gap-5 px-16 pb-1.5
-      max-lg:px-9
-      max-md:px-6
-    '
-  >
-    <span role='status' class='sr-only'>{busy ? 'Saving changes…' : ''}</span>
-    <div class='flex shrink-0 items-center'>
-      <label
-        class='
-          flex h-8 w-60 items-center gap-2.5 rounded-sm border border-(--line)
-          bg-(--surface) px-3 text-(--muted)
-          focus-within:border-(--accent)
-          max-lg:w-55
-          max-md:h-9 max-md:w-46
-        '
-      >
-        <Icon name='searchBookmarks' size={17} />
-        <input
-          bind:this={searchInput}
-          value={query}
-          oninput={search}
-          type='search'
-          aria-label='Search bookmarks'
-          placeholder='Find a bookmark…'
-          autocomplete='off'
-          spellcheck='false'
-          class='
-            w-full min-w-0 bg-transparent p-0 text-xs text-(--text) outline-none
-            placeholder:text-(--muted)
-            [&::-webkit-search-cancel-button]:hidden
-          '
-        />
-        {#if query}
-          <button
-            aria-label='Clear search'
-            class='bg-transparent p-1 text-(--muted)'
-            onclick={() => {
-              query = ''
-              searchInput.focus()
-            }}
-          >
-            <Icon name='close' size={13} />
-          </button>
-        {:else}
-          <kbd
-            class='
-              flex h-5 w-4 items-center justify-center rounded-sm border border-(--line)
-              font-[inherit] text-xs
-            '
-          >/</kbd>
-        {/if}
-      </label>
-    </div>
-    <div class='flex min-w-0 flex-1 items-center justify-center gap-5'>
-      <nav
-        class='absolute left-1/2 flex -translate-x-1/2 gap-1.5 p-2.5 max-md:hidden'
-        aria-label='Jump to bookmark group'
-      >
-        {#each visibleGroups as group, index (group.id)}
-          <button
-            class={activeGroup === index
-              ? 'w-4 rounded-full bg-(--accent) p-0 transition-all'
-              : 'size-1 rounded-full bg-(--line) p-0 transition-all'}
-            aria-label="Jump to {group.path.join(' / ')}"
-            aria-current={activeGroup === index ? 'true' : undefined}
-            onclick={() => jump(index)}
-          >
-          </button>
-        {/each}
-      </nav>
-    </div>
-    <div class='flex shrink-0 items-center gap-4'>
-      <div class='flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)'>
-        <span class='max-sm:hidden'>{bookmarkCount} bookmarks, {folderCount} folders</span>
-        <span class='sm:hidden'>{bookmarkCount} / {folderCount}</span>
-        {#if client.mode === 'preview'}
-          <span
-            class='
-              rounded-sm border border-(--line) px-1.5 py-0.5 text-xs text-(--muted)
-            '
-            title='saved locally, not your real bookmarks'
-          >Demo</span>
-        {/if}
-      </div>
-      <div class='flex items-center gap-0.5'>
-        <IconButton
-          label='Scroll groups left'
-          class='h-7 w-6 rounded-sm disabled:opacity-25'
-          disabled={!canScroll || scrollProgress < 0.01}
-          onclick={() => scroll(-1)}
-        >
-          <Icon name='arrowLeft' size={17} />
-        </IconButton>
-        <IconButton
-          label='Scroll groups right'
-          class='h-7 w-6 rounded-sm disabled:opacity-25'
-          disabled={!canScroll || scrollProgress > 0.99}
-          onclick={() => scroll(1)}
-        >
-          <Icon name='arrowRight' size={17} />
-        </IconButton>
-      </div>
-    </div>
-  </footer>
+  <WorkspaceFooter
+    bind:query
+    bind:searchInput
+    {bookmarkCount}
+    {folderCount}
+    {visibleGroups}
+    {activeGroup}
+    {canScroll}
+    {scrollProgress}
+    preview={client.mode === 'preview'}
+    {busy}
+    onSearch={handleSearch}
+    onJump={jump}
+    onScroll={scroll}
+  />
   {#if selectedTile && !dragging}
     <MetroAppBar
       title={selectedTile.title}
