@@ -26,7 +26,7 @@
   }
 </script>
 
-<p class='mb-[26px] text-[13px] leading-[1.8] text-(--muted)'>
+<p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
   Delete <strong class='text-(--text)'>{node.title}</strong> and everything
   inside it? This removes the folder from {mode === 'preview'
     ? 'this demo workspace'
@@ -34,12 +34,12 @@
 </p>
 <div
   class='
-    mb-[21px] flex items-center gap-[15px] rounded-sm border border-(--line) bg-(--bg) p-5
+    mb-5.25 flex items-center gap-3.75 rounded-sm border border-(--line) bg-(--bg) p-5
   '
 >
   <Icon name='folder' size={24} />
   <div>
-    <strong class='mb-[5px] block text-[13px] font-medium'>{countBookmarks(node)} bookmarks</strong>
+    <strong class='mb-1.25 block text-[13px] font-medium'>{countBookmarks(node)} bookmarks</strong>
     <span class='text-[11px] text-(--muted)'>
       {flatten([node]).filter(isFolder).length - 1} nested folders
     </span>

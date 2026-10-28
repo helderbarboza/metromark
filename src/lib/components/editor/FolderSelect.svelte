@@ -20,7 +20,7 @@
   const uid = $props.id()
 </script>
 
-<label class='mb-[21px] flex flex-col gap-[9px]'>
+<label class='mb-5.25 flex flex-col gap-2.25'>
   <span class='text-[12px] font-medium text-(--text)' id={`${uid}-label`}>
     {label}
   </span>
@@ -32,8 +32,8 @@
     disabled={disabled}
     data-initial-focus={initialFocus ? '' : undefined}
     class='
-      h-[45px] w-full rounded-sm border border-(--line) bg-(--bg) px-[13px] pr-7
-      text-[13px] text-(--text) outline-offset-1
+      h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 pr-7 text-[13px]
+      text-(--text) outline-offset-1
     '
   >
     {#each folders as folder (folder.id)}

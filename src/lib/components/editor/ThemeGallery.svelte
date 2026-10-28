@@ -28,12 +28,8 @@
 <div class='flex flex-col gap-5'>
   {#each themeGroupsEntries as [mode, modeTheme] (mode)}
     <div>
-      <h4
-        class='
-          mb-[10px] text-[11px] font-[550] tracking-[0.5px] text-(--muted) uppercase
-        '
-      >{mode} theme</h4>
-      <div class='grid grid-cols-2 gap-[10px]'>
+      <h4 class='mb-2.5 text-[11px] font-[550] tracking-[0.5px] text-(--muted) uppercase'>{mode} theme</h4>
+      <div class='grid grid-cols-2 gap-2.5'>
         {#each modeTheme as theme (theme)}
           {@const selected = selections[mode] === theme}
           <button
@@ -46,7 +42,7 @@
             onclick={() => chooseTheme(mode, theme)}
           >
             <ThemePreview {theme} {mode} />
-            <span class='flex items-center justify-between px-[11px] py-[9px] text-[10px]'>
+            <span class='flex items-center justify-between px-2.75 py-2.25 text-[10px]'>
               {theme}
               {#if selected}<Icon name='check' size={12} />{/if}
             </span>

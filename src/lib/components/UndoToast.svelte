@@ -15,9 +15,9 @@
 <div
   data-testid='toast'
   class='
-    fixed bottom-[78px] left-1/2 z-80 flex max-w-[calc(100vw-32px)] -translate-x-1/2
-    items-center gap-3 rounded-md border border-(--line) bg-(--surface) py-[11px] pr-3
-    pl-4 text-(--text) shadow-(--shadow)
+    fixed bottom-19.5 left-1/2 z-80 flex max-w-[calc(100vw-32px)] -translate-x-1/2
+    items-center gap-3 rounded-md border border-(--line) bg-(--surface) py-2.75 pr-3 pl-4
+    text-(--text) shadow-(--shadow)
   '
 >
   <span
@@ -28,7 +28,7 @@
   </span>
   <span
     data-testid='toast-message'
-    class='max-w-[420px] text-[11px] leading-[1.6]'
+    class='max-w-105 text-[11px] leading-[1.6]'
     role='status'
     aria-live='polite'
   >{notice.message}</span>
@@ -36,8 +36,8 @@
     <button
       data-testid='undo-button'
       class='
-        ml-1 flex h-[26px] items-center gap-1.5 border-l border-(--line) bg-transparent
-        pr-[13px] pl-4 text-[11px] whitespace-nowrap text-(--accent)
+        ml-1 flex h-6.5 items-center gap-1.5 border-l border-(--line) bg-transparent
+        pr-3.25 pl-4 text-[11px] whitespace-nowrap text-(--accent)
       '
       onclick={onundo}
     >
@@ -47,7 +47,7 @@
   <IconButton
     label='Dismiss notification'
     data-testid='toast-close'
-    class='size-[25px]! shrink-0'
+    class='size-6.25! shrink-0'
     onclick={onclose}
   >
     <Icon name='close' size={14} />

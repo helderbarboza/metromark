@@ -28,27 +28,33 @@ export default antfu(
     plugins: { 'better-tailwindcss': betterTailwindcss },
     rules: {
       ...betterTailwindcss.configs['recommended-warn'].rules,
-      'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', { printWidth: 90, preferSingleLine: true, group: 'newLine', strictness: 'loose' }],
     },
     settings: {
       'better-tailwindcss': { entryPoint: 'src/styles.css' },
-    },
-  },
-  {
-    files: ['src/lib/components/**'],
-    rules: {
-      'better-tailwindcss/no-unknown-classes': 'off',
-      'better-tailwindcss/no-conflicting-classes': 'off',
     },
   },
   // Tag formatting plus a width cap for long single-line markup.
   {
     files: ['**/*.svelte'],
     rules: {
+      'better-tailwindcss/no-unknown-classes': 'off',
+      'better-tailwindcss/no-conflicting-classes': 'error',
+      'better-tailwindcss/enforce-canonical-classes': ['error', { rootFontSize: 16 }],
+      'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', { printWidth: 90, preferSingleLine: true, group: 'newLine', strictness: 'loose' }],
       'svelte/max-attributes-per-line': ['error', { singleline: 3, multiline: 1 }],
       'svelte/first-attribute-linebreak': ['error', { multiline: 'below', singleline: 'beside' }],
       'svelte/html-closing-bracket-new-line': ['error', { singleline: 'never', multiline: 'always' }],
-      'style/max-len': ['warn', { code: 100, tabWidth: 2, ignoreUrls: true }],
+      'style/max-len': [
+        'warn',
+        {
+          code: 100,
+          tabWidth: 2,
+          ignoreUrls: true,
+          // Long Tailwind class strings and class-heavy markup (e.g. arbitrary
+          // values such as active:transform-[...] and inline class={...}).
+          ignorePattern: 'class[=\\s{]|:[a-zA-Z-]*\\[[^\\]]*\\]',
+        },
+      ],
     },
   },
   {

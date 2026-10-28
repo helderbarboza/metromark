@@ -4,7 +4,7 @@
 
   export const iconButtonVariants = tv({
     base: `
-      inline-flex size-[38px] items-center justify-center rounded-[6px] border
+      inline-flex size-9.5 items-center justify-center rounded-md border
       border-transparent bg-transparent text-(--muted)
       hover:bg-(--surface-hover) hover:text-(--text)
     `,

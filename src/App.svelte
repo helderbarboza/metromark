@@ -363,7 +363,7 @@
       return
     // Activating a tile opens it; pressing anywhere else drops the selection (p. 82).
     const target = event.target instanceof HTMLElement ? event.target : null
-    if (target?.closest('[data-grid-id], .tile-slot'))
+    if (target?.closest('[data-grid-id], [data-testid="tile-slot"]'))
       return
     clearSelection()
   }
@@ -502,7 +502,7 @@
       currentScroll = scroller.scrollLeft
     }
     const elements = [
-      ...scroller.querySelectorAll<HTMLElement>('.metro-group'),
+      ...scroller.querySelectorAll<HTMLElement>('[data-testid="metro-group"]'),
     ]
     const left = scroller.scrollLeft + 80
     activeGroup = Math.max(
@@ -597,7 +597,7 @@
   }
   function jump(index: number) {
     const element
-      = scroller?.querySelectorAll<HTMLElement>('.metro-group')[index]
+      = scroller?.querySelectorAll<HTMLElement>('[data-testid="metro-group"]')[index]
     if (element && scroller)
       cancelSmoothScroll()
     if (element && scroller) {
