@@ -16,7 +16,10 @@
         metro-tile-icon absolute inset-0 flex items-center justify-center
         **:[image-rendering:smooth]
       `,
-      label: 'absolute inset-x-2.5 bottom-1.5 flex flex-col gap-0.5 text-left',
+      label: `
+        absolute inset-x-0 bottom-0 mx-4 mb-2 flex translate-y-1 flex-col gap-0.5
+        text-left
+      `,
       title: 'truncate text-xs leading-[1.35] font-normal',
       domain: 'truncate text-[10px] leading-[1.35] font-normal opacity-[.7]',
       check: `
