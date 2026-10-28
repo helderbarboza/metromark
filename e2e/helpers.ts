@@ -29,7 +29,7 @@ export const test = base.extend<{ noPageErrors: void }>({
   }, { auto: true }],
 })
 export { expect }
-export const group = (page: Page, title: string) => page.locator('.metro-group').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
+export const group = (page: Page, title: string) => page.locator('[data-testid="metro-group"]').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
 export const link = (page: Page, title: string) => page.getByRole('link', { name: new RegExp(`^Open ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
 export const draggable = (page: Page, id: string) => page.locator(`a[data-grid-id="${id}"]`)
 export const appBar = (page: Page) => page.getByRole('toolbar')

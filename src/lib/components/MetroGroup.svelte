@@ -185,12 +185,13 @@
 
 <section
   class='metro-group'
+  data-testid='metro-group'
   style:width='{visibleWidth}px'
   aria-label={group.path.join(' / ') || 'Ungrouped bookmarks'}
 >
   <header class='group-header'>
     <div class='group-heading'>
-      <div class='group-path'>
+      <div class='group-path' data-testid='group-path'>
         {group.path.length > 1
           ? `${group.path.slice(0, -1).join(' / ')} /`
           : 'BROWSER ROOT'}
@@ -216,6 +217,7 @@
 {@attach container.attach}
     style='{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell)}px;'
     class='metro-grid'
+    data-testid='metro-grid'
     role='group'
     aria-label="Tiles in {group.path.join(' / ')}"
     class:drop-target={container.isDropTarget}
@@ -240,6 +242,7 @@
         {:else}
           <a
             class='tile-slot'
+            data-testid='tile-slot'
             href={href(tile)}
             target={preview ? '_blank' : undefined}
             rel='noopener noreferrer'
@@ -269,6 +272,7 @@
     {#if placeholder.current}
       <div
         class='grid-placeholder'
+        data-testid='grid-placeholder'
         aria-hidden='true'
         style={placeholder.current.style}
       >

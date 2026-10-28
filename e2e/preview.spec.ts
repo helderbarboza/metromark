@@ -2,13 +2,13 @@ import { appBar, draggable, expect, flat, group, link, moreActions, presentation
 
 test('flat ancestry, separate roots, launcher tiles, and background context-menu keyboard navigation', async ({ page }) => {
   await start(page)
-  await expect(page.locator('.metro-group')).toHaveCount(7)
-  await expect(group(page, 'Tools').locator('.group-path')).toHaveText('Bookmarks bar / Learning /')
+  await expect(page.locator('[data-testid="metro-group"]')).toHaveCount(7)
+  await expect(group(page, 'Tools').locator('[data-testid="group-path"]')).toHaveText('Bookmarks bar / Learning /')
   await expect(link(page, 'Steam')).toHaveAttribute('href', 'https://store.steampowered.com/')
-  await expect(link(page, 'Steam').locator('.metro-tile-large')).toHaveCount(1)
+  await expect(link(page, 'Steam').locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCount(1)
   await page.getByRole('button', { name: /^Other bookmarks/ }).click()
-  await expect(page.locator('.metro-group')).toHaveCount(1)
-  await expect(page.locator('a.tile-slot')).toHaveCount(4)
+  await expect(page.locator('[data-testid="metro-group"]')).toHaveCount(1)
+  await expect(page.locator('a[data-testid="tile-slot"]')).toHaveCount(4)
   await expect(group(page, 'Other bookmarks')).toBeVisible()
   await page.getByRole('button', { name: /^All bookmarks/ }).click()
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -49,12 +49,12 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   })
   await dialog.getByLabel('Icon', { exact: true }).selectOption('globe')
   await dialog.getByRole('button', { name: 'Save changes' }).click()
-  await expect(link(page, 'QA edited favorite').locator('.metro-tile-wide')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(link(page, 'QA edited favorite').locator('[data-testid="metro-tile"][data-size="wide"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
   for (const size of ['small', 'medium', 'large', 'wide']) {
     await rightClick(page, 'QA edited favorite')
     await page.getByRole('button', { name: `Resize selected tile to ${size}`, exact: true }).click()
     // Small tiles intentionally have no visible title; address via the accessible name.
-    await expect(page.locator(`a[aria-label^="Open QA edited favorite"] .metro-tile-${size}`)).toHaveCount(1)
+    await expect(page.locator(`a[aria-label^="Open QA edited favorite"] [data-testid="metro-tile"][data-size="${size}"]`)).toHaveCount(1)
   }
   await rightClick(page, 'QA edited favorite')
   await page.getByRole('button', { name: 'Move selected bookmark to another folder' }).click()
@@ -66,7 +66,7 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   await page.getByRole('button', { name: 'Delete selected bookmark' }).click()
   await expect(link(page, 'QA edited favorite')).toHaveCount(0)
   await page.getByRole('button', { name: 'Undo', exact: true }).click()
-  await expect(group(page, 'Work').locator('a[aria-label^="Open QA edited favorite"] .metro-tile-wide')).toHaveCount(1)
+  await expect(group(page, 'Work').locator('a[aria-label^="Open QA edited favorite"] [data-testid="metro-tile"][data-size="wide"]')).toHaveCount(1)
   await expect.poll(async () => flat(await tree(page)).filter(node => node.title === 'QA edited favorite').length).toBe(1)
 })
 
@@ -76,7 +76,7 @@ test('folder create/rename, flat nested paths, whole-subtree delete and Undo wit
   await page.getByRole('menuitem', { name: 'Create child folder' }).click()
   await page.getByRole('dialog').getByLabel('Folder name').fill('QA child')
   await page.getByRole('button', { name: 'Create group' }).click()
-  await expect(group(page, 'QA child').locator('.group-path')).toHaveText('Bookmarks bar / Learning /')
+  await expect(group(page, 'QA child').locator('[data-testid="group-path"]')).toHaveText('Bookmarks bar / Learning /')
   await page.getByRole('button', { name: 'Manage QA child', exact: true }).click()
   await page.getByRole('menuitem', { name: 'Rename folder' }).click()
   await page.getByRole('dialog').getByLabel('Folder name').fill('QA renamed child')
@@ -95,7 +95,7 @@ test('folder create/rename, flat nested paths, whole-subtree delete and Undo wit
   await expect(link(page, 'QA nested favorite')).toHaveCount(0)
   await page.getByRole('button', { name: 'Undo', exact: true }).click()
   await expect(group(page, 'QA renamed child').locator('a[aria-label^="Open QA nested favorite"]')).toHaveCount(1)
-  await expect(group(page, 'Tools').locator('.group-path')).toHaveText('Bookmarks bar / Learning /')
+  await expect(group(page, 'Tools').locator('[data-testid="group-path"]')).toHaveText('Bookmarks bar / Learning /')
   await expect.poll(async () => flat(await tree(page)).filter(node => node.title === 'QA nested favorite').length).toBe(1)
 })
 
@@ -107,7 +107,7 @@ test('pointer and keyboard moves persist without reordering native siblings; can
   await expect(github).toHaveAttribute('data-grid-id', 'github')
   const original = { x: 4, y: 2 }
   const from = (await github.boundingBox())!
-  const area = (await group(page, 'Bookmarks bar').locator('.metro-grid').boundingBox())!
+  const area = (await group(page, 'Bookmarks bar').locator('[data-testid="metro-grid"]').boundingBox())!
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2)
   await page.mouse.down()
   await page.mouse.move(from.x + from.width / 2, area.y + 50, { steps: 20 })
@@ -120,7 +120,7 @@ test('pointer and keyboard moves persist without reordering native siblings; can
   // Space picks the tile up for a keyboard move; Enter keeps activating the bookmark.
   await github.focus()
   await page.keyboard.press('Space')
-  await expect(page.locator('.grid-placeholder')).toHaveCount(1)
+  await expect(page.locator('[data-testid="grid-placeholder"]')).toHaveCount(1)
   await page.keyboard.press('ArrowDown')
   await page.keyboard.press('ArrowDown')
   await page.keyboard.press('Space')
@@ -130,10 +130,10 @@ test('pointer and keyboard moves persist without reordering native siblings; can
   // Escape cancels a keyboard gesture and leaves the tile in place.
   await github.focus()
   await page.keyboard.press('Space')
-  await expect(page.locator('.grid-placeholder')).toHaveCount(1)
+  await expect(page.locator('[data-testid="grid-placeholder"]')).toHaveCount(1)
   await page.keyboard.press('ArrowRight')
   await page.keyboard.press('Escape')
-  await expect(page.locator('.grid-placeholder')).toHaveCount(0)
+  await expect(page.locator('[data-testid="grid-placeholder"]')).toHaveCount(0)
   await expect(github).toBeVisible()
   expect((await presentation(page)).layouts.bar).toEqual(saved)
   // A pointer drop outside every group also cancels without trapping click suppression.
@@ -154,7 +154,7 @@ test('cross-group pointer dragging changes the real parent; Undo restores it', a
   await start(page)
   const tile = draggable(page, 'github')
   const source = (await tile.boundingBox())!
-  const target = (await group(page, 'Work').locator('.metro-grid').boundingBox())!
+  const target = (await group(page, 'Work').locator('[data-testid="metro-grid"]').boundingBox())!
   await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2)
   await page.mouse.down()
   await page.mouse.move(target.x + 70, target.y + 210, { steps: 35 })
@@ -185,7 +185,7 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await expect(second.locator('html')).toHaveAttribute('data-theme', 'catppuccin-mocha')
   await page.keyboard.press('Escape')
   await page.getByRole('searchbox', { name: 'Search bookmarks' }).fill('QA across')
-  await expect(page.locator('a.tile-slot')).toHaveCount(1)
+  await expect(page.locator('a[data-testid="tile-slot"]')).toHaveCount(1)
   // Results are a filtered read-only view: no selection, no dragging while searching.
   await expect(appBar(page)).toHaveCount(0)
   await expect(page.locator('a[data-grid-id]')).toHaveCount(0)
@@ -210,7 +210,7 @@ test('right-click and keyboard selection open the app bar; Escape and the canvas
   await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
   await expect(bar).toContainText('Steam')
-  await expect(page.locator('.metro-tile.selected')).toHaveCount(1)
+  await expect(page.locator('[data-testid="metro-tile"][data-selected]')).toHaveCount(1)
   // Right-clicking the same tile again keeps its commands open instead of toggling them away.
   await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
@@ -223,7 +223,7 @@ test('right-click and keyboard selection open the app bar; Escape and the canvas
   // Escape clears the selection and hands focus back to the tile it came from.
   await page.keyboard.press('Escape')
   await expect(bar).toHaveCount(0)
-  await expect(page.locator('.metro-tile.selected')).toHaveCount(0)
+  await expect(page.locator('[data-testid="metro-tile"][data-selected]')).toHaveCount(0)
   await expect(steam).toBeFocused()
   // The keyboard path moves focus into the bar so its commands are reachable.
   await steam.focus()
@@ -257,7 +257,7 @@ test('touch cross-slide selects instead of launching, and picks the tile up past
   await touch('touchMove', { x, y: y + 14 })
   await touch('touchEnd')
   await expect(appBar(page)).toBeVisible()
-  await expect(page.locator('.metro-tile.selected')).toHaveCount(1)
+  await expect(page.locator('[data-testid="metro-tile"][data-selected]')).toHaveCount(1)
   expect(popups).toEqual([])
   await page.keyboard.press('Escape')
   await expect(appBar(page)).toHaveCount(0)
@@ -267,9 +267,9 @@ test('touch cross-slide selects instead of launching, and picks the tile up past
   const y2 = Math.round(box2.y + box2.height / 2)
   await touch('touchStart', { x: x2, y: y2 })
   await touch('touchMove', { x: x2, y: y2 + 40 })
-  await expect(page.locator('.grid-placeholder')).toHaveCount(1)
+  await expect(page.locator('[data-testid="grid-placeholder"]')).toHaveCount(1)
   await touch('touchEnd')
-  await expect(page.locator('.grid-placeholder')).toHaveCount(0)
+  await expect(page.locator('[data-testid="grid-placeholder"]')).toHaveCount(0)
   expect(popups).toEqual([])
 })
 
@@ -279,11 +279,11 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   // In metro-light (initial), Notion has colorIndex 3 -> base0B #6bb71f (bright green)
   // which should produce black text.
   const notion = link(page, 'Notion')
-  await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(notion.locator('[data-testid="metro-tile"][data-size="medium"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
 
   // Steam has colorIndex 0 -> base08 #b72c1f (dark red) which should produce white text.
   const steam = link(page, 'Steam')
-  await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  await expect(steam.locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch to dark mode (metro-dark) via Appearance dialog
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -292,8 +292,8 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await page.keyboard.press('Escape')
 
   // In metro-dark all accent colors are bright, so both tiles should have black text now.
-  await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(notion.locator('[data-testid="metro-tile"][data-size="medium"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(steam.locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
 
   // Switch back to light mode
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -302,8 +302,8 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await page.keyboard.press('Escape')
 
   // Back to metro-light: Notion black, Steam white.
-  await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  await expect(notion.locator('[data-testid="metro-tile"][data-size="medium"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(steam.locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch theme to one-light (another light theme with different accent colors)
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -313,8 +313,8 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
 
   // In one-light, colorIndex 3 -> base0B #50a14f (green) -> black
   // colorIndex 0 -> base08 #ca1243 (red) -> white
-  await expect(notion.locator('.metro-tile-medium')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(steam.locator('.metro-tile-large')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  await expect(notion.locator('[data-testid="metro-tile"][data-size="medium"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(steam.locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCSS('color', 'rgb(255, 255, 255)')
 })
 
 test('factory reset restores Metro defaults and keeps sample bookmarks', async ({ page }) => {
