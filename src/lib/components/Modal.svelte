@@ -41,76 +41,27 @@
 
 <dialog
   bind:this={element}
-  class:drawer
-  class='backdrop:bg-black/40 backdrop:backdrop-blur-[1px]'
+  class={[
+    'p-0 border border-(--line) bg-(--surface) text-(--text) shadow-(--shadow) overflow-auto',
+    'backdrop:bg-black/40 backdrop:backdrop-blur-[1px]',
+    drawer && 'fixed top-[12px] right-[12px] bottom-[12px] left-auto m-0',
+    drawer && 'w-[min(410px,calc(100vw-24px))] h-[calc(100vh-24px)] max-h-none rounded-[7px]',
+    !drawer && 'w-[min(480px,calc(100vw-32px))] max-h-[calc(100vh-48px)] m-auto rounded-[9px]',
+  ].filter(Boolean).join(' ')}
   aria-label={title}
   oncancel={cancel}
   onpointerdown={backdrop}
 >
-  <div class='modal-content'>
-    <header class='modal-header'>
+  <div class='px-[30px] pt-[29px] pb-[30px] max-[480px]:p-6'>
+    <header class='mb-[26px] flex items-center justify-between gap-[10px]'>
       <div>
-        <div class='modal-eyebrow'>{eyebrow}</div>
-        <h2>{title}</h2>
+        <div class='mb-2 text-[8px] tracking-[1.7px] text-(--muted)'>{eyebrow}</div>
+        <h2 class='m-0 text-[26px] font-[450] tracking-[-1px]'>{title}</h2>
       </div>
-      <IconButton label='Close dialog' onclick={onclose}>
+      <IconButton class='mr-[-7px]' label='Close dialog' onclick={onclose}>
         <Icon name='close' size={18} />
       </IconButton>
     </header>
     {@render children()}
   </div>
 </dialog>
-
-<style>
-  dialog {
-    width: min(480px, calc(100vw - 32px));
-    max-height: calc(100vh - 48px);
-    padding: 0;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    background: var(--surface);
-    color: var(--text);
-    margin: auto;
-    box-shadow: var(--shadow);
-    overflow: auto;
-  }
-  .modal-content {
-    padding: 29px 30px 30px;
-  }
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 26px;
-  }
-  .modal-eyebrow {
-    font-size: 8px;
-    color: var(--muted);
-    letter-spacing: 1.7px;
-    margin-bottom: 8px;
-  }
-  h2 {
-    font-weight: 450;
-    font-size: 26px;
-    letter-spacing: -1px;
-    margin: 0;
-  }
-  .modal-header :global(button.icon-button) {
-    margin-right: -7px;
-  }
-  dialog.drawer {
-    position: fixed;
-    inset: 12px 12px 12px auto;
-    margin: 0;
-    width: min(410px, calc(100vw - 24px));
-    height: calc(100vh - 24px);
-    max-height: none;
-    border-radius: 7px;
-  }
-  @media (max-width: 480px) {
-    .modal-content {
-      padding: 24px;
-    }
-  }
-</style>
