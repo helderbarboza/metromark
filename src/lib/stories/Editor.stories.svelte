@@ -2,8 +2,8 @@
   module
   lang='ts'
 >
+  import EditorFixture from '$lib/stories/EditorFixture.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import EditorFixture from './EditorFixture.svelte'
 
   const { Story } = defineMeta({
     title: 'Metro/Bookmark editor',

@@ -1,5 +1,5 @@
-import type { AppData, BookmarkNode, BookmarkPort, CreateNode, PersistencePort } from '../types'
-import { flatten } from '../tree'
+import type { AppData, BookmarkNode, BookmarkPort, CreateNode, PersistencePort } from '$lib/types'
+import { flatten } from '$lib/tree'
 
 export function normalizeTree(tree: BookmarkNode[]): BookmarkNode[] {
   const walk = (nodes: BookmarkNode[], parentId?: string): BookmarkNode[] => nodes.map((node, index) => ({

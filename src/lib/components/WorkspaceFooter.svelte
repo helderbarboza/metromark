@@ -1,7 +1,7 @@
 <script lang='ts'>
-  import type { GroupView } from '../types'
-  import Icon from './Icon.svelte'
-  import IconButton from './IconButton.svelte'
+  import type { GroupView } from '$lib/types'
+  import Icon from '$lib/components/Icon.svelte'
+  import IconButton from '$lib/components/IconButton.svelte'
 
   interface Props {
     query?: string

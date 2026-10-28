@@ -1,5 +1,5 @@
+import type { AppData, BookmarkNode } from '$lib/types'
 import type { Page } from '@playwright/test'
-import type { AppData, BookmarkNode } from '../src/lib/types'
 import { test as base, expect } from '@playwright/test'
 
 function isValidJson<T>(_value: unknown, _fallback: T): _value is T {

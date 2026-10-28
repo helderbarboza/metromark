@@ -1,13 +1,13 @@
 <script lang='ts'>
+  import ThemePreview from '$lib/components/editor/ThemePreview.svelte'
+  import Icon from '$lib/components/Icon.svelte'
   import {
     DARK_THEMES,
     getThemeSelections,
     isOneOf,
     LIGHT_THEMES,
     setThemeForMode,
-  } from '../../theme-picker'
-  import Icon from '../Icon.svelte'
-  import ThemePreview from './ThemePreview.svelte'
+  } from '$lib/theme-picker'
 
   const themeGroupsEntries = [['light', LIGHT_THEMES], ['dark', DARK_THEMES]] as const
 

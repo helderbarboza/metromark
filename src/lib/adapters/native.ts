@@ -1,7 +1,7 @@
-import type { AppData, BookmarkPort, Client, Command, CommandResult, Snapshot } from '../types'
+import type { AppData, BookmarkPort, Client, Command, CommandResult, Snapshot } from '$lib/types'
+import { normalizeTree } from '$lib/adapters/memory'
+import { validateUrl } from '$lib/url.js'
 import { browser } from 'wxt/browser'
-import { validateUrl } from '../url.js'
-import { normalizeTree } from './memory'
 
 export const MESSAGE_SCOPE = 'metro-bookmarks/v1'
 export const STORAGE_KEY = 'metro.presentation.v1'

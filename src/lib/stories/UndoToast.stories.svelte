@@ -2,9 +2,9 @@
   module
   lang='ts'
 >
+  import UndoToast from '$lib/components/UndoToast.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn, userEvent } from 'storybook/test'
-  import UndoToast from '../components/UndoToast.svelte'
 
   const undo = fn()
   const { Story } = defineMeta({

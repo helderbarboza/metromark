@@ -1,10 +1,10 @@
 <script lang='ts'>
-  import type { ThemeName } from '../types'
+  import type { ThemeName } from '$lib/types'
+  import { createPreviewClient } from '$lib/adapters/preview'
+  import { SETTINGS_DEFAULTS } from '$lib/config'
   import { setTheme } from 'mode-watcher'
   import { onMount } from 'svelte'
   import App from '../../App.svelte'
-  import { createPreviewClient } from '../adapters/preview'
-  import { SETTINGS_DEFAULTS } from '../config'
 
   const {
     theme = 'catppuccin-mocha',

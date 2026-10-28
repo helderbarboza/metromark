@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import {
   ALPHA_CUTOFF,
   alphaOf,
@@ -9,7 +8,8 @@ import {
   greenOf,
   LUM_CUTOUT_PERCENTILE,
   redOf,
-} from '../src/lib/icon-convert'
+} from '$lib/icon-convert'
+import { describe, expect, it } from 'vitest'
 
 describe('icon-convert constants', () => {
   it('keeps the luminance cutout contract', () => {

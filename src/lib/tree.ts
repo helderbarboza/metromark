@@ -1,6 +1,6 @@
-import type { BookmarkNode, GroupView, Snapshot } from './types'
-import { reconcileLayout, sizeOf } from './layout-constants'
-import { tileFor } from './tile'
+import type { BookmarkNode, GroupView, Snapshot } from '$lib/types'
+import { reconcileLayout, sizeOf } from '$lib/layout-constants'
+import { tileFor } from '$lib/tile'
 
 export const isBookmark = (node: BookmarkNode) => typeof node.url === 'string' && node.type !== 'separator'
 export const isFolder = (node: BookmarkNode) => !isBookmark(node) && node.type !== 'separator'

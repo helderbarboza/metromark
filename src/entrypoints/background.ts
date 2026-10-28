@@ -1,9 +1,9 @@
-import type { Command } from '../lib/types'
+import type { Command } from '$lib/types'
+import { MESSAGE_SCOPE, nativeBookmarks, nativePersistence } from '$lib/adapters/native'
+import { loadSettings } from '$lib/config'
+import { BookmarkCoordinator } from '$lib/coordinator'
 import { browser } from 'wxt/browser'
 import { defineBackground } from 'wxt/utils/define-background'
-import { MESSAGE_SCOPE, nativeBookmarks, nativePersistence } from '../lib/adapters/native'
-import { loadSettings } from '../lib/config'
-import { BookmarkCoordinator } from '../lib/coordinator'
 
 const settings = loadSettings()
 

@@ -1,16 +1,16 @@
 <script lang='ts'>
-  import type { Command, Snapshot } from '../types'
-  import type { DialogSpec } from './editor/dialog-spec'
-  import { indexTree } from '../tree'
-  import AppearanceDialog from './editor/AppearanceDialog.svelte'
-  import BookmarkDialog from './editor/BookmarkDialog.svelte'
-  import CopyDialog from './editor/CopyDialog.svelte'
-  import DeleteDialog from './editor/DeleteDialog.svelte'
-  import DestinationDialog from './editor/DestinationDialog.svelte'
-  import { dialogEyebrow, dialogTitle } from './editor/dialog-spec'
-  import FolderDialog from './editor/FolderDialog.svelte'
-  import SettingsDialog from './editor/SettingsDialog.svelte'
-  import Modal from './Modal.svelte'
+  import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+  import type { Command, Snapshot } from '$lib/types'
+  import AppearanceDialog from '$lib/components/editor/AppearanceDialog.svelte'
+  import BookmarkDialog from '$lib/components/editor/BookmarkDialog.svelte'
+  import CopyDialog from '$lib/components/editor/CopyDialog.svelte'
+  import DeleteDialog from '$lib/components/editor/DeleteDialog.svelte'
+  import DestinationDialog from '$lib/components/editor/DestinationDialog.svelte'
+  import { dialogEyebrow, dialogTitle } from '$lib/components/editor/dialog-spec'
+  import FolderDialog from '$lib/components/editor/FolderDialog.svelte'
+  import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
+  import Modal from '$lib/components/Modal.svelte'
+  import { indexTree } from '$lib/tree'
 
   interface Props {
     spec: DialogSpec

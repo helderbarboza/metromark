@@ -3,10 +3,10 @@
 // Converted silhouettes are never persisted: the browser favicon cache is
 // local and reconversion on reload is cheap.
 
-import type { Rgb } from './dominant-color'
-import { extractDominantColor, nearestSwatchIndex } from './dominant-color'
-import { cssColorToArgb, processIconImage } from './icon-convert'
-import { buildExtensionFaviconUrl, isFaviconEligible } from './icon-sources'
+import type { Rgb } from '$lib/dominant-color'
+import { extractDominantColor, nearestSwatchIndex } from '$lib/dominant-color'
+import { cssColorToArgb, processIconImage } from '$lib/icon-convert'
+import { buildExtensionFaviconUrl, isFaviconEligible } from '$lib/icon-sources'
 
 const convertedCache = new Map<string, string>()
 const pendingCache = new Map<string, Promise<string>>()

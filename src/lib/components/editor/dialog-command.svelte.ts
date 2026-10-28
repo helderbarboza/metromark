@@ -1,4 +1,4 @@
-import type { Command } from '../../types'
+import type { Command } from '$lib/types'
 
 export function createDialogCommand(
   oncommand: (command: Command) => Promise<boolean>,

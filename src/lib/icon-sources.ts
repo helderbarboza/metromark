@@ -3,7 +3,7 @@
 // a custom remote icon URL. Everything here is DOM-free so it stays unit
 // testable; canvas pixel access happens in the component.
 
-import type { TileSize } from './types'
+import type { TileSize } from '$lib/types'
 
 declare global {
   interface Window {

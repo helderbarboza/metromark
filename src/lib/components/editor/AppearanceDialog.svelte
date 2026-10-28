@@ -1,15 +1,15 @@
 <script lang='ts'>
-  import type { BookmarkNode, Command, Snapshot, TileSize } from '../../types'
+  import type { BookmarkNode, Command, Snapshot, TileSize } from '$lib/types'
 
+  import Button from '$lib/components/Button.svelte'
+  import ColorSwatches from '$lib/components/editor/ColorSwatches.svelte'
+  import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
+  import DialogActions from '$lib/components/editor/DialogActions.svelte'
+  import DialogError from '$lib/components/editor/DialogError.svelte'
+  import { getThemeAccentColors } from '$lib/theme-colors'
+  import { tileFor } from '$lib/tile'
   import { theme } from 'mode-watcher'
   import { onMount } from 'svelte'
-  import { getThemeAccentColors } from '../../theme-colors'
-  import { tileFor } from '../../tile'
-  import Button from '../Button.svelte'
-  import ColorSwatches from './ColorSwatches.svelte'
-  import { createDialogCommand } from './dialog-command.svelte'
-  import DialogActions from './DialogActions.svelte'
-  import DialogError from './DialogError.svelte'
 
   const {
     snapshot,

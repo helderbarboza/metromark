@@ -1,11 +1,11 @@
 <script lang='ts'>
-  import type { Command, Settings } from '../../types'
+  import type { Command, Settings } from '$lib/types'
+  import Button from '$lib/components/Button.svelte'
+  import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
+  import DialogError from '$lib/components/editor/DialogError.svelte'
+  import ThemeGallery from '$lib/components/editor/ThemeGallery.svelte'
+  import Icon from '$lib/components/Icon.svelte'
   import { setMode, systemPrefersMode, userPrefersMode } from 'mode-watcher'
-  import Button from '../Button.svelte'
-  import Icon from '../Icon.svelte'
-  import { createDialogCommand } from './dialog-command.svelte'
-  import DialogError from './DialogError.svelte'
-  import ThemeGallery from './ThemeGallery.svelte'
 
   const {
     settings,

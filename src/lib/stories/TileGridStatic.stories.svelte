@@ -2,12 +2,12 @@
   module
   lang='ts'
 >
+  import type { TileSize } from '$lib/types'
   import type { ComponentProps } from 'svelte'
-  import type { TileSize } from '../types'
+  import MetroTile from '$lib/components/MetroTile.svelte'
+  import { cellsToPx, SIZES } from '$lib/layout'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
-  import MetroTile from '../components/MetroTile.svelte'
-  import { cellsToPx, SIZES } from '../layout'
 
   interface StaticTile {
     id: string

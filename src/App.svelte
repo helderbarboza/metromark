@@ -1,6 +1,6 @@
 <script lang='ts'>
-  import type { DialogSpec } from './lib/components/editor/dialog-spec'
-  import type { ThemeMode } from './lib/theme-picker'
+  import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+  import type { ThemeMode } from '$lib/theme-picker'
   import type {
     Client,
     Command,
@@ -8,29 +8,29 @@
     Notice,
     Snapshot,
     TileSize,
-  } from './lib/types'
-  import { SnapGridGroup } from '@snapgridjs/svelte'
-  import { mode, ModeWatcher, theme } from 'mode-watcher'
-  import { onMount } from 'svelte'
-  import Button from './lib/components/Button.svelte'
-  import ContextMenu from './lib/components/ContextMenu.svelte'
-  import Editor from './lib/components/Editor.svelte'
-  import Icon from './lib/components/Icon.svelte'
-  import MetroAppBar from './lib/components/MetroAppBar.svelte'
-  import MetroGroup from './lib/components/MetroGroup.svelte'
-  import RootsNav from './lib/components/RootsNav.svelte'
-  import UndoToast from './lib/components/UndoToast.svelte'
-  import WorkspaceFooter from './lib/components/WorkspaceFooter.svelte'
-  import { toggleSelection } from './lib/interaction'
-  import { cellsToPx, GAP, reconcileLayout, ROWS } from './lib/layout'
-  import { buildAppBarMenuItems, buildMenuItems } from './lib/menus'
-  import { applyThemeForMode, resetThemePreferences } from './lib/theme-picker'
+  } from '$lib/types'
+  import Button from '$lib/components/Button.svelte'
+  import ContextMenu from '$lib/components/ContextMenu.svelte'
+  import Editor from '$lib/components/Editor.svelte'
+  import Icon from '$lib/components/Icon.svelte'
+  import MetroAppBar from '$lib/components/MetroAppBar.svelte'
+  import MetroGroup from '$lib/components/MetroGroup.svelte'
+  import RootsNav from '$lib/components/RootsNav.svelte'
+  import UndoToast from '$lib/components/UndoToast.svelte'
+  import WorkspaceFooter from '$lib/components/WorkspaceFooter.svelte'
+  import { toggleSelection } from '$lib/interaction'
+  import { cellsToPx, GAP, reconcileLayout, ROWS } from '$lib/layout'
+  import { buildAppBarMenuItems, buildMenuItems } from '$lib/menus'
+  import { applyThemeForMode, resetThemePreferences } from '$lib/theme-picker'
   import {
     flatten,
     indexTree,
     isBookmark,
     projectGroups,
-  } from './lib/tree'
+  } from '$lib/tree'
+  import { SnapGridGroup } from '@snapgridjs/svelte'
+  import { mode, ModeWatcher, theme } from 'mode-watcher'
+  import { onMount } from 'svelte'
 
   const { client }: { client: Client } = $props()
   let snapshot = $state.raw<Snapshot | null>(null)

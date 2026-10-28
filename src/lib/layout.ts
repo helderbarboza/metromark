@@ -14,7 +14,7 @@ export {
   SIZES,
   usedCols,
   validateLayout,
-} from './layout-constants.js'
+} from '$lib/layout-constants.js'
 
-export type { TileSize } from './types'
+export type { TileSize } from '$lib/types'
 export type { Layout, LayoutItem } from '@snapgridjs/core'

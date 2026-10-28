@@ -1,8 +1,8 @@
 <script lang='ts'>
   import type { Snippet } from 'svelte'
+  import Icon from '$lib/components/Icon.svelte'
+  import IconButton from '$lib/components/IconButton.svelte'
   import { onMount } from 'svelte'
-  import Icon from './Icon.svelte'
-  import IconButton from './IconButton.svelte'
 
   interface Props {
     title: string

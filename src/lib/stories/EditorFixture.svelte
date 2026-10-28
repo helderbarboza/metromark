@@ -1,11 +1,11 @@
 <script lang='ts'>
-  import type { DialogSpec } from '../components/editor/dialog-spec'
-  import type { Command, Snapshot } from '../types'
+  import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+  import type { Command, Snapshot } from '$lib/types'
+  import { createPreviewClient } from '$lib/adapters/preview'
+  import Button from '$lib/components/Button.svelte'
+  import Editor from '$lib/components/Editor.svelte'
+  import { SETTINGS_DEFAULTS } from '$lib/config'
   import { onMount } from 'svelte'
-  import { createPreviewClient } from '../adapters/preview'
-  import Button from '../components/Button.svelte'
-  import Editor from '../components/Editor.svelte'
-  import { SETTINGS_DEFAULTS } from '../config'
 
   interface Props {
     kind?: DialogSpec['kind']

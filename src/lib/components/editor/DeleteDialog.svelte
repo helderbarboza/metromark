@@ -1,11 +1,11 @@
 <script lang='ts'>
-  import type { BookmarkNode, Command } from '../../types'
-  import { countBookmarks, flatten, isFolder } from '../../tree'
-  import Button from '../Button.svelte'
-  import Icon from '../Icon.svelte'
-  import { createDialogCommand } from './dialog-command.svelte'
-  import DialogActions from './DialogActions.svelte'
-  import DialogError from './DialogError.svelte'
+  import type { BookmarkNode, Command } from '$lib/types'
+  import Button from '$lib/components/Button.svelte'
+  import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
+  import DialogActions from '$lib/components/editor/DialogActions.svelte'
+  import DialogError from '$lib/components/editor/DialogError.svelte'
+  import Icon from '$lib/components/Icon.svelte'
+  import { countBookmarks, flatten, isFolder } from '$lib/tree'
 
   const {
     node,

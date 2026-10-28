@@ -1,7 +1,7 @@
 <script lang='ts'>
-  import type { IconName } from '../icons'
+  import type { IconName } from '$lib/icons'
+  import { getIcon } from '$lib/icons'
   import Iconify from '@iconify/svelte/dist/OfflineIcon.svelte'
-  import { getIcon } from '../icons'
 
   interface Props {
     name: IconName

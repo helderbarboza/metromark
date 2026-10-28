@@ -3,10 +3,10 @@
   lang='ts'
 >
   import type { ComponentProps } from 'svelte'
+  import MetroTile from '$lib/components/MetroTile.svelte'
+  import { cellsToPx, SIZES } from '$lib/layout'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
-  import MetroTile from '../components/MetroTile.svelte'
-  import { cellsToPx, SIZES } from '../layout'
 
   const { Story } = defineMeta({
     title: 'Metro/Bookmark tile',

@@ -1,9 +1,9 @@
+import { MemoryBookmarks, MemoryPersistence } from '$lib/adapters/memory'
+import { SETTINGS_DEFAULTS } from '$lib/config'
+import { BookmarkCoordinator, UNDO_TTL } from '$lib/coordinator'
+import { demoData, demoTree } from '$lib/demo'
+import { flatten, indexTree, isBookmark, projectGroups } from '$lib/tree'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { MemoryBookmarks, MemoryPersistence } from '../src/lib/adapters/memory'
-import { SETTINGS_DEFAULTS } from '../src/lib/config'
-import { BookmarkCoordinator, UNDO_TTL } from '../src/lib/coordinator'
-import { demoData, demoTree } from '../src/lib/demo'
-import { flatten, indexTree, isBookmark, projectGroups } from '../src/lib/tree'
 
 const coordinators: BookmarkCoordinator[] = []
 function fixture() {

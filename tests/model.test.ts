@@ -1,11 +1,11 @@
-import type { Snapshot } from '../src/lib/types'
+import type { Snapshot } from '$lib/types'
+import { normalizeTree } from '$lib/adapters/memory'
+import { demoData, demoTree } from '$lib/demo'
+import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '$lib/icon-sources'
+import { overlaps, reconcileLayout, usedCols, validateLayout } from '$lib/layout'
+import { canAddTo, canModify, flatten, indexTree, isBookmark, projectGroups } from '$lib/tree'
+import { validateUrl } from '$lib/url'
 import { describe, expect, it } from 'vitest'
-import { normalizeTree } from '../src/lib/adapters/memory'
-import { demoData, demoTree } from '../src/lib/demo'
-import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '../src/lib/icon-sources'
-import { overlaps, reconcileLayout, usedCols, validateLayout } from '../src/lib/layout'
-import { canAddTo, canModify, flatten, indexTree, isBookmark, projectGroups } from '../src/lib/tree'
-import { validateUrl } from '../src/lib/url'
 
 const fixture = (): Snapshot => ({ ...demoData(), tree: normalizeTree(demoTree()), revision: 0, mode: 'preview', undos: [] })
 

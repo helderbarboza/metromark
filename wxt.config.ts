@@ -1,9 +1,13 @@
 import process from 'node:process'
+import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'wxt'
 
+const libDir = fileURLToPath(new URL('./src/lib', import.meta.url))
+
 export default defineConfig({
   srcDir: 'src',
+  alias: { $lib: 'src/lib' },
   modules: ['@wxt-dev/module-svelte'],
   imports: false,
   manifest: ({ browser }) => ({
@@ -24,6 +28,7 @@ export default defineConfig({
       : { minimum_chrome_version: '128' }),
   }),
   vite: () => ({
+    resolve: { alias: { $lib: libDir } },
     define: {
       'import.meta.env.METRO_DENSITY': JSON.stringify(process.env.METRO_DENSITY),
       'import.meta.env.METRO_SHOW_DOMAINS': JSON.stringify(process.env.METRO_SHOW_DOMAINS),

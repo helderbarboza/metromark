@@ -1,11 +1,10 @@
 <script lang='ts'>
-  import type { GroupView, Layout, TileView } from '../types'
-  import {
-    createGridContainer,
-    createGridPlaceholder,
-    horizontalCompactor,
-  } from '@snapgridjs/svelte'
-  import { DRAG_PX } from '../interaction'
+  import type { GroupView, Layout, TileView } from '$lib/types'
+  import GridTile from '$lib/components/GridTile.svelte'
+  import Icon from '$lib/components/Icon.svelte'
+  import IconButton from '$lib/components/IconButton.svelte'
+  import MetroTile from '$lib/components/MetroTile.svelte'
+  import { DRAG_PX } from '$lib/interaction'
   import {
     cellsToPx,
     EMPTY_GROUP_COLS,
@@ -17,12 +16,13 @@
     ROWS,
     sizeOf,
     usedCols,
-  } from '../layout'
-  import { safeUrl, validateUrl } from '../url'
-  import GridTile from './GridTile.svelte'
-  import Icon from './Icon.svelte'
-  import IconButton from './IconButton.svelte'
-  import MetroTile from './MetroTile.svelte'
+  } from '$lib/layout'
+  import { safeUrl, validateUrl } from '$lib/url'
+  import {
+    createGridContainer,
+    createGridPlaceholder,
+    horizontalCompactor,
+  } from '@snapgridjs/svelte'
 
   interface Props {
     group: GroupView

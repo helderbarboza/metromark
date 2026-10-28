@@ -1,5 +1,5 @@
-import type { BookmarkNode, GroupView, Snapshot } from '../../types'
-import { flatten, isFolder, projectGroups } from '../../tree'
+import type { BookmarkNode, GroupView, Snapshot } from '$lib/types'
+import { flatten, isFolder, projectGroups } from '$lib/tree'
 
 export interface DialogSpec {
   kind:
