@@ -21,9 +21,10 @@
   })
 </script>
 {#snippet template(args: ComponentProps<typeof MetroTile>)}
-  <a
+  <MetroTile
+    {...args}
     href='https://store.steampowered.com/'
-    aria-label="Open {args.tile.title}{args.showDomain && args.size !== 'small'
+    ariaLabel="Open {args.tile.title}{args.showDomain && args.size !== 'small'
       ? ` ${args.domain}`
       : ''}"
     style='display:block;
@@ -31,7 +32,7 @@
         height:{cellsToPx(SIZES[args.size][1], 68)}px;
         text-decoration:none
     '
-  ><MetroTile {...args} /></a>
+  />
 {/snippet}
 <Story
   name='Small'

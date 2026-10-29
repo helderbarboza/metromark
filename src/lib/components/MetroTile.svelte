@@ -4,18 +4,16 @@
   export const tileVariants = tv({
     slots: {
       root: `
-        metro-tile group relative size-full overflow-hidden bg-(--tile-bg) font-sans
-        text-(--tile-fg) transition-[transform,outline-color,box-shadow,opacity]
-        duration-160 ease-[cubic-bezier(0.1,0.9,0.2,1)]
+        metro-tile group relative block size-full overflow-hidden bg-(--tile-bg) font-sans
+        text-(--tile-fg) no-underline
+        transition-[transform,outline-color,box-shadow,opacity] duration-160
+        ease-[cubic-bezier(0.1,0.9,0.2,1)]
         hover:outline-2 hover:-outline-offset-2 hover:outline-(--tile-fg)/35
         in-[.reduced]:active:transform-none
         motion-reduce:transition-none
         motion-reduce:active:transform-none
       `,
-      icon: `
-        metro-tile-icon absolute inset-0 flex items-center justify-center
-        **:[image-rendering:smooth]
-      `,
+      icon: `metro-tile-icon absolute inset-0 flex items-center justify-center`,
       label: `absolute inset-x-0 bottom-0 mx-4 mb-2 flex translate-y-1 flex-col text-left`,
       title: 'truncate text-xs/tight font-normal',
       domain: `
@@ -91,6 +89,7 @@
   import { GAP } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
   import { getTileGrid as getTileGridContext } from '$lib/tile-grid-context'
+  import { safeUrl } from '$lib/url'
   import { mode, theme } from 'mode-watcher'
 
   interface Props {
@@ -101,6 +100,25 @@
     domain?: string
     showDomain?: boolean
     children?: Snippet
+    href?: string
+    target?: string
+    rel?: string
+    tooltip?: string
+    ariaLabel?: string
+    ariaRoleDescription?: string
+    draggable?: boolean
+    class?: string
+    style?: string
+    dataTestId?: string
+    dataGridId?: string
+    dataDragging?: boolean
+    attach?: (node: HTMLAnchorElement) => void | (() => void)
+    onclick?: (event: MouseEvent) => void
+    oncontextmenu?: (event: MouseEvent) => void
+    onpointerdown?: (event: PointerEvent) => void
+    onpointermove?: (event: PointerEvent) => void
+    onpointerup?: (event: PointerEvent) => void
+    onpointercancel?: (event: PointerEvent) => void
   }
 
   const {
@@ -111,11 +129,37 @@
     domain = '',
     showDomain = true,
     children,
+    href,
+    target,
+    rel = 'noopener noreferrer',
+    tooltip,
+    ariaLabel,
+    ariaRoleDescription,
+    draggable = false,
+    class: className,
+    style,
+    dataTestId = 'metro-tile',
+    dataGridId,
+    dataDragging,
+    attach,
+    onclick,
+    oncontextmenu,
+    onpointerdown,
+    onpointermove,
+    onpointerup,
+    onpointercancel,
   }: Props = $props()
 
   const readTileGrid = getTileGridContext()
   const cell = $derived(readTileGrid?.().cell)
   const gap = $derived(readTileGrid?.().gap ?? GAP)
+  const launchHref = $derived(href ?? safeUrl(tile.url ?? ''))
+  const fallbackOpenLabel = $derived(
+    `Open ${tile.title}${showDomain && domain && size !== 'small'
+      ? ` ${domain}`
+      : ''}`,
+  )
+  const openLabel = $derived(ariaLabel ?? fallbackOpenLabel)
 
   // Reactive colors that update when theme/mode changes
   let colors = $derived(resolveTileColors(tile))
@@ -138,7 +182,7 @@
   // Metro "tilt": the tile leans away from where you press it. Purely decorative
   // press feedback (uwp8 p. 108); CSS drops it under reduced motion. Attached
   // imperatively so the visual wrapper needs no interactive ARIA role.
-  function tilt(node: HTMLDivElement) {
+  function tilt(node: HTMLElement) {
     const lean = (event: PointerEvent) => {
       const rect = node.getBoundingClientRect()
       if (!rect.width || !rect.height)
@@ -169,16 +213,33 @@
   }
 </script>
 
-<div
-  class={ui.root()}
-  data-testid='metro-tile'
+<a
+  class={cn(ui.root(), className)}
+  data-testid={dataTestId}
   data-size={size}
   data-selected={selected || undefined}
+  data-grid-id={dataGridId}
+  data-dragging={dataDragging || undefined}
+  href={launchHref}
+  {target}
+  {rel}
+  title={tooltip ?? `${tile.title} — ${tile.url}`}
+  aria-label={openLabel}
+  aria-roledescription={ariaRoleDescription}
+  draggable={draggable}
   style:--tile-bg={bgColor}
   style:--tile-fg={fg}
   style:--cell={cell !== undefined ? `${cell}px` : undefined}
   style:--gap={gap !== undefined ? `${gap}px` : undefined}
+  style={style}
   {@attach tilt}
+  {@attach attach ?? (() => {})}
+  onclick={onclick}
+  oncontextmenu={oncontextmenu}
+  onpointerdown={onpointerdown}
+  onpointermove={onpointermove}
+  onpointerup={onpointerup}
+  onpointercancel={onpointercancel}
 >
   {#if children}
     {@render children()}
@@ -218,4 +279,4 @@
   {#if tile.badge !== undefined}
     <span class={ui.badge()} aria-hidden='true'>{tile.badge}</span>
   {/if}
-</div>
+</a>

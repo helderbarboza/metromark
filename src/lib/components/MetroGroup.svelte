@@ -252,8 +252,20 @@
             onblocked={onBlocked}
           />
         {:else}
-          <a
-            data-testid='tile-slot'
+          <MetroTile
+            {tile}
+            size={sizeOf(entry)}
+            selected={selectedId === entry.i}
+            domain={tile.domain}
+            showDomain={showDomains}
+            href={href(tile)}
+            target={preview ? '_blank' : undefined}
+            ariaLabel="Open {tile.title}{showDomains
+              && sizeOf(entry) !== 'small'
+              ? ` ${tile.domain}`
+              : ''}"
+            onclick={event => launch(event, tile)}
+            oncontextmenu={event => onContext(event, 'tile', entry.i)}
             class='
               ease absolute block text-inherit no-underline
               transition-[left,top,width,height] duration-140
@@ -261,29 +273,14 @@
               focus-visible:outline-(--accent)
               motion-reduce:transition-none
             '
-            href={href(tile)}
-            target={preview ? '_blank' : undefined}
-            rel='noopener noreferrer'
-            title='{tile.title} — {tile.url}'
-            style:left='{entry.x * (cell + GAP)}px'
-            style:top='{entry.y * (cell + GAP)}px'
-            style:width='{cellsToPx(entry.w, cell)}px'
-            style:height='{cellsToPx(entry.h, cell)}px'
-            aria-label="Open {tile.title}{showDomains
-              && sizeOf(entry) !== 'small'
-              ? ` ${tile.domain}`
-              : ''}"
-            onclick={event => launch(event, tile)}
-            oncontextmenu={event => onContext(event, 'tile', entry.i)}
-          >
-            <MetroTile
-              {tile}
-              size={sizeOf(entry)}
-              selected={selectedId === entry.i}
-              domain={tile.domain}
-              showDomain={showDomains}
-            />
-          </a>
+            style={`
+              left: ${entry.x * (cell + GAP)}px;
+              top: ${entry.y * (cell + GAP)}px;
+              width: ${cellsToPx(entry.w, cell)}px;
+              height: ${cellsToPx(entry.h, cell)}px;
+            `}
+            dataTestId='tile-slot'
+          />
         {/if}
       {/if}
     {/each}

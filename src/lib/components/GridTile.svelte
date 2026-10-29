@@ -112,60 +112,45 @@
     document.addEventListener('keydown', keydown, true)
     return () => document.removeEventListener('keydown', keydown, true)
   }
+  const attachTile = (node: HTMLAnchorElement) => {
+    const cleanupDrag = item.attach(node)
+    const cleanupKeys = keyGuard(node)
+    return () => {
+      cleanupDrag?.()
+      cleanupKeys?.()
+    }
+  }
 </script>
 
-<a
-{@attach keyGuard}
-  {@attach item.attach}
-  style={item.style}
-  class='grid-tile snapgrid-item'
-  draggable='false'
-  data-grid-id={id}
-  data-dragging={item.isDragging || undefined}
-  {href}
+<MetroTile
+  {tile}
+  size={item.item ? sizeOf(item.item) : tile.size}
+  {selected}
+  {revealed}
+  domain={tile.domain}
+  showDomain={showDomains}
+  href={href}
   target={preview ? '_blank' : undefined}
-  rel='noopener noreferrer'
-  title='{tile.title} — {tile.url}'
-  aria-label="Open {tile.title}{showDomains && tile.size !== 'small'
+  ariaLabel="Open {tile.title}{showDomains && tile.size !== 'small'
     ? ` ${tile.domain}`
     : ''}. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel."
-  aria-roledescription='draggable bookmark'
+  ariaRoleDescription='draggable bookmark'
+  draggable={false}
+  class={`
+    grid-tile snapgrid-item block cursor-default text-(--tile-fg) no-underline
+    group-data-[dragging=true]:z-10 group-data-[dragging=true]:cursor-grabbing
+    focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
+    focus-visible:outline-(--accent)
+  `}
+  style={item.style}
+  dataTestId='metro-tile'
+  dataGridId={id}
+  dataDragging={item.isDragging}
+  attach={attachTile}
+  onclick={click}
+  oncontextmenu={oncontextmenu}
   onpointerdown={pointerdown}
   onpointermove={pointermove}
   onpointerup={pointerup}
   onpointercancel={() => (gesture = null)}
-  onclick={click}
-  {oncontextmenu}
->
-  <MetroTile
-    {tile}
-    size={item.item ? sizeOf(item.item) : tile.size}
-    {selected}
-    {revealed}
-    domain={tile.domain}
-    showDomain={showDomains}
-  />
-</a>
-
-<style>
-  .grid-tile {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    cursor: default;
-  }
-  /* Dragging needs `touch-action: none`, which the grid sets in the tile's inline
-     style. Narrowing it (for example to `pan-x`) makes the browser claim the gesture,
-     so the drag library's `preventDefault()` on touchmove is ignored and the console
-     reports a non-cancelable touchmove. A touch on a tile therefore belongs to the
-     tile, not the canvas; the canvas is panned from its own background instead. */
-  .grid-tile[data-dragging] {
-    cursor: grabbing;
-    z-index: 10;
-  }
-  .grid-tile:focus-visible {
-    outline: 3px solid var(--accent);
-    outline-offset: 3px;
-    z-index: 2;
-  }
-</style>
+/>

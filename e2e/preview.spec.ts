@@ -5,7 +5,7 @@ test('flat ancestry, separate roots, launcher tiles, and background context-menu
   await expect(page.locator('[data-testid="metro-group"]')).toHaveCount(7)
   await expect(group(page, 'Tools').locator('[data-testid="group-path"]')).toHaveText('Bookmarks bar / Learning /')
   await expect(link(page, 'Steam')).toHaveAttribute('href', 'https://store.steampowered.com/')
-  await expect(link(page, 'Steam').locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCount(1)
+  await expect(link(page, 'Steam')).toHaveAttribute('data-size', 'large')
   await page.getByRole('button', { name: /^Other bookmarks/ }).click()
   await expect(page.locator('[data-testid="metro-group"]')).toHaveCount(1)
   await expect(page.locator('a[data-testid="tile-slot"]')).toHaveCount(4)
@@ -49,12 +49,12 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   })
   await dialog.getByLabel('Icon', { exact: true }).selectOption('globe')
   await dialog.getByRole('button', { name: 'Save changes' }).click()
-  await expect(link(page, 'QA edited favorite').locator('[data-testid="metro-tile"][data-size="wide"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(link(page, 'QA edited favorite')).toHaveCSS('color', 'rgb(0, 0, 0)')
   for (const size of ['small', 'medium', 'large', 'wide']) {
     await rightClick(page, 'QA edited favorite')
     await page.getByRole('button', { name: `Resize selected tile to ${size}`, exact: true }).click()
     // Small tiles intentionally have no visible title; address via the accessible name.
-    await expect(page.locator(`a[aria-label^="Open QA edited favorite"] [data-testid="metro-tile"][data-size="${size}"]`)).toHaveCount(1)
+    await expect(page.locator(`a[data-testid="metro-tile"][aria-label^="Open QA edited favorite"][data-size="${size}"]`)).toHaveCount(1)
   }
   await rightClick(page, 'QA edited favorite')
   await page.getByRole('button', { name: 'Move selected bookmark to another folder' }).click()
@@ -66,7 +66,7 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   await page.getByRole('button', { name: 'Delete selected bookmark' }).click()
   await expect(link(page, 'QA edited favorite')).toHaveCount(0)
   await page.getByRole('button', { name: 'Undo', exact: true }).click()
-  await expect(group(page, 'Work').locator('a[aria-label^="Open QA edited favorite"] [data-testid="metro-tile"][data-size="wide"]')).toHaveCount(1)
+  await expect(group(page, 'Work').locator('a[data-testid="metro-tile"][aria-label^="Open QA edited favorite"][data-size="wide"]')).toHaveCount(1)
   await expect.poll(async () => flat(await tree(page)).filter(node => node.title === 'QA edited favorite').length).toBe(1)
 })
 
@@ -279,11 +279,11 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   // In metro-light (initial), Notion has colorIndex 3 -> base0B #6bb71f (bright green)
   // which should produce black text.
   const notion = link(page, 'Notion')
-  await expect(notion.locator('[data-testid="metro-tile"][data-size="medium"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(notion).toHaveCSS('color', 'rgb(0, 0, 0)')
 
   // Steam has colorIndex 0 -> base08 #b72c1f (dark red) which should produce white text.
   const steam = link(page, 'Steam')
-  await expect(steam.locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch to dark mode (metro-dark) via Appearance dialog
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -292,8 +292,8 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await page.keyboard.press('Escape')
 
   // In metro-dark all accent colors are bright, so both tiles should have black text now.
-  await expect(notion.locator('[data-testid="metro-tile"][data-size="medium"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(steam.locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(notion).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(steam).toHaveCSS('color', 'rgb(0, 0, 0)')
 
   // Switch back to light mode
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -302,8 +302,8 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await page.keyboard.press('Escape')
 
   // Back to metro-light: Notion black, Steam white.
-  await expect(notion.locator('[data-testid="metro-tile"][data-size="medium"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(steam.locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  await expect(notion).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch theme to one-light (another light theme with different accent colors)
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -313,8 +313,8 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
 
   // In one-light, colorIndex 3 -> base0B #50a14f (green) -> black
   // colorIndex 0 -> base08 #ca1243 (red) -> white
-  await expect(notion.locator('[data-testid="metro-tile"][data-size="medium"]')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  await expect(steam.locator('[data-testid="metro-tile"][data-size="large"]')).toHaveCSS('color', 'rgb(255, 255, 255)')
+  await expect(notion).toHaveCSS('color', 'rgb(0, 0, 0)')
+  await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 })
 
 test('factory reset restores Metro defaults and keeps sample bookmarks', async ({ page }) => {
