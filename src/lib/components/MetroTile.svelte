@@ -194,10 +194,10 @@
         pageUrl={tile.url ?? ''}
         tint={fg}
         class={cn({
-          'size-[min(calc(var(--cell)*0.8),2rem)]': size === 'small',
-          'size-[min(calc(var(--cell)*0.8),3.5rem)]': size === 'medium',
-          'size-[min(calc(var(--cell)*0.8),4rem)]': size === 'wide',
-          'size-[min(calc(var(--cell)*1),5rem)]': size === 'large',
+          'size-[min(calc(var(--cell)*0.75),2.0rem)]': size === 'small',
+          'size-[min(calc(var(--cell)*0.75),3.5rem)]': size === 'medium',
+          'size-[min(calc(var(--cell)*0.75),4.0rem)]': size === 'wide',
+          'size-[min(calc(var(--cell)*1.00),5.0rem)]': size === 'large',
         })}
       />
     </div>
