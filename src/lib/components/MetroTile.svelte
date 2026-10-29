@@ -1,5 +1,5 @@
 <script lang='ts' module>
-  import { tv } from 'tailwind-variants'
+  import { cn, tv } from 'tailwind-variants'
 
   export const tileVariants = tv({
     slots: {
@@ -36,20 +36,20 @@
       size: {
         small: {
           root: 'metro-tile-small',
-          icon: `pb-0 [&_img]:size-8 [&_svg]:size-8`,
+          icon: `pb-0`,
           check: 'size-4.5',
         },
         medium: {
           root: 'metro-tile-medium',
-          icon: `pb-6 [&_img]:size-14 [&_svg]:size-14`,
+          icon: `pb-6`,
         },
         wide: {
           root: 'metro-tile-wide',
-          icon: `pb-6 [&_img]:size-16 [&_svg]:size-16`,
+          icon: `pb-6`,
         },
         large: {
           root: 'metro-tile-large',
-          icon: `pb-6.5 [&_img]:size-20 [&_svg]:size-20`,
+          icon: `pb-6.5`,
         },
       },
       selected: {
@@ -177,7 +177,7 @@
   {:else}
     <div
       class={`
-        metro-tile-icon
+        metro-tile-icon border border-red-400
         ${ui.icon()}
       `}
       aria-hidden='true'
@@ -185,6 +185,12 @@
       <FaviconIcon
         pageUrl={tile.url ?? ''}
         tint={fg}
+        class={cn({
+          'size-8': size === 'small',
+          'size-14': size === 'medium',
+          'size-16': size === 'wide',
+          'size-20': size === 'large',
+        }, 'aspect-square')}
       />
     </div>
   {/if}
