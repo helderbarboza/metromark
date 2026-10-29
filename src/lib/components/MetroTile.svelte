@@ -4,7 +4,7 @@
   export const tileVariants = tv({
     slots: {
       root: `
-        metro-tile relative size-full overflow-hidden bg-(--tile-bg) font-sans
+        metro-tile group relative size-full overflow-hidden bg-(--tile-bg) font-sans
         text-(--tile-fg) transition-[transform,outline-color,box-shadow,opacity]
         duration-160 ease-[cubic-bezier(0.1,0.9,0.2,1)]
         hover:outline-2 hover:-outline-offset-2 hover:outline-(--tile-fg)/35
@@ -16,12 +16,12 @@
         metro-tile-icon absolute inset-0 flex items-center justify-center
         **:[image-rendering:smooth]
       `,
-      label: `
-        absolute inset-x-0 bottom-0 mx-4 mb-2 flex translate-y-1 flex-col gap-0.5
-        text-left
+      label: `absolute inset-x-0 bottom-0 mx-4 mb-2 flex translate-y-1 flex-col text-left`,
+      title: 'truncate text-xs/tight font-normal',
+      domain: `
+        truncate text-[10px]/tight font-normal opacity-0 transition
+        group-hover:opacity-70
       `,
-      title: 'truncate text-xs leading-[1.35] font-normal',
-      domain: 'truncate text-[10px] leading-[1.35] font-normal opacity-[.7]',
       check: `
         absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pt-px pr-0.5
         text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
