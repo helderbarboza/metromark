@@ -17,6 +17,7 @@
     sizeOf,
     usedCols,
   } from '$lib/layout'
+  import { setTileGrid } from '$lib/tile-grid-context'
   import { safeUrl, validateUrl } from '$lib/url'
   import { cn } from '$lib/utils'
   import {
@@ -68,6 +69,8 @@
   }: Props = $props()
 
   let liveCols = $state(0)
+
+  setTileGrid(() => ({ cell, gap: GAP }))
 
   const cols = $derived(Math.max(
     usedCols(layout),
@@ -186,10 +189,7 @@
 
 <section
   data-testid='metro-group'
-  class='
-    group ease flex-none transition-[width] duration-140
-    motion-reduce:transition-none
-  '
+  class='ease flex-none transition-[width] duration-140 motion-reduce:transition-none'
   style:width='{visibleWidth}px'
   aria-label={group.path.join(' / ') || 'Ungrouped bookmarks'}
 >
@@ -217,11 +217,7 @@
     </div>
     <IconButton
       label="Manage {group.title || 'unnamed group'}"
-      class='
-        size-9.5 shrink-0 rounded-[3px] opacity-[.85]
-        group-hover:opacity-100
-        focus-visible:opacity-100
-      '
+      class='size-9.5 shrink-0 rounded-[3px] opacity-[.85]'
       onclick={event => onContext(event, 'group', group.id)}
     >
       <Icon name='more' size={17} />

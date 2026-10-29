@@ -88,7 +88,9 @@
   import FaviconIcon from '$lib/components/FaviconIcon.svelte'
   import Icon from '$lib/components/Icon.svelte'
 
+  import { GAP } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
+  import { getTileGrid as getTileGridContext } from '$lib/tile-grid-context'
   import { mode, theme } from 'mode-watcher'
 
   interface Props {
@@ -110,6 +112,10 @@
     showDomain = true,
     children,
   }: Props = $props()
+
+  const readTileGrid = getTileGridContext()
+  const cell = $derived(readTileGrid?.().cell)
+  const gap = $derived(readTileGrid?.().gap ?? GAP)
 
   // Reactive colors that update when theme/mode changes
   let colors = $derived(resolveTileColors(tile))
@@ -170,6 +176,8 @@
   data-selected={selected || undefined}
   style:--tile-bg={bgColor}
   style:--tile-fg={fg}
+  style:--cell={cell !== undefined ? `${cell}px` : undefined}
+  style:--gap={gap !== undefined ? `${gap}px` : undefined}
   {@attach tilt}
 >
   {#if children}
@@ -177,7 +185,7 @@
   {:else}
     <div
       class={`
-        metro-tile-icon border border-red-400
+        metro-tile-icon
         ${ui.icon()}
       `}
       aria-hidden='true'
@@ -186,11 +194,11 @@
         pageUrl={tile.url ?? ''}
         tint={fg}
         class={cn({
-          'size-8': size === 'small',
-          'size-14': size === 'medium',
-          'size-16': size === 'wide',
-          'size-20': size === 'large',
-        }, 'aspect-square')}
+          'size-[min(calc(var(--cell)*0.8),2rem)]': size === 'small',
+          'size-[min(calc(var(--cell)*0.8),3.5rem)]': size === 'medium',
+          'size-[min(calc(var(--cell)*0.8),4rem)]': size === 'wide',
+          'size-[min(calc(var(--cell)*1),5rem)]': size === 'large',
+        })}
       />
     </div>
   {/if}
