@@ -902,23 +902,23 @@
 </div>
 
 <style>
-  .is-dragging :global(.snapgrid-item:not([data-dragging]) .metro-tile) {
+  .is-dragging :global(.snapgrid-item:not([data-dragging])) {
     transform: scale(.93);
     opacity: .85;
   }
   .is-dragging :global(.snapgrid-item[data-dragging]) {
     z-index: 10;
   }
-  .is-dragging :global(.snapgrid-item[data-dragging] .metro-tile) {
+  .is-dragging :global(.snapgrid-item[data-dragging]) {
     transform: scale(1.04);
     opacity: .95;
     box-shadow: 0 10px 30px #0007;
   }
-  .reduced .is-dragging :global(.snapgrid-item .metro-tile) {
+  .reduced .is-dragging :global(.snapgrid-item) {
     transform: none;
   }
   @media (prefers-reduced-motion: reduce) {
-    .is-dragging :global(.snapgrid-item .metro-tile) {
+    .is-dragging :global(.snapgrid-item) {
       transform: none;
     }
   }
