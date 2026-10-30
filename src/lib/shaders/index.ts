@@ -1,11 +1,13 @@
 import type { ShaderDefinition } from './types'
 import { balatro } from './balatro'
 import { flow } from './flow'
+import { incense } from './incense'
 
 export type { ShaderDefinition } from './types'
 export const shaders = {
   balatro,
   flow,
+  incense,
 } as const satisfies Record<string, ShaderDefinition>
 export type ShaderId = keyof typeof shaders
 export const defaultShader: ShaderDefinition = shaders.balatro
