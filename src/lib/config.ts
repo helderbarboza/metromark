@@ -1,5 +1,37 @@
 import * as v from 'valibot'
 
+const BackgroundFitSchema = v.picklist(['cover', 'contain', 'fill', 'none'])
+
+const ColorBackgroundSchema = v.object({
+  type: v.literal('color'),
+  /** Use the theme background instead of a custom color */
+  auto: v.optional(v.boolean()),
+  color: v.optional(v.string()),
+})
+
+const ShaderBackgroundSchema = v.object({
+  type: v.literal('shader'),
+  shaderId: v.optional(v.string()),
+  /** Shader animation speed factor */
+  speed: v.optional(v.number()),
+  /** Maximum shader frames per second */
+  targetFps: v.optional(v.number()),
+  /** Shader layer opacity over the base color */
+  opacity: v.optional(v.number()),
+  /** Use the theme background instead of a custom base color */
+  auto: v.optional(v.boolean()),
+  /** Base color under the shader layer */
+  color: v.optional(v.string()),
+})
+
+const ImageBackgroundSchema = v.object({
+  type: v.literal('image'),
+  url: v.string(),
+  fit: v.optional(BackgroundFitSchema),
+  opacity: v.optional(v.number()),
+  parallax: v.optional(v.boolean()),
+})
+
 /** User-facing settings schema with per-key defaults and docs */
 export const SettingsSchema = v.object({
   /** Tile density: 'comfortable' (68px) or 'compact' (54px) */
@@ -8,6 +40,12 @@ export const SettingsSchema = v.object({
   showDomains: v.boolean(),
   /** Honor prefers-reduced-motion */
   reducedMotion: v.boolean(),
+  /** Selected background shader id */
+  background: v.variant('type', [
+    ShaderBackgroundSchema,
+    ImageBackgroundSchema,
+    ColorBackgroundSchema,
+  ]),
 })
 
 export type Settings = v.InferOutput<typeof SettingsSchema>
@@ -17,14 +55,29 @@ export const SETTINGS_DEFAULTS: Settings = {
   density: 'comfortable',
   showDomains: true,
   reducedMotion: false,
+  background: { type: 'color', auto: true, color: undefined },
 } as const
+
+export const BACKGROUND_DEFAULTS = {
+  color: { type: 'color', auto: true, color: undefined },
+  image: { type: 'image', url: '' },
+  shader: {
+    type: 'shader',
+    shaderId: 'balatro',
+    speed: 1,
+    targetFps: 60,
+    opacity: 1,
+    auto: true,
+    color: undefined,
+  },
+} satisfies Record<Settings['background']['type'], Settings['background']>
 
 /** Environment variable prefix for override */
 const ENV_PREFIX = 'METRO_'
 
 /**
  * Load settings from hierarchical sources:
- * 1. Environment variables (METRO_DENSITY, METRO_SHOW_DOMAINS, METRO_REDUCED_MOTION)
+ * 1. Environment variables (METRO_DENSITY, METRO_SHOW_DOMAINS, METRO_REDUCED_MOTION, METRO_SHADER_ID)
  * 2. Fallback to defaults
  * Throws on validation failure (fail-fast)
  */
@@ -41,6 +94,9 @@ export function loadSettings(env: Record<string, string | undefined> = import.me
   }
   if (env[`${ENV_PREFIX}REDUCED_MOTION`] !== undefined) {
     fromEnv.reducedMotion = env[`${ENV_PREFIX}REDUCED_MOTION`] === 'true'
+  }
+  if (env[`${ENV_PREFIX}SHADER_ID`] !== undefined) {
+    fromEnv.background = { type: 'shader', shaderId: env[`${ENV_PREFIX}SHADER_ID`] }
   }
 
   const merged = { ...SETTINGS_DEFAULTS, ...fromEnv }

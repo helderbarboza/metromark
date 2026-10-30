@@ -33,7 +33,7 @@ export const group = (page: Page, title: string) => page.locator('[data-testid="
 export const link = (page: Page, title: string) => page.getByRole('link', { name: new RegExp(`^Open ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
 export const draggable = (page: Page, id: string) => page.locator(`a[data-grid-id="${id}"]`)
 export const appBar = (page: Page) => page.getByRole('toolbar')
-export const presentation = async (page: Page) => page.evaluate(() => readJson<AppData>('metro.preview.presentation.v1', { schema: 1, appearance: {}, layouts: {}, settings: { density: 'comfortable', showDomains: true, reducedMotion: false }, undos: [] }))
+export const presentation = async (page: Page) => page.evaluate(() => readJson<AppData>('metro.preview.presentation.v1', { schema: 1, appearance: {}, layouts: {}, settings: { density: 'comfortable', showDomains: true, reducedMotion: false, background: { type: 'color', auto: true } }, undos: [] }))
 export const tree = async (page: Page) => page.evaluate(() => readJson<BookmarkNode[]>('metro.preview.bookmarks.v1', []))
 export function flat(nodes: BookmarkNode[]): BookmarkNode[] {
   return nodes.flatMap(node => [node, ...flat(node.children ?? [])])
