@@ -109,20 +109,13 @@
     let lastTime = 0
     let lastRender = 0
     let staticRendered = false
+    let renderedTime = 0
     let pointerX = 0
     let pointerY = 0
     let pointerDown = false
 
-    const resize = () => {
-      const width = element.clientWidth
-      const height = element.clientHeight
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2)
-      element.width = Math.max(1, Math.round(width * pixelRatio))
-      element.height = Math.max(1, Math.round(height * pixelRatio))
-      gl.viewport(0, 0, element.width, element.height)
-    }
-
     const render = (time: number) => {
+      renderedTime = time
       gl.useProgram(program)
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
       gl.enableVertexAttribArray(positionLocation)
@@ -135,6 +128,22 @@
       gl.clearColor(0, 0, 0, 1)
       gl.clear(gl.COLOR_BUFFER_BIT)
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+    }
+
+    const resize = () => {
+      const width = element.clientWidth
+      const height = element.clientHeight
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2)
+      const nextWidth = Math.max(1, Math.round(width * pixelRatio))
+      const nextHeight = Math.max(1, Math.round(height * pixelRatio))
+      if (nextWidth === element.width && nextHeight === element.height)
+        return
+      element.width = nextWidth
+      element.height = nextHeight
+      gl.viewport(0, 0, nextWidth, nextHeight)
+      // Resizing the canvas clears the drawing buffer. Redraw in the same task
+      // so the cleared buffer is never composited as a blank frame.
+      render(paused ? 0 : renderedTime)
     }
 
     const frame = (now: number) => {
@@ -172,6 +181,8 @@
       animationFrame = 0
     }
 
+    // Size the buffer before the first draw so the initial frame is not stretched.
+    resize()
     const observer = new ResizeObserver(resize)
     observer.observe(element)
 
