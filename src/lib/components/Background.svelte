@@ -25,6 +25,10 @@
   }: Props = $props()
 
   let canvas = $state<HTMLCanvasElement | null>(null)
+  // The parent passes props as getters over its snapshot. Track a derived boolean
+  // so snapshot updates that do not change this setting keep the WebGL context
+  // and the animation time.
+  const motion = $derived(reducedMotion)
 
   function createShader(
     gl: WebGLRenderingContext,
@@ -64,7 +68,7 @@
 
   $effect(() => {
     const element = canvas
-    const motion = reducedMotion
+    const paused = motion
     const definition = shader
     if (!element)
       return
@@ -190,7 +194,7 @@
     window.addEventListener('pointerdown', handlePointerDown)
     window.addEventListener('pointerup', handlePointerUp)
 
-    if (motion) {
+    if (paused) {
       stopAnimation()
       render(0)
     }
@@ -204,6 +208,8 @@
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('pointerdown', handlePointerDown)
       window.removeEventListener('pointerup', handlePointerUp)
+      gl.deleteBuffer(positionBuffer)
+      gl.deleteProgram(program)
     }
   })
 </script>
