@@ -1,11 +1,13 @@
 import type { ShaderDefinition } from './types'
 import { balatro } from './balatro'
+import { clouds } from './clouds'
 import { flow } from './flow'
 import { incense } from './incense'
 
-export type { ShaderDefinition } from './types'
+export type { PassChannel, ShaderDefinition, ShaderPass, TextureSource } from './types'
 export const shaders = {
   balatro,
+  clouds,
   flow,
   incense,
 } as const satisfies Record<string, ShaderDefinition>
