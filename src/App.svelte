@@ -9,6 +9,7 @@
     Snapshot,
     TileSize,
   } from '$lib/types'
+  import Background from '$lib/components/Background.svelte'
   import Button from '$lib/components/Button.svelte'
   import ContextMenu from '$lib/components/ContextMenu.svelte'
   import Editor from '$lib/components/Editor.svelte'
@@ -21,6 +22,7 @@
   import { toggleSelection } from '$lib/interaction'
   import { cellsToPx, GAP, reconcileLayout, ROWS } from '$lib/layout'
   import { buildAppBarMenuItems, buildMenuItems } from '$lib/menus'
+  import { getShader } from '$lib/shaders'
   import { applyThemeForMode, resetThemePreferences } from '$lib/theme-picker'
   import {
     flatten,
@@ -81,6 +83,15 @@
     context?.target === 'tile' ? allTiles[context.id] : undefined,
   )
   const nodes = $derived(indexTree(snapshot?.tree ?? []))
+  const backgroundColor = $derived.by(() => {
+    if (
+      snapshot?.settings.background.type !== 'color'
+      || snapshot.settings.background.auto !== false
+    ) {
+      return undefined
+    }
+    return snapshot.settings.background.color
+  })
   const roots = $derived(
     (snapshot?.tree ?? [])
       .flatMap(root => root.children ?? [])
@@ -661,9 +672,23 @@
 >
 </span>
 <div
-  class='relative flex h-dvh w-full flex-col overflow-hidden bg-(--bg) text-(--text)'
+  class='relative flex h-dvh w-full flex-col overflow-hidden text-(--text)'
   class:reduced={snapshot?.settings.reducedMotion}
+  style:background={backgroundColor}
 >
+  {#if snapshot?.settings.background.type === 'shader'}
+    <Background
+      shader={getShader(snapshot.settings.background.shaderId ?? 'balatro')}
+      reducedMotion={snapshot.settings.reducedMotion}
+      color={snapshot.settings.background.auto === false
+        ? snapshot.settings.background.color
+        : undefined}
+      speed={snapshot.settings.background.speed ?? 1}
+      targetFps={snapshot.settings.background.targetFps ?? 60}
+      opacity={snapshot.settings.background.opacity ?? 1}
+    />
+  {/if}
+
   <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
     <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
       <RootsNav

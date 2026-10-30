@@ -6,18 +6,21 @@
   import ThemeGallery from '$lib/components/editor/ThemeGallery.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import { setMode, systemPrefersMode, userPrefersMode } from 'mode-watcher'
+  import BackgroundSettings from './BackgroundSettings.svelte'
+
+  interface Props {
+    settings: Settings
+    oncommand: (command: Command) => Promise<boolean>
+    onclose: () => void
+    onresetpreview?: () => Promise<void>
+  }
 
   const {
     settings,
     oncommand,
     onclose,
     onresetpreview,
-  }: {
-    settings: Settings
-    oncommand: (command: Command) => Promise<boolean>
-    onclose: () => void
-    onresetpreview?: () => Promise<void>
-  } = $props()
+  }: Props = $props()
 
   const { state: command, send, run } = createDialogCommand(oncommand, onclose)
 
@@ -70,6 +73,15 @@
 <div class='mb-7.25'>
   <h3 class='mb-3.25 text-[11px] font-[550]'>Canvas</h3>
   <ThemeGallery />
+</div>
+
+<div class='mb-7.25'>
+  <h3 class='mb-3.25 text-[11px] font-[550]'>Background</h3>
+
+  <BackgroundSettings {settings} busy={command.busy} onchange={setting} />
+  <p class='m-0 text-[11px] leading-[1.65] text-(--muted)'>
+    Choose what sits behind your bookmarks.
+  </p>
 </div>
 
 <div class='mb-7.25'>

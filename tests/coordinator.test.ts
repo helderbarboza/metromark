@@ -199,4 +199,16 @@ describe('durable Undo', () => {
     expect(storage.data).toMatchObject({ appearance: {}, layouts: {}, settings: SETTINGS_DEFAULTS, undos: [] })
     expect(await bookmarks.getTree()).toEqual(bookmarksBefore)
   })
+  it('stores a custom background color and rejects an invalid hex value', async () => {
+    const { coordinator } = fixture()
+    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: false, color: '#123abc' } } })
+    expect(updated.snapshot.settings.background).toEqual({ type: 'color', auto: false, color: '#123abc' })
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: false, color: 'red' } } })).rejects.toThrow('six-digit hex')
+  })
+  it('stores a shader background config and rejects an invalid opacity', async () => {
+    const { coordinator } = fixture()
+    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', shaderId: 'flow', speed: 2, targetFps: 30, opacity: 0.5, auto: false, color: '#123abc' } } })
+    expect(updated.snapshot.settings.background).toMatchObject({ type: 'shader', shaderId: 'flow', speed: 2, targetFps: 30, opacity: 0.5, auto: false, color: '#123abc' })
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', opacity: 2 } } })).rejects.toThrow('Invalid shader opacity')
+  })
 })

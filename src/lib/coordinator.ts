@@ -386,6 +386,33 @@ export class BookmarkCoordinator {
           throw new Error('Invalid domain setting.')
         if (patch.reducedMotion !== undefined && typeof patch.reducedMotion !== 'boolean')
           throw new Error('Invalid motion setting.')
+        if (patch.background !== undefined) {
+          const background = patch.background
+          if (background.type === 'color') {
+            if (background.auto !== undefined && typeof background.auto !== 'boolean')
+              throw new Error('Invalid background mode.')
+            if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))
+              throw new Error('Use a six-digit hex color.')
+          }
+          else if (background.type === 'image') {
+            if (typeof background.url !== 'string')
+              throw new Error('Invalid background image.')
+          }
+          else if (background.type === 'shader') {
+            if (background.shaderId !== undefined && typeof background.shaderId !== 'string')
+              throw new Error('Invalid shader setting.')
+            if (background.speed !== undefined && (typeof background.speed !== 'number' || !Number.isFinite(background.speed) || background.speed < 0))
+              throw new Error('Invalid shader speed.')
+            if (background.targetFps !== undefined && (typeof background.targetFps !== 'number' || !Number.isFinite(background.targetFps) || background.targetFps < 0))
+              throw new Error('Invalid shader frame rate.')
+            if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
+              throw new Error('Invalid shader opacity.')
+            if (background.auto !== undefined && typeof background.auto !== 'boolean')
+              throw new Error('Invalid background mode.')
+            if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))
+              throw new Error('Use a six-digit hex color.')
+          }
+        }
         this.data.settings = { ...this.data.settings, ...patch }
         return undefined
       }

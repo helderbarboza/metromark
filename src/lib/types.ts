@@ -1,3 +1,4 @@
+import type { Settings } from '$lib/config'
 import type { Layout, LayoutItem } from '@snapgridjs/core'
 
 export type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
@@ -44,11 +45,7 @@ export type ThemeName
     | 'catppuccin-mocha'
     | 'catppuccin-macchiato'
     | 'catppuccin-frappe'
-export interface Settings {
-  density: 'comfortable' | 'compact'
-  showDomains: boolean
-  reducedMotion: boolean
-}
+export type { Settings }
 export interface DeletedBackup {
   node: BookmarkNode
   parentId: string
