@@ -118,8 +118,15 @@
   </div>
   <div class='flex shrink-0 items-center gap-4'>
     <div class='flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)'>
-      <span class='max-sm:hidden'>{bookmarkCount} bookmarks, {folderCount} folders</span>
-      <span class='sm:hidden'>{bookmarkCount} / {folderCount}</span>
+
+      <span class='max-sm:hidden'>
+        <span>{bookmarkCount} bookmarks</span>
+        <span>{folderCount} folders</span>
+      </span>
+      <span class='inline-flex gap-2 sm:hidden'>
+        <span class='inline-flex gap-0.5'><Icon name='bookmark' size={16} /><span>{bookmarkCount}</span></span>
+        <span class='inline-flex gap-0.5'><Icon name='folder' size={16} /><span>{folderCount}</span></span>
+      </span>
       {#if preview}
         <span
           class='rounded-sm border border-(--line) px-1.5 py-0.5 text-xs text-(--muted)'

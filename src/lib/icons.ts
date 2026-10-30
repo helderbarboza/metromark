@@ -2,6 +2,7 @@ import arrowLeft from '@iconify-icons/fluent/arrow-left-20-regular'
 import arrowRight from '@iconify-icons/fluent/arrow-right-20-regular'
 import refresh from '@iconify-icons/fluent/arrow-sync-20-regular'
 import undo from '@iconify-icons/fluent/arrow-undo-20-regular'
+import bookmark from '@iconify-icons/fluent/bookmark-20-regular'
 import addBookmark from '@iconify-icons/fluent/bookmark-add-20-regular'
 import searchBookmarks from '@iconify-icons/fluent/bookmark-search-20-regular'
 import check from '@iconify-icons/fluent/checkmark-20-regular'
@@ -28,6 +29,7 @@ export const icons = {
   addFolder,
   arrowLeft,
   arrowRight,
+  bookmark,
   check,
   close,
   copy,
