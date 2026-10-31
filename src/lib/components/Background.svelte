@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { PassChannel, ShaderDefinition, ShaderPass, TextureSource } from '$lib/shaders'
   import { defaultShader } from '$lib/shaders'
+  import { untrack } from 'svelte'
 
   interface Props {
     reducedMotion?: boolean
@@ -15,6 +16,13 @@
     opacity?: number
     /** Overrides the shader's own render scale */
     renderScale?: number
+    /**
+     * Whether the pointer drives the shaders. When false `iMouse` stays at the
+     * origin, so a shader never reacts to a cursor that is just passing over the
+     * page. The pointer is still tracked, so turning the setting back on does not
+     * need a fresh pointer move.
+     */
+    mouseInteraction?: boolean
   }
 
   const {
@@ -25,7 +33,32 @@
     targetFps = 60,
     opacity = 1,
     renderScale,
+    mouseInteraction = true,
   }: Props = $props()
+
+  // A live mirror of the setting, read by the render loop every frame. Deliberately
+  // a plain object: a `$state` proxy here makes the renderer's own effect depend on
+  // the setting, so flipping the toggle would tear the pipeline down and throw away
+  // the buffer contents that shaders like the multipass ones accumulate.
+  // `untrack` seeds it from the current prop value without making the read a
+  // dependency of whatever happens to run here.
+  const mouseState = { enabled: untrack(() => mouseInteraction) }
+  $effect(() => {
+    mouseState.enabled = mouseInteraction
+  })
+
+  /**
+   * The viewer's local wall-clock time as a fraction of a day in [0, 1): midnight
+   * is 0, noon is 0.5. Read from the calendar fields rather than from epoch
+   * arithmetic so daylight-saving shifts and odd time zones are handled by the
+   * platform, and so the value the shader sees always matches the clock on screen.
+   */
+  function localTimeOfDay(): number {
+    const now = new Date()
+    const seconds
+      = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds() + now.getMilliseconds() / 1000
+    return seconds / 86400
+  }
 
   /** Shaders declare `iChannelResolution[4]`, so four bindings is the ceiling. */
   const MAX_CHANNELS = 4
@@ -65,15 +98,22 @@
   // and the animation time.
   const motion = $derived(reducedMotion)
 
-  function getContext(element: HTMLCanvasElement): WebGLRenderingContext | null {
+  interface Context {
+    gl: WebGLRenderingContext
+    /** True for a WebGL2 context, which is what GLSL ES 3.00 shaders require. */
+    webgl2: boolean
+  }
+
+  function getContext(element: HTMLCanvasElement): Context | null {
     if (PREFER_WEBGL2) {
       const webgl2 = element.getContext('webgl2', CONTEXT_ATTRIBUTES)
       // WebGL2 is a superset for everything used here; the cast keeps a single
       // code path instead of an overload-checked union at every call site.
       if (webgl2)
-        return webgl2 as unknown as WebGLRenderingContext
+        return { gl: webgl2 as unknown as WebGLRenderingContext, webgl2: true }
     }
-    return element.getContext('webgl', CONTEXT_ATTRIBUTES)
+    const gl = element.getContext('webgl', CONTEXT_ATTRIBUTES)
+    return gl ? { gl, webgl2: false } : null
   }
 
   function compileShader(
@@ -95,16 +135,45 @@
     return shader
   }
 
+  /**
+   * Shaders written for ES 3.00 need `#version 300 es` on the very first line and
+   * `in`/`out` instead of `attribute`/`varying`. Both are mechanical, so the shared
+   * vertex source is translated rather than duplicated.
+   */
+  function prepareSource(definition: ShaderDefinition, source: string, isVertex: boolean): string {
+    if ((definition.glslVersion ?? 100) < 300)
+      return source
+    if (!isVertex) {
+      // ES 3.00 has no `gl_FragColor`; each pass declares its own `out` variable,
+      // as the Shadertoy export does.
+      return `#version 300 es\n${source}`
+    }
+    const translated = source
+      .replace(/\battribute\b/g, 'in')
+      .replace(/\bvarying\b/g, 'out')
+    return `#version 300 es\n${translated}`
+  }
+
   function createProgram(
     gl: WebGLRenderingContext,
     definition: ShaderDefinition,
     fragmentSource: string,
     label: string,
   ): WebGLProgram {
-    const vertexShader = compileShader(gl, gl.VERTEX_SHADER, definition.vertexShader, 'vertex')
+    const vertexShader = compileShader(
+      gl,
+      gl.VERTEX_SHADER,
+      prepareSource(definition, definition.vertexShader, true),
+      'vertex',
+    )
     let fragmentShader: WebGLShader | null = null
     try {
-      fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource, label)
+      fragmentShader = compileShader(
+        gl,
+        gl.FRAGMENT_SHADER,
+        prepareSource(definition, fragmentSource, false),
+        label,
+      )
       const program = gl.createProgram()
       if (!program)
         throw new Error('Unable to create the background shader program.')
@@ -130,8 +199,8 @@
   /** Deterministic RGBA noise, standing in for Shadertoy's "RGBA Noise Medium"
    * texture. Each channel is independent, which is what `clouds` relies on when
    * it reads `.yx` to get two decorrelated noise fields. */
-  function createNoiseTexture(gl: WebGLRenderingContext): WebGLTexture {
-    const texels = NOISE_SIZE * NOISE_SIZE * 4
+  function createNoiseTexture(gl: WebGLRenderingContext, size: number = NOISE_SIZE): WebGLTexture {
+    const texels = size * size * 4
     const data = new Uint8Array(texels)
     // mulberry32: tiny, deterministic, and plenty for a noise source.
     let seed = 0x9E3779B9
@@ -148,7 +217,7 @@
       throw new Error('Unable to create the background noise texture.')
     gl.bindTexture(gl.TEXTURE_2D, texture)
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, NOISE_SIZE, NOISE_SIZE, 0, gl.RGBA, gl.UNSIGNED_BYTE, data)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, data)
     // REPEAT is required: the shaders wrap sample coordinates outside 0..1.
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
@@ -258,6 +327,8 @@
       time: WebGLUniformLocation | null
       mouse: WebGLUniformLocation | null
       frame: WebGLUniformLocation | null
+      /** Local wall-clock time of day, as a fraction of a day in [0, 1). */
+      timeOfDay: WebGLUniformLocation | null
       channelResolution: WebGLUniformLocation | null
       samplers: Array<WebGLUniformLocation | null>
     }
@@ -283,10 +354,12 @@
    */
   function startShader(
     gl: WebGLRenderingContext,
+    webgl2: boolean,
     element: HTMLCanvasElement,
     definition: ShaderDefinition,
     paused: boolean,
     scale: number,
+    mouseState: { enabled: boolean },
   ): () => void {
     const disposers: Array<() => void> = []
     const dispose = () => {
@@ -295,6 +368,13 @@
     }
 
     try {
+      if ((definition.glslVersion ?? 100) >= 300 && !webgl2) {
+        throw new Error(
+          `The "${definition.id}" shader is written in GLSL ES 3.00, which needs a `
+          + 'WebGL2 context; this browser fell back to WebGL1.',
+        )
+      }
+
       const passDefinitions = resolvePasses(definition)
       const multiPass = passDefinitions.length > 1
       const format = multiPass ? probeTargetFormat(gl) : null
@@ -386,6 +466,7 @@
             time: gl.getUniformLocation(program, 'iTime'),
             mouse: gl.getUniformLocation(program, 'iMouse'),
             frame: gl.getUniformLocation(program, 'iFrame'),
+            timeOfDay: gl.getUniformLocation(program, 'iTimeOfDay'),
             channelResolution: gl.getUniformLocation(program, 'iChannelResolution[0]'),
             samplers,
           },
@@ -395,19 +476,23 @@
       })
 
       // --- procedural textures ----------------------------------------------
-      let noiseTexture: WebGLTexture | null = null
-      const getNoiseTexture = () => {
-        if (!noiseTexture) {
-          noiseTexture = createNoiseTexture(gl)
+      // Keyed by edge length: a shader may hard-code the texel count it samples
+      // (Swiss Alps' blue noise is 1024 square), so one shared 256 texture is not
+      // always the right fallback.
+      const noiseTextures = new Map<number, WebGLTexture>()
+      const getNoiseTexture = (size: number = NOISE_SIZE) => {
+        let texture = noiseTextures.get(size)
+        if (!texture) {
+          texture = createNoiseTexture(gl, size)
+          noiseTextures.set(size, texture)
         }
-        return noiseTexture
+        return texture
       }
       disposers.push(() => {
         disposed = true
-        if (noiseTexture) {
-          gl.deleteTexture(noiseTexture)
-          noiseTexture = null
-        }
+        for (const texture of noiseTextures.values())
+          gl.deleteTexture(texture)
+        noiseTextures.clear()
         for (const entry of imageEntries.values()) {
           if (entry.texture)
             gl.deleteTexture(entry.texture)
@@ -433,13 +518,16 @@
       let disposed = false
       const imageEntries = new Map<string, ImageEntry>()
 
-      const loadImage = (url: string, wrap: 'clamp' | 'repeat'): ImageEntry => {
-        const cached = imageEntries.get(url)
+      const loadImage = (url: string, wrap: 'clamp' | 'repeat', flipY: boolean): ImageEntry => {
+        // Wrap mode and flip are upload-time properties, so they are part of the
+        // identity: the same file bound two ways needs two textures.
+        const key = `${url}|${wrap}|${flipY ? 'flip' : 'noflip'}`
+        const cached = imageEntries.get(key)
         if (cached)
           return cached
 
         const entry: ImageEntry = { texture: null, width: 0, height: 0, failed: false }
-        imageEntries.set(url, entry)
+        imageEntries.set(key, entry)
         const image = new Image()
         image.onload = () => {
           if (disposed)
@@ -450,7 +538,9 @@
               throw new Error('Unable to create the texture.')
             gl.bindTexture(gl.TEXTURE_2D, texture)
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
-            // No UNPACK_FLIP_Y_WEBGL: the Shadertoy channels declare vflip=false.
+            // Shadertoy channels declare `vflip` per texture; the default is false,
+            // which is also GL's default.
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY)
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
             const wrapMode = wrap === 'repeat' ? gl.REPEAT : gl.CLAMP_TO_EDGE
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapMode)
@@ -462,6 +552,7 @@
             entry.width = image.width
             entry.height = image.height
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
             // The bound texture and its iChannelResolution just changed.
             for (const pass of passes) {
               if (pass.definition.once)
@@ -488,10 +579,17 @@
       const resolveTextureSource = (source: TextureSource): ResolvedChannel => {
         if (source === 'noise')
           return { texture: getNoiseTexture(), width: NOISE_SIZE, height: NOISE_SIZE }
-        const entry = loadImage(source.image, source.wrap ?? 'clamp')
+        if ('noise' in source) {
+          const size = source.noise
+          return { texture: getNoiseTexture(size), width: size, height: size }
+        }
+        const entry = loadImage(source.image, source.wrap ?? 'clamp', source.flipY ?? false)
         if (entry.texture)
           return { texture: entry.texture, width: entry.width, height: entry.height }
-        return { texture: getNoiseTexture(), width: NOISE_SIZE, height: NOISE_SIZE }
+        // Until the decode lands, hold the fallback at the same texel count so
+        // `iChannelResolution` — and any `& mask` in the shader — stays coherent.
+        const fallback = source.noiseFallback ?? NOISE_SIZE
+        return { texture: getNoiseTexture(fallback), width: fallback, height: fallback }
       }
 
       const resolveChannel = (channel: PassChannel | null | undefined): ResolvedChannel => {
@@ -521,6 +619,9 @@
       let pressX = 0
       let pressY = 0
       let pointerDown = false
+      // Sampled once per frame so every pass in a frame agrees on the time of day,
+      // even if the clock ticks halfway through the pipeline.
+      let timeOfDay = localTimeOfDay()
       const channelResolution = new Float32Array(MAX_CHANNELS * 3)
       const warnedChannels = new Set<string>()
 
@@ -573,16 +674,21 @@
           gl.uniform1f(pass.uniform.time, time)
         if (pass.uniform.frame)
           gl.uniform1i(pass.uniform.frame, frameCount)
+        if (pass.uniform.timeOfDay)
+          gl.uniform1f(pass.uniform.timeOfDay, timeOfDay)
         if (pass.uniform.mouse) {
           // Shadertoy semantics: xy is the pointer in framebuffer pixels measured
           // from the bottom-left, zw is the press position with the sign carrying
           // the button state.
+          // With the setting off the pointer is reported as absent, which is the
+          // state shaders test for to begin with (no drag in progress).
+          const live = mouseState.enabled
           gl.uniform4f(
             pass.uniform.mouse,
-            pointerX,
-            pointerY,
-            pointerDown ? pressX : -pressX,
-            pointerDown ? pressY : -pressY,
+            live ? pointerX : 0,
+            live ? pointerY : 0,
+            live && pointerDown ? pressX : 0,
+            live && pointerDown ? pressY : 0,
           )
         }
 
@@ -596,6 +702,7 @@
 
       const renderFrame = (time: number) => {
         renderedTime = time
+        timeOfDay = localTimeOfDay()
         frameCount++
         for (const pass of passes) {
           if (pass.definition.once && !pass.dirty)
@@ -629,6 +736,7 @@
         renderFrame(paused ? 0 : renderedTime)
       }
 
+      let appliedMouseEnabled = mouseState.enabled
       const frame = (now: number) => {
         animationFrame = requestAnimationFrame(frame)
         const delta = lastTime === 0 ? 0 : (now - lastTime) / 1000
@@ -637,6 +745,13 @@
         // purpose: they should change the animation without rebuilding the
         // program and losing the accumulated time.
         elapsed += delta * speed
+        // Toggling the setting changes what the shader sees, so redraw straight
+        // away when the pipeline is not otherwise producing frames.
+        if (appliedMouseEnabled !== mouseState.enabled) {
+          appliedMouseEnabled = mouseState.enabled
+          if (targetFps <= 0)
+            renderFrame(elapsed)
+        }
         if (targetFps <= 0) {
           if (!staticRendered) {
             renderFrame(elapsed)
@@ -667,10 +782,16 @@
         animationFrame = 0
       }
 
-      // Only listen for the pointer when a pass actually samples it;
-      // `getUniformLocation` drops uniforms the compiler optimized away.
+      // Only listen for the pointer when a pass actually samples it; the setting
+      // gates what `iMouse` reports rather than whether these listeners exist.
+      // `getUniformLocation` drops uniforms the compiler optimized away. With the
+      // setting off `iMouse` stays at the origin, which is exactly the "no pointer"
+      // state shaders test for (Swiss Alps starts its own day/night cycle when the
+      // pointer is not dragging the sun).
       if (passes.some(pass => pass.uniform.mouse !== null)) {
         const updatePointer = (event: PointerEvent) => {
+          // Still tracked while disabled, so turning the setting back on does not
+          // need a fresh pointer move to pick up where the cursor is.
           const rect = element.getBoundingClientRect()
           if (rect.width === 0 || rect.height === 0)
             return
@@ -738,15 +859,15 @@
     if (!element)
       return
 
-    const gl = getContext(element)
-    if (!gl) {
+    const context = getContext(element)
+    if (!context) {
       // Decorative layer: degrade to the base color instead of throwing.
       console.error('[Background] WebGL is unavailable; showing the base color only.')
       return
     }
 
     try {
-      return startShader(gl, element, definition, paused, scale)
+      return startShader(context.gl, context.webgl2, element, definition, paused, scale, mouseState)
     }
     catch (error) {
       // A broken shader should not take the page down with it.

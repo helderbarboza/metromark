@@ -1,10 +1,50 @@
 /**
- * Procedural textures the background renderer knows how to generate.
+ * Uniform contract, as seen by every pass (Shadertoy names throughout):
  *
- * Each entry in a shader's `channels` list is bound, in order, to `iChannel0`,
- * `iChannel1`, … and its size is published through `iChannelResolution`.
+ * - `iResolution` is the pass's own render size in pixels.
+ * - `iTime` is elapsed animation time in seconds, scaled by the renderer's
+ *   `speed`; it drives motion such as wind.
+ * - `iTimeOfDay` is the viewer's *local* time of day as a fraction of a day in
+ *   [0, 1): midnight is 0, noon is 0.5. It is sampled once per frame from the
+ *   system clock, so a shader that derives its sun angle from it shows real
+ *   day/night. Unlike `iTime` it is absolute — pausing, speeding up or hiding the
+ *   shader does not move it.
+ * - `iMouse` is `(x, y, pressX, pressY)` in pixels from the bottom-left, with the
+ *   sign of `zw` carrying the button state. It stays zero when the renderer's
+ *   `mouseInteraction` setting is off, which is how a shader can tell that no
+ *   pointer is driving it.
+ * - `iChannelResolution[4]` holds the size of each bound channel, and `iFrame`
+ *   counts rendered frames.
+ *
+ * A texture the renderer can bind to `iChannel0`, `iChannel1`, … Its size is
+ * published to the shader through `iChannelResolution`, so a shader never has to
+ * assume the resolution of its inputs.
+ *
+ * - `'noise'` is the built-in 256x256 RGBA noise the renderer generates, and
+ *   `{ noise }` is the same generator at another edge length.
+ * - `{ image }` is a decoded image, given as a URL or data URI. Loading is
+ *   asynchronous, so the generated noise is bound until it decodes (and stays if
+ *   it fails to load).
  */
-export type TextureSource = 'noise'
+export type TextureSource
+  = | 'noise'
+    | {
+    /** Edge length of a generated RGBA noise texture, in texels. */
+      readonly noise: number
+    }
+    | {
+      readonly image: string
+      /** Wrap mode, default `clamp`. Noise-like inputs need `repeat`. */
+      readonly wrap?: 'clamp' | 'repeat'
+      /** Upload flipped vertically. Shadertoy channels declare `vflip` explicitly. */
+      readonly flipY?: boolean
+      /**
+       * Edge length of the procedural noise bound until the image decodes, default
+       * 256. Set it to the image's real size so a shader that samples by texel
+       * (`texelFetch(… & 1023)`) stays in range on the first frames.
+       */
+      readonly noiseFallback?: number
+    }
 
 /**
  * One input of a pass: either a procedural texture the renderer generates, or
@@ -61,13 +101,22 @@ export interface ShaderDefinition {
    */
   channels?: readonly TextureSource[]
   /**
+   * GLSL version the sources are written in, default 100.
+   *
+   * 300 means GLSL ES 3.00 (`#version 300 es`, `in`/`out`, `texelFetch`, `uint`,
+   * array constructors, bitwise operators), which is what Shadertoy's newer
+   * exports use. It requires WebGL2 — which multipass pipelines already do — and
+   * lets those shaders run verbatim instead of being rewritten into ES 1.00.
+   */
+  glslVersion?: 100 | 300
+  /**
    * Multipass pipeline, evaluated in order; each pass may read earlier passes'
    * buffers (and its own, from the previous frame), and the last pass draws to
    * the canvas.
    *
    * Buffers are float render targets, so a multipass shader needs WebGL2 with
    * float colour attachments. Shaders that store depth or camera data in a buffer
-   * channel cannot be approximated with 8-bit targets.
+   * channel (Himalayas does both) cannot be approximated with 8-bit targets.
    */
   passes?: readonly ShaderPass[]
   /** Fraction of the canvas backing store to render at, default 1. */

@@ -205,10 +205,14 @@ describe('durable Undo', () => {
     expect(updated.snapshot.settings.background).toEqual({ type: 'color', auto: false, color: '#123abc' })
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: false, color: 'red' } } })).rejects.toThrow('six-digit hex')
   })
-  it('stores a shader background config and rejects an invalid opacity', async () => {
+  it('stores a shader background config and rejects invalid shader options', async () => {
     const { coordinator } = fixture()
-    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', shaderId: 'flow', speed: 2, targetFps: 30, opacity: 0.5, auto: false, color: '#123abc' } } })
-    expect(updated.snapshot.settings.background).toMatchObject({ type: 'shader', shaderId: 'flow', speed: 2, targetFps: 30, opacity: 0.5, auto: false, color: '#123abc' })
+    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', shaderId: 'flow', speed: 2, targetFps: 30, opacity: 0.5, mouseInteraction: false, renderScale: 0.5, auto: false, color: '#123abc' } } })
+    expect(updated.snapshot.settings.background).toMatchObject({ type: 'shader', shaderId: 'flow', speed: 2, targetFps: 30, opacity: 0.5, mouseInteraction: false, renderScale: 0.5, auto: false, color: '#123abc' })
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', opacity: 2 } } })).rejects.toThrow('Invalid shader opacity')
+    // The command layer rejects a non-boolean at runtime even though the type forbids it.
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', mouseInteraction: 1 } } as never })).rejects.toThrow('Invalid shader mouse setting')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', renderScale: 3 } } })).rejects.toThrow('Invalid shader render scale')
   })
 })

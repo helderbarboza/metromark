@@ -18,6 +18,10 @@ const ShaderBackgroundSchema = v.object({
   targetFps: v.optional(v.number()),
   /** Shader layer opacity over the base color */
   opacity: v.optional(v.number()),
+  /** Whether the pointer drives the shader's iMouse uniform */
+  mouseInteraction: v.optional(v.boolean()),
+  /** Render resolution as a fraction of the canvas backing store */
+  renderScale: v.optional(v.number()),
   /** Use the theme background instead of a custom base color */
   auto: v.optional(v.boolean()),
   /** Base color under the shader layer */
@@ -67,6 +71,8 @@ export const BACKGROUND_DEFAULTS = {
     speed: 1,
     targetFps: 60,
     opacity: 1,
+    mouseInteraction: false,
+    renderScale: 0.5,
     auto: true,
     color: undefined,
   },
