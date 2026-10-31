@@ -136,6 +136,42 @@
           0.05,
           value => updateShader({ opacity: value }),
         )}
+        {@render range(
+          'shader-render-scale',
+          'Render scale',
+          settings.background.renderScale ?? 0.5,
+          0.25,
+          1.5,
+          0.05,
+          value => updateShader({ renderScale: value }),
+          value => `${Math.round(value * 100)}%`,
+        )}
+      </div>
+      <div class='mt-4 flex items-start justify-between gap-3.75 text-[11px]'>
+        <div>
+          <label for='shader-mouse'>Mouse interaction</label>
+          <p id='shader-mouse-hint' class='mt-1.75 text-[10px] text-(--muted)'>
+            Let the shader follow your pointer.
+          </p>
+        </div>
+        <input
+          id='shader-mouse'
+          type='checkbox'
+          role='switch'
+          aria-describedby='shader-mouse-hint'
+          checked={settings.background.mouseInteraction ?? true}
+          disabled={busy}
+          class='
+            h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
+            bg-(--line) p-0.75
+            before:block before:size-3 before:rounded-full before:bg-(--muted)
+            before:transition-transform before:duration-130
+            checked:bg-(--accent)
+            checked:before:translate-x-3.25 checked:before:bg-(--accent-ink)
+            disabled:cursor-not-allowed disabled:opacity-50
+          '
+          onchange={event => updateShader({ mouseInteraction: event.currentTarget.checked })}
+        />
       </div>
     {/if}
   </Tabs.Content>
@@ -149,11 +185,12 @@
   max: number,
   step: number,
   apply: (value: number) => void,
+  format?: (value: number) => string,
 )}
   <div class='grid gap-1.5'>
     <div class='flex items-center justify-between text-[11px] text-(--muted)'>
       <label for={id}>{label}</label>
-      <span class='text-(--text)'>{value}</span>
+      <span class='text-(--text)'>{format ? format(value) : value}</span>
     </div>
     <input
       {id}

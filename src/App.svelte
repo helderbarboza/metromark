@@ -686,6 +686,8 @@
       speed={snapshot.settings.background.speed ?? 1}
       targetFps={snapshot.settings.background.targetFps ?? 60}
       opacity={snapshot.settings.background.opacity ?? 1}
+      mouseInteraction={snapshot.settings.background.mouseInteraction ?? true}
+      renderScale={snapshot.settings.background.renderScale ?? 0.5}
     />
   {/if}
 
