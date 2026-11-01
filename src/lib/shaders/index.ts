@@ -1,5 +1,6 @@
 import type { ShaderDefinition } from './types'
 import { balatro } from './balatro'
+import { blackHole } from './black_hole'
 import { clouds } from './clouds'
 import { flow } from './flow'
 import { incense } from './incense'
@@ -8,6 +9,7 @@ import { swissAlps } from './swiss_alps'
 export type { PassChannel, ShaderDefinition, ShaderPass, TextureSource } from './types'
 export const shaders = {
   balatro,
+  blackHole,
   clouds,
   flow,
   incense,
