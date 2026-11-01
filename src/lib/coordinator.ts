@@ -403,7 +403,7 @@ export class BookmarkCoordinator {
               throw new Error('Invalid shader setting.')
             if (background.speed !== undefined && (typeof background.speed !== 'number' || !Number.isFinite(background.speed) || background.speed < 0))
               throw new Error('Invalid shader speed.')
-            if (background.targetFps !== undefined && (typeof background.targetFps !== 'number' || !Number.isFinite(background.targetFps) || background.targetFps < 0))
+            if (background.targetFps !== undefined && (typeof background.targetFps !== 'number' || !Number.isFinite(background.targetFps)))
               throw new Error('Invalid shader frame rate.')
             if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
               throw new Error('Invalid shader opacity.')
