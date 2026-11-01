@@ -97,6 +97,11 @@
   // so snapshot updates that do not change this setting keep the WebGL context
   // and the animation time.
   const motion = $derived(reducedMotion)
+  // Same reason: reading `renderScale` straight from the props inside the effect
+  // subscribes it to the whole snapshot, so every bookmark refresh (including the
+  // focus refresh when returning to the tab) rebuilt the pipeline and restarted
+  // the shader. Resolve the scale once and only rebuild when it really changes.
+  const effectiveScale = $derived(renderScale ?? shader.renderScale ?? 1)
 
   interface Context {
     gl: WebGLRenderingContext
@@ -855,7 +860,7 @@
     // Tracked reads: the context and programs are rebuilt when either changes.
     const paused = motion
     const definition = shader
-    const scale = renderScale ?? definition.renderScale ?? 1
+    const scale = effectiveScale
     if (!element)
       return
 
