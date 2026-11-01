@@ -126,6 +126,7 @@
           120,
           1,
           value => updateShader({ targetFps: value }),
+          value => (value === 0 ? 'Auto' : String(value)),
         )}
         {@render range(
           'shader-opacity',

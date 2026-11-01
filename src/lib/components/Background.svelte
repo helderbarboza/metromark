@@ -564,8 +564,8 @@
                 pass.dirty = true
             }
             // Animated pipelines redraw on the next frame; paused ones and static
-            // (targetFps <= 0) ones have no next frame coming.
-            if (paused || targetFps <= 0)
+            // (targetFps < 0) ones have no next frame coming.
+            if (paused || targetFps < 0)
               renderFrame(renderedTime)
           }
           catch (error) {
@@ -754,10 +754,10 @@
         // away when the pipeline is not otherwise producing frames.
         if (appliedMouseEnabled !== mouseState.enabled) {
           appliedMouseEnabled = mouseState.enabled
-          if (targetFps <= 0)
+          if (targetFps < 0)
             renderFrame(elapsed)
         }
-        if (targetFps <= 0) {
+        if (targetFps < 0) {
           if (!staticRendered) {
             renderFrame(elapsed)
             staticRendered = true
@@ -765,10 +765,12 @@
           return
         }
         staticRendered = false
-        // Allow a small margin so a 60 FPS cap does not halve the frame rate.
-        if (now - lastRender < 1000 / targetFps - 1)
-          return
-        lastRender = now
+        if (targetFps > 0) {
+          // Allow a small margin so a 60 FPS cap does not halve the frame rate.
+          if (now - lastRender < 1000 / targetFps - 1)
+            return
+          lastRender = now
+        }
         renderFrame(elapsed)
       }
 
