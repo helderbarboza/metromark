@@ -22,6 +22,8 @@ const ShaderBackgroundSchema = v.object({
   mouseInteraction: v.optional(v.boolean()),
   /** Render resolution as a fraction of the canvas backing store */
   renderScale: v.optional(v.number()),
+  /** Prefer smooth motion or sharp detail when the renderer is under load */
+  quality: v.optional(v.picklist(['motion', 'detail'])),
   /** Use the theme background instead of a custom base color */
   auto: v.optional(v.boolean()),
   /** Base color under the shader layer */
@@ -73,6 +75,7 @@ export const BACKGROUND_DEFAULTS = {
     opacity: 1,
     mouseInteraction: false,
     renderScale: 0.5,
+    quality: 'motion',
     auto: true,
     color: undefined,
   },
@@ -102,7 +105,7 @@ export function loadSettings(env: Record<string, string | undefined> = import.me
     fromEnv.reducedMotion = env[`${ENV_PREFIX}REDUCED_MOTION`] === 'true'
   }
   if (env[`${ENV_PREFIX}SHADER_ID`] !== undefined) {
-    fromEnv.background = { type: 'shader', shaderId: env[`${ENV_PREFIX}SHADER_ID`] }
+    fromEnv.background = { type: 'shader', shaderId: env[`${ENV_PREFIX}SHADER_ID`], quality: 'motion' }
   }
 
   const merged = { ...SETTINGS_DEFAULTS, ...fromEnv }

@@ -41,7 +41,7 @@
       '
       onclick={onundo}
     >
-      <Icon name='undo' size={14} />Undo
+      <Icon name='undo' size={14} />{notice.actionLabel ?? 'Undo'}
     </button>
   {/if}
   <IconButton
