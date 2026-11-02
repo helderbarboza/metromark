@@ -4,6 +4,7 @@ import { blackHole } from './black_hole'
 import { clouds } from './clouds'
 import { flow } from './flow'
 import { incense } from './incense'
+import { monterey } from './monterey'
 import { swissAlps } from './swiss_alps'
 
 export type { PassChannel, ShaderDefinition, ShaderPass, TextureSource } from './types'
@@ -13,6 +14,7 @@ export const shaders = {
   clouds,
   flow,
   incense,
+  monterey,
   swissAlps,
 } as const satisfies Record<string, ShaderDefinition>
 export type ShaderId = keyof typeof shaders
