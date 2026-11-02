@@ -13,7 +13,9 @@
   import Button from '$lib/components/Button.svelte'
   import ContextMenu from '$lib/components/ContextMenu.svelte'
   import Editor from '$lib/components/Editor.svelte'
+  import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
   import Icon from '$lib/components/Icon.svelte'
+  import IconButton from '$lib/components/IconButton.svelte'
   import MetroAppBar from '$lib/components/MetroAppBar.svelte'
   import MetroGroup from '$lib/components/MetroGroup.svelte'
   import RootsNav from '$lib/components/RootsNav.svelte'
@@ -160,6 +162,7 @@
       )
       : undefined,
   )
+  const settingsOpen = $derived(snapshot !== null && dialog?.kind === 'settings')
 
   function applySnapshot(value: Snapshot) {
     snapshot = value
@@ -624,8 +627,16 @@
     const input
       = event.target instanceof HTMLElement
         && ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
-    if (dialog || context || more)
+    if (context || more)
       return
+    if (dialog) {
+      // Settings is a non-modal drawer, so Escape is its keyboard close action.
+      if (dialog.kind === 'settings' && event.key === 'Escape') {
+        event.preventDefault()
+        dialog = null
+      }
+      return
+    }
     if (
       !input
       && (event.key === '/'
@@ -673,267 +684,324 @@
   aria-hidden='true'
 >
 </span>
-<div
-  class='relative flex h-dvh w-full flex-col overflow-hidden text-(--text)'
-  class:reduced={snapshot?.settings.reducedMotion}
-  style:background={backgroundColor}
->
-  {#if snapshot?.settings.background.type === 'shader'}
-    <Background
-      shader={getShader(snapshot.settings.background.shaderId ?? 'balatro')}
-      reducedMotion={snapshot.settings.reducedMotion}
-      color={snapshot.settings.background.auto === false
-        ? snapshot.settings.background.color
-        : undefined}
-      speed={snapshot.settings.background.speed ?? 1}
-      targetFps={snapshot.settings.background.targetFps ?? 60}
-      quality={snapshot.settings.background.quality ?? 'motion'}
-      opacity={snapshot.settings.background.opacity ?? 1}
-      mouseInteraction={snapshot.settings.background.mouseInteraction ?? true}
-      renderScale={snapshot.settings.background.renderScale ?? 0.5}
-      onstruggle={() => showNotice({ message: 'Animated background paused to keep this page fast.', actionLabel: 'Turn off' })}
-    />
-  {/if}
-
-  <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
-    <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
-      <RootsNav
-        {roots}
-        {rootFilter}
-        {bookmarkCount}
-        onSelect={selectRoot}
-      />
-    </div>
-  </header>
-
-  <!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
-  <main
-    id='canvas'
-    class='
-      relative min-h-0 flex-1 scrollbar-none overflow-auto scroll-smooth outline-none
-      [&::-webkit-scrollbar]:hidden
-    '
-    class:is-dragging={dragging}
-    bind:this={scroller}
-    onscroll={updateScroll}
-    onwheel={wheel}
-    onpointerdown={canvasPointerDown}
-    oncontextmenu={event => showContext(event, 'canvas', defaultFolder())}
-    aria-label='Bookmark tile canvas'
-    tabindex='-1'
+<div id='shell' class='flex h-full overflow-hidden'>
+  <div
+    class='relative flex h-dvh min-w-0 flex-1 flex-col overflow-hidden text-(--text)'
+    class:reduced={snapshot?.settings.reducedMotion}
+    style:background={backgroundColor}
   >
-    <div class='flex h-full flex-row items-center'>
-      {#if !snapshot}
-        <div
-          class='
-            flex size-full min-h-60 flex-col items-center justify-center text-center
-            text-(--muted)
-          '
-        >
-          {#if loadError}
-            <Icon name='lock' size={28} />
-            <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
-              Let's reconnect.
-            </h2>
-            <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
-            <button onclick={() => window.location.reload()}>
-              Reload page
-            </button>
-          {:else}
-            <span
-              class='
-                mb-5 size-6 animate-spin rounded-full border border-(--line)
-                border-t-(--accent)
-              '
-            >
-            </span>
-            <p class='mb-6 px-5 text-xs/relaxed'>
-              Finding your favorites…
-            </p>
-          {/if}
-        </div>
-      {:else if normalizedQuery && !visibleGroups.length}
-        <div class='flex size-full min-h-60 flex-col items-center justify-center border'>
-          <Icon name='searchBookmarks' size={33} />
-          <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
-            No favorites found.
-          </h2>
-          <p class='mb-6 px-5 text-xs/relaxed'>
-            Nothing matches “{query}”. Try a title, website, or folder.
-          </p>
-          <Button onclick={() => (query = '')}>Clear search</Button>
-        </div>
-      {:else}
-        <SnapGridGroup>
+    {#if snapshot?.settings.background.type === 'shader'}
+      <Background
+        shader={getShader(snapshot.settings.background.shaderId ?? 'balatro')}
+        reducedMotion={snapshot.settings.reducedMotion}
+        color={snapshot.settings.background.auto === false
+          ? snapshot.settings.background.color
+          : undefined}
+        speed={snapshot.settings.background.speed ?? 1}
+        targetFps={snapshot.settings.background.targetFps ?? 60}
+        quality={snapshot.settings.background.quality ?? 'motion'}
+        opacity={snapshot.settings.background.opacity ?? 1}
+        mouseInteraction={snapshot.settings.background.mouseInteraction ?? true}
+        renderScale={snapshot.settings.background.renderScale ?? 0.5}
+        onstruggle={() => showNotice({
+          message: 'Animated background paused to keep this page fast.',
+          actionLabel: 'Turn off',
+        })}
+      />
+    {/if}
+
+    <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
+      <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
+        <RootsNav
+          {roots}
+          {rootFilter}
+          {bookmarkCount}
+          onSelect={selectRoot}
+        />
+      </div>
+    </header>
+
+    <!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
+    <main
+      id='canvas'
+      class='
+        relative min-h-0 flex-1 scrollbar-none overflow-auto scroll-smooth outline-none
+        [&::-webkit-scrollbar]:hidden
+      '
+      class:is-dragging={dragging}
+      bind:this={scroller}
+      onscroll={updateScroll}
+      onwheel={wheel}
+      onpointerdown={canvasPointerDown}
+      oncontextmenu={event => showContext(event, 'canvas', defaultFolder())}
+      aria-label='Bookmark tile canvas'
+      tabindex='-1'
+    >
+      <div class='flex h-full flex-row items-center'>
+        {#if !snapshot}
           <div
             class='
-              flex h-fit w-max items-end gap-9 px-16
-              max-lg:gap-7 max-lg:px-9
-              max-md:px-6
+              flex size-full min-h-60 flex-col items-center justify-center text-center
+              text-(--muted)
             '
           >
-            {#each visibleGroups as group (group.id)}
-              <MetroGroup
-                {group}
-                layout={draftLayouts[group.id] ?? group.layout}
-                tiles={allTiles}
-                {cell}
-                draggable={!normalizedQuery}
-                {dragging}
-                {selectedId}
-                showDomains={snapshot.settings.showDomains}
-                preview={client.mode === 'preview'}
-                onLayoutChange={stageLayout}
-                onDragStart={() => {
-                  dragging = true
-                  // A tile on the way to another group must not keep the app bar (uwp8 p. 82).
-                  selectedId = null
-                  selectionOrigin = null
-                  // An in-flight smooth scroll would fight the drag and keep the canvas
-                  // moving under the pointer, so stop it and hold scrolling still.
-                  cancelSmoothScroll()
-                  if (scroller)
-                    scroller.style.scrollBehavior = 'auto'
-                }}
-                onDragStop={dragStop}
-                onSelect={selectByGesture}
-                onContext={contextFor}
-                onAdd={parentId => edit({ kind: 'bookmark', parentId })}
-                onBlocked={message => showNotice({ message, tone: 'error' })}
-              />
-            {/each}
-            {#if !normalizedQuery && defaultFolder()}<div class='flex w-48 shrink-0 justify-end'>
-              <button
+            {#if loadError}
+              <Icon name='lock' size={28} />
+              <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
+                Let's reconnect.
+              </h2>
+              <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
+              <button onclick={() => window.location.reload()}>
+                Reload page
+              </button>
+            {:else}
+              <span
                 class='
-                  relative flex w-full flex-col items-center justify-center border
-                  border-dashed border-(--line) bg-transparent text-(--muted)
-                  transition-colors duration-150
-                  hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)
+                  mb-5 size-6 animate-spin rounded-full border border-(--line)
+                  border-t-(--accent)
                 '
-                style:height='{cellsToPx(ROWS, cell)}px'
-                onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
               >
-                <span
+              </span>
+              <p class='mb-6 px-5 text-xs/relaxed'>
+                Finding your favorites…
+              </p>
+            {/if}
+          </div>
+        {:else if normalizedQuery && !visibleGroups.length}
+          <div class='flex size-full min-h-60 flex-col items-center justify-center border'>
+            <Icon name='searchBookmarks' size={33} />
+            <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
+              No favorites found.
+            </h2>
+            <p class='mb-6 px-5 text-xs/relaxed'>
+              Nothing matches “{query}”. Try a title, website, or folder.
+            </p>
+            <Button onclick={() => (query = '')}>Clear search</Button>
+          </div>
+        {:else}
+          <SnapGridGroup>
+            <div
+              class='
+                flex h-fit w-max items-end gap-9 px-16
+                max-lg:gap-7 max-lg:px-9
+                max-md:px-6
+              '
+            >
+              {#each visibleGroups as group (group.id)}
+                <MetroGroup
+                  {group}
+                  layout={draftLayouts[group.id] ?? group.layout}
+                  tiles={allTiles}
+                  {cell}
+                  draggable={!normalizedQuery}
+                  {dragging}
+                  {selectedId}
+                  showDomains={snapshot.settings.showDomains}
+                  preview={client.mode === 'preview'}
+                  onLayoutChange={stageLayout}
+                  onDragStart={() => {
+                    dragging = true
+                    // A tile on the way to another group must not keep the app bar (uwp8 p. 82).
+                    selectedId = null
+                    selectionOrigin = null
+                    // An in-flight smooth scroll would fight the drag and keep the canvas
+                  // moving under the pointer, so stop it and hold scrolling still.
+                    cancelSmoothScroll()
+                    if (scroller)
+                      scroller.style.scrollBehavior = 'auto'
+                  }}
+                  onDragStop={dragStop}
+                  onSelect={selectByGesture}
+                  onContext={contextFor}
+                  onAdd={parentId => edit({ kind: 'bookmark', parentId })}
+                  onBlocked={message => showNotice({ message, tone: 'error' })}
+                />
+              {/each}
+              {#if !normalizedQuery && defaultFolder()}<div class='flex w-48 shrink-0 justify-end'>
+                <button
                   class='
-                    mb-5 flex size-12 items-center justify-center rounded-full border
-                    border-(--line)
+                    relative flex w-full flex-col items-center justify-center border
+                    border-dashed border-(--line) bg-transparent text-(--muted)
+                    transition-colors duration-150
+                    hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)
+                  '
+                  style:height='{cellsToPx(ROWS, cell)}px'
+                  onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
+                >
+                  <span
+                    class='
+                      mb-5 flex size-12 items-center justify-center rounded-full border
+                      border-(--line)
+                    '
+                  >
+                    <Icon name='addFolder' size={23} />
+                  </span>
+                  <strong class='text-sm font-medium text-(--text)'>New group</strong>
+                  <span class='mt-2 text-xs'>Create a bookmark folder</span>
+                </button>
+              </div>
+              {/if}
+              {#if !visibleGroups.length && !normalizedQuery}
+                <div
+                  class='
+                    flex size-full min-h-60 flex-col items-center justify-center
+                    text-center text-(--muted)
                   '
                 >
-                  <Icon name='addFolder' size={23} />
-                </span>
-                <strong class='text-sm font-medium text-(--text)'>New group</strong>
-                <span class='mt-2 text-xs'>Create a bookmark folder</span>
-              </button>
+                  <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
+                    No bookmark folders available.
+                  </h2>
+                  <p class='mb-6 px-5 text-xs/relaxed'>
+                    Create a writable browser bookmark folder to get started.
+                  </p>
+                </div>{/if}
             </div>
-            {/if}
-            {#if !visibleGroups.length && !normalizedQuery}
-              <div
-                class='
-                  flex size-full min-h-60 flex-col items-center justify-center text-center
-                  text-(--muted)
-                '
-              >
-                <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
-                  No bookmark folders available.
-                </h2>
-                <p class='mb-6 px-5 text-xs/relaxed'>
-                  Create a writable browser bookmark folder to get started.
-                </p>
-              </div>{/if}
-          </div>
-        </SnapGridGroup>
-      {/if}
-    </div>
-  </main>
+          </SnapGridGroup>
+        {/if}
+      </div>
+    </main>
 
-  <WorkspaceFooter
-    bind:query
-    bind:searchInput
-    {bookmarkCount}
-    {folderCount}
-    {visibleGroups}
-    {activeGroup}
-    {canScroll}
-    {scrollProgress}
-    preview={client.mode === 'preview'}
-    {busy}
-    onSearch={handleSearch}
-    onJump={jump}
-    onScroll={scroll}
-  />
-  {#if selectedTile && !dragging}
-    <MetroAppBar
-      title={selectedTile.title}
-      size={selectedTile.size}
-      writable={selectedTile.writable}
-      {focusRequest}
-      onresize={size => resizeTile(selectedTile.id, size)}
-      onedit={() => edit({ kind: 'bookmark', id: selectedTile.id })}
-      onmove={() => edit({ kind: 'move', id: selectedTile.id })}
-      onmore={openMore}
-      ondelete={() => {
-        void execute({ type: 'node.remove', id: selectedTile.id })
-      }}
-      onclear={clearSelection}
+    <WorkspaceFooter
+      bind:query
+      bind:searchInput
+      {bookmarkCount}
+      {folderCount}
+      {visibleGroups}
+      {activeGroup}
+      {canScroll}
+      {scrollProgress}
+      preview={client.mode === 'preview'}
+      {busy}
+      onSearch={handleSearch}
+      onJump={jump}
+      onScroll={scroll}
     />
-  {/if}
-  {#if more && selectedTile}
-    <ContextMenu
-      x={more.x}
-      y={more.y}
-      title={selectedTile.title}
-      subtitle={selectedTile.domain}
-      items={appBarMenuItems}
-      onclose={closeMore}
-    />
-  {/if}
-  {#if context}
-    <ContextMenu
-      x={context.x}
-      y={context.y}
-      title={contextTile?.title
-        ?? (context.target === 'group'
-          ? nodes.get(context.id)?.title
-          : 'Your canvas')}
-      subtitle={contextTile?.domain}
-      items={menuItems}
-      onclose={closeContext}
-      size={contextTile?.size}
-      onresize={contextTile
-        ? (size) => {
-          if (contextTile)
-            resizeTile(contextTile.id, size)
-        }
-        : undefined}
-    />
-  {/if}
-  {#if dialog && snapshot}
-    {#key JSON.stringify(dialog)}
-      <Editor
-        spec={dialog}
-        {snapshot}
-        oncommand={execute}
-        onclose={() => (dialog = null)}
-        onresetpreview={client.resetPreview
-          ? async () => {
-            applySnapshot(await client.resetPreview!())
-            showNotice({ message: 'Sample bookmarks restored.' })
+    {#if selectedTile && !dragging}
+      <MetroAppBar
+        title={selectedTile.title}
+        size={selectedTile.size}
+        writable={selectedTile.writable}
+        {focusRequest}
+        onresize={size => resizeTile(selectedTile.id, size)}
+        onedit={() => edit({ kind: 'bookmark', id: selectedTile.id })}
+        onmove={() => edit({ kind: 'move', id: selectedTile.id })}
+        onmore={openMore}
+        ondelete={() => {
+          void execute({ type: 'node.remove', id: selectedTile.id })
+        }}
+        onclear={clearSelection}
+      />
+    {/if}
+    {#if more && selectedTile}
+      <ContextMenu
+        x={more.x}
+        y={more.y}
+        title={selectedTile.title}
+        subtitle={selectedTile.domain}
+        items={appBarMenuItems}
+        onclose={closeMore}
+      />
+    {/if}
+    {#if context}
+      <ContextMenu
+        x={context.x}
+        y={context.y}
+        title={contextTile?.title
+          ?? (context.target === 'group'
+            ? nodes.get(context.id)?.title
+            : 'Your canvas')}
+        subtitle={contextTile?.domain}
+        items={menuItems}
+        onclose={closeContext}
+        size={contextTile?.size}
+        onresize={contextTile
+          ? (size) => {
+            if (contextTile)
+              resizeTile(contextTile.id, size)
           }
           : undefined}
       />
-    {/key}
-  {/if}
-  {#if notice}
-    <UndoToast
-      {notice}
-      onundo={undo
-        ? () => performUndo(undo.id)
-        : notice.actionLabel
-        ? () => { void execute({ type: 'settings.update', patch: { background: { ...BACKGROUND_DEFAULTS.color } } }) }
-        : undefined}
-      onclose={() => (notice = null)}
-    />
-  {/if}
+    {/if}
+    {#if dialog && snapshot && dialog.kind !== 'settings'}
+      {#key JSON.stringify(dialog)}
+        <Editor
+          spec={dialog}
+          {snapshot}
+          oncommand={execute}
+          onclose={() => (dialog = null)}
+        />
+      {/key}
+    {/if}
+    {#if notice}
+      <UndoToast
+        {notice}
+        onundo={undo
+          ? () => performUndo(undo.id)
+          : notice.actionLabel
+          ? () => {
+            void execute({
+              type: 'settings.update',
+              patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+            })
+          }
+          : undefined}
+        onclose={() => (notice = null)}
+      />
+    {/if}
+  </div>
+  <aside
+    class={[
+      `flex h-dvh w-(--settings-width) shrink-0 flex-col overflow-hidden
+      border-l border-(--line) bg-(--surface) text-(--text) shadow-(--shadow)
+      transition-[margin-right,opacity] duration-300 ease
+      will-change-[margin-right,opacity] motion-reduce:transition-none`,
+      !settingsOpen && '-mr-(--settings-width) opacity-0 pointer-events-none',
+    ].filter(Boolean).join(' ')}
+    style='--settings-width: min(410px, calc(100vw - 24px))'
+    aria-label='Settings'
+    aria-hidden={!settingsOpen}
+    inert={!settingsOpen}
+  >
+    {#if snapshot}
+
+      <header
+        class='
+          flex shrink-0 items-start justify-between gap-2.5 border-b border-(--line)
+          px-7.5 pt-7.25 pb-5
+        '
+      >
+        <div>
+          <div class='mb-2 text-[8px] tracking-[1.7px] text-(--muted)'>
+            MAKE YOURSELF AT HOME
+          </div>
+          <h2 class='m-0 text-[26px] font-[450] tracking-[-1px]'>
+            Settings
+          </h2>
+        </div>
+        <IconButton
+          class='-mr-1.75'
+          label='Close settings'
+          onclick={() => (dialog = null)}
+        >
+          <Icon name='close' size={18} />
+        </IconButton>
+      </header>
+      <div class='min-h-0 flex-1 overflow-auto px-7.5 pt-6.5 pb-7.5 max-[480px]:p-6'>
+        <SettingsDialog
+          settings={snapshot.settings}
+          oncommand={execute}
+          onclose={() => (dialog = null)}
+          onresetpreview={client.resetPreview
+            ? async () => {
+              applySnapshot(await client.resetPreview!())
+              showNotice({ message: 'Sample bookmarks restored.' })
+            }
+            : undefined}
+        />
+      </div>
+    {/if}
+  </aside>
+
 </div>
 
 <style>

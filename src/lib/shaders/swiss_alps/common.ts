@@ -64,15 +64,15 @@ export const COMMON = `
 // 4 x 4 Bayer matrix
 const int bayerFilter[BAYER_LIMIT] = int[]
 (
-	 0,  8,  2, 10,
-	12,  4, 14,  6,
-	 3, 11,  1,  9,
-	15,  7, 13,  5
+     0,  8,  2, 10,
+    12,  4, 14,  6,
+     3, 11,  1,  9,
+    15,  7, 13,  5
 );
 
 struct Ray
 {
-	vec3 origin, direction;   
+    vec3 origin, direction;   
 };
     
 //-------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ float remap(float x, float a, float b, float c, float d)
 
 float remap01(float x, float a, float b)
 {
-	return ((x - a) / (b - a));   
+    return ((x - a) / (b - a));   
 }
 
 bool writeToPixel(vec2 fragCoord, int iFrame)
@@ -95,7 +95,7 @@ bool writeToPixel(vec2 fragCoord, int iFrame)
     int index = iFrame % BAYER_LIMIT;
     return (((iFragCoord.x + BAYER_LIMIT_H * iFragCoord.y) % BAYER_LIMIT)
             == bayerFilter[index]);
-		
+        
 }
 
 //-------------------------------------------------------------------------------------
@@ -160,7 +160,7 @@ vec3 getSun(vec2 mouse, float iTime)
 //-------------------------------------------------------------------------------------
 
 /** Slightly modified version of robobo1221's fake atmospheric scattering
- 	(https://www.shadertoy.com/view/4tVSRt)
+     (https://www.shadertoy.com/view/4tVSRt)
 */
 vec3 miePhase(float dist, vec3 sunL)
 {
@@ -171,24 +171,24 @@ vec3 atmosphericScattering(vec2 uv, vec2 sunPos, bool isSun)
 {
     
     float sunDistance = distance(uv, sunPos);
-	float scatterMult = SAT(sunDistance);
-	float dist = uv.y;
-	dist = (.5 * mix(scatterMult, 1., dist)) / dist;
+    float scatterMult = SAT(sunDistance);
+    float dist = uv.y;
+    dist = (.5 * mix(scatterMult, 1., dist)) / dist;
     vec3 mieScatter = miePhase(sunDistance, vec3(1.)) * SUN_COLOR;
-	vec3 color = dist * SKY_COLOR;
+    vec3 color = dist * SKY_COLOR;
     color = max(color, 0.);
     vec3 sun = .0002 / pow(length(uv-sunPos), 1.7) * SUN_COLOR;
     
-	color = max(mix(pow(color, .8 - color),
-	color / (2. * color + .5 - color * 1.3),
-	SAT(sunPos.y * 2.5)), 0.)
-	+ (isSun ? (sun + mieScatter) : vec3(0.));
+    color = max(mix(pow(color, .8 - color),
+    color / (2. * color + .5 - color * 1.3),
+    SAT(sunPos.y * 2.5)), 0.)
+    + (isSun ? (sun + mieScatter) : vec3(0.));
     
-	color *=  (pow(1. - scatterMult, 5.) * 10. * SAT(.666 - sunPos.y)) + 1.5;
-	float underscatter = distance(sunPos.y, 1.);
-	color = mix(color, vec3(0.), SAT(underscatter));
-	
-	return color;	
+    color *=  (pow(1. - scatterMult, 5.) * 10. * SAT(.666 - sunPos.y)) + 1.5;
+    float underscatter = distance(sunPos.y, 1.);
+    color = mix(color, vec3(0.), SAT(underscatter));
+    
+    return color;    
 }
 
 //-------------------------------------------------------------------------------------
@@ -204,24 +204,24 @@ vec3 atmosphericScattering(vec2 uv, vec2 sunPos, bool isSun)
 
 vec3 hash33(vec3 p)
 {
-	uvec3 q = uvec3(ivec3(p)) * UI3;
-	q = (q.x ^ q.y ^ q.z)*UI3;
-	return -1. + 2. * vec3(q) * UIF;
+    uvec3 q = uvec3(ivec3(p)) * UI3;
+    q = (q.x ^ q.y ^ q.z)*UI3;
+    return -1. + 2. * vec3(q) * UIF;
 }
 
 float hash13(vec3 p)
 {
-	uvec3 q = uvec3(ivec3(p)) * UI3;
-	q *= UI3;
-	uint n = (q.x ^ q.y ^ q.z) * UI0;
-	return float(n) * UIF;
+    uvec3 q = uvec3(ivec3(p)) * UI3;
+    q *= UI3;
+    uint n = (q.x ^ q.y ^ q.z) * UI0;
+    return float(n) * UIF;
 }
 
 float hash12(vec2 p)
 {
-	uvec2 q = uvec2(ivec2(p)) * UI2;
-	uint n = (q.x ^ q.y) * UI0;
-	return float(n) * UIF;
+    uvec2 q = uvec2(ivec2(p)) * UI2;
+    uint n = (q.x ^ q.y) * UI0;
+    return float(n) * UIF;
 }
 
 //-------------------------------------------------------------------------------------
@@ -238,20 +238,20 @@ vec3 valueNoiseDerivative(vec2 x, sampler2D smp)
     // texel fetch version
     ivec2 p = ivec2(floor(x));
     float a = texelFetch(smp, (p + ivec2(0, 0)) & 255, 0).x;
-	float b = texelFetch(smp, (p + ivec2(1, 0)) & 255, 0).x;
-	float c = texelFetch(smp, (p + ivec2(0, 1)) & 255, 0).x;
-	float d = texelFetch(smp, (p + ivec2(1, 1)) & 255, 0).x;
+    float b = texelFetch(smp, (p + ivec2(1, 0)) & 255, 0).x;
+    float c = texelFetch(smp, (p + ivec2(0, 1)) & 255, 0).x;
+    float d = texelFetch(smp, (p + ivec2(1, 1)) & 255, 0).x;
 #else    
     // texture version    
     vec2 p = floor(x);
-	float a = textureLod(smp, (p + vec2(.5, .5)) / 256., 0.).x;
-	float b = textureLod(smp, (p + vec2(1.5, .5)) / 256., 0.).x;
-	float c = textureLod(smp, (p + vec2(.5, 1.5)) / 256., 0.).x;
-	float d = textureLod(smp, (p + vec2(1.5, 1.5)) / 256., 0.).x;
+    float a = textureLod(smp, (p + vec2(.5, .5)) / 256., 0.).x;
+    float b = textureLod(smp, (p + vec2(1.5, .5)) / 256., 0.).x;
+    float c = textureLod(smp, (p + vec2(.5, 1.5)) / 256., 0.).x;
+    float d = textureLod(smp, (p + vec2(1.5, 1.5)) / 256., 0.).x;
 #endif
     
-	return vec3(a + (b - a) * u.x + (c - a) * u.y + (a - b - c + d) * u.x * u.y,
-				6. * f * (1. - f) * (vec2(b - a, c - a) + (a - b - c + d) * u.yx));
+    return vec3(a + (b - a) * u.x + (c - a) * u.y + (a - b - c + d) * u.x * u.y,
+                6. * f * (1. - f) * (vec2(b - a, c - a) + (a - b - c + d) * u.yx));
 }
 
 float valueNoise(vec3 x, float freq)
@@ -259,7 +259,7 @@ float valueNoise(vec3 x, float freq)
     vec3 i = floor(x);
     vec3 f = fract(x);
     f = f * f * (3. - 2. * f);
-	
+    
     return mix(mix(mix(hash13(mod(i + vec3(0, 0, 0), freq)),  
                        hash13(mod(i + vec3(1, 0, 0), freq)), f.x),
                    mix(hash13(mod(i + vec3(0, 1, 0), freq)),  
@@ -287,11 +287,11 @@ float worleyNoise(vec3 uv, float freq, bool tileable)
                 vec3 h = vec3(0.);
                 if (tileable)
                     h = hash33(mod(id + offset, vec3(freq))) * .4 + .3; // [.3, .7]
-				else
+                else
                     h = hash33(id + offset) * .4 + .3; // [.3, .7]
-    			h += offset;
-            	vec3 d = p - h;
-           		minDist = min(minDist, dot(d, d));
+                h += offset;
+                vec3 d = p - h;
+                   minDist = min(minDist, dot(d, d));
             }
         }
     }
@@ -321,8 +321,8 @@ float perlinFbm(vec3 p, float freq, int octaves)
 float worleyFbm(vec3 p, float freq, bool tileable)
 {
     float fbm = worleyNoise(p * freq, freq, tileable) * .625 +
-        	 	worleyNoise(p * freq * 2., freq * 2., tileable) * .25 +
-        	 	worleyNoise(p * freq * 4., freq * 4., tileable) * .125;
+                 worleyNoise(p * freq * 2., freq * 2., tileable) * .25 +
+                 worleyNoise(p * freq * 4., freq * 4., tileable) * .125;
     return max(0., fbm * 1.1 - .1);
 }
 `

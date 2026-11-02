@@ -9,7 +9,6 @@ export interface DialogSpec {
     | 'move'
     | 'delete'
     | 'appearance'
-    | 'settings'
     | 'restore'
     | 'copy'
   id?: string
@@ -31,8 +30,6 @@ export function dialogTitle(spec: DialogSpec, node?: BookmarkNode): string {
       return 'Delete this folder?'
     case 'appearance':
       return 'Make it your own'
-    case 'settings':
-      return 'Your kind of Start'
     case 'restore':
       return 'Restore to a folder'
     case 'copy':
@@ -41,8 +38,6 @@ export function dialogTitle(spec: DialogSpec, node?: BookmarkNode): string {
 }
 
 export function dialogEyebrow(spec: DialogSpec): string {
-  if (spec.kind === 'settings')
-    return 'MAKE YOURSELF AT HOME'
   if (spec.kind === 'delete')
     return 'DESTRUCTIVE ACTION'
   return 'YOUR BOOKMARKS'

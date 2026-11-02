@@ -44,7 +44,7 @@
   class={[
     'p-0 border border-(--line) bg-(--surface) text-(--text) shadow-(--shadow) overflow-auto',
     'backdrop:bg-black/40 backdrop:backdrop-blur-[1px]',
-    drawer && 'fixed top-[12px] right-[12px] bottom-[12px] left-auto m-0',
+    drawer && 'fixed top-3 right-3 bottom-3 left-auto m-0',
     drawer && 'w-[min(410px,calc(100vw-24px))] h-[calc(100vh-24px)] max-h-none rounded-[7px]',
     !drawer && 'w-[min(480px,calc(100vw-32px))] max-h-[calc(100vh-48px)] m-auto rounded-[9px]',
   ].filter(Boolean).join(' ')}

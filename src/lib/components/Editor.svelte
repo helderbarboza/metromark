@@ -8,7 +8,6 @@
   import DestinationDialog from '$lib/components/editor/DestinationDialog.svelte'
   import { dialogEyebrow, dialogTitle } from '$lib/components/editor/dialog-spec'
   import FolderDialog from '$lib/components/editor/FolderDialog.svelte'
-  import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
   import Modal from '$lib/components/Modal.svelte'
   import { indexTree } from '$lib/tree'
 
@@ -17,32 +16,22 @@
     snapshot: Snapshot
     oncommand: (command: Command) => Promise<boolean>
     onclose: () => void
-    onresetpreview?: () => Promise<void>
   }
 
-  const { spec, snapshot, oncommand, onclose, onresetpreview }: Props = $props()
+  const { spec, snapshot, oncommand, onclose }: Props = $props()
 
   const nodes = $derived(indexTree(snapshot.tree))
   const node = $derived(spec.id ? nodes.get(spec.id) : undefined)
   const title = $derived(dialogTitle(spec, node))
   const eyebrow = $derived(dialogEyebrow(spec))
-  const drawer = $derived(spec.kind === 'settings')
 
 </script>
 <Modal
   {title}
   {eyebrow}
-  {drawer}
   {onclose}
 >
-  {#if spec.kind === 'settings'}
-    <SettingsDialog
-      settings={snapshot.settings}
-      {oncommand}
-      {onclose}
-      {onresetpreview}
-    />
-  {:else if spec.kind === 'delete'}
+  {#if spec.kind === 'delete'}
     {#if node}
       <DeleteDialog
         {node}

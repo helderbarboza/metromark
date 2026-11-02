@@ -1,6 +1,6 @@
 import type { ShaderDefinition } from '../types'
 import { VERTEX_SHADER } from '../vertex'
-import { PRELUDE, EPILOGUE } from './adapter'
+import { EPILOGUE, PRELUDE } from './adapter'
 import { BUFFER_A } from './buffer-a'
 import { BUFFER_B } from './buffer-b'
 import { BUFFER_C } from './buffer-c'

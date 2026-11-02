@@ -24,7 +24,7 @@ export const IMAGE = `
 
 const float kernel[9] = float[]
 (
-	.0625, .125, .0625,
+    .0625, .125, .0625,
     .125,  .25,  .125,
     .0625, .125, .0625  
 );
@@ -33,15 +33,15 @@ vec4 gaussianBlur(sampler2D buffer, vec2 uv)
 {
     vec4 col = vec4(0.);
     
- 	vec2 offsets[9] = vec2[](
+     vec2 offsets[9] = vec2[](
         vec2(-texelOffset.x,  texelOffset.y),  // top-left
-        vec2( 			0.,   texelOffset.y),  // top-center
+        vec2(             0.,   texelOffset.y),  // top-center
         vec2( texelOffset.x,  texelOffset.y),  // top-right
-        vec2(-texelOffset.x,  			 0.),  // center-left
-        vec2( 			0.,			 	 0.),  // center-center
-        vec2( texelOffset.x,  	 		 0.),  // center-right
+        vec2(-texelOffset.x,               0.),  // center-left
+        vec2(             0.,                  0.),  // center-center
+        vec2( texelOffset.x,                0.),  // center-right
         vec2(-texelOffset.x,  -texelOffset.y), // bottom-left
-        vec2( 			0.,   -texelOffset.y), // bottom-center
+        vec2(             0.,   -texelOffset.y), // bottom-center
         vec2( texelOffset.x,  -texelOffset.y)  // bottom-right    
     );
     
@@ -57,7 +57,7 @@ vec4 gaussianBlur(sampler2D buffer, vec2 uv)
 // Lens Flare (from shadertoy.com/view/XdfXRX)
 //-------------------------------------------------------------------------------------
 
-#define ORB_FLARE_COUNT	8
+#define ORB_FLARE_COUNT    8
 #define DISTORTION_BARREL 1.3
 
 vec2 GetDistOffset(vec2 uv, vec2 pxoffset)
@@ -80,9 +80,9 @@ vec3 flare(vec2 uv, vec2 pos, float dist, float size)
     
     float r = max(.01 - pow(length(uv + (dist - .05)*pos), 2.4) 
                   *(1. / (size * 2.)), 0.) * 6.0;
-	float g = max(.01 - pow(length(uv +  dist       *pos), 2.4) 
+    float g = max(.01 - pow(length(uv +  dist       *pos), 2.4) 
                   *(1. / (size * 2.)), 0.) * 6.0;
-	float b = max(.01 - pow(length(uv + (dist + .05)*pos), 2.4) 
+    float b = max(.01 - pow(length(uv + (dist + .05)*pos), 2.4) 
                   *(1. / (size * 2.)), 0.) * 6.0;
     
     return vec3(r, g, b);
@@ -93,18 +93,18 @@ vec3 ring(vec2 uv, vec2 pos, float dist)
     vec2 uvd = uv*(length(uv));
     
     float r = max(1. / (1. + 32. * pow(length(uvd + (dist - .05)
-				  * pos), 2.)), 0.) * .25;
-	float g = max(1. / (1. + 32. * pow(length(uvd +  dist       
-				  * pos), 2.)), 0.) * .23;
-	float b = max(1. / (1. + 32. * pow(length(uvd + (dist + .05)
-				  * pos), 2.)), 0.) * .21;
+                  * pos), 2.)), 0.) * .25;
+    float g = max(1. / (1. + 32. * pow(length(uvd +  dist       
+                  * pos), 2.)), 0.) * .23;
+    float b = max(1. / (1. + 32. * pow(length(uvd + (dist + .05)
+                  * pos), 2.)), 0.) * .21;
     
     return vec3(r,g,b);
 }
 
 vec3 lensflare(vec2 uv,vec2 pos, float brightness, float size)
 {
-	
+    
     vec3 c = flare(uv, pos, -1., size) * 3.;
     c += flare(uv, pos, .5, .8 * size) * 2.;
     c += flare(uv, pos, -.4, .8 * size);
@@ -138,7 +138,7 @@ vec3 lightScattering(vec2 uv, vec2 lightPos, vec3 sun)
     {
         st -= deltauv;
         float lightStep = textureLod(iChannel1, st, 0.).a
-            		* smoothstep(2.5, -1., length(uv-sun.xy));
+                    * smoothstep(2.5, -1., length(uv-sun.xy));
 
         lightStep *= illuminationDecay * WEIGHT;
 
@@ -156,10 +156,10 @@ vec3 lightScattering(vec2 uv, vec2 lightPos, vec3 sun)
 
 vec3 luminanceReinhard(vec3 color)
 {
-	float lum = dot(color, vec3(.2126, .7152, .0722));
-	float toneMappedLum = lum / (1. + lum);
-	color *= toneMappedLum / lum;
-	return color;
+    float lum = dot(color, vec3(.2126, .7152, .0722));
+    float toneMappedLum = lum / (1. + lum);
+    color *= toneMappedLum / lum;
+    return color;
 }
 
 //-------------------------------------------------------------------------------------
@@ -171,7 +171,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec2 mouse = (2. * iMouse.xy - iResolution.xy) / iResolution.y;
     vec3 sun = getSun(mouse, iTime);
 
-	vec4 terrain = textureLod(iChannel0, vec2(st.x, st.y - 1. / iResolution.y), 0.);
+    vec4 terrain = textureLod(iChannel0, vec2(st.x, st.y - 1. / iResolution.y), 0.);
     vec4 clouds = gaussianBlur(iChannel1, st);
     float cloudsAlphaMask = clouds.a + (terrain.a > CAMERA_FAR ? 0. : 1.);
     
@@ -181,7 +181,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec3 col = vec3(0.);
     col = vec3(clouds.rgb + terrain.rgb * cloudsAlphaMask);
     col += lightScattering(st, lightPosScreenSpace, sun) * smoothstep(.01, .16, sun.z)
-        		* smoothstep(.3, 1.5, terrain.a);
+                * smoothstep(.3, 1.5, terrain.a);
     col += lensflare(uv, sun.xy, .8, 4.) * vec3(1.4, 1.2, 1.) * lensflareMask;
     col = mix(col, pow(luminanceReinhard(col), vec3(.4545)), .75);
     col += hash12(fragCoord) * .004;

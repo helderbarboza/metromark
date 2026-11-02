@@ -11,6 +11,7 @@
     solveQuality,
   } from '$lib/shaders/quality'
   import { untrack } from 'svelte'
+  import { SvelteMap, SvelteSet } from 'svelte/reactivity'
 
   interface Props {
     reducedMotion?: boolean
@@ -68,8 +69,8 @@
    */
   function localTimeOfDay(): number {
     const now = new Date()
-    const seconds
-      = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds() + now.getMilliseconds() / 1000
+    const seconds = now.getHours()
+      * 3600 + now.getMinutes() * 60 + now.getSeconds() + now.getMilliseconds() / 1000
     return seconds / 86400
   }
 
@@ -125,10 +126,13 @@
   function getContext(element: HTMLCanvasElement): Context | null {
     if (PREFER_WEBGL2) {
       const webgl2 = element.getContext('webgl2', CONTEXT_ATTRIBUTES)
-      // WebGL2 is a superset for everything used here; the cast keeps a single
-      // code path instead of an overload-checked union at every call site.
+      // WebGL2 is a superset for everything used here, and its type is assignable
+      // to `WebGLRenderingContext`, so both contexts share a single code path.
+      // Do not gate this on `instanceof WebGLRenderingContext`: the WebGL2 context
+      // is a sibling interface, not a subclass, so that check always fails and the
+      // canvas is already bound, leaving the WebGL1 fallback with a null context.
       if (webgl2)
-        return { gl: webgl2 as unknown as WebGLRenderingContext, webgl2: true }
+        return { gl: webgl2, webgl2: true }
     }
     const gl = element.getContext('webgl', CONTEXT_ATTRIBUTES)
     return gl ? { gl, webgl2: false } : null
@@ -148,7 +152,9 @@
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
       const info = gl.getShaderInfoLog(shader)
       gl.deleteShader(shader)
-      throw new Error(`Unable to compile the background ${label} shader: ${info ?? 'unknown error'}`)
+      throw new Error(
+        `Unable to compile the ${label} shader: ${info ?? 'unknown error'}`,
+      )
     }
     return shader
   }
@@ -389,20 +395,20 @@
 
     try {
       if ((definition.glslVersion ?? 100) >= 300 && !webgl2) {
-        throw new Error(
-          `The "${definition.id}" shader is written in GLSL ES 3.00, which needs a `
-          + 'WebGL2 context; this browser fell back to WebGL1.',
-        )
+        throw new Error([
+          `The "${definition.id}" shader is written in GLSL ES 3.00, which needs a `,
+          'WebGL2 context; this browser fell back to WebGL1.',
+        ].join(''))
       }
 
       const passDefinitions = resolvePasses(definition)
       const multiPass = passDefinitions.length > 1
       const format = multiPass ? probeTargetFormat(gl) : null
       if (multiPass && !format) {
-        throw new Error(
-          'Multipass shaders need a filterable float colour attachment; this context '
-          + 'offers neither RGBA16F nor RGBA32F (WebGL2 with EXT_color_buffer_float).',
-        )
+        throw new Error([
+          'Multipass shaders need a filterable float colour attachment; this context ',
+          'offers neither RGBA16F nor RGBA32F (WebGL2 with EXT_color_buffer_float).',
+        ].join(''))
       }
 
       const quadBuffer = gl.createBuffer()
@@ -413,7 +419,7 @@
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW)
 
       const passes: PassRuntime[] = []
-      const buffers = new Map<string, BufferTargets>()
+      const buffers = new SvelteMap<string, BufferTargets>()
       const disposeBuffers = () => {
         for (const buffer of buffers.values()) {
           destroyTarget(gl, buffer.targets[0])
@@ -433,7 +439,12 @@
         }
       }
 
-      const allocateBuffer = (id: string, pass: ShaderPass, size: { width: number, height: number }, screenSized: boolean) => {
+      const allocateBuffer = (
+        id: string,
+        pass: ShaderPass,
+        size: { width: number, height: number },
+        screenSized: boolean,
+      ) => {
         const wrap = pass.wrap ?? 'clamp'
         const targets: [RenderTarget, RenderTarget] = [
           createTarget(gl, size.width, size.height, wrap, format ?? 'half'),
@@ -474,7 +485,12 @@
         const isFinal = index === passDefinitions.length - 1
         let buffer: BufferTargets | null = null
         if (!isFinal) {
-          allocateBuffer(passDefinition.id, passDefinition, passDefinition.size ?? canvasSize, !passDefinition.size)
+          allocateBuffer(
+            passDefinition.id,
+            passDefinition,
+            passDefinition.size ?? canvasSize,
+            !passDefinition.size,
+          )
           buffer = buffers.get(passDefinition.id) ?? null
         }
 
@@ -500,7 +516,8 @@
       // Keyed by edge length: a shader may hard-code the texel count it samples
       // (Swiss Alps' blue noise is 1024 square), so one shared 256 texture is not
       // always the right fallback.
-      const noiseTextures = new Map<number, WebGLTexture>()
+      const noiseTextures = new SvelteMap<number, WebGLTexture>()
+      const imageEntries = new SvelteMap<string, ImageEntry>()
       const getNoiseTexture = (size: number = NOISE_SIZE) => {
         let texture = noiseTextures.get(size)
         if (!texture) {
@@ -509,6 +526,8 @@
         }
         return texture
       }
+
+      let disposed = false
       disposers.push(() => {
         disposed = true
         for (const texture of noiseTextures.values())
@@ -536,8 +555,9 @@
         height: number
         failed: boolean
       }
-      let disposed = false
-      const imageEntries = new Map<string, ImageEntry>()
+
+      // Tracked before the first render; updated by the render loop every frame.
+      let renderedTime = 0
 
       const loadImage = (url: string, wrap: 'clamp' | 'repeat', flipY: boolean): ImageEntry => {
         // Wrap mode and flip are upload-time properties, so they are part of the
@@ -591,7 +611,9 @@
         }
         image.onerror = () => {
           entry.failed = true
-          console.error(`[Background] Unable to load the shader texture "${url}"; using the generated noise.`)
+          console.error(
+            `[Background] Unable to load the shader texture "${url}"; using the generated noise.`,
+          )
         }
         image.src = url
         return entry
@@ -633,7 +655,6 @@
       let lastTime = 0
       let lastRender = 0
       let staticRendered = false
-      let renderedTime = 0
       let frameCount = 0
       let pointerX = 0
       let pointerY = 0
@@ -655,7 +676,7 @@
       // even if the clock ticks halfway through the pipeline.
       let timeOfDay = localTimeOfDay()
       const channelResolution = new Float32Array(MAX_CHANNELS * 3)
-      const warnedChannels = new Set<string>()
+      const warnedChannels = new SvelteSet<string>()
 
       const drawPass = (pass: PassRuntime, time: number) => {
         const target = pass.buffer ? pass.buffer.targets[pass.buffer.latest === 0 ? 1 : 0] : null
@@ -680,10 +701,12 @@
             const key = `${definition.id}/${pass.definition.id}/${i}`
             if (!warnedChannels.has(key)) {
               warnedChannels.add(key)
-              console.warn(
-                `[Background] The "${definition.id}" shader samples iChannel${i}, but no texture is bound to it. `
-                + 'The GPU reads an incomplete texture, which samples as black; declare a channel source in the shader definition.',
-              )
+              console.warn([
+                `[Background] The "${definition.id}" shader samples iChannel${i}, `,
+                'but no texture is bound to it. ',
+                'The GPU reads an incomplete texture, which samples as black; ',
+                'declare a channel source in the shader definition.',
+              ].join(''))
             }
           }
           gl.activeTexture(gl.TEXTURE0 + i)
@@ -732,7 +755,7 @@
         }
       }
 
-      const renderFrame = (time: number) => {
+      function renderFrame(time: number) {
         renderedTime = time
         timeOfDay = localTimeOfDay()
         frameCount++
@@ -986,7 +1009,17 @@
     }
 
     try {
-      const dispose = startShader(context.gl, context.webgl2, element, definition, paused, scale, quality, mouseState, onstruggle)
+      const dispose = startShader(
+        context.gl,
+        context.webgl2,
+        element,
+        definition,
+        paused,
+        scale,
+        quality,
+        mouseState,
+        onstruggle,
+      )
       return () => {
         dispose()
         publishMetrics(null)

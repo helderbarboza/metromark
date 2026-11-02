@@ -45,10 +45,6 @@
   const isPreview = $derived(typeof onresetpreview === 'function')
 </script>
 
-<p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
-  A familiar feeling. A space that's entirely yours.
-</p>
-
 <div class='mb-7.25'>
   <h3 class='mb-3.25 text-[11px] font-[550]'>Mode</h3>
   <div class='mb-2.25 flex rounded-sm border border-(--line) p-0.75'>

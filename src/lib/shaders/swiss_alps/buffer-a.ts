@@ -24,14 +24,14 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         col.r = abs(col.r * 2. - 1.);
         col.r = remap(col.r,  worleyFbm(vec3(uv, .2), 4., true) - 1., 1., 0., 1.);
         col.g += worleyFbm(vec3(uv, .5), 8., true) * .625 + 
-            	 worleyFbm(vec3(uv, .5), 16., true) * .25  +
-            	 worleyFbm(vec3(uv, .5), 32., true) * .125;
+                 worleyFbm(vec3(uv, .5), 16., true) * .25  +
+                 worleyFbm(vec3(uv, .5), 32., true) * .125;
         col.b = 1. - col.g;
         fragColor = col;
     }
     else
     {
-		fragColor = texelFetch(iChannel0, ivec2(fragCoord), 0);   
+        fragColor = texelFetch(iChannel0, ivec2(fragCoord), 0);   
     }
 }
 `

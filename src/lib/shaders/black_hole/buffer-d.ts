@@ -3,7 +3,7 @@ export const BUFFER_D = `
 
 vec3 ColorFetch(vec2 coord)
 {
- 	return texture(iChannel0, coord).rgb;   
+     return texture(iChannel0, coord).rgb;   
 }
 
 float weights[5];

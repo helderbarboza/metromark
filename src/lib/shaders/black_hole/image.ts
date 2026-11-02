@@ -19,11 +19,11 @@ vec4 cubic(float x)
 
 vec4 BicubicTexture(in sampler2D tex, in vec2 coord)
 {
-	vec2 resolution = iResolution.xy;
+    vec2 resolution = iResolution.xy;
 
-	coord *= resolution;
+    coord *= resolution;
 
-	float fx = fract(coord.x);
+    float fx = fract(coord.x);
     float fy = fract(coord.y);
     coord.x -= fx;
     coord.y -= fy;
@@ -51,17 +51,17 @@ vec4 BicubicTexture(in sampler2D tex, in vec2 coord)
 
 vec3 ColorFetch(vec2 coord)
 {
- 	return texture(iChannel0, coord).rgb;   
+     return texture(iChannel0, coord).rgb;   
 }
 
 vec3 BloomFetch(vec2 coord)
 {
- 	return BicubicTexture(iChannel3, coord).rgb;   
+     return BicubicTexture(iChannel3, coord).rgb;   
 }
 
 vec3 Grab(vec2 coord, const float octave, const vec2 offset)
 {
- 	float scale = exp2(octave);
+     float scale = exp2(octave);
     
     coord /= scale;
     coord -= offset;
@@ -79,25 +79,25 @@ vec2 CalcOffset(float octave)
     
     offset.y = -(1.0 - (1.0 / exp2(octave))) - padding.y * octave;
 
-	offset.y += min(1.0, floor(octave / 3.0)) * 0.35;
+    offset.y += min(1.0, floor(octave / 3.0)) * 0.35;
     
- 	return offset;   
+     return offset;   
 }
 
 vec3 GetBloom(vec2 coord)
 {
- 	vec3 bloom = vec3(0.0);
+     vec3 bloom = vec3(0.0);
     
     bloom += Grab(coord, 1.0, vec2(CalcOffset(0.0))) * 1.0;
     bloom += Grab(coord, 2.0, vec2(CalcOffset(1.0))) * 1.5;
-	bloom += Grab(coord, 3.0, vec2(CalcOffset(2.0))) * 1.0;
+    bloom += Grab(coord, 3.0, vec2(CalcOffset(2.0))) * 1.0;
     bloom += Grab(coord, 4.0, vec2(CalcOffset(3.0))) * 1.5;
     bloom += Grab(coord, 5.0, vec2(CalcOffset(4.0))) * 1.8;
     bloom += Grab(coord, 6.0, vec2(CalcOffset(5.0))) * 1.0;
     bloom += Grab(coord, 7.0, vec2(CalcOffset(6.0))) * 1.0;
     bloom += Grab(coord, 8.0, vec2(CalcOffset(7.0))) * 1.0;
 
-	return bloom;
+    return bloom;
 }
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
@@ -117,7 +117,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     color = mix(color, color * color * (3.0 - 2.0 * color), vec3(1.0));
     color = pow(color, vec3(1.3, 1.20, 1.0));    
 
-	color = saturate(color * 1.01);
+    color = saturate(color * 1.01);
     
     color = pow(color, vec3(0.7 / 2.2));
 
