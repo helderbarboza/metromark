@@ -197,7 +197,7 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await page.setViewportSize({ width: 800, height: 600 })
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'Settings' })).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(page.getByRole('searchbox', { name: 'Search bookmarks' })).toBeVisible()
   expect(secondErrors).toEqual([])
@@ -331,7 +331,7 @@ test('factory reset restores Metro defaults and keeps sample bookmarks', async (
   await expect(page.getByText('Reset Metro to factory defaults?')).toBeVisible()
   await page.getByRole('button', { name: 'Reset Metro', exact: true }).click()
 
-  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page.getByRole('complementary', { name: 'Settings' })).toHaveCount(0)
   await expect(page.locator('[data-testid="toast-message"]')).toContainText('Metro reset to factory defaults')
   await expect(page.getByRole('button', { name: 'Undo', exact: true })).toHaveCount(0)
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'metro-light')

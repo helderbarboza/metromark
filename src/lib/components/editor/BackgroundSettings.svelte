@@ -110,7 +110,10 @@
             flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px] text-(--muted)
             aria-pressed:bg-(--surface-hover) aria-pressed:text-(--text)
           '
-          aria-pressed={(settings.background.type === 'shader' ? settings.background.quality : 'motion') === 'motion'}
+          aria-pressed={(
+            settings.background.type === 'shader'
+              ? settings.background.quality
+              : 'motion') === 'motion'}
           disabled={busy}
           onclick={() => updateShader({ quality: 'motion' })}
         >
@@ -122,7 +125,9 @@
             flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px] text-(--muted)
             aria-pressed:bg-(--surface-hover) aria-pressed:text-(--text)
           '
-          aria-pressed={(settings.background.type === 'shader' ? settings.background.quality : 'motion') === 'detail'}
+          aria-pressed={(settings.background.type === 'shader'
+            ? settings.background.quality
+            : 'motion') === 'detail'}
           disabled={busy}
           onclick={() => updateShader({ quality: 'detail' })}
         >
@@ -130,7 +135,8 @@
         </button>
       </div>
       <p class='mb-4 text-[10px] leading-[1.6] text-(--muted)'>
-        Under load, keep the frame rate and lower resolution, or keep resolution and lower the frame rate. Hidden while reduced motion is on.
+        Under load, keep the frame rate and lower resolution, or keep
+        resolution and lower the frame rate. Hidden while reduced motion is on.
       </p>
       <BackgroundColorMode
         auto={settings.background.auto ?? true}

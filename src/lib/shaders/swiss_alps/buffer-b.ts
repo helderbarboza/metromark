@@ -18,14 +18,14 @@ float terrainFbm(vec2 uv, int octaves, sampler2D smp)
     vec2  p = uv * TERRAIN_FREQ;
     float a = 0.;
     float b = 1.;
-	vec2  d = vec2(0.);
+    vec2  d = vec2(0.);
     
     for (int i = 0; i < octaves; ++i)
     {
         vec3 n = valueNoiseDerivative(p, smp);
         d += n.yz;
         a += b * n.x / (1. + dot(d, d));
-		b *= .5;
+        b *= .5;
         p = m2 * p * 2.;
     }
     
@@ -41,35 +41,35 @@ vec3 calcNormal(vec3 pos, float freq, float t)
                          * t / CAMERA_FAR));
     return normalize( 
         vec3(terrainFbm(pos.xz - eps.xy, norLod, iChannel0) - terrainFbm(pos.xz
-					+ eps.xy, norLod, iChannel0),
+                    + eps.xy, norLod, iChannel0),
              2.0 * eps.x,
              terrainFbm(pos.xz - eps.yx, norLod, iChannel0) - terrainFbm(pos.xz
-					+ eps.yx, norLod, iChannel0)));
+                    + eps.yx, norLod, iChannel0)));
 }
 
 float raymarchShadow(Ray ray)
 {
     float shadow = 1.;
-	float t = CAMERA_NEAR;
+    float t = CAMERA_NEAR;
     vec3 p = vec3(0.);
     float h = 0.;
     for(int i = 0; i < 80; ++i)
-	{
-	    p = ray.origin + t * ray.direction;
+    {
+        p = ray.origin + t * ray.direction;
         h = p.y - terrainFbm(p.xz, MQ_OCTAVES, iChannel0);
-		shadow = min(shadow, 8. * h / t);
-		t += h;
-		if (shadow < 0.001 || p.z > CAMERA_FAR) break;
-	}
-	return SAT(shadow);
+        shadow = min(shadow, 8. * h / t);
+        t += h;
+        if (shadow < 0.001 || p.z > CAMERA_FAR) break;
+    }
+    return SAT(shadow);
 }
 
 float raymarchTerrain(Ray ray)
 {
-	float t = CAMERA_NEAR, h = 0.;
+    float t = CAMERA_NEAR, h = 0.;
     for (int i = 0; i < 200; ++i)
     {
-    	vec3 pos = ray.origin + ray.direction * t;
+        vec3 pos = ray.origin + ray.direction * t;
         h = pos.y - terrainFbm(pos.xz, MQ_OCTAVES, iChannel0);
         if (abs(h) < (t * .002) || t > CAMERA_FAR)
             break;
@@ -99,7 +99,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         vec3 sunHalf = normalize(sunDir+ray.direction);
         float sunDot = max(0., dot(ray.direction, sunDir));
         
-		vec3 terrainNormal = vec3(0.);
+        vec3 terrainNormal = vec3(0.);
         
         col *= 0.;
         
@@ -121,20 +121,20 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         {
             vec3 marchPos = ray.origin + ray.direction * terrainDist;
             terrainNormal += calcNormal(marchPos, TERRAIN_FREQ, terrainDist); 
-			
+            
             // terrain colors
             vec3 rock = vec3(.1, .1, .08);
             vec3 snow = vec3(.9);
             vec3 grass = vec3(.02, .1, .05);
 
             vec3 albedo = mix(grass, rock, smoothstep(0., .1 * TERRAIN_HEIGHT,
-								marchPos.y)); 
+                                marchPos.y)); 
             albedo = mix(albedo, snow, smoothstep(.4 * TERRAIN_HEIGHT,
-							1.4 * TERRAIN_HEIGHT, marchPos.y));
+                            1.4 * TERRAIN_HEIGHT, marchPos.y));
             albedo = mix(rock, albedo, smoothstep(.4, .7, terrainNormal.y));
 
             float terrainShadow = clamp(raymarchShadow(Ray(marchPos - sunDir * .001, 
-										sunDir)), 0., 8.) + .2;
+                                        sunDir)), 0., 8.) + .2;
 
             float diffuse = max(dot(sunDir, terrainNormal), 0.) * terrainShadow;
             float specular = SAT(dot(sunHalf, ray.direction));
@@ -151,14 +151,14 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
             // specular
             col.rgb += SUN_INTENSITY * .4 * SUN_COLOR * diffuse 
-                			* pow(SAT(specular), 16.);
+                            * pow(SAT(specular), 16.);
 
             // Iq's height based density fog
             float fogMask = FOG_C * exp(-ray.origin.y * FOG_B) *
                 (1. - exp(-pow(terrainDist * FOG_B, 1.5) * ray.direction.y))
                 / ray.direction.y;
             vec3 fogCol = mix(atmosphericScattering(uv * .5 + .75, sun.xy * .5 + .225,
-								false) * .75, vec3(.8, .6, .3), pow(sunDot, 8.));
+                                false) * .75, vec3(.8, .6, .3), pow(sunDot, 8.));
             // shitty night time fog hack
             fogCol = mix(vec3(.4, .5, .6), fogCol, smoothstep(0., .1, sun.z));
             col.rgb = mix(col.rgb, fogCol, SAT(fogMask));
@@ -174,7 +174,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
     if (fragCoord.x < 1. && fragCoord.y < 1.)
     {
-    	fragColor = vec4(iResolution.x, vec3(0.));   
+        fragColor = vec4(iResolution.x, vec3(0.));   
     }
 }
 `

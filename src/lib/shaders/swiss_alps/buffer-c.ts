@@ -14,12 +14,12 @@ export const BUFFER_C = `
 
 const vec3 noiseKernel[6u] = vec3[] 
 (
-	vec3( .38051305,  .92453449, -.02111345),
-	vec3(-.50625799, -.03590792, -.86163418),
-	vec3(-.32509218, -.94557439,  .01428793),
-	vec3( .09026238, -.27376545,  .95755165),
-	vec3( .28128598,  .42443639, -.86065785),
-	vec3(-.16852403,  .14748697,  .97460106)
+    vec3( .38051305,  .92453449, -.02111345),
+    vec3(-.50625799, -.03590792, -.86163418),
+    vec3(-.32509218, -.94557439,  .01428793),
+    vec3( .09026238, -.27376545,  .95755165),
+    vec3( .28128598,  .42443639, -.86065785),
+    vec3(-.16852403,  .14748697,  .97460106)
 );
 
 //-------------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ const vec3 noiseKernel[6u] = vec3[]
 float raySphereIntersect(Ray ray, float radius)
 {
     // note to future me: don't need "a" bcuz rd is normalized and dot(rd, rd) = 1
- 	float b = 2. * dot(ray.origin, ray.direction);
+     float b = 2. * dot(ray.origin, ray.direction);
     float c = dot(ray.origin, ray.origin) - radius * radius;
     float d = sqrt(b * b - 4. * c);
     return (-b + d) * .5;
@@ -42,7 +42,7 @@ float cloudGradient(float h)
 
 float cloudHeightFract(float p)
 {
-	return (p - EARTH_RADIUS - CLOUD_BOTTOM) / (CLOUD_TOP - CLOUD_BOTTOM);
+    return (p - EARTH_RADIUS - CLOUD_BOTTOM) / (CLOUD_TOP - CLOUD_BOTTOM);
 }
 
 float cloudBase(vec3 p, float y)
@@ -59,8 +59,8 @@ float cloudDetail(vec3 p, float c, float y)
     p -= WIND_DIR * 3. * iTime * WIND_SPEED;
     // this is super expensive :(
     float hf = worleyFbm(p, CLOUD_DETAIL_FREQ, false) * .625 +
-        	   worleyFbm(p, CLOUD_DETAIL_FREQ*2., false) * .25 +
-        	   worleyFbm(p, CLOUD_DETAIL_FREQ*4., false) * .125;
+               worleyFbm(p, CLOUD_DETAIL_FREQ*2., false) * .25 +
+               worleyFbm(p, CLOUD_DETAIL_FREQ*4., false) * .125;
     hf = mix(hf, 1. - hf, y * 4.);
     return remap01(c, hf * .5, 1.);
 }
@@ -80,21 +80,21 @@ float getCloudDensity(vec3 p, float y, bool detail)
 //-------------------------------------------------------------------------------------
 
 float henyeyGreenstein( float sunDot, float g) {
-	float g2 = g * g;
-	return (.25 / PI) * ((1. - g2) / pow( 1. + g2 - 2. * g * sunDot, 1.5));
+    float g2 = g * g;
+    return (.25 / PI) * ((1. - g2) / pow( 1. + g2 - 2. * g * sunDot, 1.5));
 }
 
 float marchToLight(vec3 p, vec3 sunDir, float sunDot, float scatterHeight)
 {
     float lightRayStepSize = 11.;
-	vec3 lightRayDir = sunDir * lightRayStepSize;
+    vec3 lightRayDir = sunDir * lightRayStepSize;
     vec3 lightRayDist = lightRayDir * .5;
     float coneSpread = length(lightRayDir);
     float totalDensity = 0.;
     for(int i = 0; i < CLOUD_LIGHT_STEPS; ++i)
     {
         // cone sampling as explained in GPU Pro 7 article
-     	vec3 cp = p + lightRayDist + coneSpread * noiseKernel[i] * float(i);
+         vec3 cp = p + lightRayDist + coneSpread * noiseKernel[i] * float(i);
         float y = cloudHeightFract(length(p));
         if (y > .95 || totalDensity > .95) break; // early exit
         totalDensity += getCloudDensity(cp, y, false) * lightRayStepSize;
@@ -102,7 +102,7 @@ float marchToLight(vec3 p, vec3 sunDir, float sunDot, float scatterHeight)
     }
     
     return 32. * exp(-totalDensity * mix(CLOUD_ABSORPTION_BOTTOM,
-				CLOUD_ABSORPTION_TOP, scatterHeight)) * (1. - exp(-totalDensity * 2.));
+                CLOUD_ABSORPTION_TOP, scatterHeight)) * (1. - exp(-totalDensity * 2.));
 }
 
 //-------------------------------------------------------------------------------------
@@ -141,17 +141,17 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             
             // blue noise offset
             cameraRayDist += cameraRayStepSize * texelFetch(iChannel3,
-							(ivec2(fragCoord) + iFrame * ivec2(113, 127)) & 1023, 0).r;
+                            (ivec2(fragCoord) + iFrame * ivec2(113, 127)) & 1023, 0).r;
             vec3 skyCol = atmosphericScattering(vec2(0.15, 0.05),
                                 vec2(.5, sun.y*.5+.25), false);
             skyCol.r *= 1.1;
-			skyCol = SAT(pow(skyCol * 2.1, vec3(4.2)));
+            skyCol = SAT(pow(skyCol * 2.1, vec3(4.2)));
             float sunScatterHeight = smoothstep(.15, .4, sun.z);
             float hgPhase = mix(henyeyGreenstein(sunDot, .4),
                                 henyeyGreenstein(sunDot, -.1), .5);
             // sunrise/sunset hack
             hgPhase = max(hgPhase, 1.6 * henyeyGreenstein(sqrt(sunDot),
-							SAT(.8 - sunScatterHeight)));
+                            SAT(.8 - sunScatterHeight)));
             // shitty night time hack
             hgPhase = mix(pow(sunDot, .25), hgPhase, sunHeight);
             
@@ -165,13 +165,13 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                 if (density > 0.)
                 {
                     ambient = mix(CLOUDS_AMBIENT_BOTTOM, CLOUDS_AMBIENT_TOP, 
-                                  	heightFract);
-					
+                                      heightFract);
+                    
                     // cloud illumination
                     vec3 luminance = (ambient * SAT(pow(sun.z + .04, 1.4))
-						+ skyCol * .125 + (sunHeight * skyCol + vec3(.0075, .015, .03))
-						* SUN_COLOR * hgPhase
-						* marchToLight(p, sunDir, sunDot, sunScatterHeight)) * density;
+                        + skyCol * .125 + (sunHeight * skyCol + vec3(.0075, .015, .03))
+                        * SUN_COLOR * hgPhase
+                        * marchToLight(p, sunDir, sunDot, sunScatterHeight)) * density;
 
                     // improved scatter integral by Sébastien Hillaire
                     float transmittance = exp(-density * cameraRayStepSize);
@@ -197,12 +197,12 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             col = vec4(max(vec3(intScatterTrans.rgb), 0.), intScatterTrans.a);
             
             //temporal reprojection
-    		col = mix(prevCol, col, .5);
+            col = mix(prevCol, col, .5);
         }
     }
     else
     {
-		col = prevCol;
+        col = prevCol;
     }
     
     fragColor = col;

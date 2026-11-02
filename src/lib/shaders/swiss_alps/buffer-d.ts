@@ -11,9 +11,9 @@ export const BUFFER_D = `
 const ivec2 offsets[8u] = ivec2[]
 (
     ivec2(-1,-1), ivec2(-1, 1), 
-	ivec2(1, -1), ivec2(1, 1), 
-	ivec2(1, 0), ivec2(0, -1), 
-	ivec2(0, 1), ivec2(-1, 0)
+    ivec2(1, -1), ivec2(1, 1), 
+    ivec2(1, 0), ivec2(0, -1), 
+    ivec2(0, 1), ivec2(-1, 0)
 );
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
@@ -35,12 +35,12 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     colorAvg /= 9.;
     colorVar /= 9.;
     float gColorBoxSigma = .75;
-	vec4 sigma = sqrt(max(vec4(0.), colorVar - colorAvg * colorAvg));
-	vec4 colorMin = colorAvg - gColorBoxSigma * sigma;
-	vec4 colorMax = colorAvg + gColorBoxSigma * sigma;
+    vec4 sigma = sqrt(max(vec4(0.), colorVar - colorAvg * colorAvg));
+    vec4 colorMin = colorAvg - gColorBoxSigma * sigma;
+    vec4 colorMax = colorAvg + gColorBoxSigma * sigma;
     
     historyBuffer = clamp(historyBuffer, colorMin, colorMax);
 
-	fragColor = mix(currentBuffer, historyBuffer, 0.95);
+    fragColor = mix(currentBuffer, historyBuffer, 0.95);
 }
 `
