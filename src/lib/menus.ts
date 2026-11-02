@@ -18,11 +18,12 @@ export interface MenuInputs {
   groups: GroupView[]
   selectedId: string | null
   defaultFolder: string
+  shaderActive: boolean
   callbacks: MenuCallbacks
 }
 
 export function buildMenuItems(input: MenuInputs): MenuItem[] {
-  const { context, contextTile, node, group, groups, selectedId, defaultFolder, callbacks } = input
+  const { context, contextTile, node, group, groups, selectedId, defaultFolder, shaderActive, callbacks } = input
   if (!context)
     return []
   const tile = contextTile
@@ -58,6 +59,14 @@ export function buildMenuItems(input: MenuInputs): MenuItem[] {
     { label: 'Search bookmarks', icon: 'searchBookmarks', action: () => callbacks.focusSearch() },
     { label: 'Appearance & settings', icon: 'settings', separator: true, action: () => callbacks.edit({ kind: 'settings' }) },
   )
+  if (shaderActive) {
+    items.push({
+      label: 'Turn off animated background',
+      icon: 'close',
+      separator: true,
+      action: async () => callbacks.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: true, color: undefined } } }),
+    })
+  }
   return items
 }
 

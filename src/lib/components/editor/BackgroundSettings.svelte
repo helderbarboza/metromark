@@ -2,6 +2,8 @@
   import type { Settings } from '$lib/config'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { shaders } from '$lib/shaders'
+  import { shaderMetrics } from '$lib/shaders/metrics.svelte'
+  import { levelFps, levelFrame, levelWorst } from '$lib/shaders/quality'
   import { Tabs } from 'bits-ui'
   import BackgroundColorMode from './BackgroundColorMode.svelte'
 
@@ -101,6 +103,35 @@
           </button>
         {/each}
       </div>
+      <div class='mb-4 flex rounded-sm border border-(--line) p-0.75'>
+        <button
+          type='button'
+          class='
+            flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px] text-(--muted)
+            aria-pressed:bg-(--surface-hover) aria-pressed:text-(--text)
+          '
+          aria-pressed={(settings.background.type === 'shader' ? settings.background.quality : 'motion') === 'motion'}
+          disabled={busy}
+          onclick={() => updateShader({ quality: 'motion' })}
+        >
+          Smooth motion
+        </button>
+        <button
+          type='button'
+          class='
+            flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px] text-(--muted)
+            aria-pressed:bg-(--surface-hover) aria-pressed:text-(--text)
+          '
+          aria-pressed={(settings.background.type === 'shader' ? settings.background.quality : 'motion') === 'detail'}
+          disabled={busy}
+          onclick={() => updateShader({ quality: 'detail' })}
+        >
+          Sharp detail
+        </button>
+      </div>
+      <p class='mb-4 text-[10px] leading-[1.6] text-(--muted)'>
+        Under load, keep the frame rate and lower resolution, or keep resolution and lower the frame rate. Hidden while reduced motion is on.
+      </p>
       <BackgroundColorMode
         auto={settings.background.auto ?? true}
         color={settings.background.color}
@@ -120,7 +151,7 @@
         )}
         {@render range(
           'shader-fps',
-          'Target FPS',
+          'Maximum FPS',
           settings.background.targetFps ?? 60,
           0,
           120,
@@ -139,7 +170,7 @@
         )}
         {@render range(
           'shader-render-scale',
-          'Render scale',
+          'Maximum render scale',
           settings.background.renderScale ?? 0.5,
           0.25,
           1.5,
@@ -148,6 +179,39 @@
           value => `${Math.round(value * 100)}%`,
         )}
       </div>
+      {@const metrics = shaderMetrics.current}
+      {#if metrics}
+        <div class='mt-4 grid grid-cols-2 gap-2 text-[11px]' aria-label='Animated background performance'>
+          <div class='rounded-sm border border-(--line) p-2'>
+            <div class='text-[9px] text-(--muted)'>FPS</div>
+            <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--danger)' : levelFps(metrics.fps, metrics.targetFps) === 'danger' ? 'text-(--danger)' : levelFps(metrics.fps, metrics.targetFps) === 'warn' ? 'text-(--warn)' : 'text-(--text)'}'>
+              {metrics.level === 'frozen' ? '—' : metrics.fps.toFixed(0)}
+            </div>
+          </div>
+          <div class='rounded-sm border border-(--line) p-2'>
+            <div class='text-[9px] text-(--muted)'>Frame</div>
+            <div class='font-mono tabular-nums {levelFrame(metrics.frameMs, metrics.nominalMs) === 'danger' ? 'text-(--danger)' : levelFrame(metrics.frameMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--text)'}'>
+              {metrics.frameMs.toFixed(1)} ms
+            </div>
+          </div>
+          <div class='rounded-sm border border-(--line) p-2'>
+            <div class='text-[9px] text-(--muted)'>Worst</div>
+            <div class='font-mono tabular-nums {levelWorst(metrics.worstMs, metrics.nominalMs) === 'danger' ? 'text-(--danger)' : levelWorst(metrics.worstMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--text)'}'>
+              {metrics.worstMs.toFixed(1)} ms
+            </div>
+          </div>
+          <div class='rounded-sm border border-(--line) p-2'>
+            <div class='text-[9px] text-(--muted)'>Quality</div>
+            <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--danger)' : metrics.level === 'reduced' ? 'text-(--warn)' : 'text-(--text)'}'>
+              {metrics.quality === 'motion' ? 'Motion' : 'Detail'} · {metrics.level}
+            </div>
+          </div>
+        </div>
+      {:else}
+        <p class='mt-4 text-[10px] leading-[1.6] text-(--muted)'>
+          No animated background is running.
+        </p>
+      {/if}
       <div class='mt-4 flex items-start justify-between gap-3.75 text-[11px]'>
         <div>
           <label for='shader-mouse'>Mouse interaction</label>

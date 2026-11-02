@@ -12,6 +12,7 @@
      between targets (uwp8 "Guidelines for targeting", pp. 105-106). */
   --target-min: 48px;
   --target-gap: 8px;
+  --warn: #b45309;
 }
 
 

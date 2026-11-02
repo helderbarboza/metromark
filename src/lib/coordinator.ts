@@ -411,6 +411,8 @@ export class BookmarkCoordinator {
               throw new Error('Invalid shader mouse setting.')
             if (background.renderScale !== undefined && (typeof background.renderScale !== 'number' || !Number.isFinite(background.renderScale) || background.renderScale < 0.25 || background.renderScale > 1.5))
               throw new Error('Invalid shader render scale.')
+            if (background.quality !== undefined && (typeof background.quality !== 'string' || !['motion', 'detail'].includes(background.quality)))
+              throw new Error('Invalid shader quality.')
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
               throw new Error('Invalid background mode.')
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))

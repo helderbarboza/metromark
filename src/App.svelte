@@ -19,6 +19,7 @@
   import RootsNav from '$lib/components/RootsNav.svelte'
   import UndoToast from '$lib/components/UndoToast.svelte'
   import WorkspaceFooter from '$lib/components/WorkspaceFooter.svelte'
+  import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { toggleSelection } from '$lib/interaction'
   import { cellsToPx, GAP, reconcileLayout, ROWS } from '$lib/layout'
   import { buildAppBarMenuItems, buildMenuItems } from '$lib/menus'
@@ -450,6 +451,7 @@
       groups,
       selectedId,
       defaultFolder: defaultFolder(),
+      shaderActive: snapshot?.settings.background.type === 'shader',
       callbacks: {
         open,
         edit,
@@ -685,9 +687,11 @@
         : undefined}
       speed={snapshot.settings.background.speed ?? 1}
       targetFps={snapshot.settings.background.targetFps ?? 60}
+      quality={snapshot.settings.background.quality ?? 'motion'}
       opacity={snapshot.settings.background.opacity ?? 1}
       mouseInteraction={snapshot.settings.background.mouseInteraction ?? true}
       renderScale={snapshot.settings.background.renderScale ?? 0.5}
+      onstruggle={() => showNotice({ message: 'Animated background paused to keep this page fast.', actionLabel: 'Turn off' })}
     />
   {/if}
 
@@ -922,7 +926,11 @@
   {#if notice}
     <UndoToast
       {notice}
-      onundo={undo ? () => performUndo(undo.id) : undefined}
+      onundo={undo
+        ? () => performUndo(undo.id)
+        : notice.actionLabel
+        ? () => { void execute({ type: 'settings.update', patch: { background: { ...BACKGROUND_DEFAULTS.color } } }) }
+        : undefined}
       onclose={() => (notice = null)}
     />
   {/if}

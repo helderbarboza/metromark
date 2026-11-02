@@ -139,7 +139,7 @@ export type Command
     | { type: 'factory.reset' }
     | { type: 'settings.update', patch: Partial<Settings> }
     | { type: 'undo', id: string, parentId?: string }
-export interface Notice { message: string, undoId?: string, tone?: 'success' | 'error' | 'info' }
+export interface Notice { message: string, undoId?: string, tone?: 'success' | 'error' | 'info', actionLabel?: string }
 export interface CommandResult { snapshot: Snapshot, notice?: Notice }
 export interface BookmarkPort {
   getTree: () => Promise<BookmarkNode[]>

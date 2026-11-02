@@ -1,6 +1,15 @@
 <script lang='ts'>
   import type { PassChannel, ShaderDefinition, ShaderPass, TextureSource } from '$lib/shaders'
+  import type { ShaderMetrics } from '$lib/shaders/metrics.svelte'
   import { defaultShader } from '$lib/shaders'
+  import { FrameHealth } from '$lib/shaders/health'
+  import { publishMetrics } from '$lib/shaders/metrics.svelte'
+  import {
+    isFrozen,
+    loadFloor,
+    nextLoad,
+    solveQuality,
+  } from '$lib/shaders/quality'
   import { untrack } from 'svelte'
 
   interface Props {
@@ -16,12 +25,14 @@
     opacity?: number
     /** Overrides the shader's own render scale */
     renderScale?: number
-    /**
-     * Whether the pointer drives the shaders. When false `iMouse` stays at the
+    /** Quality preference: motion or detail */
+    quality?: 'motion' | 'detail'
+    /** Called when the renderer freezes due to sustained struggle */
+    onstruggle?: () => void
+    /** Whether the pointer drives the shaders. When false `iMouse` stays at the
      * origin, so a shader never reacts to a cursor that is just passing over the
      * page. The pointer is still tracked, so turning the setting back on does not
-     * need a fresh pointer move.
-     */
+     * need a fresh pointer move. */
     mouseInteraction?: boolean
   }
 
@@ -33,6 +44,8 @@
     targetFps = 60,
     opacity = 1,
     renderScale,
+    quality = 'motion',
+    onstruggle,
     mouseInteraction = true,
   }: Props = $props()
 
@@ -364,7 +377,9 @@
     definition: ShaderDefinition,
     paused: boolean,
     scale: number,
+    quality: 'motion' | 'detail',
     mouseState: { enabled: boolean },
+    onstruggle?: () => void,
   ): () => void {
     const disposers: Array<() => void> = []
     const dispose = () => {
@@ -409,8 +424,9 @@
       disposers.push(disposeBuffers)
 
       // --- canvas sizing -----------------------------------------------------
+      let runtimeScale = scale
       const renderSize = () => {
-        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2) * scale
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2) * runtimeScale
         return {
           width: Math.max(1, Math.round(element.clientWidth * pixelRatio)),
           height: Math.max(1, Math.round(element.clientHeight * pixelRatio)),
@@ -624,6 +640,17 @@
       let pressX = 0
       let pressY = 0
       let pointerDown = false
+
+      const health = new FrameHealth()
+      const scale0 = scale
+      const fps0 = Math.min(targetFps > 0 ? targetFps : 60, 60)
+      const preference = quality
+      let load = 1
+      let frozen = false
+      let cooldownUntil = 0
+      let healthySince = 0
+      let lastPublish = 0
+      let contextLosses = 0
       // Sampled once per frame so every pass in a frame agrees on the time of day,
       // even if the clock ticks halfway through the pipeline.
       let timeOfDay = localTimeOfDay()
@@ -746,10 +773,75 @@
         animationFrame = requestAnimationFrame(frame)
         const delta = lastTime === 0 ? 0 : (now - lastTime) / 1000
         lastTime = now
-        // `speed` and `targetFps` are read here, outside the effect body, on
-        // purpose: they should change the animation without rebuilding the
-        // program and losing the accumulated time.
         elapsed += delta * speed
+        health.push(now, !frozen)
+        const verdict = health.verdict()
+        if (!frozen && verdict === 'struggling' && now >= cooldownUntil) {
+          const floor = loadFloor(preference, scale0, fps0)
+          load = nextLoad(load, 'decrease', floor)
+          const solution = solveQuality(preference, load, scale0, fps0, health.displayHz() || 60)
+          runtimeScale = solution.scale
+          // apply scale change
+          const next = renderSize()
+          if (next.width !== element.width || next.height !== element.height) {
+            element.width = next.width
+            element.height = next.height
+            for (const [id, buffer] of buffers) {
+              if (!buffer.screenSized)
+                continue
+              const passDefinition = passDefinitions.find(c => c.id === id)
+              if (passDefinition)
+                allocateBuffer(id, passDefinition, next, true)
+            }
+            for (const pass of passes) {
+              if (!pass.buffer || pass.buffer.screenSized)
+                pass.dirty = true
+            }
+            renderFrame(paused ? 0 : renderedTime)
+          }
+          cooldownUntil = now + 10000
+          healthySince = 0
+          if (isFrozen(load, preference, scale0, fps0)) {
+            frozen = true
+            onstruggle?.()
+          }
+        }
+        if (!frozen && verdict === 'ok' && cooldownUntil > 0 && now >= cooldownUntil) {
+          if (healthySince === 0)
+            healthySince = now
+          if (now - healthySince >= 10000) {
+            const floor = loadFloor(preference, scale0, fps0)
+            load = nextLoad(load, 'increase', floor)
+            const solution = solveQuality(preference, load, scale0, fps0, health.displayHz() || 60)
+            runtimeScale = solution.scale
+            healthySince = now
+          }
+        }
+        // Publish metrics every 500 ms.
+        if (now - lastPublish >= 500) {
+          lastPublish = now
+          const stats = health.stats()
+          const metrics: ShaderMetrics = {
+            shader: definition.id,
+            fps: stats?.fps ?? 0,
+            frameMs: stats?.frameMs ?? 0,
+            worstMs: stats?.worstMs ?? 0,
+            nominalMs: health.displayHz() > 0 ? 1000 / health.displayHz() : 16.67,
+            scale: runtimeScale,
+            quality: preference,
+            level: frozen ? 'frozen' : load < 0.99 ? 'reduced' : 'full',
+            targetFps: fps0,
+          }
+          publishMetrics(metrics)
+        }
+        if (frozen) {
+          if (!staticRendered) {
+            renderFrame(paused ? 0 : renderedTime)
+            staticRendered = true
+          }
+          return
+        }
+        staticRendered = false
         // Toggling the setting changes what the shader sees, so redraw straight
         // away when the pipeline is not otherwise producing frames.
         if (appliedMouseEnabled !== mouseState.enabled) {
@@ -840,6 +932,26 @@
       observer.observe(element)
       disposers.push(() => observer.disconnect())
 
+      const handleVisibility = () => {
+        if (document.hidden)
+          return
+        lastTime = 0
+        lastRender = 0
+        health.reset()
+        health.deferWarmup(performance.now(), 500)
+      }
+      document.addEventListener('visibilitychange', handleVisibility)
+      disposers.push(() => document.removeEventListener('visibilitychange', handleVisibility))
+
+      const handleContextLost = (event: Event) => {
+        event.preventDefault()
+        contextLosses++
+        if (contextLosses >= 2)
+          onstruggle?.()
+      }
+      element.addEventListener('webglcontextlost', handleContextLost)
+      disposers.push(() => element.removeEventListener('webglcontextlost', handleContextLost))
+
       if (paused) {
         stopAnimation()
         renderFrame(0)
@@ -874,7 +986,11 @@
     }
 
     try {
-      return startShader(context.gl, context.webgl2, element, definition, paused, scale, mouseState)
+      const dispose = startShader(context.gl, context.webgl2, element, definition, paused, scale, quality, mouseState, onstruggle)
+      return () => {
+        dispose()
+        publishMetrics(null)
+      }
     }
     catch (error) {
       // A broken shader should not take the page down with it.
