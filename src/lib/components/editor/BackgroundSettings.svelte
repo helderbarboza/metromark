@@ -1,5 +1,6 @@
 <script lang='ts'>
   import type { Settings } from '$lib/config'
+  import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { shaders } from '$lib/shaders'
   import { shaderMetrics } from '$lib/shaders/metrics.svelte'
@@ -149,11 +150,11 @@
       <div class='mt-4 grid gap-3'>
         <div>
           <div class='flex items-center justify-between text-[11px] text-(--muted)'>
-            <label for='shader-fps'>Speed</label>
+            <label for='shader-speed'>Speed</label>
             <span class='text-(--text)'>{settings.background.speed}x</span>
           </div>
           <Slider
-            id='shader-fps'
+            id='shader-speed'
             type='single'
             value={settings.background.speed ?? 1}
             min={0}
@@ -162,6 +163,19 @@
             onValueChange={v => updateShader({ speed: v })}
           />
         </div>
+        <ToggleGroup.Root
+          type='single'
+          value={String(settings.background.targetFps ?? 60)}
+          onValueChange={v => updateShader({ targetFps: Number(v) })}
+          id='shader-fps'
+          class='w-full'
+        >
+          {#each [15, 30, 60, 120, 0] as value (value)}
+            <ToggleGroup.Item value={String(value)} class='grow'>
+              {value === 0 ? 'Auto' : value}
+            </ToggleGroup.Item>
+          {/each}
+        </ToggleGroup.Root>
         <div>
           <div class='flex items-center justify-between text-[11px] text-(--muted)'>
             <label for='shader-fps'>Maximum FPS</label>
