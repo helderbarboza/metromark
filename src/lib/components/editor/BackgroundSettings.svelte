@@ -5,6 +5,7 @@
   import { shaderMetrics } from '$lib/shaders/metrics.svelte'
   import { levelFps, levelFrame, levelWorst } from '$lib/shaders/quality'
   import { Tabs } from 'bits-ui'
+  import Slider from '../ui/Slider.svelte'
   import BackgroundColorMode from './BackgroundColorMode.svelte'
 
   interface Props {
@@ -263,16 +264,13 @@
       <label for={id}>{label}</label>
       <span class='text-(--text)'>{format ? format(value) : value}</span>
     </div>
-    <input
-      {id}
-      type='range'
+    <Slider
+      type='single'
       {min}
       {max}
-      {step}
       {value}
-      disabled={busy}
-      class='w-full accent-(--accent) disabled:cursor-not-allowed disabled:opacity-50'
-      onchange={event => apply(Number(event.currentTarget.value))}
+      {step}
+      onValueCommit={v => apply(v)}
     />
   </div>
 {/snippet}
