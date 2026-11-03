@@ -147,44 +147,68 @@
         onchange={(auto, color) => updateShader({ auto, color })}
       />
       <div class='mt-4 grid gap-3'>
-        {@render range(
-          'shader-speed',
-          'Speed',
-          settings.background.speed ?? 1,
-          0,
-          4,
-          0.1,
-          value => updateShader({ speed: value }),
-        )}
-        {@render range(
-          'shader-fps',
-          'Maximum FPS',
-          settings.background.targetFps ?? 60,
-          0,
-          120,
-          1,
-          value => updateShader({ targetFps: value }),
-          value => (value === 0 ? 'Auto' : String(value)),
-        )}
-        {@render range(
-          'shader-opacity',
-          'Opacity',
-          settings.background.opacity ?? 1,
-          0,
-          1,
-          0.05,
-          value => updateShader({ opacity: value }),
-        )}
-        {@render range(
-          'shader-render-scale',
-          'Maximum render scale',
-          settings.background.renderScale ?? 0.5,
-          0.25,
-          1.5,
-          0.05,
-          value => updateShader({ renderScale: value }),
-          value => `${Math.round(value * 100)}%`,
-        )}
+        <div>
+          <div class='flex items-center justify-between text-[11px] text-(--muted)'>
+            <label for='shader-fps'>Speed</label>
+            <span class='text-(--text)'>{settings.background.speed}x</span>
+          </div>
+          <Slider
+            id='shader-fps'
+            type='single'
+            value={settings.background.speed ?? 1}
+            min={0}
+            max={4}
+            step={0.1}
+            onValueChange={v => updateShader({ speed: v })}
+          />
+        </div>
+        <div>
+          <div class='flex items-center justify-between text-[11px] text-(--muted)'>
+            <label for='shader-fps'>Maximum FPS</label>
+            <span class='text-(--text)'>{settings.background.targetFps === 0
+              ? 'Auto'
+              : String(settings.background.targetFps)}</span>
+          </div>
+          <Slider
+            id='shader-fps'
+            type='single'
+            value={settings.background.targetFps ?? 60}
+            min={0}
+            max={120}
+            step={10}
+            onValueChange={v => updateShader({ targetFps: v })}
+          />
+        </div>
+        <div>
+          <div class='flex items-center justify-between text-[11px] text-(--muted)'>
+            <label for='shader-opacity'>Opacity</label>
+            <span class='text-(--text)'>{(settings.background.opacity ?? 1) * 100}%</span>
+          </div>
+          <Slider
+            id='shader-opacity'
+            type='single'
+            value={settings.background.opacity ?? 1}
+            min={0.0}
+            max={1.0}
+            step={0.1}
+            onValueChange={v => updateShader({ opacity: v })}
+          />
+        </div>
+        <div>
+          <div class='flex items-center justify-between text-[11px] text-(--muted)'>
+            <label for='shader-render-scale'>Maximum render scale</label>
+            <span class='text-(--text)'>{settings.background.renderScale}x</span>
+          </div>
+          <Slider
+            id='shader-render-scale'
+            type='single'
+            value={settings.background.renderScale ?? 0.5}
+            min={0.25}
+            max={1.0}
+            step={0.25}
+            onValueChange={v => updateShader({ renderScale: v })}
+          />
+        </div>
       </div>
       {@const metrics = shaderMetrics.current}
       {#if metrics}
