@@ -2,9 +2,9 @@
   import type { DialogSpec } from '$lib/components/editor/dialog-spec'
   import type { Command, Snapshot } from '$lib/types'
   import { createPreviewClient } from '$lib/adapters/preview'
-  import Button from '$lib/components/Button.svelte'
   import Editor from '$lib/components/Editor.svelte'
   import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
+  import { Button } from '$lib/components/ui/button'
   import { SETTINGS_DEFAULTS } from '$lib/config'
   import { onMount } from 'svelte'
 
@@ -27,14 +27,14 @@
     return () => client.dispose()
   })
 </script>
-<div style='width:100vw;height:100vh;background:var(--bg);padding:32px'>
+<div style='width:100vw;height:100vh;background:var(--background);padding:32px'>
   <Button onclick={() => open = true}>Open editor</Button>
   {#if snapshot && open}
     {#if kind === 'settings'}
       <div
         class='
           fixed inset-y-3 right-3 w-[min(410px,calc(100vw-24px))] overflow-auto border
-          border-(--line) bg-(--surface) p-7.5 text-(--text) shadow-(--shadow)
+          border-(--border) bg-(--card) p-7.5 text-(--foreground) shadow-(--shadow)
         '
       >
         <SettingsDialog

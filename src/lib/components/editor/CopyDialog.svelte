@@ -1,18 +1,18 @@
 <script lang='ts'>
-  import Button from '$lib/components/Button.svelte'
   import DialogActions from '$lib/components/editor/DialogActions.svelte'
+  import { Button } from '$lib/components/ui/button'
 
   const { url, onclose }: { url: string, onclose: () => void } = $props()
 </script>
 
-<p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
+<p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
   Clipboard access isn't available here. Select the address and press
   Ctrl/Cmd+C.
 </p>
 <input
   class='
-    h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 text-[13px]
-    text-(--text) outline-offset-1
+    h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
+    text-[13px] text-(--foreground) outline-offset-1
   '
   data-initial-focus
   readonly
@@ -21,5 +21,5 @@
   onfocus={event => event.currentTarget.select()}
 />
 <DialogActions>
-  <Button variant='primary' onclick={onclose}>Done</Button>
+  <Button variant='default' onclick={onclose}>Done</Button>
 </DialogActions>

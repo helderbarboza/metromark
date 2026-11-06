@@ -1,4 +1,4 @@
-export { cn } from 'tailwind-variants'
+export { cn } from 'cn'
 
 export type WithoutChild<T> = T extends { child?: any } ? Omit<T, 'child'> : T
 export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, 'children'> : T

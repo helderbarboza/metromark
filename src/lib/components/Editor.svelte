@@ -40,14 +40,14 @@
         {onclose}
       />
     {:else}
-      <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
+      <p class='mb-6.5 text-sm/relaxed text-(--muted-foreground)'>
         This folder is no longer available.
       </p>
       <div class='mt-7 flex justify-end gap-2.25'>
         <button
           class='
-            h-10.5 rounded-sm border border-(--line) bg-(--surface) px-4.25 text-[12px]
-            font-[550] text-(--text)
+            h-10.5 rounded-sm border border-(--border) bg-(--card) px-4.25 text-[12px]
+            font-medium text-(--foreground)
           '
           onclick={onclose}
         >

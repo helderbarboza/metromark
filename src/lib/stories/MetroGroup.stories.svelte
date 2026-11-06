@@ -90,7 +90,7 @@
 
 {#snippet template(args: ComponentProps<typeof MetroGroup>)}
   <SnapGridGroup>
-    <div style='padding:32px;background:var(--bg);min-height:100vh'>
+    <div style='padding:32px;background:var(--background);min-height:100vh'>
       <MetroGroup {...args} />
     </div>
   </SnapGridGroup>

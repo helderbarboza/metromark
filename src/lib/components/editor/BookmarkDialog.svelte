@@ -1,13 +1,13 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/editor/dialog-spec'
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
-  import Button from '$lib/components/Button.svelte'
   import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
   import { writableGroups } from '$lib/components/editor/dialog-spec'
   import DialogActions from '$lib/components/editor/DialogActions.svelte'
   import DialogError from '$lib/components/editor/DialogError.svelte'
   import FolderSelect from '$lib/components/editor/FolderSelect.svelte'
   import Icon from '$lib/components/Icon.svelte'
+  import { Button } from '$lib/components/ui/button'
   import { suggestAccentIndex } from '$lib/favicon-cache'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { projectGroups } from '$lib/tree'
@@ -80,13 +80,13 @@
 </script>
 
 <form onsubmit={submit}>
-  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
+  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
     {node
       ? 'Edit the real bookmark. Your tile arrangement stays right where it is.'
       : 'Save something worth coming back to.'}
   </p>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-[12px] font-medium text-(--text)'>Title</span>
+    <span class='text-[12px] font-medium text-(--foreground)'>Title</span>
     <input
       data-initial-focus
       bind:value={name}
@@ -95,14 +95,14 @@
       placeholder='A name you’ll recognize'
       autocomplete='off'
       class='
-        h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 text-[13px]
-        text-(--text) outline-offset-1
-        placeholder:text-(--muted) placeholder:opacity-60
+        h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
+        text-[13px] text-(--foreground) outline-offset-1
+        placeholder:text-(--muted-foreground) placeholder:opacity-60
       '
     />
   </label>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-[12px] font-medium text-(--text)'>Website address</span>
+    <span class='text-[12px] font-medium text-(--foreground)'>Website address</span>
     <input
       bind:value={url}
       required
@@ -110,9 +110,9 @@
       autocomplete='url'
       spellcheck='false'
       class='
-        h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 text-[13px]
-        text-(--text) outline-offset-1
-        placeholder:text-(--muted) placeholder:opacity-60
+        h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
+        text-[13px] text-(--foreground) outline-offset-1
+        placeholder:text-(--muted-foreground) placeholder:opacity-60
       '
     />
   </label>
@@ -120,7 +120,12 @@
     <FolderSelect folders={folders} bind:value={parentId} label='Folder' />
   {/if}
   {#if node}
-    <div class='mb-5.25 flex items-center gap-2 text-[10px] leading-[1.7] text-(--muted)'>
+    <div
+      class='
+        mb-5.25 flex items-center gap-2 text-[10px] leading-[1.7]
+        text-(--muted-foreground)
+      '
+    >
       <Icon name='folder' size={14} />
       <span>{currentGroup?.path.join(' / ')}</span>
     </div>
@@ -129,7 +134,7 @@
   <DialogActions>
     <Button type='button' onclick={onclose}>Cancel</Button>
     <Button
-      variant='primary'
+      variant='default'
       type='submit'
       disabled={command.busy || (!node && !parentId)}
     >

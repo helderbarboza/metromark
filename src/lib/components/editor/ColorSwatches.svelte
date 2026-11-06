@@ -15,7 +15,7 @@
 </script>
 
 <div class='mb-5.25 flex flex-col gap-2.25'>
-  <span class='text-[12px] font-medium text-(--text)' id={uid}>
+  <span class='text-[12px] font-medium text-(--foreground)' id={uid}>
     Color
   </span>
   <div
@@ -32,7 +32,7 @@
         class='
           flex size-7.75 items-center justify-center rounded-[3px] text-white
           aria-pressed:outline-2 aria-pressed:outline-offset-2
-          aria-pressed:outline-(--text)
+          aria-pressed:outline-(--foreground)
         '
         onclick={() => {
           customColor = ''
@@ -46,12 +46,13 @@
     {/each}
     <button
       type='button'
-      style:background={customColor || 'var(--surface)'}
+      style:background={customColor || 'var(--card)'}
       aria-label='Custom color'
       aria-pressed={!!customColor}
       class='
         flex size-7.75 items-center justify-center rounded-[3px] text-white
-        aria-pressed:outline-2 aria-pressed:outline-offset-2 aria-pressed:outline-(--text)
+        aria-pressed:outline-2 aria-pressed:outline-offset-2
+        aria-pressed:outline-(--foreground)
       '
       onclick={() => {
         if (!customColor) {
@@ -73,7 +74,8 @@
         aria-label='Custom tile color'
         title='Custom color'
         class='
-          size-8 cursor-pointer rounded-[3px] border border-(--line) bg-transparent p-0.5
+          size-8 cursor-pointer rounded-[3px] border border-(--border) bg-transparent
+          p-0.5
         '
       />
     {/if}

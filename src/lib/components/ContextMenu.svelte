@@ -148,9 +148,9 @@
     z-index: 100;
     width: 260px;
     padding: 6px;
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--foreground);
+    border: 1px solid var(--border);
     border-radius: 7px;
     box-shadow: var(--shadow);
     max-height: calc(100vh - 16px);
@@ -161,7 +161,7 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--border);
     margin-bottom: 5px;
   }
   .menu-heading strong {
@@ -173,7 +173,7 @@
   }
   .menu-heading span {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--muted-foreground);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -191,30 +191,30 @@
     text-align: left;
   }
   button :global(.icon) {
-    color: var(--muted);
+    color: var(--muted-foreground);
   }
   button:hover,
   button:focus-visible {
-    background: var(--surface-hover);
+    background: var(--accent);
     outline: none;
   }
   button:disabled {
     opacity: 0.3;
   }
   button.danger {
-    color: var(--danger);
+    color: var(--destructive);
   }
   button.danger :global(.icon) {
-    color: var(--danger);
+    color: var(--destructive);
   }
   .menu-separator {
     height: 1px;
-    background: var(--line);
+    background: var(--border);
     margin: 5px 3px;
   }
   .size-label {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--muted-foreground);
     padding: 10px 10px 7px;
     letter-spacing: 1px;
   }
@@ -233,15 +233,15 @@
     padding: 0;
     text-transform: capitalize;
     font-size: 10px;
-    color: var(--muted);
+    color: var(--muted-foreground);
   }
   .sizes button.current {
-    background: var(--surface-hover);
-    color: var(--accent);
+    background: var(--accent);
+    color: var(--primary);
   }
   /* Current size gets a shape cue, not color alone. */
   .sizes button.current .size-box {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
   .size-box {

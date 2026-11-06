@@ -1,17 +1,23 @@
 <script lang='ts'>
+  import type { ThemeSelections } from '$lib/theme-picker'
   import ThemePreview from '$lib/components/editor/ThemePreview.svelte'
-  import Icon from '$lib/components/Icon.svelte'
   import {
     DARK_THEMES,
     getThemeSelections,
     isOneOf,
     LIGHT_THEMES,
     setThemeForMode,
+
   } from '$lib/theme-picker'
+  import Button from '../ui/button/button.svelte'
+
+  interface Props {
+    themes: ThemeSelections
+  }
+
+  let { themes: currentThemes = $bindable() }: Props = $props()
 
   const themeGroupsEntries = [['light', LIGHT_THEMES], ['dark', DARK_THEMES]] as const
-
-  let selections = $state(getThemeSelections())
 
   function chooseTheme(targetMode: 'light' | 'dark', newTheme: string): void {
     if (targetMode === 'light' && isOneOf(newTheme, LIGHT_THEMES)) {
@@ -21,32 +27,36 @@
       setThemeForMode('dark', newTheme)
     }
 
-    selections = getThemeSelections()
+    currentThemes = getThemeSelections()
   }
+
 </script>
 
 <div class='flex flex-col gap-5'>
   {#each themeGroupsEntries as [mode, modeTheme] (mode)}
     <div>
-      <h4 class='mb-2.5 text-[11px] font-[550] tracking-[0.5px] text-(--muted) uppercase'>{mode} theme</h4>
-      <div class='grid grid-cols-2 gap-2.5'>
+      <h4
+        class='
+          mb-2.5 text-xs font-[550] tracking-[0.5px] text-(--muted-foreground) uppercase
+        '
+      >{mode} theme</h4>
+      <div class='grid grid-cols-2 gap-2'>
         {#each modeTheme as theme (theme)}
-          {@const selected = selections[mode] === theme}
-          <button
+          {@const selected = currentThemes[mode] === theme}
+          <Button
             type='button'
-            class='
-              overflow-hidden rounded-sm border border-(--line) bg-transparent text-left
-              aria-pressed:border-(--accent)
-            '
+            class='flex h-auto flex-col items-start gap-0 truncate p-px text-left'
             aria-pressed={selected}
+            variant={selected ? 'default' : 'secondary'}
             onclick={() => chooseTheme(mode, theme)}
           >
-            <ThemePreview {theme} {mode} />
-            <span class='flex items-center justify-between px-2.75 py-2.25 text-[10px]'>
+            <div class='w-full overflow-hidden'>
+              <ThemePreview {theme} {mode} />
+            </div>
+            <span class='w-full items-center justify-between truncate p-2 text-xs'>
               {theme}
-              {#if selected}<Icon name='check' size={12} />{/if}
             </span>
-          </button>
+          </Button>
         {/each}
       </div>
     </div>

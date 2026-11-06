@@ -45,7 +45,7 @@
 {#snippet template(args: ComponentProps<typeof MetroTile>)}
   <div
     style='display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:32px;
-      background:var(--bg);min-height:100vh'
+      background:var(--background);min-height:100vh'
   >
     {#each staticTiles as tile (tile.id)}
       <MetroTile

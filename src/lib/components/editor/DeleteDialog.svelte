@@ -1,10 +1,10 @@
 <script lang='ts'>
   import type { BookmarkNode, Command } from '$lib/types'
-  import Button from '$lib/components/Button.svelte'
   import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
   import DialogActions from '$lib/components/editor/DialogActions.svelte'
   import DialogError from '$lib/components/editor/DialogError.svelte'
   import Icon from '$lib/components/Icon.svelte'
+  import { Button } from '$lib/components/ui/button'
   import { countBookmarks, flatten, isFolder } from '$lib/tree'
 
   const {
@@ -26,26 +26,27 @@
   }
 </script>
 
-<p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
-  Delete <strong class='text-(--text)'>{node.title}</strong> and everything
+<p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
+  Delete <strong class='text-(--foreground)'>{node.title}</strong> and everything
   inside it? This removes the folder from {mode === 'preview'
     ? 'this demo workspace'
     : 'your browser bookmarks'} too.
 </p>
 <div
   class='
-    mb-5.25 flex items-center gap-3.75 rounded-sm border border-(--line) bg-(--bg) p-5
+    mb-5.25 flex items-center gap-3.75 rounded-sm border border-(--border)
+    bg-(--background) p-5
   '
 >
   <Icon name='folder' size={24} />
   <div>
     <strong class='mb-1.25 block text-[13px] font-medium'>{countBookmarks(node)} bookmarks</strong>
-    <span class='text-[11px] text-(--muted)'>
+    <span class='text-xs text-(--muted-foreground)'>
       {flatten([node]).filter(isFolder).length - 1} nested folders
     </span>
   </div>
 </div>
-<p class='m-0 text-[11px] leading-[1.65] text-(--muted)'>
+<p class='m-0 text-xs leading-[1.65] text-(--muted-foreground)'>
   You can Undo for 30 seconds. Restored bookmarks receive new browser IDs.
 </p>
 <DialogError error={command.error} />

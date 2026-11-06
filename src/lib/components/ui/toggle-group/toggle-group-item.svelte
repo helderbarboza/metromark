@@ -13,6 +13,7 @@
     variant,
     ...restProps
   }: ToggleGroupPrimitive.ItemProps & ToggleVariants = $props()
+
   const ctx = getToggleGroupCtx()
 </script>
 
@@ -36,7 +37,7 @@
       group-data-vertical/toggle-group:data-[spacing=0]:first:rounded-t-md
       group-data-horizontal/toggle-group:data-[spacing=0]:last:rounded-r-md
       group-data-vertical/toggle-group:data-[spacing=0]:last:rounded-b-md
-      data-[state=on]:bg-(--line)
+      data-[state=on]:bg-muted
       group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:border-l-0
       group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:border-t-0
       group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-l

@@ -1,12 +1,12 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/editor/dialog-spec'
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
-  import Button from '$lib/components/Button.svelte'
   import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
   import { writableGroups } from '$lib/components/editor/dialog-spec'
   import DialogActions from '$lib/components/editor/DialogActions.svelte'
   import DialogError from '$lib/components/editor/DialogError.svelte'
   import FolderSelect from '$lib/components/editor/FolderSelect.svelte'
+  import { Button } from '$lib/components/ui/button'
   import { onMount } from 'svelte'
 
   const {
@@ -51,13 +51,13 @@
 </script>
 
 <form onsubmit={submit}>
-  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
+  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
     {isRename
       ? 'Only this folder’s name changes. Descendant group paths update automatically.'
       : 'A bookmark folder becomes a tile group. Nested folders get their own group, too.'}
   </p>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-[12px] font-medium text-(--text)'>Folder name</span>
+    <span class='text-[12px] font-medium text-(--foreground)'>Folder name</span>
     <input
       data-initial-focus
       bind:value={name}
@@ -66,9 +66,9 @@
       placeholder='e.g. Weekend reading'
       autocomplete='off'
       class='
-        h-11.25 w-full rounded-sm border border-(--line) bg-(--bg) px-3.25 text-[13px]
-        text-(--text) outline-offset-1
-        placeholder:text-(--muted) placeholder:opacity-60
+        h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
+        text-[13px] text-(--foreground) outline-offset-1
+        placeholder:text-(--muted-foreground) placeholder:opacity-60
       '
     />
   </label>
@@ -79,7 +79,7 @@
   <DialogActions>
     <Button type='button' onclick={onclose}>Cancel</Button>
     <Button
-      variant='primary'
+      variant='default'
       type='submit'
       disabled={command.busy || (!isRename && !parentId)}
     >

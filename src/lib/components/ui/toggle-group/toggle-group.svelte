@@ -4,17 +4,21 @@
   import { getContext, setContext } from 'svelte'
 
   type ToggleVariants = VariantProps<typeof toggleVariants>
+
   interface ToggleGroupContext extends ToggleVariants {
     spacing?: number
     orientation?: 'horizontal' | 'vertical'
   }
+
   export function setToggleGroupCtx(props: ToggleGroupContext) {
     setContext('toggleGroup', props)
   }
+
   export function getToggleGroupCtx() {
     return getContext<Required<ToggleGroupContext>>('toggleGroup')
   }
 </script>
+
 <script lang='ts'>
   import { cn } from '$lib/utils.js'
   import { ToggleGroup as ToggleGroupPrimitive } from 'bits-ui'
@@ -33,6 +37,7 @@
       spacing?: number
       orientation?: 'horizontal' | 'vertical'
     } = $props()
+
   setToggleGroupCtx({
     get variant() {
       return variant
@@ -67,8 +72,8 @@ get along, so we shut typescript up by casting `value` to `never`.
     `
       group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))]
       rounded-md
-      data-vertical:flex-col data-vertical:items-stretch
       data-[spacing=0]:data-[variant=outline]:shadow-xs
+      data-vertical:flex-col data-vertical:items-stretch
     `,
     className,
   )}
