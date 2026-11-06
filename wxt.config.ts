@@ -28,6 +28,7 @@ export default defineConfig({
       : { minimum_chrome_version: '128' }),
   }),
   vite: () => ({
+    build: { sourcemap: true },
     resolve: { alias: { $lib: libDir } },
     define: {
       'import.meta.env.METRO_DENSITY': JSON.stringify(process.env.METRO_DENSITY),
