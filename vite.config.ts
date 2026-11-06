@@ -10,5 +10,5 @@ export default defineConfig({
   resolve: { alias: { $lib: libDir } },
   plugins: [svelte(), tailwindcss()],
   server: { host: '0.0.0.0', allowedHosts: true, port: 5173, watch: { ignored: ['**/.output/**', '**/storybook-static/**', '**/release/**', '**/.arena/**', '**/test-results/**'] } },
-  build: { outDir: 'dist/preview' },
+  build: { outDir: 'dist/preview', sourcemap: true },
 })
