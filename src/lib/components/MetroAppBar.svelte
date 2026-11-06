@@ -117,8 +117,8 @@
     justify-content: center;
     gap: 24px;
     border: none;
-    border-top: 1px solid var(--line);
-    background: var(--surface);
+    border-top: 1px solid var(--border);
+    background: var(--card);
     padding: 8px 16px max(8px, env(safe-area-inset-bottom));
     z-index: 50;
     box-shadow: var(--shadow);
@@ -137,7 +137,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--primary);
     flex-shrink: 0;
   }
   .selection-actions {
@@ -151,15 +151,15 @@
     align-items: center;
     justify-content: center;
     background: transparent;
-    color: var(--muted);
+    color: var(--muted-foreground);
     border-radius: 50%;
   }
   .selection-actions button:hover {
-    background: var(--surface-hover);
-    color: var(--text);
+    background: var(--accent);
+    color: var(--foreground);
   }
   .selection-actions button.delete:hover {
-    color: var(--danger);
+    color: var(--destructive);
   }
   .selection-actions button:disabled {
     opacity: 0.3;
@@ -167,7 +167,7 @@
   .size-options {
     display: flex;
     gap: 3px;
-    border-left: 1px solid var(--line);
+    border-left: 1px solid var(--border);
     padding-left: 12px;
   }
   .size-options button {
@@ -178,17 +178,17 @@
     font-size: 11px;
     text-transform: capitalize;
     background: transparent;
-    color: var(--muted);
+    color: var(--muted-foreground);
   }
   .size-options button:hover,
   .size-options button.active {
-    background: var(--surface-hover);
-    color: var(--text);
+    background: var(--accent);
+    color: var(--foreground);
   }
   .bar-actions {
     display: flex;
     gap: var(--target-gap);
-    border-left: 1px solid var(--line);
+    border-left: 1px solid var(--border);
     padding-left: 12px;
   }
   .bar-actions button {
@@ -198,12 +198,12 @@
     align-items: center;
     justify-content: center;
     background: transparent;
-    color: var(--muted);
+    color: var(--muted-foreground);
     border-radius: 50%;
   }
   .bar-actions button:hover {
-    background: var(--surface-hover);
-    color: var(--text);
+    background: var(--accent);
+    color: var(--foreground);
   }
   .bar-actions button:disabled {
     opacity: 0.3;

@@ -35,11 +35,11 @@
       id={`${idPrefix}-auto`}
       value='auto'
       class='
-        size-5 shrink-0 cursor-pointer rounded-full border border-(--line) bg-(--surface)
+        size-5 shrink-0 cursor-pointer rounded-full border border-(--border) bg-(--card)
         transition-all duration-100 ease-in-out
-        hover:border-(--muted)
+        hover:border-(--muted-foreground)
         disabled:cursor-not-allowed disabled:opacity-50
-        data-[state=checked]:border-[6px] data-[state=checked]:border-(--accent)
+        data-[state=checked]:border-[6px] data-[state=checked]:border-(--primary)
       '
     />
     <Label.Root for={`${idPrefix}-auto`} class='pl-3'>Auto</Label.Root>
@@ -49,18 +49,18 @@
       id={`${idPrefix}-custom`}
       value='custom'
       class='
-        size-5 shrink-0 cursor-pointer rounded-full border border-(--line) bg-(--surface)
+        size-5 shrink-0 cursor-pointer rounded-full border border-(--border) bg-(--card)
         transition-all duration-100 ease-in-out
-        hover:border-(--muted)
+        hover:border-(--muted-foreground)
         disabled:cursor-not-allowed disabled:opacity-50
-        data-[state=checked]:border-[6px] data-[state=checked]:border-(--accent)
+        data-[state=checked]:border-[6px] data-[state=checked]:border-(--primary)
       '
     />
     <Label.Root for={`${idPrefix}-custom`} class='pl-3'>Custom</Label.Root>
   </div>
 </RadioGroup.Root>
 {#if auto}
-  <p class='mt-3.5 text-[11px] text-(--muted)'>
+  <p class='mt-3.5 text-xs text-(--muted-foreground)'>
     Uses your theme background.
   </p>
 {:else}
@@ -71,12 +71,12 @@
       disabled={busy}
       value={color || DEFAULT_CUSTOM_COLOR}
       class='
-        size-8 cursor-pointer rounded-[3px] border border-(--line) bg-transparent p-0.5
+        size-8 cursor-pointer rounded-[3px] border border-(--border) bg-transparent p-0.5
         disabled:cursor-not-allowed disabled:opacity-50
       '
       oninput={event => onchange(false, event.currentTarget.value)}
     />
-    <p class='m-0 text-[11px] text-(--muted) uppercase'>
+    <p class='m-0 text-xs text-(--muted-foreground) uppercase'>
       {color || DEFAULT_CUSTOM_COLOR}
     </p>
   </div>

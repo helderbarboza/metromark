@@ -4,16 +4,15 @@
   export const tileVariants = tv({
     slots: {
       root: `
-        metro-tile group relative block size-full overflow-hidden bg-(--tile-bg) font-sans
-        text-(--tile-fg) no-underline
-        transition-[transform,outline-color,box-shadow,opacity] duration-160
-        ease-[cubic-bezier(0.1,0.9,0.2,1)]
+        metro-tile group relative block size-full overflow-hidden border border-border/50
+        bg-(--tile-bg) font-sans text-(--tile-fg) no-underline
+        transition-[transform,outline-color,box-shadow,opacity] duration-160 ease-fluent
         hover:outline-2 hover:-outline-offset-2 hover:outline-(--tile-fg)/35
         in-[.reduced]:active:transform-none
         motion-reduce:transition-none
         motion-reduce:active:transform-none
       `,
-      icon: `metro-tile-icon absolute inset-0 flex items-center justify-center`,
+      icon: `absolute inset-0 flex items-center justify-center`,
       label: `absolute inset-x-0 bottom-0 mx-4 mb-2 flex translate-y-1 flex-col text-left`,
       title: 'truncate text-xs/tight font-normal',
       domain: `
@@ -33,20 +32,16 @@
     variants: {
       size: {
         small: {
-          root: 'metro-tile-small',
           icon: `pb-0`,
           check: 'size-4.5',
         },
         medium: {
-          root: 'metro-tile-medium',
           icon: `pb-6`,
         },
         wide: {
-          root: 'metro-tile-wide',
           icon: `pb-6`,
         },
         large: {
-          root: 'metro-tile-large',
           icon: `pb-6.5`,
         },
       },
@@ -245,10 +240,7 @@
     {@render children()}
   {:else}
     <div
-      class={`
-        metro-tile-icon
-        ${ui.icon()}
-      `}
+      class={ui.icon()}
       aria-hidden='true'
     >
       <FaviconIcon

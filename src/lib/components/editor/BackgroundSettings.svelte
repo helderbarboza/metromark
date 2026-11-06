@@ -1,13 +1,15 @@
 <script lang='ts'>
   import type { Settings } from '$lib/config'
+
+  import { Slider } from '$lib/components/ui/slider'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { shaders } from '$lib/shaders'
   import { shaderMetrics } from '$lib/shaders/metrics.svelte'
   import { levelFps, levelFrame, levelWorst } from '$lib/shaders/quality'
   import { Tabs } from 'bits-ui'
-  import Slider from '../ui/Slider.svelte'
   import BackgroundColorMode from './BackgroundColorMode.svelte'
+  import SettingsField from './SettingsField.svelte'
 
   interface Props {
     settings: Settings
@@ -57,15 +59,16 @@
       selectBackground(tab)
   }}
 >
-  <Tabs.List class='mb-4 flex rounded-sm border border-(--line) p-0.75'>
+  <Tabs.List class='mb-4 flex rounded-sm border border-(--border) p-0.75'>
     {#each BACKGROUND_TYPES as type (type)}
       <Tabs.Trigger
         value={type}
         disabled={busy}
         class='
-          flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px] text-(--muted) capitalize
+          flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px] text-(--muted-foreground)
+          capitalize
           disabled:cursor-not-allowed disabled:opacity-50
-          data-[state=active]:bg-(--surface-hover) data-[state=active]:text-(--text)
+          data-[state=active]:bg-(--accent) data-[state=active]:text-(--foreground)
         '
       >
         {type}
@@ -93,9 +96,10 @@
           <button
             type='button'
             class='
-              rounded-[3px] bg-transparent px-2.25 py-1.5 text-[10px] text-(--muted)
+              rounded-[3px] bg-transparent px-2.25 py-1.5 text-[10px]
+              text-(--muted-foreground)
               disabled:cursor-not-allowed disabled:opacity-50
-              aria-pressed:bg-(--surface-hover) aria-pressed:text-(--text)
+              aria-pressed:bg-(--accent) aria-pressed:text-(--foreground)
             '
             aria-pressed={settings.background.shaderId === shader.id}
             disabled={busy}
@@ -105,12 +109,13 @@
           </button>
         {/each}
       </div>
-      <div class='mb-4 flex rounded-sm border border-(--line) p-0.75'>
+      <div class='mb-4 flex rounded-sm border border-(--border) p-0.75'>
         <button
           type='button'
           class='
-            flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px] text-(--muted)
-            aria-pressed:bg-(--surface-hover) aria-pressed:text-(--text)
+            flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px]
+            text-(--muted-foreground)
+            aria-pressed:bg-(--accent) aria-pressed:text-(--foreground)
           '
           aria-pressed={(
             settings.background.type === 'shader'
@@ -124,8 +129,9 @@
         <button
           type='button'
           class='
-            flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px] text-(--muted)
-            aria-pressed:bg-(--surface-hover) aria-pressed:text-(--text)
+            flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px]
+            text-(--muted-foreground)
+            aria-pressed:bg-(--accent) aria-pressed:text-(--foreground)
           '
           aria-pressed={(settings.background.type === 'shader'
             ? settings.background.quality
@@ -136,7 +142,7 @@
           Sharp detail
         </button>
       </div>
-      <p class='mb-4 text-[10px] leading-[1.6] text-(--muted)'>
+      <p class='mb-4 text-[10px] leading-[1.6] text-(--muted-foreground)'>
         Under load, keep the frame rate and lower resolution, or keep
         resolution and lower the frame rate. Hidden while reduced motion is on.
       </p>
@@ -147,57 +153,51 @@
         idPrefix='shader-background'
         onchange={(auto, color) => updateShader({ auto, color })}
       />
-      <div class='mt-4 grid gap-3'>
-        <div>
-          <div class='flex items-center justify-between text-[11px] text-(--muted)'>
-            <label for='shader-speed'>Speed</label>
-            <span class='text-(--text)'>{settings.background.speed}x</span>
-          </div>
+      <div class='mt-4 grid gap-1'>
+        <SettingsField
+          icon='personRunning'
+          title='Shader speed'
+          helpText='Shader animation speed factor'
+          controlId='shader-speed'
+        >
+          <span>{settings.background.speed}x</span>
           <Slider
             id='shader-speed'
+            class='w-32'
             type='single'
             value={settings.background.speed ?? 1}
-            min={0}
+            min={0.1}
             max={4}
             step={0.1}
             onValueChange={v => updateShader({ speed: v })}
           />
-        </div>
-        <ToggleGroup.Root
-          type='single'
-          value={String(settings.background.targetFps ?? 60)}
-          onValueChange={v => updateShader({ targetFps: Number(v) })}
-          id='shader-fps'
-          class='w-full'
+        </SettingsField>
+        <SettingsField
+          icon='gauge'
+          title='Maximum FPS'
+          helpText='Limit the framerate'
+          controlId='shader-fps'
         >
-          {#each [15, 30, 60, 120, 0] as value (value)}
-            <ToggleGroup.Item value={String(value)} class='grow'>
-              {value === 0 ? 'Auto' : value}
-            </ToggleGroup.Item>
-          {/each}
-        </ToggleGroup.Root>
-        <div>
-          <div class='flex items-center justify-between text-[11px] text-(--muted)'>
-            <label for='shader-fps'>Maximum FPS</label>
-            <span class='text-(--text)'>{settings.background.targetFps === 0
-              ? 'Auto'
-              : String(settings.background.targetFps)}</span>
-          </div>
-          <Slider
-            id='shader-fps'
+          <ToggleGroup.Root
             type='single'
-            value={settings.background.targetFps ?? 60}
-            min={0}
-            max={120}
-            step={10}
-            onValueChange={v => updateShader({ targetFps: v })}
-          />
-        </div>
-        <div>
-          <div class='flex items-center justify-between text-[11px] text-(--muted)'>
-            <label for='shader-opacity'>Opacity</label>
-            <span class='text-(--text)'>{(settings.background.opacity ?? 1) * 100}%</span>
-          </div>
+            value={String(settings.background.targetFps ?? 60)}
+            onValueChange={v => updateShader({ targetFps: Number(v) })}
+            id='shader-fps'
+          >
+            {#each [15, 30, 60, 120, 0] as value (value)}
+              <ToggleGroup.Item value={String(value)} class='grow'>
+                {value === 0 ? 'Auto' : value}
+              </ToggleGroup.Item>
+            {/each}
+          </ToggleGroup.Root>
+        </SettingsField>
+        <SettingsField
+          icon='transparencySquare'
+          title='Opacity'
+          helpText='Make the shader transparent'
+          controlId='shader-opacity'
+        >
+          <span>{(settings.background.opacity ?? 1) * 100}%</span>
           <Slider
             id='shader-opacity'
             type='single'
@@ -205,62 +205,66 @@
             min={0.0}
             max={1.0}
             step={0.1}
+            class='w-32'
             onValueChange={v => updateShader({ opacity: v })}
           />
-        </div>
-        <div>
-          <div class='flex items-center justify-between text-[11px] text-(--muted)'>
-            <label for='shader-render-scale'>Maximum render scale</label>
-            <span class='text-(--text)'>{settings.background.renderScale}x</span>
-          </div>
+        </SettingsField>
+        <SettingsField
+          icon='scaleFill'
+          title='Maximum render scale'
+          helpText='...'
+          controlId='shader-render-scale'
+        >
+          <span>{settings.background.renderScale}x</span>
           <Slider
             id='shader-render-scale'
             type='single'
             value={settings.background.renderScale ?? 0.5}
             min={0.25}
             max={1.0}
-            step={0.25}
+            step={[0.25, 0.5, 0.75, 1.0]}
+            class='mt-6 w-32'
             onValueChange={v => updateShader({ renderScale: v })}
           />
-        </div>
+        </SettingsField>
       </div>
       {@const metrics = shaderMetrics.current}
       {#if metrics}
-        <div class='mt-4 grid grid-cols-2 gap-2 text-[11px]' aria-label='Animated background performance'>
-          <div class='rounded-sm border border-(--line) p-2'>
-            <div class='text-[9px] text-(--muted)'>FPS</div>
-            <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--danger)' : levelFps(metrics.fps, metrics.targetFps) === 'danger' ? 'text-(--danger)' : levelFps(metrics.fps, metrics.targetFps) === 'warn' ? 'text-(--warn)' : 'text-(--text)'}'>
+        <div class='mt-4 grid grid-cols-2 gap-2 text-xs' aria-label='Animated background performance'>
+          <div class='rounded-sm border border-(--border) p-2'>
+            <div class='text-[9px] text-(--muted-foreground)'>FPS</div>
+            <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--destructive)' : levelFps(metrics.fps, metrics.targetFps) === 'danger' ? 'text-(--destructive)' : levelFps(metrics.fps, metrics.targetFps) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
               {metrics.level === 'frozen' ? '—' : metrics.fps.toFixed(0)}
             </div>
           </div>
-          <div class='rounded-sm border border-(--line) p-2'>
-            <div class='text-[9px] text-(--muted)'>Frame</div>
-            <div class='font-mono tabular-nums {levelFrame(metrics.frameMs, metrics.nominalMs) === 'danger' ? 'text-(--danger)' : levelFrame(metrics.frameMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--text)'}'>
+          <div class='rounded-sm border border-(--border) p-2'>
+            <div class='text-[9px] text-(--muted-foreground)'>Frame</div>
+            <div class='font-mono tabular-nums {levelFrame(metrics.frameMs, metrics.nominalMs) === 'danger' ? 'text-(--destructive)' : levelFrame(metrics.frameMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
               {metrics.frameMs.toFixed(1)} ms
             </div>
           </div>
-          <div class='rounded-sm border border-(--line) p-2'>
-            <div class='text-[9px] text-(--muted)'>Worst</div>
-            <div class='font-mono tabular-nums {levelWorst(metrics.worstMs, metrics.nominalMs) === 'danger' ? 'text-(--danger)' : levelWorst(metrics.worstMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--text)'}'>
+          <div class='rounded-sm border border-(--border) p-2'>
+            <div class='text-[9px] text-(--muted-foreground)'>Worst</div>
+            <div class='font-mono tabular-nums {levelWorst(metrics.worstMs, metrics.nominalMs) === 'danger' ? 'text-(--destructive)' : levelWorst(metrics.worstMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
               {metrics.worstMs.toFixed(1)} ms
             </div>
           </div>
-          <div class='rounded-sm border border-(--line) p-2'>
-            <div class='text-[9px] text-(--muted)'>Quality</div>
-            <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--danger)' : metrics.level === 'reduced' ? 'text-(--warn)' : 'text-(--text)'}'>
+          <div class='rounded-sm border border-(--border) p-2'>
+            <div class='text-[9px] text-(--muted-foreground)'>Quality</div>
+            <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--destructive)' : metrics.level === 'reduced' ? 'text-(--warn)' : 'text-(--foreground)'}'>
               {metrics.quality === 'motion' ? 'Motion' : 'Detail'} · {metrics.level}
             </div>
           </div>
         </div>
       {:else}
-        <p class='mt-4 text-[10px] leading-[1.6] text-(--muted)'>
+        <p class='mt-4 text-[10px] leading-[1.6] text-(--muted-foreground)'>
           No animated background is running.
         </p>
       {/if}
-      <div class='mt-4 flex items-start justify-between gap-3.75 text-[11px]'>
+      <div class='mt-4 flex items-start justify-between gap-3.75 text-xs'>
         <div>
           <label for='shader-mouse'>Mouse interaction</label>
-          <p id='shader-mouse-hint' class='mt-1.75 text-[10px] text-(--muted)'>
+          <p id='shader-mouse-hint' class='mt-1.75 text-[10px] text-(--muted-foreground)'>
             Let the shader follow your pointer.
           </p>
         </div>
@@ -273,11 +277,11 @@
           disabled={busy}
           class='
             h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
-            bg-(--line) p-0.75
-            before:block before:size-3 before:rounded-full before:bg-(--muted)
+            bg-(--border) p-0.75
+            before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
             before:transition-transform before:duration-130
-            checked:bg-(--accent)
-            checked:before:translate-x-3.25 checked:before:bg-(--accent-ink)
+            checked:bg-(--primary)
+            checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
             disabled:cursor-not-allowed disabled:opacity-50
           '
           onchange={event => updateShader({ mouseInteraction: event.currentTarget.checked })}
@@ -286,29 +290,3 @@
     {/if}
   </Tabs.Content>
 </Tabs.Root>
-
-{#snippet range(
-  id: string,
-  label: string,
-  value: number,
-  min: number,
-  max: number,
-  step: number,
-  apply: (value: number) => void,
-  format?: (value: number) => string,
-)}
-  <div class='grid gap-1.5'>
-    <div class='flex items-center justify-between text-[11px] text-(--muted)'>
-      <label for={id}>{label}</label>
-      <span class='text-(--text)'>{format ? format(value) : value}</span>
-    </div>
-    <Slider
-      type='single'
-      {min}
-      {max}
-      {value}
-      {step}
-      onValueCommit={v => apply(v)}
-    />
-  </div>
-{/snippet}

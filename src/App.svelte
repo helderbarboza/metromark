@@ -10,7 +10,6 @@
     TileSize,
   } from '$lib/types'
   import Background from '$lib/components/Background.svelte'
-  import Button from '$lib/components/Button.svelte'
   import ContextMenu from '$lib/components/ContextMenu.svelte'
   import Editor from '$lib/components/Editor.svelte'
   import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
@@ -19,6 +18,7 @@
   import MetroAppBar from '$lib/components/MetroAppBar.svelte'
   import MetroGroup from '$lib/components/MetroGroup.svelte'
   import RootsNav from '$lib/components/RootsNav.svelte'
+  import { Button } from '$lib/components/ui/button'
   import UndoToast from '$lib/components/UndoToast.svelte'
   import WorkspaceFooter from '$lib/components/WorkspaceFooter.svelte'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
@@ -33,6 +33,7 @@
     isBookmark,
     projectGroups,
   } from '$lib/tree'
+  import { cn } from '$lib/utils'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { mode, ModeWatcher, theme } from 'mode-watcher'
   import { onMount } from 'svelte'
@@ -680,13 +681,15 @@
 />
 <span
   bind:this={themeColorProbe}
-  class='pointer-events-none fixed hidden size-px bg-(--bg)'
+  class='pointer-events-none fixed hidden size-px bg-(--background)'
   aria-hidden='true'
 >
 </span>
 <div id='shell' class='flex h-full overflow-hidden'>
   <div
-    class='relative flex h-dvh min-w-0 flex-1 flex-col overflow-hidden text-(--text)'
+    class='
+      relative flex h-dvh min-w-0 flex-1 flex-col overflow-hidden text-(--foreground)
+    '
     class:reduced={snapshot?.settings.reducedMotion}
     style:background={backgroundColor}
   >
@@ -742,12 +745,16 @@
           <div
             class='
               flex size-full min-h-60 flex-col items-center justify-center text-center
-              text-(--muted)
+              text-(--muted-foreground)
             '
           >
             {#if loadError}
               <Icon name='lock' size={28} />
-              <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
+              <h2
+                class={cn(`
+                  mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)
+                `)}
+              >
                 Let's reconnect.
               </h2>
               <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
@@ -757,8 +764,8 @@
             {:else}
               <span
                 class='
-                  mb-5 size-6 animate-spin rounded-full border border-(--line)
-                  border-t-(--accent)
+                  mb-5 size-6 animate-spin rounded-full border border-(--border)
+                  border-t-(--primary)
                 '
               >
               </span>
@@ -770,7 +777,7 @@
         {:else if normalizedQuery && !visibleGroups.length}
           <div class='flex size-full min-h-60 flex-col items-center justify-center border'>
             <Icon name='searchBookmarks' size={33} />
-            <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
+            <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
               No favorites found.
             </h2>
             <p class='mb-6 px-5 text-xs/relaxed'>
@@ -821,9 +828,10 @@
                 <button
                   class='
                     relative flex w-full flex-col items-center justify-center border
-                    border-dashed border-(--line) bg-transparent text-(--muted)
-                    transition-colors duration-150
-                    hover:border-(--muted) hover:bg-(--surface) hover:text-(--text)
+                    border-dashed border-(--border) bg-transparent
+                    text-(--muted-foreground) transition-colors duration-150
+                    hover:border-(--muted-foreground) hover:bg-(--card)
+                    hover:text-(--foreground)
                   '
                   style:height='{cellsToPx(ROWS, cell)}px'
                   onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
@@ -831,12 +839,12 @@
                   <span
                     class='
                       mb-5 flex size-12 items-center justify-center rounded-full border
-                      border-(--line)
+                      border-(--border)
                     '
                   >
                     <Icon name='addFolder' size={23} />
                   </span>
-                  <strong class='text-sm font-medium text-(--text)'>New group</strong>
+                  <strong class='text-sm font-medium text-(--foreground)'>New group</strong>
                   <span class='mt-2 text-xs'>Create a bookmark folder</span>
                 </button>
               </div>
@@ -845,10 +853,14 @@
                 <div
                   class='
                     flex size-full min-h-60 flex-col items-center justify-center
-                    text-center text-(--muted)
+                    text-center text-(--muted-foreground)
                   '
                 >
-                  <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--text)'>
+                  <h2
+                    class={cn(`
+                      mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)
+                    `)}
+                  >
                     No bookmark folders available.
                   </h2>
                   <p class='mb-6 px-5 text-xs/relaxed'>
@@ -952,12 +964,12 @@
   <aside
     class={[
       `flex h-dvh w-(--settings-width) shrink-0 flex-col overflow-hidden
-      border-l border-(--line) bg-(--surface) text-(--text) shadow-(--shadow)
-      transition-[margin-right,opacity] duration-300 ease
+      border-l border-(--border) bg-(--card) text-(--foreground) shadow-(--shadow)
+      transition-[margin-right,opacity] duration-300
       will-change-[margin-right,opacity] motion-reduce:transition-none`,
       !settingsOpen && '-mr-(--settings-width) opacity-0 pointer-events-none',
     ].filter(Boolean).join(' ')}
-    style='--settings-width: min(410px, calc(100vw - 24px))'
+    style='--settings-width: min(32rem, calc(100vw - 24px))'
     aria-label='Settings'
     aria-hidden={!settingsOpen}
     inert={!settingsOpen}
@@ -966,15 +978,15 @@
 
       <header
         class='
-          flex shrink-0 items-start justify-between gap-2.5 border-b border-(--line)
+          flex shrink-0 items-start justify-between gap-2.5 border-b border-(--border)
           px-7.5 pt-7.25 pb-5
         '
       >
         <div>
-          <div class='mb-2 text-[8px] tracking-[1.7px] text-(--muted)'>
+          <div class='mb-2 text-[0.5rem] tracking-[1.7px] text-(--muted-foreground)'>
             MAKE YOURSELF AT HOME
           </div>
-          <h2 class='m-0 text-[26px] font-[450] tracking-[-1px]'>
+          <h2 class='m-0 text-2xl font-[450] tracking-[-1px]'>
             Settings
           </h2>
         </div>
@@ -986,7 +998,13 @@
           <Icon name='close' size={18} />
         </IconButton>
       </header>
-      <div class='min-h-0 flex-1 overflow-auto px-7.5 pt-6.5 pb-7.5 max-[480px]:p-6'>
+      <div
+        class='
+          min-h-0 flex-1 scrollbar-thin scrollbar-gutter-stable overflow-auto px-7.5
+          pt-6.5 pb-7.5
+          max-[480px]:p-6
+        '
+      >
         <SettingsDialog
           settings={snapshot.settings}
           oncommand={execute}

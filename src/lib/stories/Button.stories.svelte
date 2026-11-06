@@ -2,8 +2,8 @@
   module
   lang='ts'
 >
-  import Button from '$lib/components/Button.svelte'
   import Icon from '$lib/components/Icon.svelte'
+  import Button from '$lib/components/ui/button/button.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn, userEvent } from 'storybook/test'
 
@@ -38,22 +38,22 @@
 </Story>
 
 <Story
-  name='Primary'
-  args={{ variant: 'primary' }}
+  name='Secondary'
+  args={{ variant: 'secondary' }}
   play={async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Done' })
-    await expect(button).toHaveClass('primary')
+    await expect(button).toHaveClass('secondary')
   }}
 >
   Done
 </Story>
 
 <Story
-  name='Danger'
-  args={{ variant: 'danger' }}
+  name='Destructive'
+  args={{ variant: 'destructive' }}
   play={async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Delete folder' })
-    await expect(button).toHaveClass('danger')
+    await expect(button).toHaveClass('destructive')
     await expect(button.querySelector('svg')).toBeInTheDocument()
   }}
 >

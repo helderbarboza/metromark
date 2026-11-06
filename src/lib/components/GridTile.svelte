@@ -137,10 +137,10 @@
   ariaRoleDescription='draggable bookmark'
   draggable={false}
   class={`
-    grid-tile snapgrid-item block cursor-default text-(--tile-fg) no-underline
+    snapgrid-item block cursor-default text-(--tile-fg) no-underline
     group-data-[dragging=true]:z-10 group-data-[dragging=true]:cursor-grabbing
     focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
-    focus-visible:outline-(--accent)
+    focus-visible:outline-(--primary)
   `}
   style={item.style}
   dataTestId='metro-tile'

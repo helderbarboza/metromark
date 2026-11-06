@@ -3,6 +3,7 @@ import { balatro } from './balatro'
 import { blackHole } from './black_hole'
 import { clouds } from './clouds'
 import { flow } from './flow'
+import { grainient } from './grainient'
 import { incense } from './incense'
 import { monterey } from './monterey'
 import { swissAlps } from './swiss_alps'
@@ -13,6 +14,7 @@ export const shaders = {
   blackHole,
   clouds,
   flow,
+  grainient,
   incense,
   monterey,
   swissAlps,

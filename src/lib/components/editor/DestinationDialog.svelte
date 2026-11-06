@@ -1,12 +1,12 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/editor/dialog-spec'
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
-  import Button from '$lib/components/Button.svelte'
   import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
   import { destinationGroups, writableGroups } from '$lib/components/editor/dialog-spec'
   import DialogActions from '$lib/components/editor/DialogActions.svelte'
   import DialogError from '$lib/components/editor/DialogError.svelte'
   import FolderSelect from '$lib/components/editor/FolderSelect.svelte'
+  import { Button } from '$lib/components/ui/button'
   import { onMount } from 'svelte'
 
   const {
@@ -49,12 +49,12 @@
 </script>
 
 <form onsubmit={submit}>
-  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted)'>
+  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
     {#if isRestore}
       The original folder is no longer available. Choose a writable
       destination to restore this item.
     {:else}
-      Move <strong class='text-(--text)'>{node?.title}</strong> to another folder.
+      Move <strong class='text-(--foreground)'>{node?.title}</strong> to another folder.
       This changes its location in your browser bookmarks.
     {/if}
   </p>
@@ -68,7 +68,7 @@
   <DialogActions>
     <Button type='button' onclick={onclose}>Cancel</Button>
     <Button
-      variant='primary'
+      variant='default'
       type='submit'
       disabled={command.busy || !parentId}
     >

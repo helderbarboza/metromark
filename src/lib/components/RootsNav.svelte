@@ -24,31 +24,31 @@
   <button
     class={rootFilter === 'all'
       ? `
-        flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2 text-xs
-        whitespace-nowrap text-(--text)
+        flex h-7 items-center gap-2 rounded-sm bg-(--accent) px-2 text-xs
+        whitespace-nowrap text-(--foreground)
       `
       : `
         flex h-7 items-center gap-2 rounded-sm bg-transparent px-2 text-xs
-        whitespace-nowrap text-(--muted)
-        hover:text-(--text)
+        whitespace-nowrap text-(--muted-foreground)
+        hover:text-(--foreground)
       `}
     aria-pressed={rootFilter === 'all'}
     onclick={() => onSelect('all')}
-  >All bookmarks <span class={rootFilter === 'all' ? 'text-xs text-(--accent)' : 'text-xs text-(--muted)'}>{bookmarkCount}</span></button>
+  >All bookmarks <span class={rootFilter === 'all' ? 'text-xs text-(--primary)' : 'text-xs text-(--muted-foreground)'}>{bookmarkCount}</span></button>
   {#each roots as root (root.id)}
     <button
       class={rootFilter === root.id
         ? `
-          flex h-7 items-center gap-2 rounded-sm bg-(--surface-hover) px-2 text-xs
-          whitespace-nowrap text-(--text)
+          flex h-7 items-center gap-2 rounded-sm bg-(--accent) px-2 text-xs
+          whitespace-nowrap text-(--foreground)
         `
         : `
           flex h-7 items-center gap-2 rounded-sm bg-transparent px-2 text-xs
-          whitespace-nowrap text-(--muted)
-          hover:text-(--text)
+          whitespace-nowrap text-(--muted-foreground)
+          hover:text-(--foreground)
         `}
       aria-pressed={rootFilter === root.id}
       onclick={() => onSelect(root.id)}
-    >{root.title}<span class={rootFilter === root.id ? 'text-xs text-(--accent)' : 'text-xs text-(--muted)'}>{countBookmarks(root)}</span></button>
+    >{root.title}<span class={rootFilter === root.id ? 'text-xs text-(--primary)' : 'text-xs text-(--muted-foreground)'}>{countBookmarks(root)}</span></button>
   {/each}
 </nav>

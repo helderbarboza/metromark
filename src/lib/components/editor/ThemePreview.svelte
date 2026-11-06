@@ -72,12 +72,12 @@
 <span
   data-theme={theme}
   aria-hidden='true'
-  class='theme-preview flex flex-row gap-2 bg-(--bg) px-2 py-3'
+  class='theme-preview flex flex-row gap-2 bg-(--background) px-2 py-3'
   class:dark={mode === 'dark'}
 >
   {#each boards as board (board.label)}
     <span class='flex w-full flex-col'>
-      <span class='pb-0.5 text-[0.5rem] leading-none text-(--text)'>{board.label}</span>
+      <span class='pb-0.5 text-[0.5rem] leading-none text-(--foreground)'>{board.label}</span>
       <span
         class='
           grid min-h-6 auto-cols-2 grid-flow-col grid-rows-[repeat(4,0.5rem)] gap-px

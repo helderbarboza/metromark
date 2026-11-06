@@ -189,14 +189,16 @@
 
 <section
   data-testid='metro-group'
-  class='ease flex-none transition-[width] duration-140 motion-reduce:transition-none'
+  class='flex-none transition-[width] duration-140 motion-reduce:transition-none'
   style:width='{visibleWidth}px'
   aria-label={group.path.join(' / ') || 'Ungrouped bookmarks'}
 >
   <header class='flex h-15 items-end justify-between gap-2 pb-4.25'>
     <div class='min-w-0'>
       <div
-        class='mb-1.5 truncate text-[11px] tracking-[1.1px] text-(--muted) uppercase'
+        class='
+          mb-1.5 truncate text-xs tracking-[1.1px] text-(--muted-foreground) uppercase
+        '
         data-testid='group-path'
       >
         {group.path.length > 1
@@ -204,10 +206,10 @@
           : 'BROWSER ROOT'}
       </div>
       <div class='flex items-center gap-2.75'>
-        <h2 class='m-0 truncate text-[16px] leading-[1.1] font-semibold text-(--text)'>
+        <h2 class='m-0 truncate text-[16px] leading-[1.1] font-semibold text-(--foreground)'>
           {group.title}
         </h2>
-        <span class='text-[11px] text-(--muted) tabular-nums'>
+        <span class='text-xs text-(--muted-foreground) tabular-nums'>
           {String(layout.length).padStart(2, '0')}
         </span>
         {#if !group.writable}
@@ -228,7 +230,7 @@
     style='{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell)}px;'
     class={cn(
       'relative',
-      container.isDropTarget && 'outline outline-offset-[6px] outline-(--accent)',
+      container.isDropTarget && 'outline outline-offset-[6px] outline-(--primary)',
     )}
     data-testid='metro-grid'
     role='group'
@@ -267,10 +269,10 @@
             onclick={event => launch(event, tile)}
             oncontextmenu={event => onContext(event, 'tile', entry.i)}
             class='
-              ease absolute block text-inherit no-underline
-              transition-[left,top,width,height] duration-140
+              absolute block text-inherit no-underline transition-[left,top,width,height]
+              duration-140
               focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
-              focus-visible:outline-(--accent)
+              focus-visible:outline-(--primary)
               motion-reduce:transition-none
             '
             style={`
@@ -289,8 +291,8 @@
         data-testid='grid-placeholder'
         class='
           pointer-events-none absolute z-0
-          bg-[color-mix(in_srgb,var(--accent)_16%,transparent)] outline outline-(--accent)
-          outline-dashed
+          bg-[color-mix(in_srgb,var(--primary)_16%,transparent)] outline
+          outline-(--primary) outline-dashed
         '
         aria-hidden='true'
         style={placeholder.current.style}
@@ -301,18 +303,18 @@
       <div
         class='
           flex h-full flex-col items-center justify-center border border-dashed
-          border-(--line) text-(--muted)
+          border-(--border) text-(--muted-foreground)
         '
       >
         <Icon name='folder' size={30} />
-        <h3 class='mt-4 mb-2.25 text-[16px] font-semibold text-(--text)'>Nothing here. Yet.</h3>
+        <h3 class='mt-4 mb-2.25 text-[16px] font-semibold text-(--foreground)'>Nothing here. Yet.</h3>
         <p class='m-0 text-[12px]'>A little room for your next favorite.</p>
         {#if group.writable}
           <button
             class='
               mt-6.5 inline-flex items-center gap-1.75 rounded-[3px] border
-              border-(--line) bg-(--surface) px-3 py-2.25 text-[11px] text-(--text)
-              hover:bg-(--surface-hover)
+              border-(--border) bg-(--card) px-3 py-2.25 text-xs text-(--foreground)
+              hover:bg-(--accent)
             '
             onclick={() => onAdd(group.id)}
           >

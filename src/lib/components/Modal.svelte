@@ -42,7 +42,7 @@
 <dialog
   bind:this={element}
   class={[
-    'p-0 border border-(--line) bg-(--surface) text-(--text) shadow-(--shadow) overflow-auto',
+    'p-0 border border-(--border) bg-(--card) text-(--foreground) shadow-(--shadow) overflow-auto',
     'backdrop:bg-black/40 backdrop:backdrop-blur-[1px]',
     drawer && 'fixed top-3 right-3 bottom-3 left-auto m-0',
     drawer && 'w-[min(410px,calc(100vw-24px))] h-[calc(100vh-24px)] max-h-none rounded-[7px]',
@@ -55,8 +55,8 @@
   <div class='px-7.5 pt-7.25 pb-7.5 max-[480px]:p-6'>
     <header class='mb-6.5 flex items-center justify-between gap-2.5'>
       <div>
-        <div class='mb-2 text-[8px] tracking-[1.7px] text-(--muted)'>{eyebrow}</div>
-        <h2 class='m-0 text-[26px] font-[450] tracking-[-1px]'>{title}</h2>
+        <div class='mb-2 text-[0.5rem] tracking-[1.7px] text-(--muted-foreground)'>{eyebrow}</div>
+        <h2 class='m-0 text-2xl font-[450] tracking-[-1px]'>{title}</h2>
       </div>
       <IconButton class='-mr-1.75' label='Close dialog' onclick={onclose}>
         <Icon name='close' size={18} />

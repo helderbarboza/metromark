@@ -2,6 +2,7 @@ import { mode, setMode, setTheme, systemPrefersMode } from 'mode-watcher'
 
 export const LIGHT_THEMES = [
   'metro-light',
+  'fluent-light',
   'catppuccin-latte',
   'github',
   'one-light',
@@ -11,6 +12,7 @@ export const LIGHT_THEMES = [
 
 export const DARK_THEMES = [
   'metro-dark',
+  'fluent-dark',
   'catppuccin-frappe',
   'catppuccin-macchiato',
   'catppuccin-mocha',

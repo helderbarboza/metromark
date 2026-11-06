@@ -2,6 +2,7 @@
   import type { GroupView } from '$lib/types'
   import Icon from '$lib/components/Icon.svelte'
   import IconButton from '$lib/components/IconButton.svelte'
+  import { cn } from '$lib/utils'
 
   interface Props {
     query?: string
@@ -54,9 +55,9 @@
   <div class='flex shrink-0 items-center'>
     <label
       class='
-        flex h-8 w-60 items-center gap-2.5 rounded-sm border border-(--line)
-        bg-(--surface) px-3 text-(--muted)
-        focus-within:border-(--accent)
+        flex h-8 w-60 items-center gap-2.5 rounded-sm border border-(--border) bg-(--card)
+        px-3 text-(--muted-foreground)
+        focus-within:border-(--primary)
         max-lg:w-55
         max-md:h-9 max-md:w-46
       '
@@ -72,15 +73,15 @@
         autocomplete='off'
         spellcheck='false'
         class='
-          w-full min-w-0 bg-transparent p-0 text-xs text-(--text) outline-none
-          placeholder:text-(--muted)
+          w-full min-w-0 bg-transparent p-0 text-xs text-(--foreground) outline-none
+          placeholder:text-(--muted-foreground)
           [&::-webkit-search-cancel-button]:hidden
         '
       />
       {#if query}
         <button
           aria-label='Clear search'
-          class='bg-transparent p-1 text-(--muted)'
+          class='bg-transparent p-1 text-(--muted-foreground)'
           onclick={() => {
             query = ''
             searchInput?.focus()
@@ -91,7 +92,7 @@
       {:else}
         <kbd
           class='
-            flex h-5 w-4 items-center justify-center rounded-sm border border-(--line)
+            flex h-5 w-4 items-center justify-center rounded-sm border border-(--border)
             font-[inherit] text-xs
           '
         >/</kbd>
@@ -106,8 +107,8 @@
       {#each visibleGroups as group, index (group.id)}
         <button
           class={activeGroup === index
-            ? 'w-4 rounded-full bg-(--accent) p-0 transition-all'
-            : 'size-1 rounded-full bg-(--line) p-0 transition-all'}
+            ? 'w-4 rounded-full bg-(--primary) p-0 transition-all'
+            : 'size-1 rounded-full bg-(--border) p-0 transition-all'}
           aria-label="Jump to {group.path.join(' / ')}"
           aria-current={activeGroup === index ? 'true' : undefined}
           onclick={() => onJump(index)}
@@ -117,8 +118,11 @@
     </nav>
   </div>
   <div class='flex shrink-0 items-center gap-4'>
-    <div class='flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted)'>
-
+    <div
+      class={cn(`
+        flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted-foreground)
+      `)}
+    >
       <span class='max-sm:hidden'>
         <span>{bookmarkCount} bookmarks</span>
         <span>{folderCount} folders</span>
@@ -129,7 +133,10 @@
       </span>
       {#if preview}
         <span
-          class='rounded-sm border border-(--line) px-1.5 py-0.5 text-xs text-(--muted)'
+          class='
+            rounded-sm border border-(--border) px-1.5 py-0.5 text-xs
+            text-(--muted-foreground)
+          '
           title='saved locally, not your real bookmarks'
         >Demo</span>
       {/if}
