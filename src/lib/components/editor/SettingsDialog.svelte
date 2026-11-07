@@ -113,97 +113,86 @@
         <ThemeGallery bind:themes />
       </div>
     </CollapsibleSection>
-
-    <!-- <div class='mb-7.25'>
-      <h3 class='mb-3.25 text-xs font-[550]'>Canvas</h3>
-      <ThemeGallery />
-    </div> -->
   </Tabs.Content>
 
   <Tabs.Content value='tiles' class='mt-4 grid gap-1'>
-    <div class='mb-7.25'>
-      <h3 class='mb-3.25 text-xs font-[550]'>Tile density</h3>
-      <div class='mb-2.25 flex rounded-sm border border-(--border) p-0.75'>
+    <SettingsCard
+      icon='customize'
+      title='Tile density'
+      helpText='Coordinates stay the same. Just a little more breathing room.'
+      controlId='tile-density'
+    >
+      <ToggleGroup.Root
+        type='single'
+        id='tile-density'
+        value={settings.density}
+        disabled={command.busy}
+        onValueChange={(v) => {
+          if (v !== 'comfortable' && v !== 'compact')
+            return
+          setting({ density: v })
+        }}
+      >
         {#each densities as density (density)}
-          <button
-            class='
-              flex-1 rounded-[3px] bg-transparent p-2.25 text-[10px]
-              text-(--muted-foreground) capitalize
-              aria-pressed:bg-(--accent) aria-pressed:text-(--foreground)
-            '
-            aria-pressed={settings.density === density}
-            disabled={command.busy}
-            onclick={() => setting({ density })}
-          >
+          <ToggleGroup.Item value={density} class='grow capitalize'>
             {density}
-          </button>
+          </ToggleGroup.Item>
         {/each}
-      </div>
-      <p class='m-0 text-xs leading-[1.65] text-(--muted-foreground)'>
-        Coordinates stay the same. Just a little more breathing room.
-      </p>
-    </div>
-
-    <div class='mb-7.25'>
-      <div class='flex flex-col'>
-        <label class='mb-5.75 flex items-center justify-between gap-3.75 text-xs'>
-          <span>
-            Show website addresses
-            <small class='mt-1.75 block text-[10px] text-(--muted-foreground)'>
-              A little context below each title.
-            </small>
-          </span>
-          <input
-            type='checkbox'
-            role='switch'
-            checked={settings.showDomains}
-            disabled={command.busy}
-            class='
-              h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
-              bg-(--border) p-0.75
-              before:block before:size-3 before:rounded-full
-              before:bg-(--muted-foreground) before:transition-transform
-              before:duration-130
-              checked:bg-(--primary)
-              checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-            '
-            onchange={event => setting({ showDomains: event.currentTarget.checked })}
-          />
-        </label>
-        <label class='mb-5.75 flex items-center justify-between gap-3.75 text-xs'>
-          <span>
-            Reduce motion
-            <small class='mt-1.75 block text-[10px] text-(--muted-foreground)'>
-              A quieter, more instant experience.
-            </small>
-          </span>
-          <input
-            type='checkbox'
-            role='switch'
-            checked={settings.reducedMotion}
-            disabled={command.busy}
-            class='
-              h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
-              bg-(--border) p-0.75
-              before:block before:size-3 before:rounded-full
-              before:bg-(--muted-foreground) before:transition-transform
-              before:duration-130
-              checked:bg-(--primary)
-              checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-            '
-            onchange={event => setting({ reducedMotion: event.currentTarget.checked })}
-          />
-        </label>
-      </div>
-    </div>
+      </ToggleGroup.Root>
+    </SettingsCard>
+    <SettingsCard
+      icon='globe'
+      title='Show website addresses'
+      helpText='A little context below each title.'
+      controlId='show-domains'
+    >
+      <input
+        id='show-domains'
+        type='checkbox'
+        role='switch'
+        aria-describedby='show-domains-help'
+        checked={settings.showDomains}
+        disabled={command.busy}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
+          bg-(--border) p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+        onchange={event => setting({ showDomains: event.currentTarget.checked })}
+      />
+    </SettingsCard>
+    <SettingsCard
+      icon='personRunning'
+      title='Reduce motion'
+      helpText='A quieter, more instant experience.'
+      controlId='reduce-motion'
+    >
+      <input
+        id='reduce-motion'
+        type='checkbox'
+        role='switch'
+        aria-describedby='reduce-motion-help'
+        checked={settings.reducedMotion}
+        disabled={command.busy}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
+          bg-(--border) p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+        onchange={event => setting({ reducedMotion: event.currentTarget.checked })}
+      />
+    </SettingsCard>
   </Tabs.Content>
   <Tabs.Content value='background' class='mt-4 grid gap-1'>
-
-    <div class='mb-7.25'>
-      <h3 class='mb-3.25 text-xs font-[550]'>Background</h3>
-
-      <BackgroundSettings {settings} busy={command.busy} onchange={setting} />
-    </div>
+    <BackgroundSettings {settings} busy={command.busy} onchange={setting} />
   </Tabs.Content>
   <Tabs.Content value='reset' class='mt-4 grid gap-1'>
 
