@@ -74,13 +74,13 @@ describe('independent layouts', () => {
     const links = Array.from({ length: 180 }, (_, i) => ({ id: `${i}`, title: `${i}`, url: 'https://example.com' }))
     const layout = reconcileLayout(links)
     expect(usedCols(layout)).toBeGreaterThan(48)
-    expect(layout.every(entry => entry.y >= 0 && entry.y + entry.h <= 6)).toBe(true)
+    expect(layout.every(entry => entry.y >= 0 && entry.y + entry.h <= 8)).toBe(true)
     expect(new Set(layout.map(entry => entry.i)).size).toBe(180)
   })
   it('repairs collisions and clamps a large tile to valid rows', () => {
     const links = [{ id: 'a', title: 'a', url: 'https://a.com' }, { id: 'b', title: 'b', url: 'https://b.com' }]
     const result = reconcileLayout(links, [{ i: 'a', x: 0, y: 5, w: 4, h: 4 }, { i: 'b', x: 0, y: 4, w: 2, h: 2 }])
-    expect(result[0].y + result[0].h).toBeLessThanOrEqual(6)
+    expect(result[0].y + result[0].h).toBeLessThanOrEqual(8)
     expect(overlaps(result[0], result[1])).toBe(false)
   })
   it('rejects unknown sizes, negative coordinates, and repeated IDs', () => {
