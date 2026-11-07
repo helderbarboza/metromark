@@ -79,17 +79,14 @@
         {value}
       </span>
     {/if}
-    <span
-      class='
+    <Icon
+      name='chevronDown'
+      class={cn(`
         pointer-events-none relative z-10 shrink-0 text-(--muted-foreground)
         transition-transform
         motion-reduce:transition-none
-      '
-      class:rotate-180={open}
-      aria-hidden='true'
-    >
-      <Icon name='chevronDown' size={16} />
-    </span>
+      `, { 'rotate-180': open })}
+    />
   </div>
   <div id={contentId} class='border-t border-(--border) bg-(--card)' hidden={!open}>
     {@render children()}

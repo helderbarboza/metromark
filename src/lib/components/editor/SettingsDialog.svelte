@@ -12,8 +12,8 @@
   import { getThemeSelections } from '$lib/theme-picker'
   import { setMode, systemPrefersMode, userPrefersMode } from 'mode-watcher'
   import BackgroundSettings from './BackgroundSettings.svelte'
-  import CollapsibleField from './CollapsibleField.svelte'
-  import SettingsField from './SettingsField.svelte'
+  import CollapsibleSection from './CollapsibleSection.svelte'
+  import SettingsCard from './SettingsCard.svelte'
 
   interface Props {
     settings: Settings
@@ -71,7 +71,7 @@
   </Tabs.List>
 
   <Tabs.Content value='appearance' class='mt-4 grid gap-1'>
-    <SettingsField
+    <SettingsCard
       icon='darkTheme'
       title='Mode'
       helpText='Color mode'
@@ -95,18 +95,24 @@
           </ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
-    </SettingsField>
+    </SettingsCard>
 
-    <CollapsibleField
+    <CollapsibleSection
       icon='color'
       title='Themes'
       helpText='Color theme'
       value={`${themes.light}, ${themes.dark}`}
     >
+      {#snippet control()}
+        <div class='inline-flex items-center gap-3 text-sm'>
+          <span>{themes.light}</span>
+          <span>{themes.dark}</span>
+        </div>
+      {/snippet}
       <div class='p-4'>
         <ThemeGallery bind:themes />
       </div>
-    </CollapsibleField>
+    </CollapsibleSection>
 
     <!-- <div class='mb-7.25'>
       <h3 class='mb-3.25 text-xs font-[550]'>Canvas</h3>

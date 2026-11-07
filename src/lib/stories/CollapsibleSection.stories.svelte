@@ -2,15 +2,15 @@
   module
   lang='ts'
 >
-  import CollapsibleField from '$lib/components/editor/CollapsibleField.svelte'
+  import CollapsibleSection from '$lib/components/editor/CollapsibleSection.svelte'
   import SettingsRow from '$lib/components/editor/SettingsRow.svelte'
   import { Button } from '$lib/components/ui/button'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, userEvent } from 'storybook/test'
 
   const { Story } = defineMeta({
-    title: 'Base/Collapsible field',
-    component: CollapsibleField,
+    title: 'Base/Collapsible section',
+    component: CollapsibleSection,
     tags: ['autodocs'],
     parameters: { layout: 'padded' },
   })
@@ -97,7 +97,7 @@
   }}
 >
   <div class='w-180 max-w-full'>
-    <CollapsibleField
+    <CollapsibleSection
       icon='customize'
       title='Current theme'
       helpText={THEME_HELP}
@@ -114,7 +114,7 @@
       <SettingsRow title='Get more themes from Microsoft Store'>
         <Button variant='secondary'>Browse themes</Button>
       </SettingsRow>
-    </CollapsibleField>
+    </CollapsibleSection>
   </div>
 </Story>
 
@@ -127,7 +127,7 @@
   }}
 >
   <div class='w-180 max-w-full'>
-    <CollapsibleField icon='settings' title='Accent color'>
+    <CollapsibleSection icon='settings' title='Accent color'>
       {#snippet control({ titleId })}
         <select
           aria-labelledby={titleId}
@@ -173,7 +173,7 @@
       >
         {@render switchControl('accent-borders', 'accent-borders-title', true)}
       </SettingsRow>
-    </CollapsibleField>
+    </CollapsibleSection>
   </div>
 </Story>
 
@@ -187,7 +187,7 @@
   }}
 >
   <div class='w-180 max-w-full'>
-    <CollapsibleField
+    <CollapsibleSection
       icon='globe'
       title='Personalize your background'
       helpText={BACKGROUND_HELP}
@@ -248,13 +248,13 @@
       >
         <Button variant='secondary' disabled>Add stickers</Button>
       </SettingsRow>
-    </CollapsibleField>
+    </CollapsibleSection>
   </div>
 </Story>
 
 <Story name='Collapsed' asChild>
   <div class='w-180 max-w-full'>
-    <CollapsibleField
+    <CollapsibleSection
       icon='customize'
       title='Current theme'
       helpText={THEME_HELP}
@@ -264,6 +264,6 @@
       <SettingsRow title='Get more themes from Microsoft Store'>
         <Button variant='secondary'>Browse themes</Button>
       </SettingsRow>
-    </CollapsibleField>
+    </CollapsibleSection>
   </div>
 </Story>
