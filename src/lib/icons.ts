@@ -29,6 +29,8 @@ import settings from '@iconify-icons/fluent/settings-20-regular'
 import add from '@iconify-icons/fluent/square-add-20-regular'
 import openTab from '@iconify-icons/fluent/tab-new-20-regular'
 import transparencySquare from '@iconify-icons/fluent/transparency-square-20-regular'
+import weatherMoon from '@iconify-icons/fluent/weather-moon-20-regular'
+import weatherSunny from '@iconify-icons/fluent/weather-sunny-20-regular'
 
 // Static per-icon imports keep the Iconify icon data tree-shakable. Passing the
 // bundled data objects to OfflineIcon also avoids any remote icon requests.
@@ -64,6 +66,8 @@ export const icons = {
   settings,
   transparencySquare,
   undo,
+  weatherMoon,
+  weatherSunny,
 } as const
 
 export type IconName = keyof typeof icons

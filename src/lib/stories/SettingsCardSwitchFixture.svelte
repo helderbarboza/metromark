@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { IconName } from '$lib/icons'
-  import SettingsField from '$lib/components/editor/SettingsField.svelte'
+  import SettingsCard from '$lib/components/editor/SettingsCard.svelte'
 
   interface Props {
     icon: IconName
@@ -14,7 +14,7 @@
 </script>
 
 <div class='w-180 max-w-full'>
-  <SettingsField
+  <SettingsCard
     {icon}
     {title}
     {helpText}
@@ -39,5 +39,5 @@
         '
       />
     </label>
-  </SettingsField>
+  </SettingsCard>
 </div>
