@@ -2,9 +2,7 @@
   import type { HTMLImgAttributes } from 'svelte/elements'
   import { loadConvertedFavicon } from '$lib/favicon-cache'
   import { icons } from '$lib/icons'
-  import { motionDuration } from '$lib/reduced-motion'
   import OfflineIcon from '@iconify/svelte/dist/OfflineIcon.svelte'
-  import { fade } from 'svelte/transition'
   import { cn } from 'tailwind-variants'
   // Tile icon: the browser's local favicon cache, converted to a Metro-tint
   // silhouette, with the bundled globe while converting and whenever the page
@@ -28,13 +26,9 @@
 
 <div class='grid'>
   {#await loadConvertedFavicon(pageUrl, tint)}
-    <div
-      out:fade={{ duration: motionDuration(150) }}
-      class={cn('col-start-1 row-start-1 animate-pulse rounded-full bg-current', className)}
-    ></div>
+    <div class={cn('col-start-1 row-start-1 animate-pulse rounded-full bg-current opacity-20', className)}></div>
   {:then dataUrl}
     <img
-      transition:fade={{ duration: motionDuration(150) }}
       src={dataUrl}
       alt=""
       decoding='async'
@@ -44,10 +38,7 @@
       {...rest}
     />
   {:catch}
-    <span
-      transition:fade={{ duration: motionDuration(150) }}
-      class={cn('col-start-1 row-start-1 inline-flex', className)}
-    >
+    <span class={cn('col-start-1 row-start-1 inline-flex', className)}>
       <OfflineIcon icon={icons.globe} aria-hidden='true' class={className} />
     </span>
   {/await}
