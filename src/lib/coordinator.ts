@@ -217,19 +217,27 @@ export class BookmarkCoordinator {
     return this.exclusive(async () => {
       if (typeof command?.type !== 'string')
         throw new Error('Invalid bookmark command.')
-      await this.refresh()
-      this.recoverPrepared()
+      // Settings changes never touch the bookmark tree. Skip the tree reads so
+      // high-frequency updates (slider drags) stay cheap.
+      const settingsOnly = command.type === 'settings.update'
+      if (!settingsOnly) {
+        await this.refresh()
+        this.recoverPrepared()
+      }
       try {
         const notice = await this.perform(command)
-        await this.refresh()
+        if (!settingsOnly)
+          await this.refresh()
         await this.save()
         this.publish()
         return { snapshot: this.currentSnapshot(), notice }
       }
       catch (error) {
-        await this.refresh()
-        if (this.recoverPrepared())
-          await this.save().catch(() => undefined)
+        if (!settingsOnly) {
+          await this.refresh()
+          if (this.recoverPrepared())
+            await this.save().catch(() => undefined)
+        }
         this.publish()
         throw error
       }

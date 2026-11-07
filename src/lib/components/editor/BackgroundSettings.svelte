@@ -52,6 +52,96 @@
       return
     onchange({ background: { ...settings.background, ...patch } })
   }
+
+  // Draft state keeps the sliders responsive while settings changes round-trip
+  // through the async command queue. The parent owns the persisted values;
+  // these mirror what the user sees while dragging. A closure captures the
+  // mount-time value on purpose; the effect below keeps them in sync after.
+  const initialShader = () =>
+    settings.background.type === 'shader' ? settings.background : undefined
+  let speedDraft = $state(initialShader()?.speed ?? 1)
+  let opacityDraft = $state(initialShader()?.opacity ?? 1)
+  let renderScaleDraft = $state(initialShader()?.renderScale ?? 0.5)
+  let dragging = $state(false)
+  // Target of the last commit, so a stale in-flight snapshot does not pull the
+  // drafts back before the coordinator persists and republishes.
+  let pending = $state<{ speed: number, opacity: number, renderScale: number } | null>(null)
+
+  const COMMIT_INTERVAL_MS = 125
+  let lastCommitAt = 0
+  let trailingTimer: ReturnType<typeof setTimeout> | undefined
+
+  $effect(() => {
+    const bg = settings.background
+    if (bg.type !== 'shader') {
+      // Switching away from the shader tab cancels any in-flight commit tracking
+      // so the drafts re-sync when the user comes back.
+      pending = null
+      dragging = false
+      return
+    }
+    if (pending) {
+      if (
+        (bg.speed ?? 1) === pending.speed
+        && (bg.opacity ?? 1) === pending.opacity
+        && (bg.renderScale ?? 0.5) === pending.renderScale
+      ) {
+        pending = null
+      }
+      return
+    }
+    if (dragging)
+      return
+    speedDraft = bg.speed ?? 1
+    opacityDraft = bg.opacity ?? 1
+    renderScaleDraft = bg.renderScale ?? 0.5
+  })
+
+  $effect(() => () => clearTimeout(trailingTimer))
+
+  function commitDrafts() {
+    const bg = settings.background
+    if (bg.type !== 'shader')
+      return
+    clearTimeout(trailingTimer)
+    trailingTimer = undefined
+    lastCommitAt = Date.now()
+    pending = { speed: speedDraft, opacity: opacityDraft, renderScale: renderScaleDraft }
+    onchange({ background: { ...bg, ...pending } })
+  }
+
+  function scheduleCommit() {
+    const elapsed = Date.now() - lastCommitAt
+    if (elapsed >= COMMIT_INTERVAL_MS) {
+      commitDrafts()
+      return
+    }
+    clearTimeout(trailingTimer)
+    trailingTimer = setTimeout(commitDrafts, COMMIT_INTERVAL_MS - elapsed)
+  }
+
+  function dragSpeed(value: number) {
+    speedDraft = value
+    dragging = true
+    scheduleCommit()
+  }
+
+  function dragOpacity(value: number) {
+    opacityDraft = value
+    dragging = true
+    scheduleCommit()
+  }
+
+  function dragRenderScale(value: number) {
+    renderScaleDraft = value
+    dragging = true
+    scheduleCommit()
+  }
+
+  function finishDrag() {
+    dragging = false
+    commitDrafts()
+  }
 </script>
 
 <CollapsibleSection open={true} title='background type' icon='customize'>
@@ -134,16 +224,17 @@
       helpText='Shader animation speed factor'
       controlId='shader-speed'
     >
-      <span>{settings.background.speed}x</span>
+      <span>{speedDraft.toFixed(1)}x</span>
       <Slider
         id='shader-speed'
         class='w-32'
         type='single'
-        value={settings.background.speed ?? 1}
+        value={speedDraft}
         min={0.1}
         max={4}
         step={0.1}
-        onValueChange={v => updateShader({ speed: v })}
+        onValueChange={dragSpeed}
+        onValueCommit={finishDrag}
       />
     </SettingsRow>
     <SettingsRow
@@ -169,32 +260,34 @@
       helpText='Make the shader transparent'
       controlId='shader-opacity'
     >
-      <span>{(settings.background.opacity ?? 1) * 100}%</span>
+      <span>{Math.round(opacityDraft * 100)}%</span>
       <Slider
         id='shader-opacity'
         type='single'
-        value={settings.background.opacity ?? 1}
+        value={opacityDraft}
         min={0.0}
         max={1.0}
         step={0.1}
         class='w-32'
-        onValueChange={v => updateShader({ opacity: v })}
+        onValueChange={dragOpacity}
+        onValueCommit={finishDrag}
       />
     </SettingsRow>
     <SettingsRow
       title='Maximum render scale'
       controlId='shader-render-scale'
     >
-      <span>{settings.background.renderScale}x</span>
+      <span>{renderScaleDraft}x</span>
       <Slider
         id='shader-render-scale'
         type='single'
-        value={settings.background.renderScale ?? 0.5}
+        value={renderScaleDraft}
         min={0.25}
         max={1.0}
         step={[0.25, 0.5, 0.75, 1.0]}
         class='w-32'
-        onValueChange={v => updateShader({ renderScale: v })}
+        onValueChange={dragRenderScale}
+        onValueCommit={finishDrag}
       />
     </SettingsRow>
     {@const metrics = shaderMetrics.current}
