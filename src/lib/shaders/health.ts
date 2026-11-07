@@ -94,7 +94,7 @@ export class FrameHealth {
     if (this.warmupEnd != null && now < this.warmupEnd)
       return 'ok'
     const stats = computeStats(this.samples)
-    if (!stats)
+    if (stats === null)
       return 'ok'
     const nominal = minDelta(this.samples)
     if (nominal <= 0)

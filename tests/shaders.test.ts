@@ -13,7 +13,7 @@ describe('shader registry', () => {
   })
 
   it('resolves the swiss alps id', () => {
-    expect(getShader('swiss-alps')).toBe(shaders.swissAlps)
+    expect(getShader('swiss-alps')).toBe(shaders['swiss-alps'])
   })
 
   it('falls back to the default shader for an unknown id', () => {

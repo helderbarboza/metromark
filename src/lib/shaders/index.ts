@@ -11,13 +11,13 @@ import { swissAlps } from './swiss_alps'
 export type { PassChannel, ShaderDefinition, ShaderPass, TextureSource } from './types'
 export const shaders = {
   balatro,
-  blackHole,
+  'black-hole': blackHole,
   clouds,
   flow,
   grainient,
   incense,
   monterey,
-  swissAlps,
+  'swiss-alps': swissAlps,
 } as const satisfies Record<string, ShaderDefinition>
 export type ShaderId = keyof typeof shaders
 const list: readonly ShaderDefinition[] = Object.values(shaders)
