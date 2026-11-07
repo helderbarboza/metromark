@@ -1,5 +1,6 @@
 <script lang='ts'>
-  import { Label, RadioGroup } from 'bits-ui'
+  import * as ToggleGroup from '$lib/components/ui/toggle-group'
+  import SettingsRow from './SettingsRow.svelte'
 
   interface Props {
     auto: boolean
@@ -23,51 +24,37 @@
   }
 </script>
 
-<RadioGroup.Root
-  class='flex gap-4 text-sm'
-  value={auto ? 'auto' : 'custom'}
-  onValueChange={selectMode}
+<SettingsRow
+  title='Background color'
+  helpText='Choose an automatic or custom background color.'
+  controlId={`${idPrefix}-source`}
   disabled={busy}
-  aria-label='Background color source'
 >
-  <div class='flex items-center'>
-    <RadioGroup.Item
-      id={`${idPrefix}-auto`}
-      value='auto'
-      class='
-        size-5 shrink-0 cursor-pointer rounded-full border border-(--border) bg-(--card)
-        transition-all duration-100 ease-in-out
-        hover:border-(--muted-foreground)
-        disabled:cursor-not-allowed disabled:opacity-50
-        data-[state=checked]:border-[6px] data-[state=checked]:border-(--primary)
-      '
-    />
-    <Label.Root for={`${idPrefix}-auto`} class='pl-3'>Auto</Label.Root>
-  </div>
-  <div class='flex items-center'>
-    <RadioGroup.Item
-      id={`${idPrefix}-custom`}
-      value='custom'
-      class='
-        size-5 shrink-0 cursor-pointer rounded-full border border-(--border) bg-(--card)
-        transition-all duration-100 ease-in-out
-        hover:border-(--muted-foreground)
-        disabled:cursor-not-allowed disabled:opacity-50
-        data-[state=checked]:border-[6px] data-[state=checked]:border-(--primary)
-      '
-    />
-    <Label.Root for={`${idPrefix}-custom`} class='pl-3'>Custom</Label.Root>
-  </div>
-</RadioGroup.Root>
-{#if auto}
-  <p class='mt-3.5 text-xs text-(--muted-foreground)'>
-    Uses your theme background.
-  </p>
-{:else}
-  <div class='mt-3.5 flex items-center gap-2.5'>
+  <ToggleGroup.Root
+    type='single'
+    id={`${idPrefix}-source`}
+    value={auto ? 'auto' : 'custom'}
+    disabled={busy}
+    onValueChange={(mode) => {
+      if (!mode)
+        return
+      selectMode(mode)
+    }}
+  >
+    <ToggleGroup.Item value='auto' class='grow'>Auto</ToggleGroup.Item>
+    <ToggleGroup.Item value='custom' class='grow'>Custom</ToggleGroup.Item>
+  </ToggleGroup.Root>
+</SettingsRow>
+{#if !auto}
+  <SettingsRow
+    title='Custom color'
+    helpText='Choose the color used as the background.'
+    controlId={`${idPrefix}-color`}
+    disabled={busy}
+  >
     <input
+      id={`${idPrefix}-color`}
       type='color'
-      aria-label='Custom background color'
       disabled={busy}
       value={color || DEFAULT_CUSTOM_COLOR}
       class='
@@ -79,5 +66,5 @@
     <p class='m-0 text-xs text-(--muted-foreground) uppercase'>
       {color || DEFAULT_CUSTOM_COLOR}
     </p>
-  </div>
+  </SettingsRow>
 {/if}

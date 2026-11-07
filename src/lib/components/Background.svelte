@@ -28,6 +28,12 @@
     renderScale?: number
     /** Quality preference: motion or detail */
     quality?: 'motion' | 'detail'
+    /** Whether the frame loop may advance the simulation. When false the last
+     * frame stays on the canvas; nothing rebuilds. Default true. */
+    animated?: boolean
+    /** Publish frame metrics through the shared metrics panel. Thumbnails pass
+     * false so they do not overwrite the main page's numbers. Default true. */
+    metrics?: boolean
     /** Called when the renderer freezes due to sustained struggle */
     onstruggle?: () => void
     /** Whether the pointer drives the shaders. When false `iMouse` stays at the
@@ -46,6 +52,8 @@
     opacity = 1,
     renderScale,
     quality = 'motion',
+    animated = true,
+    metrics = true,
     onstruggle,
     mouseInteraction = true,
   }: Props = $props()
@@ -59,6 +67,14 @@
   const mouseState = { enabled: untrack(() => mouseInteraction) }
   $effect(() => {
     mouseState.enabled = mouseInteraction
+  })
+
+  // Same pattern for `animated`: a plain mirror the render loop reads every frame.
+  // Toggling it must not rebuild the pipeline, or every hover on a thumbnail would
+  // recompile the shaders.
+  const animState = { enabled: untrack(() => animated) }
+  $effect(() => {
+    animState.enabled = animated
   })
 
   /**
@@ -107,6 +123,9 @@
   const PREFER_WEBGL2 = true
 
   let canvas = $state<HTMLCanvasElement | null>(null)
+  // Set when the pipeline cannot start; hides the canvas so the base color
+  // layer shows instead of an opaque black rectangle.
+  let failed = $state(false)
   // The parent passes props as getters over its snapshot. Track a derived boolean
   // so snapshot updates that do not change this setting keep the WebGL context
   // and the animation time.
@@ -138,6 +157,17 @@
     return gl ? { gl, webgl2: false } : null
   }
 
+  /**
+   * Extra detail for GL calls that fail without a useful info log — typically
+   * an empty string when the GPU process is gone, not a GLSL source problem.
+   * `getError` is destructive, so it only runs on the failure path.
+   */
+  function glDiagnostics(gl: WebGLRenderingContext): string {
+    const error = gl.getError()
+    const lost = gl.isContextLost()
+    return `empty info log (glError=0x${error.toString(16).padStart(4, '0')}, contextLost=${lost})`
+  }
+
   function compileShader(
     gl: WebGLRenderingContext,
     type: number,
@@ -150,11 +180,10 @@
     gl.shaderSource(shader, source)
     gl.compileShader(shader)
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      const info = gl.getShaderInfoLog(shader)
+      const info = gl.getShaderInfoLog(shader)?.trim()
       gl.deleteShader(shader)
-      throw new Error(
-        `Unable to compile the ${label} shader: ${info ?? 'unknown error'}`,
-      )
+      const detail = info && info.length > 0 ? info : glDiagnostics(gl)
+      throw new Error(`Unable to compile the ${label} shader: ${detail}`)
     }
     return shader
   }
@@ -205,9 +234,10 @@
       gl.attachShader(program, fragmentShader)
       gl.linkProgram(program)
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        const info = gl.getProgramInfoLog(program)
+        const info = gl.getProgramInfoLog(program)?.trim()
         gl.deleteProgram(program)
-        throw new Error(`Unable to link the ${label} shader: ${info ?? 'unknown error'}`)
+        const detail = info && info.length > 0 ? info : glDiagnostics(gl)
+        throw new Error(`Unable to link the ${label} shader: ${detail}`)
       }
       return program
     }
@@ -384,7 +414,9 @@
     paused: boolean,
     scale: number,
     quality: 'motion' | 'detail',
+    metrics: boolean,
     mouseState: { enabled: boolean },
+    animState: { enabled: boolean },
     onstruggle?: () => void,
   ): () => void {
     const disposers: Array<() => void> = []
@@ -796,6 +828,15 @@
         animationFrame = requestAnimationFrame(frame)
         const delta = lastTime === 0 ? 0 : (now - lastTime) / 1000
         lastTime = now
+        if (!animState.enabled) {
+          // Frozen: keep the last presented frame. `lastTime` still tracks the wall
+          // clock so resuming produces no time jump.
+          if (!staticRendered) {
+            renderFrame(paused ? 0 : renderedTime)
+            staticRendered = true
+          }
+          return
+        }
         elapsed += delta * speed
         health.push(now, !frozen)
         const verdict = health.verdict()
@@ -841,10 +882,10 @@
           }
         }
         // Publish metrics every 500 ms.
-        if (now - lastPublish >= 500) {
+        if (metrics && now - lastPublish >= 500) {
           lastPublish = now
           const stats = health.stats()
-          const metrics: ShaderMetrics = {
+          const snapshot: ShaderMetrics = {
             shader: definition.id,
             fps: stats?.fps ?? 0,
             frameMs: stats?.frameMs ?? 0,
@@ -855,7 +896,7 @@
             level: frozen ? 'frozen' : load < 0.99 ? 'reduced' : 'full',
             targetFps: fps0,
           }
-          publishMetrics(metrics)
+          publishMetrics(snapshot)
         }
         if (frozen) {
           if (!staticRendered) {
@@ -980,6 +1021,16 @@
         renderFrame(0)
       }
       else {
+        // A frozen multipass pipeline starts on empty buffers, so its first frame
+        // is black. When the animation starts disabled (e.g. a thumbnail that only
+        // moves on hover), pre-roll it a little so the static frame is representative.
+        // One-off cost at mount, not motion; reduced motion keeps the single frame.
+        if (!animState.enabled && (definition.passes?.length ?? 0) > 0) {
+          const warmFrames = 24
+          for (let i = 1; i <= warmFrames; i++)
+            renderFrame(i / 30)
+          elapsed = warmFrames / 30
+        }
         startAnimation()
       }
       disposers.push(stopAnimation)
@@ -1005,8 +1056,18 @@
     if (!context) {
       // Decorative layer: degrade to the base color instead of throwing.
       console.error('[Background] WebGL is unavailable; showing the base color only.')
+      failed = true
       return
     }
+    if (context.gl.isContextLost()) {
+      // A fresh context can already be dead (GPU process crash, context
+      // loss limit). Compiling against it fails with empty info logs.
+      console.error('[Background] The WebGL context is lost; showing the base color only.')
+      failed = true
+      return
+    }
+
+    failed = false
 
     try {
       const dispose = startShader(
@@ -1017,16 +1078,20 @@
         paused,
         scale,
         quality,
+        metrics,
         mouseState,
+        animState,
         onstruggle,
       )
       return () => {
         dispose()
-        publishMetrics(null)
+        if (metrics)
+          publishMetrics(null)
       }
     }
     catch (error) {
       // A broken shader should not take the page down with it.
+      failed = true
       console.error(`[Background] Unable to render the "${definition.id}" shader.`, error)
     }
   })
@@ -1040,7 +1105,7 @@
   <canvas
     bind:this={canvas}
     class='absolute inset-0 size-full'
-    style:opacity={opacity}
+    style:opacity={failed ? 0 : opacity}
     aria-hidden='true'
   ></canvas>
 </div>
