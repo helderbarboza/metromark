@@ -215,4 +215,47 @@ describe('durable Undo', () => {
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', mouseInteraction: 1 } } as never })).rejects.toThrow('Invalid shader mouse setting')
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', renderScale: 3 } } })).rejects.toThrow('Invalid shader render scale')
   })
+  it('migrates a legacy whole-percentage parallax zoom to a factor on load', async () => {
+    const bookmarks = new MemoryBookmarks(demoTree())
+    const seeded = {
+      ...demoData(),
+      settings: {
+        ...SETTINGS_DEFAULTS,
+        background: { type: 'image' as const, url: '', parallaxZoom: 250 },
+      },
+    }
+    const storage = new MemoryPersistence(seeded)
+    const coordinator = new BookmarkCoordinator(bookmarks, storage, SETTINGS_DEFAULTS, 'preview')
+    coordinators.push(coordinator)
+    await coordinator.ready
+    expect((await coordinator.snapshot()).settings.background).toMatchObject({ parallaxZoom: 2.5 })
+  })
+  it('stores an image background and rejects invalid values', async () => {
+    const { coordinator } = fixture()
+    const dataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: dataUri, fit: 'contain', opacity: 0.5, parallax: true, auto: false, color: '#123abc' } } })
+    expect(updated.snapshot.settings.background).toMatchObject({ type: 'image', url: dataUri, fit: 'contain', opacity: 0.5, parallax: true, auto: false, color: '#123abc' })
+    const remote = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'https://example.com/wallpaper.jpg' } } })
+    expect(remote.snapshot.settings.background).toMatchObject({ type: 'image', url: 'https://example.com/wallpaper.jpg' })
+    const idb = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'idb:123e4567-e89b-42d3-a456-426655440000' } } })
+    expect(idb.snapshot.settings.background).toMatchObject({ type: 'image', url: 'idb:123e4567-e89b-42d3-a456-426655440000' })
+    const zoomed = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallaxZoom: 2.5 } } })
+    expect(zoomed.snapshot.settings.background).toMatchObject({ parallaxZoom: 2.5 })
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallaxZoom: 175 } } as never })).rejects.toThrow('Invalid parallax zoom')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallaxZoom: 0.5 } } })).rejects.toThrow('Invalid parallax zoom')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'idb:not-a-uuid' } } })).rejects.toThrow('stored image reference')
+    const empty = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '' } } })
+    expect(empty.snapshot.settings.background).toMatchObject({ type: 'image', url: '' })
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'ftp://example.com/a.png' } } })).rejects.toThrow('http(s)')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'javascript:alert(1)' } } })).rejects.toThrow('http(s)')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'data:text/html;base64,PHN2Zz4=' } } })).rejects.toThrow('Unsupported image data')
+    // The command layer rejects invalid enum members even though the type forbids them.
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', fit: 'stretch' } } as never })).rejects.toThrow('Invalid image fit')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', opacity: 2 } } })).rejects.toThrow('Invalid image opacity')
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallax: 1 } } as never })).rejects.toThrow('Invalid parallax setting')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', color: 'red' } } })).rejects.toThrow('six-digit hex')
+  })
 })

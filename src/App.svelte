@@ -15,6 +15,7 @@
   import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import IconButton from '$lib/components/IconButton.svelte'
+  import ImageBackground from '$lib/components/ImageBackground.svelte'
   import MetroAppBar from '$lib/components/MetroAppBar.svelte'
   import MetroGroup from '$lib/components/MetroGroup.svelte'
   import RootsNav from '$lib/components/RootsNav.svelte'
@@ -22,8 +23,10 @@
   import UndoToast from '$lib/components/UndoToast.svelte'
   import WorkspaceFooter from '$lib/components/WorkspaceFooter.svelte'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
+  import { isMediaKey } from '$lib/image-background'
   import { toggleSelection } from '$lib/interaction'
   import { cellsToPx, GAP, reconcileLayout, ROWS } from '$lib/layout'
+  import { sweepBackgroundMedia } from '$lib/media-store'
   import { buildAppBarMenuItems, buildMenuItems } from '$lib/menus'
   import { getShader } from '$lib/shaders'
   import { applyThemeForMode, resetThemePreferences } from '$lib/theme-picker'
@@ -40,6 +43,8 @@
 
   const { client }: { client: Client } = $props()
   let snapshot = $state.raw<Snapshot | null>(null)
+  // Plain guard: the media sweep runs once per page load, not on every snapshot.
+  let sweptMedia = false
   let loadError = $state('')
   let query = $state('')
   let rootFilter = $state('all')
@@ -167,6 +172,18 @@
 
   function applySnapshot(value: Snapshot) {
     snapshot = value
+    // Reclaim background-media blobs that are no longer referenced (orphans
+    // from a factory reset land here on the next page load). Once per session.
+    if (!sweptMedia) {
+      sweptMedia = true
+      const background = value.settings.background
+      const referenced = background.type === 'image' && isMediaKey(background.url ?? '')
+        ? [background.url]
+        : []
+      sweepBackgroundMedia(referenced).catch((error) => {
+        console.warn('[media] Unable to sweep orphaned background media.', error)
+      })
+    }
     if (
       selectedId
       && !flatten(value.tree).some(node => node.id === selectedId)
@@ -456,6 +473,8 @@
       selectedId,
       defaultFolder: defaultFolder(),
       shaderActive: snapshot?.settings.background.type === 'shader',
+      imageActive: snapshot?.settings.background.type === 'image'
+        && snapshot.settings.background.url !== '',
       callbacks: {
         open,
         edit,
@@ -708,6 +727,23 @@
         renderScale={snapshot.settings.background.renderScale ?? 0.5}
         onstruggle={() => showNotice({
           message: 'Animated background paused to keep this page fast.',
+          actionLabel: 'Turn off',
+        })}
+      />
+    {:else if snapshot?.settings.background.type === 'image'}
+      <ImageBackground
+        src={snapshot.settings.background.url}
+        color={snapshot.settings.background.auto === false
+          ? snapshot.settings.background.color
+          : undefined}
+        fit={snapshot.settings.background.fit ?? 'cover'}
+        opacity={snapshot.settings.background.opacity ?? 1}
+        parallax={snapshot.settings.background.parallax ?? false}
+        parallaxZoom={snapshot.settings.background.parallaxZoom ?? 1.5}
+        scrollProgress={scrollProgress}
+        reducedMotion={snapshot.settings.reducedMotion}
+        onerror={() => showNotice({
+          message: 'The background image could not be loaded.',
           actionLabel: 'Turn off',
         })}
       />
