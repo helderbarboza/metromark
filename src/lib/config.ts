@@ -32,10 +32,18 @@ const ShaderBackgroundSchema = v.object({
 
 const ImageBackgroundSchema = v.object({
   type: v.literal('image'),
+  /** Remote http(s) URL, or a base64 data:image/… URI produced by an upload */
   url: v.string(),
   fit: v.optional(BackgroundFitSchema),
   opacity: v.optional(v.number()),
+  /** Subtle horizontal offset while the canvas scrolls; forced off by reduced motion */
   parallax: v.optional(v.boolean()),
+  /** Layer scale as a multiple of the canvas size, from 1 to 4; bigger means wider layer and more travel */
+  parallaxZoom: v.optional(v.number()),
+  /** Use the theme background instead of a custom base color */
+  auto: v.optional(v.boolean()),
+  /** Base color under the image layer */
+  color: v.optional(v.string()),
 })
 
 /** User-facing settings schema with per-key defaults and docs */
@@ -66,7 +74,7 @@ export const SETTINGS_DEFAULTS: Settings = {
 
 export const BACKGROUND_DEFAULTS = {
   color: { type: 'color', auto: true, color: undefined },
-  image: { type: 'image', url: '' },
+  image: { type: 'image', url: '', auto: true, color: undefined, parallaxZoom: 1.5 },
   shader: {
     type: 'shader',
     shaderId: 'balatro',

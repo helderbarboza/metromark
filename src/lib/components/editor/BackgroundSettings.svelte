@@ -1,10 +1,20 @@
 <script lang='ts'>
   import type { Settings } from '$lib/config'
 
+  import { Button } from '$lib/components/ui/button'
+  import { Input } from '$lib/components/ui/input'
   import * as Select from '$lib/components/ui/select'
   import { Slider } from '$lib/components/ui/slider'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
+  import {
+    clampDimensions,
+    isDataImageUri,
+    isMediaKey,
+    validateBackgroundUrl,
+    validateUploadFile,
+  } from '$lib/image-background'
+  import { deleteBackgroundMedia, saveBackgroundMedia } from '$lib/media-store'
   import { shaders } from '$lib/shaders'
   import { shaderMetrics } from '$lib/shaders/metrics.svelte'
   import { levelFps, levelFrame, levelWorst } from '$lib/shaders/quality'
@@ -21,8 +31,10 @@
 
   type BackgroundType = Settings['background']['type']
   type ShaderBackground = Extract<Settings['background'], { type: 'shader' }>
+  type ImageBackground = Extract<Settings['background'], { type: 'image' }>
   const BACKGROUND_TYPES = ['color', 'image', 'shader'] as const satisfies readonly BackgroundType[]
   const SHADERS = Object.values(shaders)
+  const IMAGE_FITS = ['cover', 'contain', 'fill', 'none'] as const
 
   const { settings, busy, onchange }: Props = $props()
 
@@ -49,6 +61,12 @@
 
   function updateShader(patch: Partial<ShaderBackground>) {
     if (settings.background.type !== 'shader')
+      return
+    onchange({ background: { ...settings.background, ...patch } })
+  }
+
+  function updateImage(patch: Partial<ImageBackground>) {
+    if (settings.background.type !== 'image')
       return
     onchange({ background: { ...settings.background, ...patch } })
   }
@@ -141,6 +159,303 @@
   function finishDrag() {
     dragging = false
     commitDrafts()
+  }
+
+  // --- image background -----------------------------------------------------
+  function isStoredMedia(url?: string): boolean {
+    return isDataImageUri(url ?? '') || isMediaKey(url ?? '')
+  }
+  const initialImage = () =>
+    settings.background.type === 'image' ? settings.background : undefined
+  let urlDraft = $state(
+    isStoredMedia(initialImage()?.url) ? '' : (initialImage()?.url ?? ''),
+  )
+  let urlDirty = $state(false)
+  let urlError = $state('')
+  let checking = $state(false)
+  let uploading = $state(false)
+  let imageOpacityDraft = $state(initialImage()?.opacity ?? 1)
+  let opacityDragging = $state(false)
+  let opacityPending = $state<number | null>(null)
+  let zoomDraft = $state(initialImage()?.parallaxZoom ?? 1.5)
+  let zoomDragging = $state(false)
+  let zoomPending = $state<number | null>(null)
+  let fileInput = $state<HTMLInputElement | null>(null)
+
+  $effect(() => {
+    const bg = settings.background
+    if (bg.type !== 'image') {
+      opacityPending = null
+      opacityDragging = false
+      zoomPending = null
+      zoomDragging = false
+      urlDirty = false
+      urlError = ''
+      return
+    }
+    // Never show a multi-megabyte data URI or an opaque media key in the text field.
+    if (!urlDirty)
+      urlDraft = isStoredMedia(bg.url) ? '' : (bg.url ?? '')
+    if (opacityPending !== null) {
+      if ((bg.opacity ?? 1) === opacityPending)
+        opacityPending = null
+    }
+    if (zoomPending !== null && (bg.parallaxZoom ?? 1.5) === zoomPending)
+      zoomPending = null
+    if (opacityDragging || zoomDragging) {
+      if (!opacityDragging && opacityPending === null)
+        imageOpacityDraft = bg.opacity ?? 1
+      if (!zoomDragging && zoomPending === null)
+        zoomDraft = bg.parallaxZoom ?? 1.5
+      return
+    }
+    if (opacityPending === null)
+      imageOpacityDraft = bg.opacity ?? 1
+    if (zoomPending === null)
+      zoomDraft = bg.parallaxZoom ?? 1.5
+  })
+
+  const COMMIT_OPACITY_INTERVAL_MS = 125
+  let lastOpacityCommitAt = 0
+  let opacityTrailingTimer: ReturnType<typeof setTimeout> | undefined
+
+  $effect(() => () => clearTimeout(opacityTrailingTimer))
+
+  function commitImageOpacity() {
+    const bg = settings.background
+    if (bg.type !== 'image')
+      return
+    clearTimeout(opacityTrailingTimer)
+    opacityTrailingTimer = undefined
+    lastOpacityCommitAt = Date.now()
+    opacityPending = imageOpacityDraft
+    onchange({ background: { ...bg, opacity: imageOpacityDraft } })
+  }
+
+  function scheduleImageOpacityCommit() {
+    const elapsed = Date.now() - lastOpacityCommitAt
+    if (elapsed >= COMMIT_OPACITY_INTERVAL_MS) {
+      commitImageOpacity()
+      return
+    }
+    clearTimeout(opacityTrailingTimer)
+    opacityTrailingTimer = setTimeout(commitImageOpacity, COMMIT_OPACITY_INTERVAL_MS - elapsed)
+  }
+
+  function dragImageOpacity(value: number) {
+    imageOpacityDraft = value
+    opacityDragging = true
+    scheduleImageOpacityCommit()
+  }
+
+  function finishImageOpacityDrag() {
+    opacityDragging = false
+    commitImageOpacity()
+  }
+
+  const COMMIT_ZOOM_INTERVAL_MS = 125
+  let lastZoomCommitAt = 0
+  let zoomTrailingTimer: ReturnType<typeof setTimeout> | undefined
+
+  $effect(() => () => clearTimeout(zoomTrailingTimer))
+
+  function commitZoom() {
+    const bg = settings.background
+    if (bg.type !== 'image')
+      return
+    clearTimeout(zoomTrailingTimer)
+    zoomTrailingTimer = undefined
+    lastZoomCommitAt = Date.now()
+    zoomPending = zoomDraft
+    onchange({ background: { ...bg, parallaxZoom: zoomDraft } })
+  }
+
+  function scheduleZoomCommit() {
+    const elapsed = Date.now() - lastZoomCommitAt
+    if (elapsed >= COMMIT_ZOOM_INTERVAL_MS) {
+      commitZoom()
+      return
+    }
+    clearTimeout(zoomTrailingTimer)
+    zoomTrailingTimer = setTimeout(commitZoom, COMMIT_ZOOM_INTERVAL_MS - elapsed)
+  }
+
+  function dragZoom(value: number) {
+    zoomDraft = value
+    zoomDragging = true
+    scheduleZoomCommit()
+  }
+
+  function finishZoomDrag() {
+    zoomDragging = false
+    commitZoom()
+  }
+
+  function loadImageElement(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const image = new Image()
+      image.onload = () => resolve(image)
+      image.onerror = () => reject(new Error('That file could not be decoded as an image.'))
+      image.src = src
+    })
+  }
+
+  /** Draw at (width, height) and re-encode. WebP when the engine supports it, JPEG otherwise. */
+  function encodeAt(image: HTMLImageElement, width: number, height: number): Promise<Blob> {
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const context = canvas.getContext('2d')
+    if (!context)
+      return Promise.reject(new Error('Canvas is unavailable in this window.'))
+    context.imageSmoothingEnabled = true
+    context.imageSmoothingQuality = 'high'
+    context.drawImage(image, 0, 0, width, height)
+    const webP = (quality: number) =>
+      new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/webp', quality))
+    const jpeg = (quality: number) =>
+      new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', quality))
+    return webP(0.85).then((blob) => {
+      if (blob && blob.type === 'image/webp')
+        return blob
+      return jpeg(0.88).then((fallback) => {
+        if (!fallback)
+          throw new Error('The image could not be encoded.')
+        return fallback
+      })
+    })
+  }
+
+  /**
+   * Produce a Blob to store. SVG passes through untouched (vectors are compact
+   * and rasterizing loses the format); everything else keeps the original file
+   * when it already fits, otherwise downscales and re-encodes.
+   */
+  async function encodeForStorage(
+    file: File,
+    image: HTMLImageElement,
+  ): Promise<Blob> {
+    if (file.type === 'image/svg+xml')
+      return file
+    const MAX_STORED_BYTES = 24 * 1024 * 1024
+    const clamped = clampDimensions(image.naturalWidth, image.naturalHeight)
+    if (!clamped.scaled && file.size <= MAX_STORED_BYTES)
+      return file
+    for (const step of [1, 0.75, 0.5]) {
+      const blob = await encodeAt(
+        image,
+        Math.max(1, Math.round(clamped.width * step)),
+        Math.max(1, Math.round(clamped.height * step)),
+      )
+      if (blob.size <= MAX_STORED_BYTES)
+        return blob
+    }
+    throw new Error('That image is still too large after resizing. Choose a simpler image.')
+  }
+
+  async function handleUpload(event: Event & { currentTarget: HTMLInputElement }) {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    // Reset so picking the same file twice still fires `change`.
+    input.value = ''
+    if (!file || settings.background.type !== 'image')
+      return
+    urlError = ''
+    uploading = true
+    try {
+      validateUploadFile(file)
+      const probeUrl = URL.createObjectURL(file)
+      let image: HTMLImageElement
+      try {
+        image = await loadImageElement(probeUrl)
+      }
+      finally {
+        URL.revokeObjectURL(probeUrl)
+      }
+      if (image.naturalWidth === 0 || image.naturalHeight === 0)
+        throw new Error('That file could not be decoded as an image.')
+      const blob = await encodeForStorage(file, image)
+      const key = await saveBackgroundMedia(blob)
+      onchange({ background: { ...settings.background, url: key } })
+      urlDirty = false
+    }
+    catch (error) {
+      urlError = error instanceof Error ? error.message : 'That image could not be used.'
+    }
+    finally {
+      uploading = false
+    }
+  }
+
+  /** Confirm a remote address decodes as an image before persisting it. */
+  function preflightImage(url: string, timeoutMs = 10000): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const probe = new Image()
+      const timer = setTimeout(() => {
+        probe.onload = null
+        probe.onerror = null
+        reject(new Error('timeout'))
+      }, timeoutMs)
+      probe.onload = () => {
+        clearTimeout(timer)
+        resolve()
+      }
+      probe.onerror = () => {
+        clearTimeout(timer)
+        reject(new Error('load'))
+      }
+      probe.referrerPolicy = 'no-referrer'
+      probe.src = url
+    })
+  }
+
+  async function commitUrl() {
+    const bg = settings.background
+    if (bg.type !== 'image')
+      return
+    urlError = ''
+    let validated: string
+    try {
+      validated = validateBackgroundUrl(urlDraft)
+    }
+    catch (error) {
+      urlError = error instanceof Error ? error.message : 'That address is not valid.'
+      return
+    }
+    const current = bg.url ?? ''
+    if (validated === current) {
+      urlDirty = false
+      return
+    }
+    if (validated !== '' && !isDataImageUri(validated)) {
+      checking = true
+      try {
+        await preflightImage(validated)
+      }
+      catch {
+        urlError = 'That address did not load as an image. Check the URL and try again.'
+        checking = false
+        return
+      }
+      checking = false
+    }
+    onchange({ background: { ...bg, url: validated } })
+    urlDirty = false
+  }
+
+  function removeImage() {
+    const bg = settings.background
+    if (bg.type !== 'image')
+      return
+    const current = bg.url ?? ''
+    onchange({ background: { ...BACKGROUND_DEFAULTS.image } })
+    urlDraft = ''
+    urlDirty = false
+    urlError = ''
+    if (isMediaKey(current)) {
+      // Orphaned blobs are reclaimed by the startup sweep, so a failure here is safe to ignore.
+      deleteBackgroundMedia(current).catch(() => {})
+    }
   }
 </script>
 
@@ -351,6 +666,195 @@
         '
       />
     </SettingsRow>
+  {/if}
+
+  {#if settings.background.type === 'image'}
+    {@const bg = settings.background}
+    <SettingsRow
+      title='Image address'
+      helpText='A remote http(s) address. Loaded fresh each new tab.'
+      controlId='image-url'
+      disabled={busy || uploading}
+    >
+      <div class='flex items-center gap-2'>
+        <Input
+          id='image-url'
+          type='text'
+          inputmode='url'
+          placeholder={isStoredMedia(bg.url)
+            ? 'Uploaded image in use — enter an address to replace it'
+            : 'https://example.com/wallpaper.jpg'}
+          class='w-48 text-sm'
+          value={urlDraft}
+          disabled={busy || uploading}
+          aria-invalid={urlError !== '' ? 'true' : undefined}
+          aria-describedby={urlError !== '' ? 'image-url-error' : undefined}
+          oninput={(event) => {
+            urlDraft = event.currentTarget.value
+            urlDirty = true
+            urlError = ''
+          }}
+          onkeydown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              void commitUrl()
+            }
+          }}
+        />
+        <Button
+          variant='secondary'
+          size='sm'
+          disabled={busy || uploading || checking}
+          onclick={() => void commitUrl()}
+        >
+          {checking ? 'Checking…' : 'Use'}
+        </Button>
+      </div>
+    </SettingsRow>
+    {#if urlError !== ''}
+      <p id='image-url-error' role='alert' class='px-4 pb-2 text-xs text-(--destructive)'>
+        {urlError}
+      </p>
+    {/if}
+    <SettingsRow
+      title='Upload image'
+      helpText='PNG, JPEG, WebP, GIF or SVG, up to 25 MB. Stored locally in your browser.'
+      controlId='image-upload'
+      disabled={busy || uploading}
+    >
+      <Button
+        id='image-upload'
+        variant='secondary'
+        size='sm'
+        disabled={busy || uploading}
+        onclick={() => fileInput?.click()}
+      >
+        {uploading ? 'Reading…' : 'Choose file…'}
+      </Button>
+      <input
+        bind:this={fileInput}
+        id='image-upload-input'
+        name='image-upload'
+        type='file'
+        accept='image/png,image/jpeg,image/webp,image/gif,image/svg+xml'
+        class='hidden'
+        tabindex='-1'
+        aria-hidden='true'
+        onchange={handleUpload}
+      />
+    </SettingsRow>
+    <SettingsRow
+      title='Fit'
+      helpText='How the image fills the canvas'
+      disabled={busy || uploading}
+    >
+      <ToggleGroup.Root
+        type='single'
+        id='image-fit'
+        value={bg.fit ?? 'cover'}
+        disabled={busy || uploading}
+        onValueChange={(v) => {
+          const fit = IMAGE_FITS.find(candidate => candidate === v)
+          if (fit)
+            updateImage({ fit })
+        }}
+      >
+        {#each IMAGE_FITS as fit (fit)}
+          <ToggleGroup.Item value={fit} class='grow capitalize'>{fit}</ToggleGroup.Item>
+        {/each}
+      </ToggleGroup.Root>
+    </SettingsRow>
+    <BackgroundColorMode
+      auto={bg.auto ?? true}
+      color={bg.color}
+      busy={busy || uploading}
+      idPrefix='image-background'
+      onchange={(auto, color) => updateImage({ auto, color })}
+    />
+    <SettingsRow
+      title='Opacity'
+      helpText='Make the image transparent'
+      disabled={busy || uploading}
+    >
+      <span>{Math.round(imageOpacityDraft * 100)}%</span>
+      <Slider
+        id='image-opacity'
+        type='single'
+        value={imageOpacityDraft}
+        min={0.0}
+        max={1.0}
+        step={0.1}
+        class='w-32'
+        onValueChange={dragImageOpacity}
+        onValueCommit={finishImageOpacityDrag}
+      />
+    </SettingsRow>
+    <SettingsRow
+      title='Parallax'
+      helpText={settings.reducedMotion
+        ? 'Disabled because reduced motion is on.'
+        : 'Nudge the image as the canvas scrolls.'}
+      controlId='image-parallax'
+      disabled={busy || uploading || settings.reducedMotion}
+    >
+      <input
+        id='image-parallax'
+        type='checkbox'
+        role='switch'
+        aria-describedby='image-parallax-help'
+        checked={bg.parallax ?? false}
+        disabled={busy || uploading || settings.reducedMotion}
+        onchange={event => updateImage({ parallax: event.currentTarget.checked })}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
+          bg-(--border) p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+      />
+    </SettingsRow>
+    {@const parallaxDisabled = busy || uploading || settings.reducedMotion
+      || !(bg.parallax ?? false)}
+    <SettingsRow
+      title='Parallax zoom'
+      helpText='How large the background layer is. Bigger means more travel.'
+      disabled={parallaxDisabled}
+    >
+      <span>{String(Number(zoomDraft.toFixed(2)))}x</span>
+      <Slider
+        id='image-parallax-zoom'
+        type='single'
+        value={zoomDraft}
+        min={1}
+        max={4}
+        step={0.25}
+        class='w-32'
+        disabled={parallaxDisabled}
+        onValueChange={dragZoom}
+        onValueCommit={finishZoomDrag}
+      />
+    </SettingsRow>
+    {#if (bg.url ?? '') !== ''}
+      <SettingsRow
+        title='Remove image'
+        helpText='Back to a plain background'
+        controlId='image-remove'
+        disabled={busy || uploading}
+      >
+        <Button
+          id='image-remove'
+          variant='secondary'
+          size='sm'
+          disabled={busy || uploading}
+          onclick={removeImage}
+        >
+          Remove image
+        </Button>
+      </SettingsRow>
+    {/if}
   {/if}
 
 </CollapsibleSection>

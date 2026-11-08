@@ -27,7 +27,6 @@
 <SettingsRow
   title='Background color'
   helpText='Choose an automatic or custom background color.'
-  controlId={`${idPrefix}-source`}
   disabled={busy}
 >
   <ToggleGroup.Root

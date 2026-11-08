@@ -13,6 +13,7 @@ import type {
   Snapshot,
   UndoRecord,
 } from '$lib/types'
+import { normalizeImageBackgroundSettings, validateBackgroundUrl } from '$lib/image-background'
 import { freePosition, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
 import { validateUrl } from '$lib/url.js'
@@ -71,8 +72,16 @@ export class BookmarkCoordinator {
     })
     this.ready = this.exclusive(async () => {
       const stored = await persistence.read()
-      if (stored?.schema === 1)
-        this.data = { ...emptyData(this.settings), ...stored, settings: { ...this.settings, ...stored.settings } }
+      if (stored?.schema === 1) {
+        this.data = {
+          ...emptyData(this.settings),
+          ...stored,
+          settings: normalizeImageBackgroundSettings({
+            ...this.settings,
+            ...stored.settings,
+          }),
+        }
+      }
       await this.refresh()
       if (this.recoverPrepared())
         await this.save()
@@ -405,6 +414,24 @@ export class BookmarkCoordinator {
           else if (background.type === 'image') {
             if (typeof background.url !== 'string')
               throw new Error('Invalid background image.')
+            try {
+              validateBackgroundUrl(background.url)
+            }
+            catch (error) {
+              throw new Error(error instanceof Error ? error.message : 'Invalid background image.')
+            }
+            if (background.fit !== undefined && !['cover', 'contain', 'fill', 'none'].includes(background.fit))
+              throw new Error('Invalid image fit.')
+            if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
+              throw new Error('Invalid image opacity.')
+            if (background.parallax !== undefined && typeof background.parallax !== 'boolean')
+              throw new Error('Invalid parallax setting.')
+            if (background.parallaxZoom !== undefined && (!Number.isFinite(background.parallaxZoom) || background.parallaxZoom < 1 || background.parallaxZoom > 4))
+              throw new Error('Invalid parallax zoom setting.')
+            if (background.auto !== undefined && typeof background.auto !== 'boolean')
+              throw new Error('Invalid background mode.')
+            if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))
+              throw new Error('Use a six-digit hex color.')
           }
           else if (background.type === 'shader') {
             if (background.shaderId !== undefined && typeof background.shaderId !== 'string')

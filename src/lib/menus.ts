@@ -1,5 +1,6 @@
 import type { MenuItem } from '$lib/components/ContextMenu.svelte'
 import type { BookmarkNode, GroupView, TileView } from '$lib/types'
+import { BACKGROUND_DEFAULTS } from '$lib/config'
 
 export interface MenuCallbacks {
   open: (url: string, disposition: 'tab' | 'window') => void
@@ -19,11 +20,13 @@ export interface MenuInputs {
   selectedId: string | null
   defaultFolder: string
   shaderActive: boolean
+  /** Whether an image background with a URL is currently applied. */
+  imageActive: boolean
   callbacks: MenuCallbacks
 }
 
 export function buildMenuItems(input: MenuInputs): MenuItem[] {
-  const { context, contextTile, node, group, groups, selectedId, defaultFolder, shaderActive, callbacks } = input
+  const { context, contextTile, node, group, groups, selectedId, defaultFolder, shaderActive, imageActive, callbacks } = input
   if (!context)
     return []
   const tile = contextTile
@@ -65,6 +68,14 @@ export function buildMenuItems(input: MenuInputs): MenuItem[] {
       icon: 'close',
       separator: true,
       action: async () => callbacks.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: true, color: undefined } } }),
+    })
+  }
+  if (imageActive) {
+    items.push({
+      label: 'Turn off background image',
+      icon: 'close',
+      separator: true,
+      action: async () => callbacks.execute({ type: 'settings.update', patch: { background: { ...BACKGROUND_DEFAULTS.color } } }),
     })
   }
   return items
