@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { Settings } from '$lib/config'
 
+  import Icon from '$lib/components/Icon.svelte'
   import { Button } from '$lib/components/ui/button'
   import { Input } from '$lib/components/ui/input'
   import * as Select from '$lib/components/ui/select'
@@ -181,6 +182,15 @@
   let zoomDragging = $state(false)
   let zoomPending = $state<number | null>(null)
   let fileInput = $state<HTMLInputElement | null>(null)
+  type ImageSourceTab = 'upload' | 'url'
+  const initialSourceTab = (): ImageSourceTab => {
+    const url = initialImage()?.url ?? ''
+    // A stored upload belongs to the Upload tab; a remote or data address belongs to From URL.
+    return url !== '' && !isStoredMedia(url) ? 'url' : 'upload'
+  }
+  let sourceTab = $state<ImageSourceTab>(initialSourceTab())
+  let dragOver = $state(false)
+  let dragDepth = 0
 
   $effect(() => {
     const bg = settings.background
@@ -353,12 +363,9 @@
     throw new Error('That image is still too large after resizing. Choose a simpler image.')
   }
 
-  async function handleUpload(event: Event & { currentTarget: HTMLInputElement }) {
-    const input = event.currentTarget
-    const file = input.files?.[0]
-    // Reset so picking the same file twice still fires `change`.
-    input.value = ''
-    if (!file || settings.background.type !== 'image')
+  async function uploadFile(file: File) {
+    const bg = settings.background
+    if (bg.type !== 'image')
       return
     urlError = ''
     uploading = true
@@ -376,7 +383,7 @@
         throw new Error('That file could not be decoded as an image.')
       const blob = await encodeForStorage(file, image)
       const key = await saveBackgroundMedia(blob)
-      onchange({ background: { ...settings.background, url: key } })
+      onchange({ background: { ...bg, url: key } })
       urlDirty = false
     }
     catch (error) {
@@ -385,6 +392,49 @@
     finally {
       uploading = false
     }
+  }
+
+  async function handleUpload(event: Event & { currentTarget: HTMLInputElement }) {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    // Reset so picking the same file twice still fires `change`.
+    input.value = ''
+    if (!file)
+      return
+    await uploadFile(file)
+  }
+
+  function handleDragEnter(event: DragEvent) {
+    if (busy || uploading)
+      return
+    event.preventDefault()
+    dragDepth += 1
+    dragOver = true
+  }
+
+  function handleDragOver(event: DragEvent) {
+    // Required so the browser allows a drop.
+    if (busy || uploading)
+      return
+    event.preventDefault()
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    event.preventDefault()
+    dragDepth = Math.max(0, dragDepth - 1)
+    if (dragDepth === 0)
+      dragOver = false
+  }
+
+  function handleDrop(event: DragEvent) {
+    event.preventDefault()
+    dragDepth = 0
+    dragOver = false
+    if (busy || uploading)
+      return
+    const file = event.dataTransfer?.files?.[0]
+    if (file)
+      void uploadFile(file)
   }
 
   /** Confirm a remote address decodes as an image before persisting it. */
@@ -670,79 +720,125 @@
 
   {#if settings.background.type === 'image'}
     {@const bg = settings.background}
-    <SettingsRow
-      title='Image address'
-      helpText='A remote http(s) address. Loaded fresh each new tab.'
-      controlId='image-url'
-      disabled={busy || uploading}
-    >
-      <div class='flex items-center gap-2'>
-        <Input
-          id='image-url'
-          type='text'
-          inputmode='url'
-          placeholder={isStoredMedia(bg.url)
-            ? 'Uploaded image in use — enter an address to replace it'
-            : 'https://example.com/wallpaper.jpg'}
-          class='w-48 text-sm'
-          value={urlDraft}
-          disabled={busy || uploading}
-          aria-invalid={urlError !== '' ? 'true' : undefined}
-          aria-describedby={urlError !== '' ? 'image-url-error' : undefined}
-          oninput={(event) => {
-            urlDraft = event.currentTarget.value
-            urlDirty = true
-            urlError = ''
-          }}
-          onkeydown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault()
-              void commitUrl()
-            }
-          }}
-        />
-        <Button
-          variant='secondary'
-          size='sm'
-          disabled={busy || uploading || checking}
-          onclick={() => void commitUrl()}
+    <div class='px-4 py-3'>
+      <ToggleGroup.Root
+        type='single'
+        id='image-source'
+        aria-label='Image source'
+        value={sourceTab}
+        class='w-full'
+        disabled={busy || uploading}
+        onValueChange={(v) => {
+          if (v === 'upload' || v === 'url')
+            sourceTab = v
+        }}
+      >
+        <ToggleGroup.Item value='upload' class='grow'>Upload</ToggleGroup.Item>
+        <ToggleGroup.Item value='url' class='grow'>From URL</ToggleGroup.Item>
+      </ToggleGroup.Root>
+
+      {#if sourceTab === 'upload'}
+        <p
+          class='
+            mt-4 mb-2 text-[0.5rem] font-semibold tracking-[1.1px]
+            text-(--muted-foreground)
+          '
         >
-          {checking ? 'Checking…' : 'Use'}
-        </Button>
-      </div>
-    </SettingsRow>
+          IMAGE FILE
+        </p>
+        <button
+          id='image-upload'
+          type='button'
+          class='
+            flex w-full flex-col items-center justify-center gap-1.5 rounded-md border
+            border-dashed border-(--border) px-4 py-6 text-center text-(--foreground)
+            transition-colors
+            hover:border-(--muted-foreground) hover:bg-(--muted)/30
+            focus-visible:outline-2 focus-visible:outline-offset-2
+            focus-visible:outline-ring
+            disabled:cursor-not-allowed disabled:opacity-50
+            {dragOver ? 'border-(--primary) bg-(--muted)/40' : ''}
+          '
+          disabled={busy || uploading}
+          aria-describedby='image-upload-help'
+          onclick={() => fileInput?.click()}
+          ondragenter={handleDragEnter}
+          ondragover={handleDragOver}
+          ondragleave={handleDragLeave}
+          ondrop={handleDrop}
+        >
+          <Icon name='image' size={32} class='text-(--muted-foreground)' />
+          <span class='text-sm font-semibold'>
+            {uploading ? 'Reading…' : 'Click to browse or drop an image'}
+          </span>
+          <span id='image-upload-help' class='text-xs text-(--muted-foreground)'>
+            PNG, JPG, WebP, GIF or SVG · max 25 MB
+          </span>
+        </button>
+        <input
+          bind:this={fileInput}
+          id='image-upload-input'
+          name='image-upload'
+          type='file'
+          accept='image/png,image/jpeg,image/webp,image/gif,image/svg+xml'
+          class='hidden'
+          tabindex='-1'
+          aria-hidden='true'
+          onchange={handleUpload}
+        />
+      {:else}
+        <label
+          for='image-url'
+          class='
+            mt-4 mb-2 block text-[0.5rem] font-semibold tracking-[1.1px]
+            text-(--muted-foreground)
+          '
+        >
+          IMAGE URL
+        </label>
+        <div class='flex items-center gap-2'>
+          <Input
+            id='image-url'
+            type='text'
+            inputmode='url'
+            placeholder={isStoredMedia(bg.url)
+              ? 'Uploaded image in use — enter an address to replace it'
+              : 'https://example.com/photo.jpg'}
+            class='min-w-0 flex-1 text-sm'
+            value={urlDraft}
+            disabled={busy || uploading}
+            aria-invalid={urlError !== '' ? 'true' : undefined}
+            aria-describedby={urlError !== '' ? 'image-url-error' : undefined}
+            oninput={(event) => {
+              urlDraft = event.currentTarget.value
+              urlDirty = true
+              urlError = ''
+            }}
+            onkeydown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                void commitUrl()
+              }
+            }}
+          />
+          <Button
+            variant='default'
+            size='sm'
+            class='h-9 px-4'
+            disabled={busy || uploading || checking}
+            onclick={() => void commitUrl()}
+          >
+            {checking ? 'Checking…' : 'Apply'}
+          </Button>
+        </div>
+      {/if}
+    </div>
+
     {#if urlError !== ''}
-      <p id='image-url-error' role='alert' class='px-4 pb-2 text-xs text-(--destructive)'>
+      <p id='image-url-error' role='alert' class='border-t border-(--border) px-4 py-2 text-xs text-(--destructive)'>
         {urlError}
       </p>
     {/if}
-    <SettingsRow
-      title='Upload image'
-      helpText='PNG, JPEG, WebP, GIF or SVG, up to 25 MB. Stored locally in your browser.'
-      controlId='image-upload'
-      disabled={busy || uploading}
-    >
-      <Button
-        id='image-upload'
-        variant='secondary'
-        size='sm'
-        disabled={busy || uploading}
-        onclick={() => fileInput?.click()}
-      >
-        {uploading ? 'Reading…' : 'Choose file…'}
-      </Button>
-      <input
-        bind:this={fileInput}
-        id='image-upload-input'
-        name='image-upload'
-        type='file'
-        accept='image/png,image/jpeg,image/webp,image/gif,image/svg+xml'
-        class='hidden'
-        tabindex='-1'
-        aria-hidden='true'
-        onchange={handleUpload}
-      />
-    </SettingsRow>
     <SettingsRow
       title='Fit'
       helpText='How the image fills the canvas'
