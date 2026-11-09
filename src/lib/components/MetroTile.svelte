@@ -103,10 +103,11 @@
     style?: string
     dataTestId?: string
     dataGridId?: string
+    /** Tile id for plain (non-draggable) tiles so context menus can find the owner. */
+    dataTileId?: string
     dataDragging?: boolean
     attach?: (node: HTMLAnchorElement) => void | (() => void)
     onclick?: (event: MouseEvent) => void
-    oncontextmenu?: (event: MouseEvent) => void
     onpointerdown?: (event: PointerEvent) => void
     onpointermove?: (event: PointerEvent) => void
     onpointerup?: (event: PointerEvent) => void
@@ -132,10 +133,10 @@
     style,
     dataTestId = 'metro-tile',
     dataGridId,
+    dataTileId,
     dataDragging,
     attach,
     onclick,
-    oncontextmenu,
     onpointerdown,
     onpointermove,
     onpointerup,
@@ -211,6 +212,7 @@
   data-size={size}
   data-selected={selected || undefined}
   data-grid-id={dataGridId}
+  data-tile-id={dataTileId}
   data-dragging={dataDragging || undefined}
   href={launchHref}
   {target}
@@ -227,7 +229,6 @@
   {@attach tilt}
   {@attach attach ?? (() => {})}
   onclick={onclick}
-  oncontextmenu={oncontextmenu}
   onpointerdown={onpointerdown}
   onpointermove={onpointermove}
   onpointerup={onpointerup}

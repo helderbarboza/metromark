@@ -16,7 +16,6 @@
     preview: boolean
     dragging: boolean
     onselect: (id: string, event: PointerEvent) => void
-    oncontextmenu: (event: MouseEvent) => void
     onblocked: (message: string) => void
   }
 
@@ -29,7 +28,6 @@
     preview,
     dragging,
     onselect,
-    oncontextmenu,
     onblocked,
   }: Props = $props()
   // Snapgrid instances are keyed by immutable browser bookmark IDs.
@@ -148,7 +146,6 @@
   dataDragging={item.isDragging}
   attach={attachTile}
   onclick={click}
-  oncontextmenu={oncontextmenu}
   onpointerdown={pointerdown}
   onpointermove={pointermove}
   onpointerup={pointerup}
