@@ -110,9 +110,9 @@
     >
       {#snippet control()}
         <div class='inline-flex items-center gap-2 text-sm'>
-          <span><span class='text-(--muted-foreground)'>Light:</span> {themes.light}</span>
+          <span>{themes.light}</span>
           <span aria-hidden='true' class='text-(--muted-foreground)'>·</span>
-          <span><span class='text-(--muted-foreground)'>Dark:</span> {themes.dark}</span>
+          <span>{themes.dark}</span>
         </div>
       {/snippet}
       <div class='p-4'>
