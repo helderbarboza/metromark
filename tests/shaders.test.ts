@@ -1,5 +1,5 @@
-import { defaultShader, getShader, shaders } from '$lib/shaders'
-import { describe, expect, it, vi } from 'vitest'
+import { getShader, NONE_SHADER_ID, shaders } from '$lib/shaders'
+import { describe, expect, it } from 'vitest'
 
 describe('shader registry', () => {
   it('keys every definition by its own id', () => {
@@ -16,9 +16,11 @@ describe('shader registry', () => {
     expect(getShader('swiss-alps')).toBe(shaders['swiss-alps'])
   })
 
-  it('falls back to the default shader for an unknown id', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    expect(getShader('not-a-shader')).toBe(defaultShader)
-    warn.mockRestore()
+  it('returns undefined for an unknown id (no implicit default shader)', () => {
+    expect(getShader('not-a-shader')).toBeUndefined()
+  })
+
+  it('has no definition for the none selection', () => {
+    expect(getShader(NONE_SHADER_ID)).toBeUndefined()
   })
 })

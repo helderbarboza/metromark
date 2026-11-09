@@ -76,8 +76,10 @@ export const BACKGROUND_DEFAULTS = {
   color: { type: 'color', auto: true, color: undefined },
   image: { type: 'image', url: '', auto: true, color: undefined, parallaxZoom: 1.5 },
   shader: {
+    // No shader runs by default: pick one in the background editor. This also
+    // keeps a first benchmark run free of contention from a default background.
     type: 'shader',
-    shaderId: 'balatro',
+    shaderId: 'none',
     speed: 1,
     targetFps: 60,
     opacity: 1,

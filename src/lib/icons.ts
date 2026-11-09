@@ -8,6 +8,11 @@ import bookmark from '@iconify-icons/fluent/bookmark-20-regular'
 import addBookmark from '@iconify-icons/fluent/bookmark-add-20-regular'
 import searchBookmarks from '@iconify-icons/fluent/bookmark-search-20-regular'
 import buildingFactory from '@iconify-icons/fluent/building-factory-20-regular'
+import cellularExcellent from '@iconify-icons/fluent/cellular-data-1-20-regular'
+import cellularGood from '@iconify-icons/fluent/cellular-data-2-20-regular'
+import cellularModerate from '@iconify-icons/fluent/cellular-data-3-20-regular'
+import cellularWeak from '@iconify-icons/fluent/cellular-data-4-20-regular'
+import cellularPoor from '@iconify-icons/fluent/cellular-data-5-20-regular'
 import check from '@iconify-icons/fluent/checkmark-20-regular'
 import chevronDown from '@iconify-icons/fluent/chevron-down-20-regular'
 import color from '@iconify-icons/fluent/color-20-regular'
@@ -30,6 +35,7 @@ import openWindow from '@iconify-icons/fluent/open-20-regular'
 import paintBrush from '@iconify-icons/fluent/paint-brush-20-regular'
 import pause from '@iconify-icons/fluent/pause-20-regular'
 import lock from '@iconify-icons/fluent/person-shield-20-regular'
+import prohibited from '@iconify-icons/fluent/prohibited-20-regular'
 import scaleFill from '@iconify-icons/fluent/scale-fill-20-regular'
 import settings from '@iconify-icons/fluent/settings-20-regular'
 import add from '@iconify-icons/fluent/square-add-20-regular'
@@ -69,12 +75,18 @@ export const icons = {
   lock,
   more,
   openTab,
+  prohibited,
   openWindow,
   paintBrush,
   pause,
   refresh,
   scaleFill,
   searchBookmarks,
+  signalExcellent: cellularExcellent,
+  signalGood: cellularGood,
+  signalModerate: cellularModerate,
+  signalPoor: cellularPoor,
+  signalWeak: cellularWeak,
   settings,
   transparencySquare,
   undo,

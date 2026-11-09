@@ -37,7 +37,8 @@
     buildGroupMenuItems,
     buildTileMenuItems,
   } from '$lib/menus'
-  import { getShader } from '$lib/shaders'
+  import { getShader, NONE_SHADER_ID } from '$lib/shaders'
+  import { shaderBenchmark } from '$lib/shaders/benchmark.svelte'
   import { applyThemeForMode, resetThemePreferences } from '$lib/theme-picker'
   import {
     flatten,
@@ -107,6 +108,18 @@
       return undefined
     }
     return snapshot.settings.background.color
+  })
+  const shaderBackground = $derived(
+    snapshot?.settings.background.type === 'shader' ? snapshot.settings.background : undefined,
+  )
+  const liveShader = $derived.by(() => {
+    const bg = shaderBackground
+    if (!bg)
+      return undefined
+    const id = bg.shaderId ?? NONE_SHADER_ID
+    if (id === NONE_SHADER_ID)
+      return undefined
+    return getShader(id)
   })
   const roots = $derived(
     (snapshot?.tree ?? [])
@@ -726,19 +739,18 @@
     class:reduced={snapshot?.settings.reducedMotion}
     style:background={backgroundColor}
   >
-    {#if snapshot?.settings.background.type === 'shader'}
+    {#if liveShader && shaderBackground && snapshot}
       <Background
-        shader={getShader(snapshot.settings.background.shaderId ?? 'balatro')}
+        shader={liveShader}
         reducedMotion={snapshot.settings.reducedMotion}
-        color={snapshot.settings.background.auto === false
-          ? snapshot.settings.background.color
-          : undefined}
-        speed={snapshot.settings.background.speed ?? 1}
-        targetFps={snapshot.settings.background.targetFps ?? 60}
-        quality={snapshot.settings.background.quality ?? 'motion'}
-        opacity={snapshot.settings.background.opacity ?? 1}
-        mouseInteraction={snapshot.settings.background.mouseInteraction ?? true}
-        renderScale={snapshot.settings.background.renderScale ?? 0.5}
+        animated={!shaderBenchmark.running}
+        color={shaderBackground.auto === false ? shaderBackground.color : undefined}
+        speed={shaderBackground.speed ?? 1}
+        targetFps={shaderBackground.targetFps ?? 60}
+        quality={shaderBackground.quality ?? 'motion'}
+        opacity={shaderBackground.opacity ?? 1}
+        mouseInteraction={shaderBackground.mouseInteraction ?? true}
+        renderScale={shaderBackground.renderScale ?? 0.5}
         onstruggle={() => showNotice({
           message: 'Animated background paused to keep this page fast.',
           actionLabel: 'Turn off',
