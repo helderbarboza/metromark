@@ -102,6 +102,7 @@
       title='Current theme'
       helpText={THEME_HELP}
       value='Custom'
+      open
     >
       <div class='p-4'>
         <p class='mb-2.5 text-xs text-(--muted-foreground)'>Recent themes</p>
@@ -191,6 +192,7 @@
       icon='globe'
       title='Personalize your background'
       helpText={BACKGROUND_HELP}
+      open
     >
       {#snippet control({ titleId })}
         <select

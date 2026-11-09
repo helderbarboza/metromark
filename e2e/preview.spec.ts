@@ -8,7 +8,7 @@ test('flat ancestry, separate roots, launcher tiles, and background context-menu
   await expect(link(page, 'Steam')).toHaveAttribute('data-size', 'large')
   await page.getByRole('button', { name: /^Other bookmarks/ }).click()
   await expect(page.locator('[data-testid="metro-group"]')).toHaveCount(1)
-  await expect(page.locator('a[data-testid="tile-slot"]')).toHaveCount(4)
+  await expect(page.locator('a[data-grid-id]')).toHaveCount(4)
   await expect(group(page, 'Other bookmarks')).toBeVisible()
   await page.getByRole('button', { name: /^All bookmarks/ }).click()
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -43,11 +43,11 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   await page.getByRole('menuitem', { name: 'Customize tile' }).click()
   dialog = page.getByRole('dialog')
   await dialog.getByLabel('Tile size', { exact: true }).selectOption('wide')
+  await dialog.getByRole('button', { name: 'Custom color', exact: true }).click()
   await dialog.getByLabel('Custom tile color').evaluate((input: HTMLInputElement) => {
     input.value = '#f7f7f7'
     input.dispatchEvent(new Event('input', { bubbles: true }))
   })
-  await dialog.getByLabel('Icon', { exact: true }).selectOption('globe')
   await dialog.getByRole('button', { name: 'Save changes' }).click()
   await expect(link(page, 'QA edited favorite')).toHaveCSS('color', 'rgb(0, 0, 0)')
   for (const size of ['small', 'medium', 'large', 'wide']) {
@@ -180,7 +180,9 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await expect(link(second, 'QA across tabs')).toBeVisible()
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await page.getByRole('button', { name: 'Catppuccin Mocha', exact: true }).click()
+  await page.getByRole('radio', { name: 'dark', exact: true }).click()
+  await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
+  await page.getByRole('button', { name: 'catppuccin-mocha', exact: true }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'catppuccin-mocha')
   await expect(second.locator('html')).toHaveAttribute('data-theme', 'catppuccin-mocha')
   await page.keyboard.press('Escape')
@@ -288,7 +290,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   // Switch to dark mode (metro-dark) via Appearance dialog
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await page.getByRole('button', { name: 'Dark', exact: true }).click()
+  await page.getByRole('radio', { name: 'dark', exact: true }).click()
   await page.keyboard.press('Escape')
 
   // In metro-dark all accent colors are bright, so both tiles should have black text now.
@@ -298,7 +300,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   // Switch back to light mode
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await page.getByRole('button', { name: 'Light', exact: true }).click()
+  await page.getByRole('radio', { name: 'light', exact: true }).click()
   await page.keyboard.press('Escape')
 
   // Back to metro-light: Notion black, Steam white.
@@ -308,7 +310,8 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   // Switch theme to one-light (another light theme with different accent colors)
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await page.getByRole('button', { name: 'One Light', exact: true }).click()
+  await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
+  await page.getByRole('button', { name: 'one-light', exact: true }).click()
   await page.keyboard.press('Escape')
 
   // In one-light, colorIndex 3 -> base0B #50a14f (green) -> black
@@ -323,10 +326,14 @@ test('factory reset restores Metro defaults and keeps sample bookmarks', async (
   await expect(draggable(page, 'steam')).toBeVisible()
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await page.getByRole('button', { name: 'compact', exact: true }).click()
-  await page.getByRole('button', { name: /one-light$/ }).click()
+  await page.getByRole('tab', { name: 'Tiles', exact: true }).click()
+  await page.getByRole('radio', { name: 'compact', exact: true }).click()
+  await page.getByRole('tab', { name: 'Appearance', exact: true }).click()
+  await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
+  await page.getByRole('button', { name: 'one-light', exact: true }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'one-light')
 
+  await page.getByRole('tab', { name: 'Reset', exact: true }).click()
   await page.getByRole('button', { name: 'Factory reset', exact: true }).click()
   await expect(page.getByText('Reset Metro to factory defaults?')).toBeVisible()
   await page.getByRole('button', { name: 'Reset Metro', exact: true }).click()
@@ -358,5 +365,10 @@ test('factory reset restores Metro defaults and keeps sample bookmarks', async (
   expect(saved.appearance).toEqual({})
   expect(saved.layouts).toEqual({})
   expect(saved.undos).toEqual([])
-  expect(saved.settings).toEqual({ density: 'comfortable', showDomains: true, reducedMotion: false })
+  expect(saved.settings).toEqual({
+    density: 'comfortable',
+    showDomains: true,
+    reducedMotion: false,
+    background: { auto: true, type: 'color' },
+  })
 })

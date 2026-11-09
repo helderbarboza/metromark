@@ -2,22 +2,12 @@ import type { AppData, BookmarkNode } from '$lib/types'
 import type { Page } from '@playwright/test'
 import { test as base, expect } from '@playwright/test'
 
-function isValidJson<T>(_value: unknown, _fallback: T): _value is T {
-  return true
-}
-
-function readJson<T>(key: string, fallback: T): T {
-  try {
-    const value = localStorage.getItem(key)
-    if (value == null || value === '') {
-      return fallback
-    }
-    const parsed: unknown = JSON.parse(value)
-    return isValidJson(parsed, fallback) ? parsed : fallback
-  }
-  catch {
-    return fallback
-  }
+const PRESENTATION_FALLBACK: AppData = {
+  schema: 1,
+  appearance: {},
+  layouts: {},
+  settings: { density: 'comfortable', showDomains: true, reducedMotion: false, background: { type: 'color', auto: true } },
+  undos: [],
 }
 
 export const test = base.extend<{ noPageErrors: void }>({
@@ -30,11 +20,53 @@ export const test = base.extend<{ noPageErrors: void }>({
 })
 export { expect }
 export const group = (page: Page, title: string) => page.locator('[data-testid="metro-group"]').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
-export const link = (page: Page, title: string) => page.getByRole('link', { name: new RegExp(`^Open ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
+/** Tiles are dnd-kit sortables, so they expose role="button" with an "Open …" name. */
+export const link = (page: Page, title: string) => page.getByRole('button', { name: new RegExp(`^Open ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
 export const draggable = (page: Page, id: string) => page.locator(`a[data-grid-id="${id}"]`)
 export const appBar = (page: Page) => page.getByRole('toolbar')
-export const presentation = async (page: Page) => page.evaluate(() => readJson<AppData>('metro.preview.presentation.v1', { schema: 1, appearance: {}, layouts: {}, settings: { density: 'comfortable', showDomains: true, reducedMotion: false, background: { type: 'color', auto: true } }, undos: [] }))
-export const tree = async (page: Page) => page.evaluate(() => readJson<BookmarkNode[]>('metro.preview.bookmarks.v1', []))
+/** Browser context runs outside this module; keep each evaluate body self-contained. */
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function isBookmarkNode(value: unknown): value is BookmarkNode {
+  if (!isObject(value))
+    return false
+  return typeof value.id === 'string' && typeof value.title === 'string'
+}
+
+function isAppData(value: unknown): value is AppData {
+  if (!isObject(value))
+    return false
+  return typeof value.schema === 'number'
+    && isObject(value.appearance)
+    && isObject(value.layouts)
+    && isObject(value.settings)
+}
+
+export async function presentation(page: Page): Promise<AppData> {
+  const raw = await page.evaluate((): unknown => {
+    try {
+      return JSON.parse(localStorage.getItem('metro.preview.presentation.v1') ?? 'null')
+    }
+    catch {
+      return null
+    }
+  })
+  return isAppData(raw) ? raw : PRESENTATION_FALLBACK
+}
+
+export async function tree(page: Page): Promise<BookmarkNode[]> {
+  const raw = await page.evaluate((): unknown => {
+    try {
+      return JSON.parse(localStorage.getItem('metro.preview.bookmarks.v1') ?? '[]')
+    }
+    catch {
+      return null
+    }
+  })
+  return Array.isArray(raw) ? raw.filter(isBookmarkNode) : []
+}
 export function flat(nodes: BookmarkNode[]): BookmarkNode[] {
   return nodes.flatMap(node => [node, ...flat(node.children ?? [])])
 }

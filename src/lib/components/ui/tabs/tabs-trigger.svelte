@@ -16,7 +16,7 @@
     `
       relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5
       rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap
-      text-foreground/60 transition-all
+      text-muted-foreground transition-all
       group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start
       hover:text-foreground
       focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50

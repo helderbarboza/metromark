@@ -82,6 +82,8 @@
       = active instanceof HTMLButtonElement ? buttons.indexOf(active) : -1
     if (event.key === 'Escape' || event.key === 'Tab') {
       event.preventDefault()
+      // The menu owns the event while open; the canvas/app bar must not also act on it.
+      event.stopPropagation()
       onclose()
     }
     if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
@@ -237,7 +239,7 @@
   }
   .sizes button.current {
     background: var(--accent);
-    color: var(--primary);
+    color: var(--foreground);
   }
   /* Current size gets a shape cue, not color alone. */
   .sizes button.current .size-box {
