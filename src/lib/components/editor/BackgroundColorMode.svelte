@@ -26,12 +26,15 @@
 
 <SettingsRow
   title='Background color'
-  helpText='Choose an automatic or custom background color.'
+  helpText='Auto matches the page theme; custom uses your color'
+  controlId={`${idPrefix}-source`}
   disabled={busy}
 >
   <ToggleGroup.Root
     type='single'
     id={`${idPrefix}-source`}
+    aria-labelledby={`${idPrefix}-source-title`}
+    aria-describedby={`${idPrefix}-source-help`}
     value={auto ? 'auto' : 'custom'}
     disabled={busy}
     onValueChange={(mode) => {
@@ -47,7 +50,7 @@
 {#if !auto}
   <SettingsRow
     title='Custom color'
-    helpText='Choose the color used as the background.'
+    helpText='The color used as the background'
     controlId={`${idPrefix}-color`}
     disabled={busy}
   >
@@ -56,6 +59,7 @@
       type='color'
       disabled={busy}
       value={color || DEFAULT_CUSTOM_COLOR}
+      aria-describedby={`${idPrefix}-color-help`}
       class='
         size-8 cursor-pointer rounded-[3px] border border-(--border) bg-transparent p-0.5
         disabled:cursor-not-allowed disabled:opacity-50

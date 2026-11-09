@@ -1,10 +1,13 @@
+import density from '@iconify-icons/fluent/align-space-between-horizontal-20-regular'
 import arrowLeft from '@iconify-icons/fluent/arrow-left-20-regular'
+import arrowReset from '@iconify-icons/fluent/arrow-reset-20-regular'
 import arrowRight from '@iconify-icons/fluent/arrow-right-20-regular'
 import refresh from '@iconify-icons/fluent/arrow-sync-20-regular'
 import undo from '@iconify-icons/fluent/arrow-undo-20-regular'
 import bookmark from '@iconify-icons/fluent/bookmark-20-regular'
 import addBookmark from '@iconify-icons/fluent/bookmark-add-20-regular'
 import searchBookmarks from '@iconify-icons/fluent/bookmark-search-20-regular'
+import buildingFactory from '@iconify-icons/fluent/building-factory-20-regular'
 import check from '@iconify-icons/fluent/checkmark-20-regular'
 import chevronDown from '@iconify-icons/fluent/chevron-down-20-regular'
 import color from '@iconify-icons/fluent/color-20-regular'
@@ -20,10 +23,12 @@ import gauge from '@iconify-icons/fluent/gauge-20-regular'
 import globe from '@iconify-icons/fluent/globe-20-regular'
 import customize from '@iconify-icons/fluent/grid-20-regular'
 import image from '@iconify-icons/fluent/image-20-regular'
+import imageAdd from '@iconify-icons/fluent/image-add-20-regular'
+import layer from '@iconify-icons/fluent/layer-20-regular'
 import more from '@iconify-icons/fluent/more-vertical-20-regular'
 import openWindow from '@iconify-icons/fluent/open-20-regular'
 import paintBrush from '@iconify-icons/fluent/paint-brush-20-regular'
-import personRunning from '@iconify-icons/fluent/person-running-20-regular'
+import pause from '@iconify-icons/fluent/pause-20-regular'
 import lock from '@iconify-icons/fluent/person-shield-20-regular'
 import scaleFill from '@iconify-icons/fluent/scale-fill-20-regular'
 import settings from '@iconify-icons/fluent/settings-20-regular'
@@ -40,8 +45,10 @@ export const icons = {
   addBookmark,
   addFolder,
   arrowLeft,
+  arrowReset,
   arrowRight,
   bookmark,
+  buildingFactory,
   check,
   chevronDown,
   close,
@@ -50,18 +57,21 @@ export const icons = {
   customize,
   darkTheme,
   delete: deleteIcon,
+  density,
   edit,
   fastForward,
   folder,
   gauge,
   globe,
   image,
+  imageAdd,
+  layer,
   lock,
   more,
   openTab,
   openWindow,
   paintBrush,
-  personRunning,
+  pause,
   refresh,
   scaleFill,
   searchBookmarks,
