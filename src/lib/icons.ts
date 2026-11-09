@@ -19,6 +19,7 @@ import addFolder from '@iconify-icons/fluent/folder-add-20-regular'
 import gauge from '@iconify-icons/fluent/gauge-20-regular'
 import globe from '@iconify-icons/fluent/globe-20-regular'
 import customize from '@iconify-icons/fluent/grid-20-regular'
+import image from '@iconify-icons/fluent/image-20-regular'
 import more from '@iconify-icons/fluent/more-vertical-20-regular'
 import openWindow from '@iconify-icons/fluent/open-20-regular'
 import paintBrush from '@iconify-icons/fluent/paint-brush-20-regular'
@@ -54,6 +55,7 @@ export const icons = {
   folder,
   gauge,
   globe,
+  image,
   lock,
   more,
   openTab,
