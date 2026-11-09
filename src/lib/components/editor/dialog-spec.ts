@@ -11,6 +11,7 @@ export interface DialogSpec {
     | 'appearance'
     | 'restore'
     | 'copy'
+    | 'settings'
   id?: string
   parentId?: string
   undoId?: string
@@ -34,6 +35,8 @@ export function dialogTitle(spec: DialogSpec, node?: BookmarkNode): string {
       return 'Restore to a folder'
     case 'copy':
       return 'Copy website address'
+    case 'settings':
+      return 'Settings'
   }
 }
 

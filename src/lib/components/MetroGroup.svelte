@@ -269,8 +269,7 @@
             onclick={event => launch(event, tile)}
             oncontextmenu={event => onContext(event, 'tile', entry.i)}
             class='
-              absolute block text-inherit no-underline transition-[left,top,width,height]
-              duration-140
+              absolute block no-underline transition-[left,top,width,height] duration-140
               focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
               focus-visible:outline-(--primary)
               motion-reduce:transition-none

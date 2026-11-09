@@ -18,7 +18,10 @@
       onclick: clickFn,
     },
     argTypes: {
-      variant: { control: 'radio', options: ['primary', 'danger'] },
+      variant: {
+        control: 'radio',
+        options: ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+      },
       disabled: { control: 'boolean' },
     },
   })
@@ -42,7 +45,7 @@
   args={{ variant: 'secondary' }}
   play={async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Done' })
-    await expect(button).toHaveClass('secondary')
+    await expect(button).toHaveClass('bg-secondary')
   }}
 >
   Done
@@ -53,7 +56,7 @@
   args={{ variant: 'destructive' }}
   play={async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Delete folder' })
-    await expect(button).toHaveClass('destructive')
+    await expect(button).toHaveClass('bg-destructive')
     await expect(button.querySelector('svg')).toBeInTheDocument()
   }}
 >
@@ -67,9 +70,6 @@
   play={async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Save changes' })
     await expect(button).toBeDisabled()
-    const disabledClickFn = fn()
-    await userEvent.click(button)
-    await expect(disabledClickFn).not.toHaveBeenCalled()
   }}
 >
   Save changes

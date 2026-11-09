@@ -55,6 +55,9 @@
   let selectedId = $state<string | null>(null)
   let selectionOrigin = $state<HTMLElement | null>(null)
   let focusRequest = $state(0)
+  // Shift+F10 and the menu key produce a contextmenu whose coordinates still point
+  // at the last mouse position, so the keyboard origin must be tracked separately.
+  let kbMenu = false
   let busy = $state(false)
   let now = $state(Date.now())
   let viewportHeight = $state(800)
@@ -352,14 +355,16 @@
       showContext(event, 'tile', id)
       return
     }
-    const target = event.target instanceof HTMLElement ? event.target : null
+    const target = event.target instanceof Element ? event.target : null
     selectionOrigin = target?.closest<HTMLElement>('a, button') ?? null
     // Right-click always shows the commands for the tile it was pressed on; the
     // cross-slide gesture is what cancels a selection (uwp8 pp. 81-82).
+    const keyboard = kbMenu || (event.clientX === 0 && event.clientY === 0)
+    kbMenu = false
     selectedId = id
     // Marking an item also gives it focus, so Escape can hand focus back.
     selectionOrigin?.focus({ preventScroll: true })
-    if (event.clientX === 0 && event.clientY === 0)
+    if (keyboard)
       focusRequest += 1
   }
   /** Tiles select; group headers and the canvas keep their own menus. */
@@ -368,13 +373,17 @@
     target: 'tile' | 'group' | 'canvas',
     id: string,
   ) {
-    if (target === 'tile')
+    if (target === 'tile') {
       selectTile(event, id)
-    else showContext(event, target, id)
+    }
+    else {
+      kbMenu = false
+      showContext(event, target, id)
+    }
   }
   /** Cross-slide selection from a touch or pen gesture (uwp8 pp. 79-80). */
   function selectByGesture(id: string, event: PointerEvent) {
-    const target = event.target instanceof HTMLElement ? event.target : null
+    const target = event.target instanceof Element ? event.target : null
     selectionOrigin = target?.closest<HTMLElement>('a, button') ?? null
     selectedId = toggleSelection(selectedId, id)
   }
@@ -395,7 +404,7 @@
     if (dragging)
       return
     // Activating a tile opens it; pressing anywhere else drops the selection (p. 82).
-    const target = event.target instanceof HTMLElement ? event.target : null
+    const target = event.target instanceof Element ? event.target : null
     if (target?.closest('[data-grid-id], [data-testid="tile-slot"]'))
       return
     clearSelection()
@@ -423,7 +432,7 @@
   ) {
     event.preventDefault()
     event.stopPropagation()
-    const origin = event.target instanceof HTMLElement ? event.target : null
+    const origin = event.target instanceof Element ? event.target : null
     contextOrigin = origin?.closest<HTMLElement>('a, button') ?? null
     const rect = contextOrigin?.getBoundingClientRect()
     const keyboardOrButton
@@ -645,8 +654,11 @@
   }
   function key(event: KeyboardEvent) {
     const input
-      = event.target instanceof HTMLElement
+      = event.target instanceof Element
         && ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
+    // The browser fires contextmenu for these keys; mark it as keyboard-driven.
+    if ((event.key === 'F10' && event.shiftKey) || event.key === 'ContextMenu')
+      kbMenu = true
     if (context || more)
       return
     if (dialog) {

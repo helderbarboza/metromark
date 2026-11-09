@@ -29,7 +29,10 @@
     onresetpreview,
   }: Props = $props()
 
-  const { state: command, send, run } = createDialogCommand(oncommand, onclose)
+  const { state: command, send, run } = createDialogCommand(
+    command => oncommand(command),
+    () => onclose(),
+  )
 
   const densities = ['comfortable', 'compact'] as const
   const modes = ['system', 'light', 'dark'] as const
@@ -80,7 +83,11 @@
       <ToggleGroup.Root
         type='single'
         value={userPrefersMode.current}
-        onValueChange={v => setMode(v)}
+        onValueChange={(v) => {
+          // bits-ui passes a bare string; mode-watcher only accepts known modes.
+          if (v === 'light' || v === 'dark' || v === 'system')
+            setMode(v)
+        }}
         id='app-mode'
         aria-labelledby='app-mode-title'
         aria-describedby='app-mode-help'

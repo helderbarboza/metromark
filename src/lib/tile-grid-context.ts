@@ -5,4 +5,4 @@ export interface TileGridMetrics {
   gap?: number
 }
 
-export const [getTileGrid, setTileGrid] = createContext<(() => TileGridMetrics) | undefined>()
+export const [getTileGrid, setTileGrid, hasTileGrid] = createContext<(() => TileGridMetrics) | undefined>()

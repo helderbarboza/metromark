@@ -8,7 +8,7 @@
   import MetroGroup from '$lib/components/MetroGroup.svelte'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import { expect, fn } from 'storybook/test'
+  import { expect, fn, userEvent } from 'storybook/test'
 
   const tiles: Record<string, TileView> = {
     steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true },
@@ -103,6 +103,7 @@
     await expect(await canvas.findByRole('heading', { name: 'Design' })).toBeVisible()
     await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
     await expect(await canvas.findByRole('link', { name: /^Open Gmail/ })).toBeVisible()
+    await userEvent.hover(canvas.getByRole('link', { name: /^Open Gmail/ }))
     await expect(canvas.getByText('mail.google.com')).toBeVisible()
   }}
 />

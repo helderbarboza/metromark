@@ -15,10 +15,7 @@
       icon: `absolute inset-0 flex items-center justify-center`,
       label: `absolute inset-x-0 bottom-0 mx-4 mb-2 flex translate-y-1 flex-col text-left`,
       title: 'truncate text-xs/tight font-normal',
-      domain: `
-        truncate text-[10px]/tight font-normal opacity-0 transition
-        group-hover:opacity-70
-      `,
+      domain: `truncate text-[10px]/tight font-normal`,
       check: `
         absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pt-px pr-0.5
         text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
@@ -83,7 +80,7 @@
 
   import { GAP } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
-  import { getTileGrid as getTileGridContext } from '$lib/tile-grid-context'
+  import { getTileGrid as getTileGridContext, hasTileGrid } from '$lib/tile-grid-context'
   import { safeUrl } from '$lib/url'
   import { mode, theme } from 'mode-watcher'
 
@@ -145,7 +142,7 @@
     onpointercancel,
   }: Props = $props()
 
-  const readTileGrid = getTileGridContext()
+  const readTileGrid = hasTileGrid() ? getTileGridContext() : undefined
   const cell = $derived(readTileGrid?.().cell)
   const gap = $derived(readTileGrid?.().gap ?? GAP)
   const launchHref = $derived(href ?? safeUrl(tile.url ?? ''))
@@ -257,10 +254,10 @@
   {/if}
   {#if size !== 'small'}
     <div class={ui.label()}>
-      {#if showDomain && domain}
-        <span class={ui.domain()}>{` ${domain}`}</span>
-      {/if}
       <span class={ui.title()}>{tile.title}</span>
+      {#if showDomain && domain}
+        <span class={ui.domain()}>{domain}</span>
+      {/if}
     </div>
   {/if}
   {#if checked}

@@ -19,7 +19,10 @@
     onclose: () => void
   } = $props()
 
-  const { state: command, send } = createDialogCommand(oncommand, onclose)
+  const { state: command, send } = createDialogCommand(
+    command => oncommand(command),
+    () => onclose(),
+  )
 
   async function remove() {
     return send({ type: 'node.remove', id: node.id })
@@ -53,7 +56,7 @@
 <DialogActions>
   <Button type='button' onclick={onclose}>Keep folder</Button>
   <Button
-    variant='danger'
+    variant='destructive'
     disabled={command.busy}
     onclick={remove}
   >

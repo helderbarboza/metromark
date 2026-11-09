@@ -23,7 +23,10 @@
     onclose: () => void
   } = $props()
 
-  const { state: command, send } = createDialogCommand(oncommand, onclose)
+  const { state: command, send } = createDialogCommand(
+    command => oncommand(command),
+    () => onclose(),
+  )
 
   let parentId = $state('')
 
