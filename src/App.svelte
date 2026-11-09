@@ -4,22 +4,25 @@
   import type {
     Client,
     Command,
+    GroupView,
     Layout,
     Notice,
     Snapshot,
     TileSize,
   } from '$lib/types'
   import Background from '$lib/components/Background.svelte'
-  import ContextMenu from '$lib/components/ContextMenu.svelte'
   import Editor from '$lib/components/Editor.svelte'
   import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import IconButton from '$lib/components/IconButton.svelte'
   import ImageBackground from '$lib/components/ImageBackground.svelte'
+  import MenuItems from '$lib/components/MenuItems.svelte'
   import MetroAppBar from '$lib/components/MetroAppBar.svelte'
   import MetroGroup from '$lib/components/MetroGroup.svelte'
   import RootsNav from '$lib/components/RootsNav.svelte'
+  import TileSizeGrid from '$lib/components/TileSizeGrid.svelte'
   import { Button } from '$lib/components/ui/button'
+  import * as ContextMenu from '$lib/components/ui/context-menu'
   import UndoToast from '$lib/components/UndoToast.svelte'
   import WorkspaceFooter from '$lib/components/WorkspaceFooter.svelte'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
@@ -27,7 +30,13 @@
   import { toggleSelection } from '$lib/interaction'
   import { cellsToPx, GAP, reconcileLayout, ROWS } from '$lib/layout'
   import { sweepBackgroundMedia } from '$lib/media-store'
-  import { buildAppBarMenuItems, buildMenuItems } from '$lib/menus'
+  import { focusFirstMenuItem } from '$lib/menu-focus'
+  import {
+    buildAppBarMenuItems,
+    buildCanvasMenuItems,
+    buildGroupMenuItems,
+    buildTileMenuItems,
+  } from '$lib/menus'
   import { getShader } from '$lib/shaders'
   import { applyThemeForMode, resetThemePreferences } from '$lib/theme-picker'
   import {
@@ -70,19 +79,14 @@
   let layoutTimer: ReturnType<typeof setTimeout> | undefined
   let gestureTimer: ReturnType<typeof setTimeout> | undefined
   let dialog = $state<DialogSpec | null>(null)
-  let context = $state<{
-    target: 'tile' | 'group' | 'canvas'
+  let menuTarget = $state<{
+    target: 'tile' | 'canvas'
     id: string
-    x: number
-    y: number
   } | null>(null)
-  let contextOrigin: HTMLElement | null = null
-  // Extra commands for the selected tile, opened from the app bar (uwp8 p. 157).
-  let more = $state<{
-    x: number
-    y: number
-    origin: HTMLElement | null
-  } | null>(null)
+  let menuOpen = $state(false)
+  let menuContentEl = $state<HTMLDivElement | null>(null)
+  /** Element to refocus when the context menu closes. */
+  let menuOrigin: HTMLElement | null = null
   let notice = $state<Notice | null>(null)
   let noticeUntil = $state(0)
 
@@ -92,7 +96,7 @@
   )
   const selectedTile = $derived(selectedId ? allTiles[selectedId] : undefined)
   const contextTile = $derived(
-    context?.target === 'tile' ? allTiles[context.id] : undefined,
+    menuTarget?.target === 'tile' ? allTiles[menuTarget.id] : undefined,
   )
   const nodes = $derived(indexTree(snapshot?.tree ?? []))
   const backgroundColor = $derived.by(() => {
@@ -345,16 +349,10 @@
     dialog = spec
     selectedId = spec.id ?? selectedId
   }
-  /** Right-click, the menu key, or Shift+F10 on a tile marks it selected (uwp8 p. 158). */
+  /** Right-click, the menu key, or Shift+F10 on a writable tile marks it selected (uwp8 p. 158). */
   function selectTile(event: MouseEvent, id: string) {
+    // preventDefault also keeps the canvas context menu closed (bits-ui honors it).
     event.preventDefault()
-    event.stopPropagation()
-    const tile = allTiles[id]
-    // Commands for objects that cannot be selected stay in a context menu (p. 160).
-    if (!tile?.writable) {
-      showContext(event, 'tile', id)
-      return
-    }
     const target = event.target instanceof Element ? event.target : null
     selectionOrigin = target?.closest<HTMLElement>('a, button') ?? null
     // Right-click always shows the commands for the tile it was pressed on; the
@@ -367,19 +365,48 @@
     if (keyboard)
       focusRequest += 1
   }
-  /** Tiles select; group headers and the canvas keep their own menus. */
-  function contextFor(
-    event: MouseEvent,
-    target: 'tile' | 'group' | 'canvas',
-    id: string,
-  ) {
-    if (target === 'tile') {
-      selectTile(event, id)
-    }
-    else {
+  /** Canvas handler first, then bits-ui's handler (it opens the menu and honors preventDefault). */
+  function forwardContextMenu(props: Record<string, unknown>, event: MouseEvent) {
+    handleContextMenu(event)
+    const triggerContextMenu = props.oncontextmenu
+    if (typeof triggerContextMenu === 'function')
+      Reflect.apply(triggerContextMenu, undefined, [event])
+  }
+  /**
+   * Single contextmenu entry point on the canvas. Writable tiles select instead of
+   * opening a menu (uwp8 p. 158); everything else opens the canvas/tile context menu.
+   */
+  function handleContextMenu(event: MouseEvent) {
+    const target = event.target
+    if (!(target instanceof Element))
+      return
+    const tileEl = target.closest<HTMLElement>('[data-grid-id], [data-tile-id]')
+    if (tileEl) {
+      const id = tileEl.dataset.gridId ?? tileEl.dataset.tileId
+      const tile = id ? allTiles[id] : undefined
+      if (id && tile?.writable) {
+        selectTile(event, id)
+        return
+      }
       kbMenu = false
-      showContext(event, target, id)
+      if (id) {
+        // Unsupported tiles stay launchable via commands, not selection (p. 160).
+        menuTarget = { target: 'tile', id }
+        menuOrigin = tileEl.closest<HTMLElement>('a, button') ?? tileEl
+        return
+      }
     }
+    kbMenu = false
+    const grid = target.closest<HTMLElement>('[data-testid="metro-grid"]')
+    menuTarget = { target: 'canvas', id: grid?.dataset.groupId ?? defaultFolder() }
+    menuOrigin = grid ?? scroller
+  }
+  /** Return focus to the element that was right-clicked (or focused for Shift+F10). */
+  function handleMenuCloseAutoFocus(event: Event) {
+    if (!menuOrigin)
+      return
+    event.preventDefault()
+    menuOrigin.focus({ preventScroll: true })
   }
   /** Cross-slide selection from a touch or pen gesture (uwp8 pp. 79-80). */
   function selectByGesture(id: string, event: PointerEvent) {
@@ -395,7 +422,6 @@
       = document.activeElement instanceof HTMLElement
         && document.activeElement.closest('[role="toolbar"]') !== null
     selectedId = null
-    more = null
     if (keyboard)
       selectionOrigin?.focus({ preventScroll: true })
     selectionOrigin = null
@@ -405,44 +431,9 @@
       return
     // Activating a tile opens it; pressing anywhere else drops the selection (p. 82).
     const target = event.target instanceof Element ? event.target : null
-    if (target?.closest('[data-grid-id], [data-testid="tile-slot"]'))
+    if (target?.closest('[data-grid-id], [data-tile-id]'))
       return
     clearSelection()
-  }
-  function closeContext() {
-    context = null
-    contextOrigin?.focus({ preventScroll: true })
-  }
-  function openMore(event: MouseEvent) {
-    const origin = event.currentTarget instanceof HTMLElement ? event.currentTarget : null
-    if (origin) {
-      const rect = origin.getBoundingClientRect()
-      more = { x: rect.left, y: rect.top, origin }
-    }
-  }
-  function closeMore() {
-    const origin = more?.origin ?? null
-    more = null
-    origin?.focus({ preventScroll: true })
-  }
-  function showContext(
-    event: MouseEvent,
-    target: 'tile' | 'group' | 'canvas',
-    id: string,
-  ) {
-    event.preventDefault()
-    event.stopPropagation()
-    const origin = event.target instanceof Element ? event.target : null
-    contextOrigin = origin?.closest<HTMLElement>('a, button') ?? null
-    const rect = contextOrigin?.getBoundingClientRect()
-    const keyboardOrButton
-      = event.type === 'click' || (event.clientX === 0 && event.clientY === 0)
-    context = {
-      target,
-      id,
-      x: keyboardOrButton && rect ? rect.left : event.clientX,
-      y: keyboardOrButton && rect ? rect.bottom + 7 : event.clientY,
-    }
   }
   async function open(url: string, disposition: 'tab' | 'window') {
     try {
@@ -470,41 +461,43 @@
       edit({ kind: 'copy', id })
     }
   }
+  const menuCallbacks = {
+    open,
+    edit,
+    copy,
+    execute,
+    clearSelection,
+    focusSearch: () => searchInput?.focus(),
+  }
   const menuItems = $derived(
-    buildMenuItems({
-      context,
-      contextTile,
-      node: context ? nodes.get(context.id) : undefined,
-      group: context?.target === 'group'
-        ? groups.find(item => item.id === context?.id)
-        : undefined,
-      groups,
-      selectedId,
-      defaultFolder: defaultFolder(),
-      shaderActive: snapshot?.settings.background.type === 'shader',
-      imageActive: snapshot?.settings.background.type === 'image'
-        && snapshot.settings.background.url !== '',
-      callbacks: {
-        open,
-        edit,
-        copy,
-        execute,
-        clearSelection,
-        focusSearch: () => searchInput?.focus(),
-      },
-    }),
+    menuTarget?.target === 'tile'
+      ? buildTileMenuItems(contextTile, menuCallbacks)
+      : menuTarget?.target === 'canvas'
+      ? buildCanvasMenuItems({
+        groups,
+        selectedId,
+        contextId: menuTarget.id,
+        defaultFolder: defaultFolder(),
+        shaderActive: snapshot?.settings.background.type === 'shader',
+        imageActive: snapshot?.settings.background.type === 'image'
+          && snapshot.settings.background.url !== '',
+        callbacks: menuCallbacks,
+      })
+      : [],
+  )
+  interface MenuHeading {
+    title: string
+    subtitle?: string
+  }
+  const menuHeading = $derived<MenuHeading>(
+    menuTarget?.target === 'tile'
+      ? { title: contextTile?.title ?? 'Your canvas', subtitle: contextTile?.domain }
+      : { title: 'Your canvas' },
   )
   // Commands that stay off the app bar itself live in a menu opened from one of
   // its buttons (uwp8 p. 157), so they are not duplicated as bar commands.
   const appBarMenuItems = $derived(
-    buildAppBarMenuItems(selectedTile, {
-      open,
-      edit,
-      copy,
-      execute,
-      clearSelection,
-      focusSearch: () => searchInput?.focus(),
-    }),
+    buildAppBarMenuItems(selectedTile, menuCallbacks),
   )
   function resizeTile(id: string, size: TileSize) {
     void execute({ type: 'tile.appearance', id, patch: { size } })
@@ -537,6 +530,8 @@
   let smoothFrame: number | null = null
 
   function updateScroll() {
+    if (menuOpen)
+      menuOpen = false
     if (!scroller)
       return
     const max = scroller.scrollWidth - scroller.clientWidth
@@ -653,13 +648,20 @@
     }
   }
   function key(event: KeyboardEvent) {
+    // Another layer (e.g. a menus's Escape/keyboard handling) already handled this key.
+    if (event.defaultPrevented)
+      return
     const input
       = event.target instanceof Element
         && ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
     // The browser fires contextmenu for these keys; mark it as keyboard-driven.
     if ((event.key === 'F10' && event.shiftKey) || event.key === 'ContextMenu')
       kbMenu = true
-    if (context || more)
+    // Menus are self-contained while open (Escape/Tab/arrows); leave them alone.
+    const inMenu
+      = document.activeElement instanceof Element
+        && document.activeElement.closest('[role="menu"]') !== null
+    if (menuOpen || inMenu)
       return
     if (dialog) {
       // Settings is a non-modal drawer, so Escape is its keyboard close action.
@@ -772,154 +774,198 @@
       </div>
     </header>
 
+    {#snippet groupMenu(group: GroupView)}
+      <MenuItems
+        variant='dropdown'
+        items={buildGroupMenuItems({
+          node: nodes.get(group.id),
+          group,
+          callbacks: menuCallbacks,
+        })}
+      />
+    {/snippet}
+
     <!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
-    <main
-      id='canvas'
-      class='
-        relative min-h-0 flex-1 scrollbar-none overflow-auto scroll-smooth outline-none
-        [&::-webkit-scrollbar]:hidden
-      '
-      class:is-dragging={dragging}
-      bind:this={scroller}
-      onscroll={updateScroll}
-      onwheel={wheel}
-      onpointerdown={canvasPointerDown}
-      oncontextmenu={event => showContext(event, 'canvas', defaultFolder())}
-      aria-label='Bookmark tile canvas'
-      tabindex='-1'
-    >
-      <div class='flex h-full flex-row items-center'>
-        {#if !snapshot}
-          <div
+    <ContextMenu.Root bind:open={menuOpen}>
+      <ContextMenu.Trigger>
+        {#snippet child({ props })}
+          <main
+            {...props}
+            id='canvas'
             class='
-              flex size-full min-h-60 flex-col items-center justify-center text-center
-              text-(--muted-foreground)
+              relative min-h-0 flex-1 scrollbar-none overflow-auto scroll-smooth
+              outline-none
+              [&::-webkit-scrollbar]:hidden
             '
+            class:is-dragging={dragging}
+            bind:this={scroller}
+            onscroll={updateScroll}
+            onwheel={wheel}
+            onpointerdown={canvasPointerDown}
+            oncontextmenu={event => forwardContextMenu(props, event)}
+            aria-label='Bookmark tile canvas'
+            tabindex='-1'
           >
-            {#if loadError}
-              <Icon name='lock' size={28} />
-              <h2
-                class={cn(`
-                  mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)
-                `)}
-              >
-                Let's reconnect.
-              </h2>
-              <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
-              <button onclick={() => window.location.reload()}>
-                Reload page
-              </button>
-            {:else}
-              <span
-                class='
-                  mb-5 size-6 animate-spin rounded-full border border-(--border)
-                  border-t-(--primary)
-                '
-              >
-              </span>
-              <p class='mb-6 px-5 text-xs/relaxed'>
-                Finding your favorites…
-              </p>
-            {/if}
-          </div>
-        {:else if normalizedQuery && !visibleGroups.length}
-          <div class='flex size-full min-h-60 flex-col items-center justify-center border'>
-            <Icon name='searchBookmarks' size={33} />
-            <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
-              No favorites found.
-            </h2>
-            <p class='mb-6 px-5 text-xs/relaxed'>
-              Nothing matches “{query}”. Try a title, website, or folder.
-            </p>
-            <Button onclick={() => (query = '')}>Clear search</Button>
-          </div>
-        {:else}
-          <SnapGridGroup>
-            <div
-              class='
-                flex h-fit w-max items-end gap-9 px-16
-                max-lg:gap-7 max-lg:px-9
-                max-md:px-6
-              '
-            >
-              {#each visibleGroups as group (group.id)}
-                <MetroGroup
-                  {group}
-                  layout={draftLayouts[group.id] ?? group.layout}
-                  tiles={allTiles}
-                  {cell}
-                  draggable={!normalizedQuery}
-                  {dragging}
-                  {selectedId}
-                  showDomains={snapshot.settings.showDomains}
-                  preview={client.mode === 'preview'}
-                  onLayoutChange={stageLayout}
-                  onDragStart={() => {
-                    dragging = true
-                    // A tile on the way to another group must not keep the app bar (uwp8 p. 82).
-                    selectedId = null
-                    selectionOrigin = null
-                    // An in-flight smooth scroll would fight the drag and keep the canvas
-                  // moving under the pointer, so stop it and hold scrolling still.
-                    cancelSmoothScroll()
-                    if (scroller)
-                      scroller.style.scrollBehavior = 'auto'
-                  }}
-                  onDragStop={dragStop}
-                  onSelect={selectByGesture}
-                  onContext={contextFor}
-                  onAdd={parentId => edit({ kind: 'bookmark', parentId })}
-                  onBlocked={message => showNotice({ message, tone: 'error' })}
-                />
-              {/each}
-              {#if !normalizedQuery && defaultFolder()}<div class='flex w-48 shrink-0 justify-end'>
-                <button
-                  class='
-                    relative flex w-full flex-col items-center justify-center border
-                    border-dashed border-(--border) bg-transparent
-                    text-(--muted-foreground) transition-colors duration-150
-                    hover:border-(--muted-foreground) hover:bg-(--card)
-                    hover:text-(--foreground)
-                  '
-                  style:height='{cellsToPx(ROWS, cell)}px'
-                  onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
-                >
-                  <span
-                    class='
-                      mb-5 flex size-12 items-center justify-center rounded-full border
-                      border-(--border)
-                    '
-                  >
-                    <Icon name='addFolder' size={23} />
-                  </span>
-                  <strong class='text-sm font-medium text-(--foreground)'>New group</strong>
-                  <span class='mt-2 text-xs'>Create a bookmark folder</span>
-                </button>
-              </div>
-              {/if}
-              {#if !visibleGroups.length && !normalizedQuery}
+            <div class='flex h-full flex-row items-center'>
+              {#if !snapshot}
                 <div
                   class='
                     flex size-full min-h-60 flex-col items-center justify-center
                     text-center text-(--muted-foreground)
                   '
                 >
-                  <h2
-                    class={cn(`
-                      mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)
-                    `)}
-                  >
-                    No bookmark folders available.
+                  {#if loadError}
+                    <Icon name='lock' size={28} />
+                    <h2
+                      class={cn(`
+                        mt-5 mb-2.5 text-2xl font-normal tracking-tight
+                        text-(--foreground)
+                      `)}
+                    >
+                      Let's reconnect.
+                    </h2>
+                    <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
+                    <button onclick={() => window.location.reload()}>
+                      Reload page
+                    </button>
+                  {:else}
+                    <span
+                      class='
+                        mb-5 size-6 animate-spin rounded-full border border-(--border)
+                        border-t-(--primary)
+                      '
+                    >
+                    </span>
+                    <p class='mb-6 px-5 text-xs/relaxed'>
+                      Finding your favorites…
+                    </p>
+                  {/if}
+                </div>
+              {:else if normalizedQuery && !visibleGroups.length}
+                <div class={cn(`flex size-full min-h-60 flex-col items-center justify-center border`)}>
+                  <Icon name='searchBookmarks' size={33} />
+                  <h2 class={cn(`mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)`)}>
+                    No favorites found.
                   </h2>
                   <p class='mb-6 px-5 text-xs/relaxed'>
-                    Create a writable browser bookmark folder to get started.
+                    Nothing matches “{query}”. Try a title, website, or folder.
                   </p>
-                </div>{/if}
+                  <Button onclick={() => (query = '')}>Clear search</Button>
+                </div>
+              {:else}
+                <SnapGridGroup>
+                  <div
+                    class='
+                      flex h-fit w-max items-end gap-9 px-16
+                      max-lg:gap-7 max-lg:px-9
+                      max-md:px-6
+                    '
+                  >
+                    {#each visibleGroups as group (group.id)}
+                      <MetroGroup
+                        {group}
+                        layout={draftLayouts[group.id] ?? group.layout}
+                        tiles={allTiles}
+                        {cell}
+                        draggable={!normalizedQuery}
+                        {dragging}
+                        {selectedId}
+                        showDomains={snapshot.settings.showDomains}
+                        preview={client.mode === 'preview'}
+                        onLayoutChange={stageLayout}
+                        onDragStart={() => {
+                          dragging = true
+                          // A tile moving between groups must not keep the app bar (uwp8 p. 82).
+                          selectedId = null
+                          selectionOrigin = null
+                          // An in-flight smooth scroll would fight the drag and keep the canvas
+                  // moving under the pointer, so stop it and hold scrolling still.
+                          cancelSmoothScroll()
+                          if (scroller)
+                            scroller.style.scrollBehavior = 'auto'
+                        }}
+                        onDragStop={dragStop}
+                        onSelect={selectByGesture}
+                        menu={groupMenu}
+                        onAdd={parentId => edit({ kind: 'bookmark', parentId })}
+                        onBlocked={message => showNotice({ message, tone: 'error' })}
+                      />
+                    {/each}
+                    {#if !normalizedQuery && defaultFolder()}<div class='flex w-48 shrink-0 justify-end'>
+                      <button
+                        class='
+                          relative flex w-full flex-col items-center justify-center border
+                          border-dashed border-(--border) bg-transparent
+                          text-(--muted-foreground) transition-colors duration-150
+                          hover:border-(--muted-foreground) hover:bg-(--card)
+                          hover:text-(--foreground)
+                        '
+                        style:height='{cellsToPx(ROWS, cell)}px'
+                        onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
+                      >
+                        <span
+                          class='
+                            mb-5 flex size-12 items-center justify-center rounded-full
+                            border border-(--border)
+                          '
+                        >
+                          <Icon name='addFolder' size={23} />
+                        </span>
+                        <strong class='text-sm font-medium text-(--foreground)'>New group</strong>
+                        <span class='mt-2 text-xs'>Create a bookmark folder</span>
+                      </button>
+                    </div>
+                    {/if}
+                    {#if !visibleGroups.length && !normalizedQuery}
+                      <div
+                        class='
+                          flex size-full min-h-60 flex-col items-center justify-center
+                          text-center text-(--muted-foreground)
+                        '
+                      >
+                        <h2
+                          class={cn(`
+                            mt-5 mb-2.5 text-2xl font-normal tracking-tight
+                            text-(--foreground)
+                          `)}
+                        >
+                          No bookmark folders available.
+                        </h2>
+                        <p class='mb-6 px-5 text-xs/relaxed'>
+                          Create a writable browser bookmark folder to get started.
+                        </p>
+                      </div>{/if}
+                  </div>
+                </SnapGridGroup>
+              {/if}
             </div>
-          </SnapGridGroup>
+          </main>
+        {/snippet}
+      </ContextMenu.Trigger>
+      <ContextMenu.Content
+        bind:ref={menuContentEl}
+        class='w-65'
+        aria-label={menuTarget?.target === 'tile'
+          ? `Actions for ${contextTile?.title ?? 'tile'}`
+          : 'Canvas actions'}
+        onOpenAutoFocus={event => focusFirstMenuItem(event, menuContentEl)}
+        onCloseAutoFocus={handleMenuCloseAutoFocus}
+      >
+        <ContextMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
+          <strong class='truncate text-[12px] font-semibold'>{menuHeading.title}</strong>
+          {#if menuHeading.subtitle}
+            <span class='truncate text-[12px] text-(--muted-foreground)'>{menuHeading.subtitle}</span>
+          {/if}
+        </ContextMenu.Label>
+        <MenuItems items={menuItems} variant='context' />
+        {#if contextTile}
+          <TileSizeGrid
+            size={contextTile.size}
+            onresize={size => resizeTile(contextTile.id, size)}
+          />
         {/if}
-      </div>
-    </main>
+      </ContextMenu.Content>
+    </ContextMenu.Root>
 
     <WorkspaceFooter
       bind:query
@@ -939,47 +985,18 @@
     {#if selectedTile && !dragging}
       <MetroAppBar
         title={selectedTile.title}
+        subtitle={selectedTile.domain}
         size={selectedTile.size}
         writable={selectedTile.writable}
         {focusRequest}
+        menuItems={appBarMenuItems}
         onresize={size => resizeTile(selectedTile.id, size)}
         onedit={() => edit({ kind: 'bookmark', id: selectedTile.id })}
         onmove={() => edit({ kind: 'move', id: selectedTile.id })}
-        onmore={openMore}
         ondelete={() => {
           void execute({ type: 'node.remove', id: selectedTile.id })
         }}
         onclear={clearSelection}
-      />
-    {/if}
-    {#if more && selectedTile}
-      <ContextMenu
-        x={more.x}
-        y={more.y}
-        title={selectedTile.title}
-        subtitle={selectedTile.domain}
-        items={appBarMenuItems}
-        onclose={closeMore}
-      />
-    {/if}
-    {#if context}
-      <ContextMenu
-        x={context.x}
-        y={context.y}
-        title={contextTile?.title
-          ?? (context.target === 'group'
-            ? nodes.get(context.id)?.title
-            : 'Your canvas')}
-        subtitle={contextTile?.domain}
-        items={menuItems}
-        onclose={closeContext}
-        size={contextTile?.size}
-        onresize={contextTile
-          ? (size) => {
-            if (contextTile)
-              resizeTile(contextTile.id, size)
-          }
-          : undefined}
       />
     {/if}
     {#if dialog && snapshot && dialog.kind !== 'settings'}

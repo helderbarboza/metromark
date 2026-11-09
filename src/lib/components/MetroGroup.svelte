@@ -1,9 +1,10 @@
 <script lang='ts'>
   import type { GroupView, Layout, TileView } from '$lib/types'
+  import type { Snippet } from 'svelte'
   import GridTile from '$lib/components/GridTile.svelte'
   import Icon from '$lib/components/Icon.svelte'
-  import IconButton from '$lib/components/IconButton.svelte'
   import MetroTile from '$lib/components/MetroTile.svelte'
+  import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
   import { DRAG_PX } from '$lib/interaction'
   import {
     cellsToPx,
@@ -17,6 +18,7 @@
     sizeOf,
     usedCols,
   } from '$lib/layout'
+  import { focusFirstMenuItem } from '$lib/menu-focus'
   import { setTileGrid } from '$lib/tile-grid-context'
   import { safeUrl, validateUrl } from '$lib/url'
   import { cn } from '$lib/utils'
@@ -40,11 +42,8 @@
     onDragStart: () => void
     onDragStop: () => void
     onSelect: (id: string, event: PointerEvent) => void
-    onContext: (
-      event: MouseEvent,
-      target: 'tile' | 'group' | 'canvas',
-      id: string,
-    ) => void
+    /** Content of the per-group "Manage" dropdown menu. Omit to hide the button. */
+    menu?: Snippet<[GroupView]>
     onAdd: (folderId: string) => void
     onBlocked: (message: string) => void
   }
@@ -63,12 +62,13 @@
     onDragStart,
     onDragStop,
     onSelect,
-    onContext,
+    menu,
     onAdd,
     onBlocked,
   }: Props = $props()
 
   let liveCols = $state(0)
+  let menuContentEl = $state<HTMLDivElement | null>(null)
 
   setTileGrid(() => ({ cell, gap: GAP }))
 
@@ -217,13 +217,33 @@
         {/if}
       </div>
     </div>
-    <IconButton
-      label="Manage {group.title || 'unnamed group'}"
-      class='size-9.5 shrink-0 rounded-[3px] opacity-[.85]'
-      onclick={event => onContext(event, 'group', group.id)}
-    >
-      <Icon name='more' size={17} />
-    </IconButton>
+    {#if menu}
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger
+          aria-label="Manage {group.title || 'unnamed group'}"
+          class='
+            inline-flex size-9.5 shrink-0 items-center justify-center rounded-[3px] border
+            border-transparent bg-transparent text-(--muted-foreground) opacity-[.85]
+            hover:bg-(--accent) hover:text-(--foreground)
+            focus-visible:outline-2 focus-visible:outline-offset-2
+            focus-visible:outline-(--primary)
+          '
+        >
+          <Icon name='more' size={17} />
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          bind:ref={menuContentEl}
+          aria-label={`Actions for ${group.title || 'unnamed group'}`}
+          class='w-65'
+          onOpenAutoFocus={event => focusFirstMenuItem(event, menuContentEl)}
+        >
+          <DropdownMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
+            <strong class='truncate text-[12px] font-semibold'>{group.title || 'Unnamed group'}</strong>
+          </DropdownMenu.Label>
+          {@render menu(group)}
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    {/if}
   </header>
   <div
 {@attach container.attach}
@@ -235,7 +255,7 @@
     data-testid='metro-grid'
     role='group'
     aria-label="Tiles in {group.path.join(' / ')}"
-    oncontextmenu={event => onContext(event, 'canvas', group.id)}
+    data-group-id={group.id}
   >
     {#each layout as entry (entry.i)}
       {@const tile = tiles[entry.i]}
@@ -250,7 +270,6 @@
             {preview}
             {dragging}
             onselect={onSelect}
-            oncontextmenu={event => onContext(event, 'tile', entry.i)}
             onblocked={onBlocked}
           />
         {:else}
@@ -267,7 +286,6 @@
               ? ` ${tile.domain}`
               : ''}"
             onclick={event => launch(event, tile)}
-            oncontextmenu={event => onContext(event, 'tile', entry.i)}
             class='
               absolute block no-underline transition-[left,top,width,height] duration-140
               focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
@@ -281,6 +299,7 @@
               height: ${cellsToPx(entry.h, cell)}px;
             `}
             dataTestId='tile-slot'
+            dataTileId={entry.i}
           />
         {/if}
       {/if}

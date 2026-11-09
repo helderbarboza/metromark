@@ -5,10 +5,11 @@
   import type { GroupView, TileView } from '$lib/types'
   import type { Layout } from '@snapgridjs/core'
   import type { ComponentProps } from 'svelte'
+  import MenuItems from '$lib/components/MenuItems.svelte'
   import MetroGroup from '$lib/components/MetroGroup.svelte'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import { expect, fn, userEvent } from 'storybook/test'
+  import { expect, fn, screen, userEvent } from 'storybook/test'
 
   const tiles: Record<string, TileView> = {
     steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true },
@@ -62,6 +63,7 @@
     tiles: {},
   }
 
+  const rename = fn()
   const { Story } = defineMeta({
     title: 'Metro/Tile grid',
     component: MetroGroup,
@@ -81,17 +83,34 @@
       onDragStart: fn(),
       onDragStop: fn(),
       onSelect: fn(),
-      onContext: fn(),
       onAdd: fn(),
       onBlocked: fn(),
     },
   })
 </script>
 
+{#snippet manageMenu(group: GroupView)}
+  <MenuItems
+    variant='dropdown'
+    items={[
+      { label: 'Add bookmark here', icon: 'addBookmark', action: fn(), disabled: !group.writable },
+      { label: 'Rename folder', icon: 'edit', action: rename, separator: true },
+      {
+        label: 'Delete folder',
+        icon: 'delete',
+        action: fn(),
+        danger: true,
+        disabled: !group.mutable,
+        separator: true,
+      },
+    ]}
+  />
+{/snippet}
+
 {#snippet template(args: ComponentProps<typeof MetroGroup>)}
   <SnapGridGroup>
     <div style='padding:32px;background:var(--background);min-height:100vh'>
-      <MetroGroup {...args} />
+      <MetroGroup {...args} menu={manageMenu} />
     </div>
   </SnapGridGroup>
 {/snippet}
@@ -159,5 +178,14 @@
     await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
     await expect(canvas.queryByText('store.steampowered.com')).not.toBeInTheDocument()
     await expect(canvas.queryByText('mail.google.com')).not.toBeInTheDocument()
+  }}
+/>
+<Story
+  name='Manage dropdown'
+  {template}
+  play={async ({ canvas }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Manage Design' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Rename folder' }))
+    await expect(rename).toHaveBeenCalled()
   }}
 />
