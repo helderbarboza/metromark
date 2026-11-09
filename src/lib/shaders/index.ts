@@ -27,10 +27,15 @@ const list: readonly ShaderDefinition[] = Object.values(shaders)
  * use `id`, so keying off the property name silently resolves to the default.
  */
 const byId = new Map(list.map(definition => [definition.id, definition]))
-export const defaultShader: ShaderDefinition = balatro
-export function getShader(id: string): ShaderDefinition {
-  const match = byId.get(id)
-  if (!match && import.meta.env.DEV)
-    console.warn(`[shaders] Unknown shader id "${id}"; using "${defaultShader.id}".`)
-  return match ?? defaultShader
+
+/**
+ * Selection id for "no shader background" (base color only). Stored and
+ * persisted like a shader id, but it has no definition and renders nothing.
+ * It is the default selection so the new-tab page and the shader benchmark
+ * are not competing with a shader that was never asked for.
+ */
+export const NONE_SHADER_ID = 'none'
+
+export function getShader(id: string): ShaderDefinition | undefined {
+  return byId.get(id)
 }

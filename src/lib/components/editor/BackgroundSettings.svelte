@@ -16,7 +16,14 @@
     validateUploadFile,
   } from '$lib/image-background'
   import { deleteBackgroundMedia, saveBackgroundMedia } from '$lib/media-store'
-  import { shaders } from '$lib/shaders'
+  import { NONE_SHADER_ID, shaders } from '$lib/shaders'
+  import { BENCHMARK_LEVELS } from '$lib/shaders/benchmark'
+  import { BENCHMARK_PRESENTATION } from '$lib/shaders/benchmark-ui'
+  import {
+    cancelShaderBenchmarks,
+    runShaderBenchmarks,
+    shaderBenchmark,
+  } from '$lib/shaders/benchmark.svelte'
   import { shaderMetrics } from '$lib/shaders/metrics.svelte'
   import { levelFps, levelFrame, levelWorst } from '$lib/shaders/quality'
   import BackgroundColorMode from './BackgroundColorMode.svelte'
@@ -43,6 +50,15 @@
   const IMAGE_FITS = ['cover', 'contain', 'fill', 'none'] as const
 
   const { settings, busy, onchange }: Props = $props()
+
+  const nonePressed = $derived(
+    settings.background.type === 'shader' && settings.background.shaderId === NONE_SHADER_ID,
+  )
+  const currentBenchmarkName = $derived(
+    shaderBenchmark.currentShaderId === null
+      ? null
+      : (SHADERS.find(shader => shader.id === shaderBenchmark.currentShaderId)?.name ?? null),
+  )
 
   const autoColor = $derived(
     settings.background.type === 'color' ? settings.background.auto !== false : true,
@@ -557,15 +573,70 @@
   {#if settings.background.type === 'shader'}
     <div class='p-4'>
       <div class='grid grid-cols-2 gap-2'>
+        <ShaderThumb
+          shader={null}
+          pressed={nonePressed}
+          disabled={busy}
+          reducedMotion={settings.reducedMotion}
+          onselect={() => updateShader({ shaderId: NONE_SHADER_ID })}
+        />
         {#each SHADERS as shader (shader.id)}
           <ShaderThumb
             {shader}
             pressed={settings.background.shaderId === shader.id}
             disabled={busy}
             reducedMotion={settings.reducedMotion}
+            benchmark={shaderBenchmark.resultFor(shader.id)}
             onselect={() => updateShader({ shaderId: shader.id })}
           />
         {/each}
+      </div>
+    </div>
+    <div class='border-t border-(--border) p-4'>
+      <div class='flex flex-wrap items-center justify-between gap-2'>
+        <p class='text-xs font-semibold'>Shader performance</p>
+        <Button
+          variant='secondary'
+          size='sm'
+          class='h-8'
+          disabled={busy}
+          onclick={() => (shaderBenchmark.running
+            ? cancelShaderBenchmarks()
+            : void runShaderBenchmarks())}
+        >
+          <Icon name={shaderBenchmark.running ? 'close' : 'gauge'} size={14} />
+          {shaderBenchmark.running
+            ? 'Cancel'
+            : shaderBenchmark.hasResults() ? 'Re-run benchmark' : 'Run benchmark'}
+        </Button>
+      </div>
+      <p class='mt-1.5 text-[10px] leading-[1.6] text-(--muted-foreground)'>
+        Your GPU re-renders the background on every new tab, and shader cost differs
+        a lot between shaders. This test renders each shader offscreen at a fixed
+        size on this PC and measures the frame time, so you can pick one that keeps
+        your new tab fast. Results are kept in memory and disappear on reload.
+      </p>
+      <div
+        class='
+          mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px]
+          text-(--muted-foreground)
+        '
+      >
+        {#each BENCHMARK_LEVELS as level (level)}
+          <span class='flex items-center gap-1'>
+            <Icon name={BENCHMARK_PRESENTATION[level].icon} size={12} class={BENCHMARK_PRESENTATION[level].class} />
+            {BENCHMARK_PRESENTATION[level].short}
+          </span>
+        {/each}
+      </div>
+      <div aria-live='polite' class='mt-1.5 text-[10px] text-(--muted-foreground)'>
+        {#if shaderBenchmark.running && currentBenchmarkName !== null}
+          Testing {shaderBenchmark.done + 1} of {shaderBenchmark.total}: {currentBenchmarkName}…
+        {:else if shaderBenchmark.cancelled}
+          Benchmark cancelled.
+        {:else if shaderBenchmark.failure !== null}
+          <span class='text-(--destructive)'>{shaderBenchmark.failure}</span>
+        {/if}
       </div>
     </div>
     <SettingsRow
