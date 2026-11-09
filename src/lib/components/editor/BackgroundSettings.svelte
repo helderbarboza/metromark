@@ -34,6 +34,11 @@
   type ShaderBackground = Extract<Settings['background'], { type: 'shader' }>
   type ImageBackground = Extract<Settings['background'], { type: 'image' }>
   const BACKGROUND_TYPES = ['color', 'image', 'shader'] as const satisfies readonly BackgroundType[]
+  const BACKGROUND_TYPE_LABELS: Record<BackgroundType, string> = {
+    color: 'Color',
+    image: 'Image',
+    shader: 'Shader',
+  }
   const SHADERS = Object.values(shaders)
   const IMAGE_FITS = ['cover', 'contain', 'fill', 'none'] as const
 
@@ -509,7 +514,12 @@
   }
 </script>
 
-<CollapsibleSection open={true} title='background type' icon='customize'>
+<CollapsibleSection
+  open={true}
+  title='Background type'
+  helpText='Choose what renders behind your tiles'
+  icon='layer'
+>
   {#snippet control()}
     <Select.Root
       type='single'
@@ -520,11 +530,16 @@
           selectBackground(tab)
       }}
     >
-      <Select.Trigger class='w-20'>{settings.background.type}</Select.Trigger>
+      <Select.Trigger
+        class='w-20'
+        aria-label='Background type'
+      >
+        {BACKGROUND_TYPE_LABELS[settings.background.type]}
+      </Select.Trigger>
       <Select.Content>
         <Select.Group>
           {#each BACKGROUND_TYPES as type (type)}
-            <Select.Item value={type}>{type}</Select.Item>
+            <Select.Item value={type}>{BACKGROUND_TYPE_LABELS[type]}</Select.Item>
           {/each}
         </Select.Group>
       </Select.Content>
@@ -555,13 +570,15 @@
     </div>
     <SettingsRow
       title='Performance priority'
-      helpText='What to keep when the GPU is busy.'
+      helpText='Prioritize frame rate or render resolution'
       controlId='shader-quality'
       disabled={busy}
     >
       <ToggleGroup.Root
         type='single'
         id='shader-quality'
+        aria-labelledby='shader-quality-title'
+        aria-describedby='shader-quality-help'
         value={(
           settings.background.type === 'shader'
             ? settings.background.quality
@@ -586,12 +603,14 @@
     />
     <SettingsRow
       title='Shader speed'
-      helpText='Shader animation speed factor'
+      helpText='How fast the shader animates'
       controlId='shader-speed'
     >
       <span>{speedDraft.toFixed(1)}x</span>
       <Slider
         id='shader-speed'
+        aria-labelledby='shader-speed-title'
+        aria-describedby='shader-speed-help'
         class='w-32'
         type='single'
         value={speedDraft}
@@ -604,7 +623,7 @@
     </SettingsRow>
     <SettingsRow
       title='Maximum FPS'
-      helpText='Limit the framerate'
+      helpText='Cap frames per second. Auto removes the cap'
       controlId='shader-fps'
     >
       <ToggleGroup.Root
@@ -612,6 +631,8 @@
         value={String(settings.background.targetFps ?? 60)}
         onValueChange={v => updateShader({ targetFps: Number(v) })}
         id='shader-fps'
+        aria-labelledby='shader-fps-title'
+        aria-describedby='shader-fps-help'
       >
         {#each [15, 30, 60, 120, 0] as value (value)}
           <ToggleGroup.Item value={String(value)} class='grow'>
@@ -622,12 +643,14 @@
     </SettingsRow>
     <SettingsRow
       title='Opacity'
-      helpText='Make the shader transparent'
+      helpText='How visible the shader is'
       controlId='shader-opacity'
     >
       <span>{Math.round(opacityDraft * 100)}%</span>
       <Slider
         id='shader-opacity'
+        aria-labelledby='shader-opacity-title'
+        aria-describedby='shader-opacity-help'
         type='single'
         value={opacityDraft}
         min={0.0}
@@ -640,11 +663,14 @@
     </SettingsRow>
     <SettingsRow
       title='Maximum render scale'
+      helpText='Render below display resolution to save GPU'
       controlId='shader-render-scale'
     >
       <span>{renderScaleDraft}x</span>
       <Slider
         id='shader-render-scale'
+        aria-labelledby='shader-render-scale-title'
+        aria-describedby='shader-render-scale-help'
         type='single'
         value={renderScaleDraft}
         min={0.25}
@@ -693,7 +719,7 @@
     {/if}
     <SettingsRow
       title='Mouse interaction'
-      helpText='Let the shader follow your pointer.'
+      helpText='Let the shader follow your pointer'
       controlId='shader-mouse'
       disabled={busy}
     >
@@ -767,7 +793,7 @@
           ondragleave={handleDragLeave}
           ondrop={handleDrop}
         >
-          <Icon name='image' size={32} class='text-(--muted-foreground)' />
+          <Icon name='imageAdd' size={32} class='text-(--muted-foreground)' />
           <span class='text-sm font-semibold'>
             {uploading ? 'Reading…' : 'Click to browse or drop an image'}
           </span>
@@ -802,13 +828,13 @@
             type='text'
             inputmode='url'
             placeholder={isStoredMedia(bg.url)
-              ? 'Uploaded image in use — enter an address to replace it'
+              ? 'Uploaded image in use'
               : 'https://example.com/photo.jpg'}
             class='min-w-0 flex-1 text-sm'
             value={urlDraft}
             disabled={busy || uploading}
             aria-invalid={urlError !== '' ? 'true' : undefined}
-            aria-describedby={urlError !== '' ? 'image-url-error' : undefined}
+            aria-describedby={urlError !== '' ? 'image-url-help image-url-error' : 'image-url-help'}
             oninput={(event) => {
               urlDraft = event.currentTarget.value
               urlDirty = true
@@ -831,6 +857,9 @@
             {checking ? 'Checking…' : 'Apply'}
           </Button>
         </div>
+        <p id='image-url-help' class='mt-2 text-xs text-(--muted-foreground)'>
+          An address that points directly at an image file
+        </p>
       {/if}
     </div>
 
@@ -841,12 +870,15 @@
     {/if}
     <SettingsRow
       title='Fit'
-      helpText='How the image fills the canvas'
+      helpText='How the image fills the page'
+      controlId='image-fit'
       disabled={busy || uploading}
     >
       <ToggleGroup.Root
         type='single'
         id='image-fit'
+        aria-labelledby='image-fit-title'
+        aria-describedby='image-fit-help'
         value={bg.fit ?? 'cover'}
         disabled={busy || uploading}
         onValueChange={(v) => {
@@ -869,12 +901,15 @@
     />
     <SettingsRow
       title='Opacity'
-      helpText='Make the image transparent'
+      helpText='How visible the image is'
+      controlId='image-opacity'
       disabled={busy || uploading}
     >
       <span>{Math.round(imageOpacityDraft * 100)}%</span>
       <Slider
         id='image-opacity'
+        aria-labelledby='image-opacity-title'
+        aria-describedby='image-opacity-help'
         type='single'
         value={imageOpacityDraft}
         min={0.0}
@@ -888,8 +923,8 @@
     <SettingsRow
       title='Parallax'
       helpText={settings.reducedMotion
-        ? 'Disabled because reduced motion is on.'
-        : 'Nudge the image as the canvas scrolls.'}
+        ? 'Disabled because reduced motion is on'
+        : 'Nudge the image as you scroll'}
       controlId='image-parallax'
       disabled={busy || uploading || settings.reducedMotion}
     >
@@ -916,12 +951,15 @@
       || !(bg.parallax ?? false)}
     <SettingsRow
       title='Parallax zoom'
-      helpText='How large the background layer is. Bigger means more travel.'
+      helpText='More zoom gives the image room to shift'
+      controlId='image-parallax-zoom'
       disabled={parallaxDisabled}
     >
       <span>{String(Number(zoomDraft.toFixed(2)))}x</span>
       <Slider
         id='image-parallax-zoom'
+        aria-labelledby='image-parallax-zoom-title'
+        aria-describedby='image-parallax-zoom-help'
         type='single'
         value={zoomDraft}
         min={1}
@@ -936,7 +974,7 @@
     {#if (bg.url ?? '') !== ''}
       <SettingsRow
         title='Remove image'
-        helpText='Back to a plain background'
+        helpText='Removes the image from the background'
         controlId='image-remove'
         disabled={busy || uploading}
       >

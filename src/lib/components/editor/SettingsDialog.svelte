@@ -52,9 +52,9 @@
   const isPreview = $derived(typeof onresetpreview === 'function')
   const tabs: { value: string, icon: IconName, label: string }[] = [
     { value: 'appearance', icon: 'paintBrush', label: 'Appearance' },
-    { value: 'tiles', icon: 'paintBrush', label: 'Tiles' },
-    { value: 'background', icon: 'paintBrush', label: 'Background' },
-    { value: 'reset', icon: 'paintBrush', label: 'Reset' },
+    { value: 'tiles', icon: 'customize', label: 'Tiles' },
+    { value: 'background', icon: 'image', label: 'Background' },
+    { value: 'reset', icon: 'arrowReset', label: 'Reset' },
   ]
 
   let themes: ThemeSelections = $state(getThemeSelections())
@@ -74,7 +74,7 @@
     <SettingsCard
       icon='darkTheme'
       title='Mode'
-      helpText='Color mode'
+      helpText='Light, dark, or match the system'
       controlId='app-mode'
     >
       <ToggleGroup.Root
@@ -82,16 +82,15 @@
         value={userPrefersMode.current}
         onValueChange={v => setMode(v)}
         id='app-mode'
+        aria-labelledby='app-mode-title'
+        aria-describedby='app-mode-help'
       >
         {#each modes as mode (mode)}
           <ToggleGroup.Item
             value={mode}
-            class='grow capitalize'
+            class={mode === 'system' ? 'grow' : 'grow capitalize'}
           >
-            {mode}
-            {#if mode === 'system'}
-              <p>({systemPrefersMode.current})</p>
-            {/if}
+            {mode === 'system' ? `System (${systemPrefersMode.current})` : mode}
           </ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
@@ -100,13 +99,13 @@
     <CollapsibleSection
       icon='color'
       title='Themes'
-      helpText='Color theme'
-      value={`${themes.light}, ${themes.dark}`}
+      helpText='Pick the colors used in light and dark mode'
     >
       {#snippet control()}
-        <div class='inline-flex items-center gap-3 text-sm'>
-          <span>{themes.light}</span>
-          <span>{themes.dark}</span>
+        <div class='inline-flex items-center gap-2 text-sm'>
+          <span><span class='text-(--muted-foreground)'>Light:</span> {themes.light}</span>
+          <span aria-hidden='true' class='text-(--muted-foreground)'>·</span>
+          <span><span class='text-(--muted-foreground)'>Dark:</span> {themes.dark}</span>
         </div>
       {/snippet}
       <div class='p-4'>
@@ -117,14 +116,16 @@
 
   <Tabs.Content value='tiles' class='mt-4 grid gap-1'>
     <SettingsCard
-      icon='customize'
+      icon='density'
       title='Tile density'
-      helpText='Coordinates stay the same. Just a little more breathing room.'
+      helpText='Comfortable adds space; compact fits more tiles'
       controlId='tile-density'
     >
       <ToggleGroup.Root
         type='single'
         id='tile-density'
+        aria-labelledby='tile-density-title'
+        aria-describedby='tile-density-help'
         value={settings.density}
         disabled={command.busy}
         onValueChange={(v) => {
@@ -143,7 +144,7 @@
     <SettingsCard
       icon='globe'
       title='Show website addresses'
-      helpText='A little context below each title.'
+      helpText='Show the domain under each tile title'
       controlId='show-domains'
     >
       <input
@@ -166,9 +167,9 @@
       />
     </SettingsCard>
     <SettingsCard
-      icon='personRunning'
+      icon='pause'
       title='Reduce motion'
-      helpText='A quieter, more instant experience.'
+      helpText='Disables tile, menu, and background animations'
       controlId='reduce-motion'
     >
       <input
@@ -197,25 +198,29 @@
   <Tabs.Content value='reset' class='mt-4 grid gap-1'>
 
     <div class='mb-7.25'>
-      <h3 class='mb-3.25 text-xs font-[550]'>A fresh arrangement</h3>
+      <h3 class='mb-3.25 text-xs font-[550]'>Reset layouts</h3>
       <p class='m-0 text-xs leading-[1.65] text-(--muted-foreground)'>
         Reset positions to browser bookmark order. Your colors, sizes, and
         bookmarks stay intact.
       </p>
       {#if confirmReset}
         <div class='mt-3.5'>
-          <p class='mb-3 text-xs'>Reset layouts for every group?</p>
-          <Button
-            variant='default'
-            disabled={command.busy}
-            onclick={() => send({ type: 'layout.reset' })}
-          >
-            Reset with Undo
-          </Button>
-          <Button class='mr-1.25' onclick={() => (confirmReset = false)}>Cancel</Button>
+          <p class='mb-3 text-xs'>Reset tile layouts for every group?</p>
+          <div class='flex w-full gap-1'>
+            <Button class='grow' onclick={() => (confirmReset = false)}>Cancel</Button>
+            <Button
+              class='grow'
+              variant='default'
+              disabled={command.busy}
+              onclick={() => send({ type: 'layout.reset' })}
+            >
+              <Icon name='undo' size={15} />
+              Reset with Undo
+            </Button>
+          </div>
         </div>
       {:else}
-        <Button class='mt-3.75 w-full text-[10px]' onclick={() => (confirmReset = true)}>
+        <Button class='mt-3.75 w-full' onclick={() => (confirmReset = true)}>
           <Icon name='refresh' size={15} />
           Reset tile layouts
         </Button>
@@ -230,29 +235,30 @@
         stay. This cannot be undone.
       </p>
       {#if confirmFactory}
-        <div class='inl mt-3.5'>
+        <div class='mt-3.5'>
           <p class='mb-3 text-xs'>Reset Metro to factory defaults?</p>
           <div class='flex w-full gap-1'>
-            <Button disabled={command.busy} onclick={() => (confirmFactory = false)}>
+            <Button class='grow' disabled={command.busy} onclick={() => (confirmFactory = false)}>
               Cancel
             </Button>
             <Button
+              class='grow'
               variant='destructive'
               disabled={command.busy}
               onclick={() => send({ type: 'factory.reset' })}
             >
-              <Icon name='refresh' size={15} />
+              <Icon name='buildingFactory' size={15} />
               Reset Metro
             </Button>
           </div>
         </div>
       {:else}
         <Button
-          class='mt-3.75 w-full text-[10px]'
+          class='mt-3.75 w-full'
           disabled={command.busy}
           onclick={() => (confirmFactory = true)}
         >
-          <Icon name='refresh' size={15} />
+          <Icon name='buildingFactory' size={15} />
           Factory reset
         </Button>
       {/if}
