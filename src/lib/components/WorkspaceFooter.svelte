@@ -101,18 +101,29 @@
   </div>
   <div class='flex min-w-0 flex-1 items-center justify-center gap-5'>
     <nav
-      class='absolute left-1/2 flex -translate-x-1/2 gap-1.5 p-2.5 max-md:hidden'
+      class='
+        absolute left-1/2 flex -translate-x-1/2 px-2 transition-[background-color,opacity]
+        hover:bg-background
+        max-md:hidden
+      '
       aria-label='Jump to bookmark group'
     >
       {#each visibleGroups as group, index (group.id)}
         <button
-          class={activeGroup === index
-            ? 'w-4 rounded-full bg-(--primary) p-0 transition-all'
-            : 'size-1 rounded-full bg-(--border) p-0 transition-all'}
+          class='group/button px-1 py-3'
           aria-label="Jump to {group.path.join(' / ')}"
           aria-current={activeGroup === index ? 'true' : undefined}
           onclick={() => onJump(index)}
+          title={group.title}
         >
+          <span
+            class={cn(
+              activeGroup === index
+                ? 'h-1 w-4 bg-(--primary)'
+                : 'size-1 bg-(--muted-foreground)',
+              'block rounded-full p-0 transition-all group-hover/button:bg-(--foreground)',
+            )}
+          ></span>
         </button>
       {/each}
     </nav>
