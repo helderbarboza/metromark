@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { Gesture } from '$lib/interaction'
-  import type { TileView } from '$lib/types'
+  import type { TileSize, TileView } from '$lib/types'
   import MetroTile from '$lib/components/MetroTile.svelte'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
   import { sizeOf } from '$lib/layout'
@@ -17,6 +17,8 @@
     dragging: boolean
     onselect: (id: string, event: PointerEvent) => void
     onblocked: (message: string) => void
+    /** Omit to hide the quick grow/shrink button (read-only tiles). */
+    onresize?: (size: TileSize) => void
   }
 
   const {
@@ -29,6 +31,7 @@
     dragging,
     onselect,
     onblocked,
+    onresize,
   }: Props = $props()
   // Snapgrid instances are keyed by immutable browser bookmark IDs.
   // svelte-ignore state_referenced_locally
@@ -135,16 +138,15 @@
   ariaRoleDescription='draggable bookmark'
   draggable={false}
   class={`
-    snapgrid-item block cursor-default text-(--tile-fg) no-underline
-    group-data-[dragging=true]:z-10 group-data-[dragging=true]:cursor-grabbing
-    focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
-    focus-visible:outline-(--primary)
+    snapgrid-item block cursor-default
+    data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
   `}
   style={item.style}
   dataTestId='metro-tile'
   dataGridId={id}
   dataDragging={item.isDragging}
   attach={attachTile}
+  {onresize}
   onclick={click}
   onpointerdown={pointerdown}
   onpointermove={pointermove}

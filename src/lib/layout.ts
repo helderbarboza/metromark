@@ -12,6 +12,7 @@ export {
   ROWS,
   sizeOf,
   SIZES,
+  TILE_SIZES,
   usedCols,
   validateLayout,
 } from '$lib/layout-constants.js'

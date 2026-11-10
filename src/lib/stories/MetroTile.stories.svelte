@@ -59,8 +59,19 @@
 />
 <Story
   name='Selected'
-  args={{ selected: true }}
+  args={{ selected: true, onresize: () => {} }}
   {template}
+  play={async ({ canvas }) => {
+    await expect(canvas.getByRole('button', { name: 'Grow Steam tile to wide' })).toBeVisible()
+  }}
+/>
+<Story
+  name='Largest'
+  args={{ selected: true, size: 'large', onresize: () => {} }}
+  {template}
+  play={async ({ canvas }) => {
+    await expect(canvas.getByRole('button', { name: 'Shrink Steam tile to small' })).toBeVisible()
+  }}
 />
 <Story
   name='Self-revealing'

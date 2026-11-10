@@ -1,9 +1,11 @@
 import density from '@iconify-icons/fluent/align-space-between-horizontal-20-regular'
+import arrowDownRight from '@iconify-icons/fluent/arrow-down-right-20-regular'
 import arrowLeft from '@iconify-icons/fluent/arrow-left-20-regular'
 import arrowReset from '@iconify-icons/fluent/arrow-reset-20-regular'
 import arrowRight from '@iconify-icons/fluent/arrow-right-20-regular'
 import refresh from '@iconify-icons/fluent/arrow-sync-20-regular'
 import undo from '@iconify-icons/fluent/arrow-undo-20-regular'
+import arrowUpLeft from '@iconify-icons/fluent/arrow-up-left-20-regular'
 import bookmark from '@iconify-icons/fluent/bookmark-20-regular'
 import addBookmark from '@iconify-icons/fluent/bookmark-add-20-regular'
 import searchBookmarks from '@iconify-icons/fluent/bookmark-search-20-regular'
@@ -50,9 +52,11 @@ export const icons = {
   add,
   addBookmark,
   addFolder,
+  arrowDownRight,
   arrowLeft,
   arrowReset,
   arrowRight,
+  arrowUpLeft,
   bookmark,
   buildingFactory,
   check,
@@ -75,19 +79,19 @@ export const icons = {
   lock,
   more,
   openTab,
-  prohibited,
   openWindow,
   paintBrush,
   pause,
+  prohibited,
   refresh,
   scaleFill,
   searchBookmarks,
+  settings,
   signalExcellent: cellularExcellent,
   signalGood: cellularGood,
   signalModerate: cellularModerate,
   signalPoor: cellularPoor,
   signalWeak: cellularWeak,
-  settings,
   transparencySquare,
   undo,
   weatherMoon,
