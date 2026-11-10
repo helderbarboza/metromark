@@ -4,10 +4,12 @@
   export const tileVariants = tv({
     slots: {
       root: `
-        metro-tile group relative block size-full overflow-hidden border border-border/50
-        bg-(--tile-bg) font-sans text-(--tile-fg) no-underline
+        metro-tile relative block size-full border border-border/50 bg-(--tile-bg)
+        font-sans text-(--tile-fg) no-underline
         transition-[transform,outline-color,box-shadow,opacity] duration-160 ease-fluent
         hover:outline-2 hover:-outline-offset-2 hover:outline-(--tile-fg)/35
+        focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
+        focus-visible:outline-(--primary)
         in-[.reduced]:active:transform-none
         motion-reduce:transition-none
         motion-reduce:active:transform-none
@@ -17,7 +19,7 @@
       title: 'truncate text-xs/tight font-normal',
       domain: `truncate text-[10px]/tight font-normal`,
       check: `
-        absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pt-px pr-0.5
+        absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pb-3 pl-3
         text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
       `,
       badge: `
@@ -30,7 +32,6 @@
       size: {
         small: {
           icon: `pb-0`,
-          check: 'size-4.5',
         },
         medium: {
           icon: `pb-6`,
@@ -78,11 +79,12 @@
   import FaviconIcon from '$lib/components/FaviconIcon.svelte'
   import Icon from '$lib/components/Icon.svelte'
 
-  import { GAP } from '$lib/layout'
+  import { GAP, TILE_SIZES } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
   import { getTileGrid as getTileGridContext, hasTileGrid } from '$lib/tile-grid-context'
   import { safeUrl } from '$lib/url'
   import { mode, theme } from 'mode-watcher'
+  import Button from './ui/button/button.svelte'
 
   interface Props {
     tile: MetroTileDef
@@ -107,6 +109,8 @@
     dataTileId?: string
     dataDragging?: boolean
     attach?: (node: HTMLAnchorElement) => void | (() => void)
+    /** Called with the target size on quick grow/shrink tap. Omit to hide it. */
+    onresize?: (size: TileSize) => void
     onclick?: (event: MouseEvent) => void
     onpointerdown?: (event: PointerEvent) => void
     onpointermove?: (event: PointerEvent) => void
@@ -136,6 +140,7 @@
     dataTileId,
     dataDragging,
     attach,
+    onresize,
     onclick,
     onpointerdown,
     onpointermove,
@@ -169,6 +174,19 @@
   })
 
   const checked = $derived(selected || revealed)
+
+  // Quick resize: grow through small → medium → wide → large, then wrap
+  // straight back to small. Null when the parent does not want the button
+  // (e.g. read-only tiles).
+  const quickResize = $derived.by(():
+    { target: TileSize, direction: 'grow' | 'shrink' } | null => {
+    if (!onresize)
+      return null
+    if (size === 'large')
+      return { target: 'small', direction: 'shrink' }
+    const index = TILE_SIZES.indexOf(size)
+    return { target: TILE_SIZES[index + 1], direction: 'grow' }
+  })
 
   const ui = $derived(tileVariants({ size, selected, revealed }))
 
@@ -206,67 +224,97 @@
   }
 </script>
 
-<a
-  class={cn(ui.root(), className)}
-  data-testid={dataTestId}
-  data-size={size}
-  data-selected={selected || undefined}
-  data-grid-id={dataGridId}
-  data-tile-id={dataTileId}
+<div
+  class={cn('relative size-full', className)}
   data-dragging={dataDragging || undefined}
-  href={launchHref}
-  {target}
-  {rel}
-  title={tooltip ?? `${tile.title} — ${tile.url}`}
-  aria-label={openLabel}
-  aria-roledescription={ariaRoleDescription}
-  draggable={draggable}
-  style:--tile-bg={bgColor}
-  style:--tile-fg={fg}
-  style:--cell={cell !== undefined ? `${cell}px` : undefined}
-  style:--gap={gap !== undefined ? `${gap}px` : undefined}
   style={style}
+>
+  <a
+    class={ui.root()}
+    data-testid={dataTestId}
+    data-size={size}
+    data-selected={selected || undefined}
+    data-grid-id={dataGridId}
+    data-tile-id={dataTileId}
+    href={launchHref}
+    {target}
+    {rel}
+    title={tooltip ?? `${tile.title} — ${tile.url}`}
+    aria-label={openLabel}
+    aria-roledescription={ariaRoleDescription}
+    draggable={draggable}
+    style:--tile-bg={bgColor}
+    style:--tile-fg={fg}
+    style:--cell={cell !== undefined ? `${cell}px` : undefined}
+    style:--gap={gap !== undefined ? `${gap}px` : undefined}
   {@attach tilt}
   {@attach attach ?? (() => {})}
-  onclick={onclick}
-  onpointerdown={onpointerdown}
-  onpointermove={onpointermove}
-  onpointerup={onpointerup}
-  onpointercancel={onpointercancel}
->
-  {#if children}
-    {@render children()}
-  {:else}
-    <div
-      class={ui.icon()}
-      aria-hidden='true'
+    onclick={onclick}
+    onpointerdown={onpointerdown}
+    onpointermove={onpointermove}
+    onpointerup={onpointerup}
+    onpointercancel={onpointercancel}
+  >
+    {#if children}
+      {@render children()}
+    {:else}
+      <div
+        class={ui.icon()}
+        aria-hidden='true'
+      >
+        <FaviconIcon
+          pageUrl={tile.url ?? ''}
+          tint={fg}
+          class={cn({
+            'size-[min(calc(var(--cell)*0.75),2.0rem)]': size === 'small',
+            'size-[min(calc(var(--cell)*0.75),3.5rem)]': size === 'medium',
+            'size-[min(calc(var(--cell)*0.75),4.0rem)]': size === 'wide',
+            'size-[min(calc(var(--cell)*1.00),5.0rem)]': size === 'large',
+          })}
+        />
+      </div>
+    {/if}
+    {#if size !== 'small'}
+      <div class={ui.label()}>
+        <span class={ui.title()}>{tile.title}</span>
+        {#if showDomain && domain}
+          <span class={ui.domain()}>{domain}</span>
+        {/if}
+      </div>
+    {/if}
+    {#if checked}
+      <span class={ui.check()} aria-hidden='true'>
+        <Icon name='check' class='size-4' />
+      </span>
+    {/if}
+    {#if tile.badge !== undefined}
+      <span class={ui.badge()} aria-hidden='true'>{tile.badge}</span>
+    {/if}
+  </a>
+  {#if checked && quickResize}
+    <Button
+      variant='secondary'
+      size='icon-xs'
+      class='
+        absolute right-0 bottom-0 z-2 translate-1.5 rounded-full border-border/60
+        shadow-sm
+      '
+      aria-label={quickResize.direction === 'grow'
+        ? `Grow ${tile.title} tile to ${quickResize.target}`
+        : `Shrink ${tile.title} tile to ${quickResize.target}`}
+      onpointerdown={event => event.stopPropagation()}
+      onclick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        const target = quickResize?.target
+        if (target)
+          onresize?.(target)
+      }}
     >
-      <FaviconIcon
-        pageUrl={tile.url ?? ''}
-        tint={fg}
-        class={cn({
-          'size-[min(calc(var(--cell)*0.75),2.0rem)]': size === 'small',
-          'size-[min(calc(var(--cell)*0.75),3.5rem)]': size === 'medium',
-          'size-[min(calc(var(--cell)*0.75),4.0rem)]': size === 'wide',
-          'size-[min(calc(var(--cell)*1.00),5.0rem)]': size === 'large',
-        })}
+      <Icon
+        class='size-3.5'
+        name={quickResize.direction === 'grow' ? 'arrowDownRight' : 'arrowUpLeft'}
       />
-    </div>
+    </Button>
   {/if}
-  {#if size !== 'small'}
-    <div class={ui.label()}>
-      <span class={ui.title()}>{tile.title}</span>
-      {#if showDomain && domain}
-        <span class={ui.domain()}>{domain}</span>
-      {/if}
-    </div>
-  {/if}
-  {#if checked}
-    <span class={ui.check()} aria-hidden='true'>
-      <Icon name='check' size={size === 'small' ? 9 : 12} />
-    </span>
-  {/if}
-  {#if tile.badge !== undefined}
-    <span class={ui.badge()} aria-hidden='true'>{tile.badge}</span>
-  {/if}
-</a>
+</div>

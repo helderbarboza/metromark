@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import type { GroupView, Layout, TileView } from '$lib/types'
+  import type { GroupView, Layout, TileSize, TileView } from '$lib/types'
   import type { Snippet } from 'svelte'
   import GridTile from '$lib/components/GridTile.svelte'
   import Icon from '$lib/components/Icon.svelte'
@@ -42,6 +42,8 @@
     onDragStart: () => void
     onDragStop: () => void
     onSelect: (id: string, event: PointerEvent) => void
+    /** Quick grow/shrink handler for the button on checked tiles. Omit to hide it. */
+    onResizeTile?: (id: string, size: TileSize) => void
     /** Content of the per-group "Manage" dropdown menu. Omit to hide the button. */
     menu?: Snippet<[GroupView]>
     onAdd: (folderId: string) => void
@@ -62,6 +64,7 @@
     onDragStart,
     onDragStop,
     onSelect,
+    onResizeTile,
     menu,
     onAdd,
     onBlocked,
@@ -271,6 +274,7 @@
             {dragging}
             onselect={onSelect}
             onblocked={onBlocked}
+            onresize={onResizeTile && (size => onResizeTile(entry.i, size))}
           />
         {:else}
           <MetroTile
@@ -287,12 +291,11 @@
               : ''}"
             onclick={event => launch(event, tile)}
             class='
-              absolute block no-underline transition-[left,top,width,height] duration-140
-              focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
-              focus-visible:outline-(--primary)
+              block transition-[left,top,width,height] duration-140
               motion-reduce:transition-none
             '
             style={`
+              position: absolute;
               left: ${entry.x * (cell + GAP)}px;
               top: ${entry.y * (cell + GAP)}px;
               width: ${cellsToPx(entry.w, cell)}px;
@@ -300,6 +303,9 @@
             `}
             dataTestId='tile-slot'
             dataTileId={entry.i}
+            onresize={tile.writable && onResizeTile
+              ? size => onResizeTile(entry.i, size)
+              : undefined}
           />
         {/if}
       {/if}

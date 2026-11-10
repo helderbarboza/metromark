@@ -898,6 +898,7 @@
                         }}
                         onDragStop={dragStop}
                         onSelect={selectByGesture}
+                        onResizeTile={resizeTile}
                         menu={groupMenu}
                         onAdd={parentId => edit({ kind: 'bookmark', parentId })}
                         onBlocked={message => showNotice({ message, tone: 'error' })}
