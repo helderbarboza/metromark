@@ -1,3 +1,38 @@
+<script module lang='ts'>
+  import type { Attachment } from 'svelte/attachments'
+  import { SvelteMap } from 'svelte/reactivity'
+
+  const observers = new SvelteMap<string, IntersectionObserver>()
+
+  function getObserver(rootMargin: string) {
+    let io = observers.get(rootMargin)
+    if (!io) {
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const { target, isIntersecting } of entries) {
+            target.toggleAttribute('data-offscreen', !isIntersecting)
+          }
+        },
+        { rootMargin },
+      )
+      observers.set(rootMargin, io)
+    }
+    return io
+  }
+
+  function pauseOffscreen(rootMargin = '100px'): Attachment<HTMLElement> {
+    return (element) => {
+      const io = getObserver(rootMargin)
+      io.observe(element)
+
+      return () => {
+        io.unobserve(element)
+        element.removeAttribute('data-offscreen')
+      }
+    }
+  }
+</script>
+
 <script lang='ts'>
   import type { Gesture } from '$lib/interaction'
   import type { TileSize, TileView } from '$lib/types'
@@ -125,9 +160,11 @@
       cleanupKeys?.()
     }
   }
+
 </script>
 
 <MetroTile
+  {@attach pauseOffscreen()}
   {tile}
   size={item.item ? sizeOf(item.item) : tile.size}
   {selected}
@@ -144,6 +181,7 @@
   class={cn(
     `
       snapgrid-item block cursor-default
+      data-offscreen:paused
       data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
     `,
     // During a drag, sibling tiles shrink and dim while the dragged tile lifts.
