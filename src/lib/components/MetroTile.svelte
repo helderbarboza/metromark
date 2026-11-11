@@ -147,6 +147,7 @@
     onpointermove,
     onpointerup,
     onpointercancel,
+    ...rest
   }: Props = $props()
 
   const readTileGrid = hasTileGrid() ? getTileGridContext() : undefined
@@ -229,6 +230,7 @@
   class={cn('relative size-full', className)}
   data-dragging={dataDragging || undefined}
   style={style}
+  {...rest}
 >
   <a
     class={ui.root()}
