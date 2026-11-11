@@ -6,7 +6,8 @@
       root: `
         metro-tile relative block size-full border border-border/50 bg-(--tile-bg)
         font-sans text-(--tile-fg) no-underline
-        transition-[transform,outline-color,box-shadow,opacity] duration-160 ease-fluent
+        transition-[transform,scale,outline-color,box-shadow,opacity] duration-160
+        ease-fluent
         hover:outline-2 hover:-outline-offset-2 hover:outline-(--tile-fg)/35
         focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
         focus-visible:outline-(--primary)

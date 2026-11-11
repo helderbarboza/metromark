@@ -22,6 +22,7 @@
   import { setTileGrid } from '$lib/tile-grid-context'
   import { safeUrl, validateUrl } from '$lib/url'
   import { cn } from '$lib/utils'
+  import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import {
     createGridContainer,
     createGridPlaceholder,
@@ -34,8 +35,6 @@
     tiles: Record<string, TileView>
     cell: number
     draggable: boolean
-    dragging: boolean
-    selectedId: string | null
     showDomains: boolean
     preview: boolean
     onLayoutChange: (id: string, layout: Layout) => void
@@ -56,8 +55,6 @@
     tiles,
     cell,
     draggable,
-    dragging,
-    selectedId,
     showDomains,
     preview,
     onLayoutChange,
@@ -69,6 +66,12 @@
     onAdd,
     onBlocked,
   }: Props = $props()
+
+  // Workspace state flows through context (set by the root component); stories
+  // without a provider get inert defaults.
+  const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const dragging = $derived(readWorkspace?.().dragging ?? false)
+  const selectedId = $derived(readWorkspace?.().selectedId ?? null)
 
   let liveCols = $state(0)
   let menuContentEl = $state<HTMLDivElement | null>(null)
@@ -268,10 +271,8 @@
             id={entry.i}
             group={container.group}
             {tile}
-            selected={selectedId === entry.i}
             {showDomains}
             {preview}
-            {dragging}
             onselect={onSelect}
             onblocked={onBlocked}
             onresize={onResizeTile && (size => onResizeTile(entry.i, size))}
