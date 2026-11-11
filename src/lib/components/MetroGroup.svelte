@@ -4,7 +4,9 @@
   import GridTile from '$lib/components/GridTile.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import MetroTile from '$lib/components/MetroTile.svelte'
+  import { Button } from '$lib/components/ui/button'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
+  import * as Empty from '$lib/components/ui/empty'
   import { DRAG_PX } from '$lib/interaction'
   import {
     cellsToPx,
@@ -325,28 +327,24 @@
       </div>
     {/if}
     {#if !layout.length}
-      <div
-        class='
-          flex h-full flex-col items-center justify-center border border-dashed
-          border-(--border) text-(--muted-foreground)
-        '
-      >
-        <Icon name='folder' size={30} />
-        <h3 class='mt-4 mb-2.25 text-[16px] font-semibold text-(--foreground)'>Nothing here. Yet.</h3>
-        <p class='m-0 text-[12px]'>A little room for your next favorite.</p>
+      <Empty.Root class='h-full'>
+        <Empty.Header>
+          <Empty.Media variant='icon'>
+            <Icon name='folder' size={22} />
+          </Empty.Media>
+          <Empty.Title>This folder is empty</Empty.Title>
+          <Empty.Description>
+            Add a bookmark or move tiles here from any other group.
+          </Empty.Description>
+        </Empty.Header>
         {#if group.writable}
-          <button
-            class='
-              mt-6.5 inline-flex items-center gap-1.75 rounded-[3px] border
-              border-(--border) bg-(--card) px-3 py-2.25 text-xs text-(--foreground)
-              hover:bg-(--accent)
-            '
-            onclick={() => onAdd(group.id)}
-          >
-            <Icon name='addBookmark' size={15} />Add a bookmark
-          </button>
+          <Empty.Content>
+            <Button variant='outline' size='sm' onclick={() => onAdd(group.id)}>
+              <Icon name='addBookmark' />Add a bookmark
+            </Button>
+          </Empty.Content>
         {/if}
-      </div>
+      </Empty.Root>
     {/if}
   </div>
 </section>

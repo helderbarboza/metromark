@@ -28,7 +28,7 @@
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { isMediaKey } from '$lib/image-background'
   import { toggleSelection } from '$lib/interaction'
-  import { cellsToPx, GAP, reconcileLayout, ROWS } from '$lib/layout'
+  import { GAP, reconcileLayout, ROWS } from '$lib/layout'
   import { sweepBackgroundMedia } from '$lib/media-store'
   import { focusFirstMenuItem } from '$lib/menu-focus'
   import {
@@ -910,31 +910,6 @@
                         onBlocked={message => showNotice({ message, tone: 'error' })}
                       />
                     {/each}
-                    {#if !normalizedQuery && defaultFolder()}<div class='flex w-48 shrink-0 justify-end'>
-                      <button
-                        class='
-                          relative flex w-full flex-col items-center justify-center border
-                          border-dashed border-(--border) bg-transparent
-                          text-(--muted-foreground) transition-colors duration-150
-                          hover:border-(--muted-foreground) hover:bg-(--card)
-                          hover:text-(--foreground)
-                        '
-                        style:height='{cellsToPx(ROWS, cell)}px'
-                        onclick={() => edit({ kind: 'folder', parentId: defaultFolder() })}
-                      >
-                        <span
-                          class='
-                            mb-5 flex size-12 items-center justify-center rounded-full
-                            border border-(--border)
-                          '
-                        >
-                          <Icon name='addFolder' size={23} />
-                        </span>
-                        <strong class='text-sm font-medium text-(--foreground)'>New group</strong>
-                        <span class='mt-2 text-xs'>Create a bookmark folder</span>
-                      </button>
-                    </div>
-                    {/if}
                     {#if !visibleGroups.length && !normalizedQuery}
                       <div
                         class='

@@ -25,7 +25,6 @@ import close from '@iconify-icons/fluent/dismiss-circle-20-regular'
 import edit from '@iconify-icons/fluent/edit-20-regular'
 import fastForward from '@iconify-icons/fluent/fast-forward-20-regular'
 import folder from '@iconify-icons/fluent/folder-20-regular'
-import addFolder from '@iconify-icons/fluent/folder-add-20-regular'
 import gauge from '@iconify-icons/fluent/gauge-20-regular'
 import globe from '@iconify-icons/fluent/globe-20-regular'
 import customize from '@iconify-icons/fluent/grid-20-regular'
@@ -51,7 +50,6 @@ import weatherSunny from '@iconify-icons/fluent/weather-sunny-20-regular'
 export const icons = {
   add,
   addBookmark,
-  addFolder,
   arrowDownRight,
   arrowLeft,
   arrowReset,

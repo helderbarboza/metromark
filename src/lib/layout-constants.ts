@@ -11,7 +11,7 @@ export const SIZES: Record<TileSize, [number, number]> = {
 }
 
 export const MIN_GROUP_COLS = 2
-export const EMPTY_GROUP_COLS = 4
+export const EMPTY_GROUP_COLS = 6
 export const ENGINE_COL_HEADROOM = 12
 export const MAX_TILE_COLS = 4
 export const MIN_ENGINE_COLS = 24
