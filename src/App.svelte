@@ -47,9 +47,11 @@
     projectGroups,
   } from '$lib/tree'
   import { cn } from '$lib/utils'
+  import { setWorkspace } from '$lib/workspace-context'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { mode, ModeWatcher, theme } from 'mode-watcher'
   import { onMount } from 'svelte'
+  import { MediaQuery } from 'svelte/reactivity'
 
   const { client }: { client: Client } = $props()
   let snapshot = $state.raw<Snapshot | null>(null)
@@ -189,6 +191,13 @@
       : undefined,
   )
   const settingsOpen = $derived(snapshot !== null && dialog?.kind === 'settings')
+  const osReducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)')
+  const reducedMotion = $derived(
+    snapshot?.settings.reducedMotion || osReducedMotion.current,
+  )
+  // Workspace state for the canvas subtree (tiles read it via context). The getter
+  // closure keeps consumers reactive without drilling props.
+  setWorkspace(() => ({ dragging, selectedId, reducedMotion }))
 
   function applySnapshot(value: Snapshot) {
     snapshot = value
@@ -809,7 +818,6 @@
               outline-none
               [&::-webkit-scrollbar]:hidden
             '
-            class:is-dragging={dragging}
             bind:this={scroller}
             onscroll={updateScroll}
             onwheel={wheel}
@@ -880,8 +888,6 @@
                         tiles={allTiles}
                         {cell}
                         draggable={!normalizedQuery}
-                        {dragging}
-                        {selectedId}
                         showDomains={snapshot.settings.showDomains}
                         preview={client.mode === 'preview'}
                         onLayoutChange={stageLayout}
@@ -1099,26 +1105,3 @@
   </aside>
 
 </div>
-
-<style>
-  .is-dragging :global(.snapgrid-item:not([data-dragging])) {
-    transform: scale(.93);
-    opacity: .85;
-  }
-  .is-dragging :global(.snapgrid-item[data-dragging]) {
-    z-index: 10;
-  }
-  .is-dragging :global(.snapgrid-item[data-dragging]) {
-    transform: scale(1.04);
-    opacity: .95;
-    box-shadow: 0 10px 30px #0007;
-  }
-  .reduced .is-dragging :global(.snapgrid-item) {
-    transform: none;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .is-dragging :global(.snapgrid-item) {
-      transform: none;
-    }
-  }
-</style>

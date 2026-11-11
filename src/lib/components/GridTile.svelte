@@ -5,16 +5,16 @@
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
   import { sizeOf } from '$lib/layout'
   import { safeUrl, validateUrl } from '$lib/url'
+  import { cn } from '$lib/utils'
+  import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import { createGridItem } from '@snapgridjs/svelte'
 
   interface Props {
     id: string
     group: string
     tile: TileView
-    selected: boolean
     showDomains: boolean
     preview: boolean
-    dragging: boolean
     onselect: (id: string, event: PointerEvent) => void
     onblocked: (message: string) => void
     /** Omit to hide the quick grow/shrink button (read-only tiles). */
@@ -25,10 +25,8 @@
     id,
     group,
     tile,
-    selected,
     showDomains,
     preview,
-    dragging,
     onselect,
     onblocked,
     onresize,
@@ -36,6 +34,12 @@
   // Snapgrid instances are keyed by immutable browser bookmark IDs.
   // svelte-ignore state_referenced_locally
   const item = createGridItem({ id, group })
+  // Workspace state flows through context (set by the root component); without a
+  // provider (e.g. in stories), consumers get inert defaults.
+  const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const dragging = $derived(readWorkspace?.().dragging ?? false)
+  const selected = $derived((readWorkspace?.().selectedId ?? null) === id)
+  const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? false)
   // Cross-slide runs on touch and pen only; a mouse selects with the right button
   // (uwp8 pp. 79, 158) and moves tiles with a plain drag.
   let gesture = $state<Gesture | null>(null)
@@ -137,10 +141,24 @@
     : ''}. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel."
   ariaRoleDescription='draggable bookmark'
   draggable={false}
-  class={`
-    snapgrid-item block cursor-default
-    data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
-  `}
+  class={cn(
+    `
+      snapgrid-item block cursor-default
+      data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
+    `,
+    // During a drag, sibling tiles shrink and dim while the dragged tile lifts.
+    // Tailwind v4 `scale-*` uses the CSS `scale` property, so it composes with the
+    // transform FLIP that snapgrid animates. The dragged tile is the anchor (it is
+    // position:fixed and floats with the pointer); its outer grid-item wrapper
+    // stays behind at the origin, so the lift styles go on the anchor, not the
+    // wrapper. dnd-kit also clones the anchor as an invisible inert ghost
+    // (data-dnd-placeholder="hidden"), which needs no exclusion handling.
+    dragging && !item.isDragging && !reducedMotion && 'animate-float [&>a]:scale-93',
+    dragging && !item.isDragging && '[&>a]:opacity-85',
+    dragging && item.isDragging && !reducedMotion && '[&>a]:scale-104',
+    dragging && item.isDragging && '[&>a]:opacity-95',
+    dragging && item.isDragging && '[&>a]:shadow-[0_10px_30px_#0007]',
+  )}
   style={item.style}
   dataTestId='metro-tile'
   dataGridId={id}

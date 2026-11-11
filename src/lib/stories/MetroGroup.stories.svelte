@@ -7,6 +7,7 @@
   import type { ComponentProps } from 'svelte'
   import MenuItems from '$lib/components/MenuItems.svelte'
   import MetroGroup from '$lib/components/MetroGroup.svelte'
+  import WorkspaceProvider from '$lib/stories/WorkspaceProvider.svelte'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn, screen, userEvent } from 'storybook/test'
@@ -75,8 +76,6 @@
       tiles,
       cell: 68,
       draggable: true,
-      dragging: false,
-      selectedId: null,
       showDomains: true,
       preview: true,
       onLayoutChange: fn(),
@@ -110,7 +109,19 @@
 {#snippet template(args: ComponentProps<typeof MetroGroup>)}
   <SnapGridGroup>
     <div style='padding:32px;background:var(--background);min-height:100vh'>
-      <MetroGroup {...args} menu={manageMenu} />
+      <WorkspaceProvider>
+        <MetroGroup {...args} menu={manageMenu} />
+      </WorkspaceProvider>
+    </div>
+  </SnapGridGroup>
+{/snippet}
+
+{#snippet selectionTemplate(args: ComponentProps<typeof MetroGroup>)}
+  <SnapGridGroup>
+    <div style='padding:32px;background:var(--background);min-height:100vh'>
+      <WorkspaceProvider state={{ selectedId: 'steam' }}>
+        <MetroGroup {...args} menu={manageMenu} />
+      </WorkspaceProvider>
     </div>
   </SnapGridGroup>
 {/snippet}
@@ -150,8 +161,7 @@
 
 <Story
   name='Selection'
-  args={{ selectedId: 'steam' }}
-  {template}
+  template={selectionTemplate}
   play={async ({ canvas, canvasElement }) => {
     await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
     await expect(canvasElement.querySelectorAll('.metro-tile.selected')).toHaveLength(1)
