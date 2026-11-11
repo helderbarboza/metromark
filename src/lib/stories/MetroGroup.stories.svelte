@@ -143,7 +143,7 @@
   args={{ group: emptyGroup, layout: [], tiles: {} }}
   {template}
   play={async ({ canvas }) => {
-    await expect(await canvas.findByText('Nothing here. Yet.')).toBeVisible()
+    await expect(await canvas.findByText('This folder is empty')).toBeVisible()
     await expect(await canvas.findByRole('button', { name: 'Add a bookmark' })).toBeVisible()
   }}
 />
