@@ -4,26 +4,42 @@ import { tv } from 'tailwind-variants'
 export const tileVariants = tv({
   slots: {
     root: `
-      metro-tile relative block size-full border border-border/50 font-sans
-      text-(--tile-fg) no-underline
-      transition-[transform,scale,outline-color,box-shadow,opacity] duration-160
+      metro-tile relative block size-full font-sans text-(--tile-fg)
+      no-underline transition-[transform,translate,opacity] duration-160
       ease-fluent
-      hover:outline-2 hover:-outline-offset-2 hover:outline-(--tile-fg)/35
-      focus-visible:z-2 focus-visible:outline-[3px]
-      focus-visible:outline-offset-3 focus-visible:outline-(--primary)
+      before:pointer-events-none before:absolute before:inset-0 before:z-1
+      before:border-2 before:border-transparent before:transition-[border-color]
+      before:duration-160 before:ease-fluent before:content-['']
+      after:pointer-events-none after:absolute after:inset-0 after:border-2
+      after:border-transparent after:outline-1 after:-outline-offset-1
+      after:outline-foreground/25 after:transition-[border-color]
+      after:duration-160 after:ease-fluent after:content-['']
+      after:outline-solid
+      hover:before:border-foreground/35
+      focus-visible:z-2 focus-visible:outline-3 focus-visible:outline-offset-3
+      focus-visible:outline-(--primary)
+      in-[.reduced]:before:transition-none
+      in-[.reduced]:after:transition-none
       in-[.reduced]:active:transform-none
+      data-selected:before:inset-3
+      data-selected:after:outline-transparent
       motion-reduce:transition-none
+      motion-reduce:before:transition-none
+      motion-reduce:after:transition-none
       motion-reduce:active:transform-none
     `,
-    background: `bg-(--tile-bg)`,
+    // Win8-style sheen: left edge brighter, right edge darker, hue preserved.
+    background: `
+      bg-[linear-gradient(to_left,color-mix(in_oklab,var(--tile-bg),white_5%),var(--tile-bg)_50%,color-mix(in_oklab,var(--tile-bg),black_11%))]
+    `,
     icon: `absolute inset-0 flex items-center justify-center`,
     labelContainer: `absolute inset-x-0 bottom-0`,
     label: `mx-4 mb-1 flex flex-col text-left`,
-    title: 'truncate text-xs/tight font-normal',
+    title: '-ms-px -me-px truncate text-xs/tight font-normal',
     domain: `truncate text-[10px]/tight font-normal`,
     check: `
-      absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pb-3
-      pl-3 text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
+      absolute top-0 right-0 flex items-start justify-end bg-background pb-3
+      pl-3 text-foreground [clip-path:polygon(100%_0,0_0,100%_100%)]
     `,
     badge: `
       absolute top-2.5 left-3 flex h-5.5 min-w-5.5 items-center justify-center
@@ -49,9 +65,9 @@ export const tileVariants = tv({
     selected: {
       true: {
         root: `
-          selected outline-[3px] outline-offset-[-3px] outline-(--tile-fg)
-          hover:outline-[3px] hover:outline-offset-[-3px]
-          hover:outline-(--tile-fg)
+          selected
+          after:pointer-events-none after:absolute after:inset-0 after:border-3
+          after:border-background after:content-['']
         `,
       },
     },
@@ -64,7 +80,9 @@ export const tileVariants = tv({
       true: {
         root: `
           revealed translate-y-1.5
-          active:transform-[translateY(6px)_perspective(600px)_rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))_scale(.97)]
+          active:transform-[perspective(600px)_rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))_scale(.97)]
+          in-[.reduced]:translate-none
+          motion-reduce:translate-none
         `,
       },
     },

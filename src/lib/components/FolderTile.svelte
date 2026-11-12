@@ -157,13 +157,9 @@
     >
       {#each cells as cell, index (index)}
         {#if cell.kind === 'blank'}
-          <div class={cn(ui.background(), `aspect-square min-h-0`)}></div>
+          <div class='aspect-square min-h-0 bg-(--tile-bg)'></div>
         {:else if cell.kind === 'folder'}
-          <div
-            class={cn(ui.background(), `
-              flex aspect-square min-h-0 items-center justify-center
-            `)}
-          >
+          <div class='flex aspect-square min-h-0 items-center justify-center bg-(--tile-bg)'>
             <Icon name='folder' class='size-[55%]' />
           </div>
         {:else}
