@@ -10,7 +10,7 @@ Chrome/Firefox MV3 extension that replaces the new tab with a Metro bookmark lau
 
 - Svelte 5 runes + TypeScript; Tailwind CSS 4 via Vite.
 - ESLint only; no Prettier.
-- WXT for Chrome and Firefox MV3 builds.
+- WXT for Chrome and Firefox MV3 builds. Auto-imports are disabled (`imports: false` in `wxt.config.ts`). Import browser APIs explicitly from `wxt/browser`; do not rely on auto-import globals.
 - Snapgrid for tile arrangement.
 - Storybook 10 with native Svelte CSF stories.
 - `$lib` alias points to `src/lib`.
@@ -18,7 +18,7 @@ Chrome/Firefox MV3 extension that replaces the new tab with a Metro bookmark lau
 ## Commands
 
 ```sh
-npm ci
+npm ci                   # also runs `wxt prepare` (postinstall); `.wxt/` is gitignored
 npm run dev              # isolated preview, 0.0.0.0:5173
 npm run dev:chrome       # WXT Chrome development
 npm run dev:firefox      # Firefox development; always pass --mv3
@@ -32,20 +32,29 @@ npm run package          # package existing .output builds; run build first
 npm run check            # svelte-check
 npm run lint             # ESLint
 npm run lint:fix         # ESLint auto-fix
-npm test                 # Vitest unit project (node)
+npm test                 # Vitest unit project (node env) only
 npm run test:stories     # Vitest Storybook project (browser)
 npm run test:e2e         # Playwright preview interactions
-node scripts/test-firefox.mjs  # disposable Firefox profile; requires Firefox build
+node scripts/test-firefox.mjs  # disposable Firefox profile; requires Firefox build; downloads geckodriver (network)
 ```
 
-Run one unit test with `npx vitest run --project unit tests/<file>.test.ts`. Append a path to `npm run test:stories` for one story file. Browser checks need Playwright browsers installed.
+Run one unit test with `npx vitest run --project unit tests/<file>.test.ts`. Append a path to `npm run test:stories` for one story file.
+
+Testing quirks:
+
+- `npm test` runs only the `unit` project. It does not run Storybook or e2e checks.
+- `npm run test:stories` runs Storybook 10 in browser mode (chromium, `--no-sandbox`). It starts Storybook itself and needs Playwright browsers installed (`npx playwright install chromium`).
+- `npm run test:e2e` auto-starts the vite preview on port 5173 (or reuses a running one) and targets `http://127.0.0.1:5173`.
+- Vitest runs serially (`maxWorkers: 1`, `fileParallelism: false`).
+- There is no CI. Run `npm run check`, `npm run lint` and `npm test` yourself and report only the checks that actually passed.
 
 ## Architecture
 
 - `src/App.svelte`: workspace state, menus/dialogs, search, navigation, drag-layout batching.
 - `src/lib/coordinator.ts`: serialized commands, native-event reconciliation, persistence, durable Undo.
 - `src/lib/tree.ts`: bookmark projection, ancestry, protection rules, tile presentation, URL validation.
-- `src/lib/layout.ts`: tile sizes, packing, validation, independent layout reconciliation.
+- `src/lib/layout.ts`: re-export shim only. Implementation is `src/lib/layout-constants.ts` (tile sizes, packing, validation, layout reconciliation). Import from `$lib/layout` or `$lib/layout-constants` as the surrounding code does.
+- shadcn-svelte is configured (`components.json`). UI primitives are in `src/lib/components/ui`. Prefer them over hand-rolled dialogs, menus and inputs.
 - `src/lib/adapters/native.ts`: native bookmark/storage APIs and privileged background messaging.
 - `src/lib/adapters/preview.ts`: isolated demo persistence and cross-tab updates.
 - `src/lib/components/`: adapted Metro UI and management components.
@@ -109,6 +118,7 @@ Put bookmark mutations behind coordinator commands. Keep browser API details in 
 ## Delivery
 
 - Build before packaging when code changes require updated browser artifacts.
+- `release/` artifacts are git-tracked. Regenerate them with `npm run build` + `npm run package`; never hand-edit them.
 - Keep persistent deliverables in `release/`. Do not rely on `.output/`, `dist/`, caches, or `node_modules/` surviving snapshots.
 - Include editable source, installation instructions, privacy information, and dependency notices in releases.
 - Chrome loads through Load unpacked. Firefox unsigned XPI is temporary installation; permanent standard Firefox needs Mozilla signing.

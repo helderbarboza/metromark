@@ -21,7 +21,7 @@ await cp('NOTICE.md', 'release/NOTICE.md')
 
 const source = {}
 for (const directory of ['src', 'public', '.storybook', 'tests', 'e2e', 'scripts', 'docs']) Object.assign(source, await folderEntries(directory, `metro-bookmarks/${directory}/`))
-for (const file of ['package.json', 'package-lock.json', '.nvmrc', '.gitignore', 'README.md', 'PRIVACY.md', 'NOTICE.md', 'wxt.config.ts', 'vite.config.ts', 'vitest.config.ts', 'playwright.config.ts', 'tsconfig.json', 'svelte.config.js', 'eslint.config.js', 'index.html']) {
+for (const file of ['package.json', 'package-lock.json', '.nvmrc', '.gitignore', 'README.md', 'PRIVACY.md', 'NOTICE.md', 'wxt.config.ts', 'vite.config.ts', 'vitest.config.ts', 'playwright.config.ts', 'tsconfig.json', 'svelte.config.js', 'eslint.config.mjs', 'index.html']) {
   source[`metro-bookmarks/${file}`] = new Uint8Array(await readFile(file))
 }
 const sourceName = `metro-bookmarks-source-${version}.zip`
