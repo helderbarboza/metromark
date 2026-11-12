@@ -7,7 +7,8 @@
   import DialogError from '$lib/components/editor/DialogError.svelte'
   import { Button } from '$lib/components/ui/button'
   import { getThemeAccentColors } from '$lib/theme-colors'
-  import { tileFor } from '$lib/tile'
+  import { tileFor, tileForFolder } from '$lib/tile'
+  import { isFolder } from '$lib/tree'
   import { theme } from 'mode-watcher'
   import { onMount } from 'svelte'
 
@@ -32,7 +33,12 @@
   let colorIndex = $state(0)
   let customColor = $state('')
 
-  const tile = $derived(node ? tileFor(node, snapshot.appearance[node.id]) : undefined)
+  const tile = $derived(node
+    ? isFolder(node)
+      ? tileForFolder(node, snapshot.appearance[node.id])
+      : tileFor(node, snapshot.appearance[node.id])
+    : undefined)
+  const folder = $derived(node ? isFolder(node) : false)
 
   const themeColors = $derived.by(() => {
     void theme.current
@@ -67,7 +73,7 @@
   {#if tile}
     <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
       A little personality for <strong class='text-(--foreground)'>{tile.title}</strong>.
-      Appearance changes are local; the bookmark itself stays untouched.
+      Appearance changes are local; {folder ? 'the folder itself' : 'the bookmark itself'} stays untouched.
     </p>
     <label class='mb-5.25 flex flex-col gap-2.25'>
       <span class='text-[12px] font-medium text-(--foreground)' id='tile-size-label'>Tile size</span>

@@ -12,13 +12,16 @@
     subtitle?: string
     size: TileSize
     writable: boolean
+    /** Tile kind; folder tiles rename instead of editing and cannot be deleted. */
+    kind?: 'bookmark' | 'folder'
     /** Increments when a selection was made from the keyboard, so focus can move here. */
     focusRequest?: number
     /** Commands that stay off the app bar itself (uwp8 p. 157). */
     menuItems: MenuItem[]
     onresize: (size: TileSize) => void
     onedit: () => void
-    ondelete: () => void
+    /** Omit to hide the delete command (folder tiles cannot be deleted). */
+    ondelete?: () => void
     onmove: () => void
     onclear: () => void
   }
@@ -28,6 +31,7 @@
     subtitle,
     size,
     writable,
+    kind = 'bookmark',
     focusRequest = 0,
     menuItems,
     onresize,
@@ -49,6 +53,7 @@
   })
 
   const presets = ['small', 'medium', 'wide', 'large'] as const
+  const actionNoun = $derived(kind === 'folder' ? 'folder' : 'bookmark')
 </script>
 
 <div
@@ -64,26 +69,28 @@
     <button
       data-initial-focus
       disabled={!writable}
-      aria-label='Edit selected bookmark'
+      aria-label={kind === 'folder' ? 'Rename selected folder' : 'Edit selected bookmark'}
       onclick={onedit}
     >
       <Icon name='edit' size={15} />
     </button>
     <button
       disabled={!writable}
-      aria-label='Move selected bookmark to another folder'
+      aria-label={`Move selected ${actionNoun} to another folder`}
       onclick={onmove}
     >
       <Icon name='folder' size={15} />
     </button>
-    <button
-      class='delete'
-      disabled={!writable}
-      aria-label='Delete selected bookmark'
-      onclick={ondelete}
-    >
-      <Icon name='delete' size={15} />
-    </button>
+    {#if ondelete}
+      <button
+        class='delete'
+        disabled={!writable}
+        aria-label='Delete selected bookmark'
+        onclick={ondelete}
+      >
+        <Icon name='delete' size={15} />
+      </button>
+    {/if}
   </div>
   <div class='size-options'>
     {#each presets as preset (preset)}
@@ -98,27 +105,29 @@
     {/each}
   </div>
   <div class='bar-actions'>
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger aria-label='More actions for {title}'>
-        <Icon name='more' size={16} />
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content
-        bind:ref={menuContentEl}
-        aria-label='Actions for {title}'
-        class='w-65'
-        side='top'
-        align='end'
-        onOpenAutoFocus={event => focusFirstMenuItem(event, menuContentEl)}
-      >
-        <DropdownMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
-          <strong class='truncate text-[12px] font-semibold'>{title}</strong>
-          {#if subtitle}
-            <span class='truncate text-[12px] text-(--muted-foreground)'>{subtitle}</span>
-          {/if}
-        </DropdownMenu.Label>
-        <MenuItems items={menuItems} variant='dropdown' />
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+    {#if menuItems.length > 0}
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger aria-label='More actions for {title}'>
+          <Icon name='more' size={16} />
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          bind:ref={menuContentEl}
+          aria-label='Actions for {title}'
+          class='w-65'
+          side='top'
+          align='end'
+          onOpenAutoFocus={event => focusFirstMenuItem(event, menuContentEl)}
+        >
+          <DropdownMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
+            <strong class='truncate text-[12px] font-semibold'>{title}</strong>
+            {#if subtitle}
+              <span class='truncate text-[12px] text-(--muted-foreground)'>{subtitle}</span>
+            {/if}
+          </DropdownMenu.Label>
+          <MenuItems items={menuItems} variant='dropdown' />
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    {/if}
     <button aria-label='Clear selection' onclick={onclear}>
       <Icon name='close' size={16} />
     </button>

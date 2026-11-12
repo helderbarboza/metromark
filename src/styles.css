@@ -723,6 +723,31 @@ button:focus:not(:focus-visible) {
   will-change: translate, transform;
 }
 
+/* Brief outline flash on a group after a folder tile scrolled it into view. */
+@utility animate-flash {
+  animation-name: flash-group;
+  animation-timing-function: ease-in-out;
+  animation-duration: 0.75s;
+  animation-iteration-count: 4;
+  outline-style: solid;
+  outline-width: 0.25rem;
+  outline-offset: 0.5rem;
+  outline-color: transparent; 
+}
+
+@keyframes flash-group {
+  0% { outline-color: transparent; }
+  15% { outline-color: var(--primary); }
+  70% { outline-color: var(--primary); }
+  100% { outline-color: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-flash {
+    animation: none;
+  }
+}
+
 @keyframes float-x {
   0%, 100% { translate: -0.1rem 0; }
   50%      { translate: 0.1rem 0; }

@@ -78,6 +78,9 @@
   let scrollProgress = $state(0)
   let canScroll = $state(false)
   let activeGroup = $state(0)
+  /** Group id briefly outlined after an activation scrolled it into view. */
+  let flashGroup = $state<string | null>(null)
+  let flashTimer: ReturnType<typeof setTimeout> | undefined
   let draftLayouts = $state.raw<Record<string, Layout>>({})
   let layoutTimer: ReturnType<typeof setTimeout> | undefined
   let gestureTimer: ReturnType<typeof setTimeout> | undefined
@@ -157,7 +160,7 @@
           .toLowerCase()
           .includes(normalizedQuery)
         const matching = Object.values(group.tiles).filter((tile) => {
-          const matchesTile = `${tile.title} ${tile.url}`
+          const matchesTile = `${tile.title} ${tile.kind === 'bookmark' ? tile.url : ''}`
             .toLowerCase()
             .includes(normalizedQuery)
           return matchesPath || matchesTile
@@ -174,7 +177,7 @@
             matching.map(tile => ({
               id: tile.id,
               title: tile.title,
-              url: tile.url,
+              url: tile.kind === 'bookmark' ? tile.url : undefined,
             })),
             [],
             sizes,
@@ -313,6 +316,7 @@
       clearInterval(clock)
       clearTimeout(layoutTimer)
       clearTimeout(gestureTimer)
+      clearTimeout(flashTimer)
       cancelSmoothScroll()
     }
   })
@@ -355,6 +359,31 @@
     rootFilter = id
     cancelSmoothScroll()
     scroller?.scrollTo({ left: 0 })
+  }
+  /**
+   * Folder tiles never launch; they pan the canvas to the folder's own group and
+   * outline it briefly (Windows Explorer-style "open" without leaving the page).
+   * Filters are reset first so the target group is always rendered.
+   */
+  function activateFolder(id: string) {
+    if (rootFilter !== 'all')
+      rootFilter = 'all'
+    if (query)
+      query = ''
+    // Wait for the unfiltered canvas to render before locating the group.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const element = scroller?.querySelector<HTMLElement>(`[data-group-id="${CSS.escape(id)}"]`)
+      if (!element || !scroller)
+        return
+      cancelSmoothScroll()
+      scroller.scrollTo({
+        left: Math.max(0, element.offsetLeft - 68),
+        behavior: snapshot?.settings.reducedMotion ? 'instant' : 'smooth',
+      })
+      flashGroup = id
+      clearTimeout(flashTimer)
+      flashTimer = setTimeout(() => (flashGroup = null), 4000)
+    }))
   }
   function handleSearch() {
     if (query.trim())
@@ -472,7 +501,10 @@
     }
   }
   async function copy(id: string) {
-    const url = allTiles[id]?.url
+    const tile = allTiles[id]
+    if (tile?.kind !== 'bookmark')
+      return
+    const url = tile.url
     if (!url)
       return
     try {
@@ -511,9 +543,15 @@
     title: string
     subtitle?: string
   }
+  /** Accessible/domain line for menus and the app bar; folders are labeled 'Folder'. */
+  function tileSubtitle(tile: typeof contextTile): string | undefined {
+    if (!tile)
+      return undefined
+    return tile.kind === 'folder' ? 'Folder' : tile.domain
+  }
   const menuHeading = $derived<MenuHeading>(
     menuTarget?.target === 'tile'
-      ? { title: contextTile?.title ?? 'Your canvas', subtitle: contextTile?.domain }
+      ? { title: contextTile?.title ?? 'Your canvas', subtitle: tileSubtitle(contextTile) }
       : { title: 'Your canvas' },
   )
   // Commands that stay off the app bar itself live in a menu opened from one of
@@ -904,6 +942,8 @@
                         }}
                         onDragStop={dragStop}
                         onSelect={selectByGesture}
+                        onActivateFolder={activateFolder}
+                        flash={flashGroup === group.id}
                         onResizeTile={resizeTile}
                         menu={groupMenu}
                         onAdd={parentId => edit({ kind: 'bookmark', parentId })}
@@ -979,17 +1019,22 @@
     {#if selectedTile && !dragging}
       <MetroAppBar
         title={selectedTile.title}
-        subtitle={selectedTile.domain}
+        subtitle={tileSubtitle(selectedTile)}
         size={selectedTile.size}
         writable={selectedTile.writable}
+        kind={selectedTile.kind}
         {focusRequest}
         menuItems={appBarMenuItems}
         onresize={size => resizeTile(selectedTile.id, size)}
-        onedit={() => edit({ kind: 'bookmark', id: selectedTile.id })}
+        onedit={selectedTile.kind === 'folder'
+          ? () => edit({ kind: 'rename', id: selectedTile.id })
+          : () => edit({ kind: 'bookmark', id: selectedTile.id })}
         onmove={() => edit({ kind: 'move', id: selectedTile.id })}
-        ondelete={() => {
-          void execute({ type: 'node.remove', id: selectedTile.id })
-        }}
+        ondelete={selectedTile.kind === 'folder'
+          ? undefined
+          : () => {
+            void execute({ type: 'node.remove', id: selectedTile.id })
+          }}
         onclear={clearSelection}
       />
     {/if}

@@ -1,4 +1,4 @@
-import { appBar, draggable, expect, flat, group, link, moreActions, presentation, rightClick, start, test, tree } from './helpers'
+import { appBar, draggable, expect, flat, folderTile, group, link, moreActions, presentation, rightClick, start, test, tree } from './helpers'
 
 test('flat ancestry, separate roots, launcher tiles, and background context-menu keyboard navigation', async ({ page }) => {
   await start(page)
@@ -371,4 +371,100 @@ test('factory reset restores Metro defaults and keeps sample bookmarks', async (
     reducedMotion: false,
     background: { auto: true, type: 'color' },
   })
+})
+
+test('folder tiles render with previews and scroll to their group', async ({ page }) => {
+  await start(page)
+  // Direct subfolders become tiles in their parent group.
+  const workTile = group(page, 'Bookmarks bar').locator('button[data-grid-id="work"]')
+  await expect(workTile).toBeVisible()
+  await expect(workTile).toHaveAttribute('aria-label', /^Folder Work\b/)
+  await expect(workTile).toHaveAttribute('data-size', 'medium')
+  // The folder's own group keeps its bookmark tiles plus its subfolder tile.
+  await expect(group(page, 'Learning').locator('button[data-grid-id="tools"]')).toBeVisible()
+  await expect(group(page, 'Tools').locator('a[data-grid-id="storybook"]')).toBeVisible()
+  // Activating the folder tile pans the canvas and flashes its group.
+  const before = await page.locator('#canvas').evaluate(element => (element as HTMLElement).scrollLeft)
+  await workTile.click()
+  await expect.poll(async () => page.locator('#canvas').evaluate(element => (element as HTMLElement).scrollLeft)).toBeGreaterThan(before)
+  await expect(group(page, 'Work')).toHaveClass(/animate-flash/)
+  // The flash clears after ~1s.
+  await expect(group(page, 'Work')).not.toHaveClass(/animate-flash/, { timeout: 2500 })
+})
+
+test('folder tiles resize, rename, move and cannot be deleted', async ({ page }) => {
+  await start(page)
+  const workTile = group(page, 'Bookmarks bar').locator('button[data-grid-id="work"]')
+  await workTile.click({ button: 'right' })
+  const bar = appBar(page)
+  await expect(bar).toContainText('Work')
+  await expect(page.getByRole('button', { name: 'Delete selected bookmark' })).toHaveCount(0)
+  // Resize via the app bar presets.
+  await page.getByRole('button', { name: 'Resize selected tile to large', exact: true }).click()
+  await expect(group(page, 'Bookmarks bar').locator('button[data-grid-id="work"]')).toHaveAttribute('data-size', 'large')
+  // Rename via the app bar.
+  await folderTile(page, 'Work').click({ button: 'right' })
+  await page.getByRole('button', { name: 'Rename selected folder', exact: true }).click()
+  await page.getByRole('dialog').getByLabel('Folder name').fill('QA renamed work')
+  await page.getByRole('dialog').getByRole('button', { name: 'Save changes' }).click()
+  await expect(group(page, 'QA renamed work')).toBeVisible()
+  // Move via the app bar.
+  await folderTile(page, 'QA renamed work').click({ button: 'right' })
+  await page.getByRole('button', { name: 'Move selected folder to another folder', exact: true }).click()
+  await page.getByRole('dialog').getByLabel('Folder', { exact: true }).selectOption('other')
+  await page.getByRole('dialog').getByRole('button', { name: 'Move here', exact: true }).click()
+  await expect.poll(async () => flat(await tree(page)).find(node => node.id === 'work')?.parentId).toBe('other')
+  await expect(group(page, 'Other bookmarks').locator('button[data-grid-id="work"]')).toBeVisible()
+})
+
+test('cross-group pointer dragging moves the real folder; Undo restores it', async ({ page }) => {
+  await start(page)
+  const tile = group(page, 'Learning').locator('button[data-grid-id="tools"]')
+  const source = (await tile.boundingBox())!
+  const target = (await group(page, 'Inspiration').locator('[data-testid="metro-grid"]').boundingBox())!
+  await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(target.x + 70, target.y + 210, { steps: 35 })
+  await page.mouse.up()
+  await expect.poll(async () => flat(await tree(page)).find(node => node.id === 'tools')?.parentId).toBe('inspiration')
+  await expect(group(page, 'Inspiration').locator('button[data-grid-id="tools"]')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Undo', exact: true }).click()
+  await expect.poll(async () => flat(await tree(page)).find(node => node.id === 'tools')?.parentId).toBe('learning')
+})
+
+test('folder tiles appear and disappear with the search filter, read-only', async ({ page }) => {
+  await start(page)
+  await page.getByRole('searchbox', { name: 'Search bookmarks' }).fill('zzz-no-match-zzz')
+  await expect(page.locator('button[data-tile-id]')).toHaveCount(0)
+  await page.getByRole('searchbox', { name: 'Search bookmarks' }).fill('learning')
+  // The Learning group itself matches via its path; its folder tile is part of the read-only view.
+  await expect(page.locator('button[data-tile-id="tools"]')).toHaveCount(1)
+  // Read-only while searching: no app bar.
+  await expect(appBar(page)).toHaveCount(0)
+})
+
+test('folder tiles accept custom colors from the shared appearance dialog', async ({ page }) => {
+  await start(page)
+  const workTile = group(page, 'Bookmarks bar').locator('button[data-grid-id="work"]')
+  // The folder chrome is intentionally not baked in: no flat amber anymore.
+  const defaultBackground = await workTile.evaluate(element => getComputedStyle(element).getPropertyValue('--tile-bg').trim())
+  expect(defaultBackground).not.toBe('')
+  await workTile.click({ button: 'right' })
+  await page.getByRole('button', { name: 'More actions for Work', exact: true }).click()
+  await page.getByRole('menuitem', { name: 'Customize tile', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await expect(dialog.getByText('A little personality for')).toBeVisible()
+  await dialog.getByRole('button', { name: 'Custom color', exact: true }).click()
+  await dialog.getByLabel('Custom tile color').evaluate((input: HTMLInputElement) => {
+    input.value = '#f7f7f7'
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+  await dialog.getByRole('button', { name: 'Save changes', exact: true }).click()
+  await expect(dialog).toHaveCount(0)
+  await expect.poll(async () => workTile.evaluate(element => getComputedStyle(element).getPropertyValue('--tile-bg').trim())).toBe('#f7f7f7')
+  // The appearance is local metadata; the folder itself stays untouched.
+  expect((await presentation(page)).appearance.work?.color).toBe('#f7f7f7')
+  // The folder tile still cannot be deleted from its menus.
+  await folderTile(page, 'Work').click({ button: 'right' })
+  await expect(page.getByRole('button', { name: 'Delete selected bookmark' })).toHaveCount(0)
 })

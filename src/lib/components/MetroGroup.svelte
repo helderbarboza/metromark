@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { GroupView, Layout, TileSize, TileView } from '$lib/types'
   import type { Snippet } from 'svelte'
+  import FolderTile from '$lib/components/FolderTile.svelte'
   import GridTile from '$lib/components/GridTile.svelte'
   import Icon from '$lib/components/Icon.svelte'
   import MetroTile from '$lib/components/MetroTile.svelte'
@@ -45,6 +46,10 @@
     onSelect: (id: string, event: PointerEvent) => void
     /** Quick grow/shrink handler for the button on checked tiles. Omit to hide it. */
     onResizeTile?: (id: string, size: TileSize) => void
+    /** Folder tiles activate by scrolling to their group instead of launching. */
+    onActivateFolder?: (id: string) => void
+    /** Brief highlight of this group after a folder tile scrolled it into view. */
+    flash?: boolean
     /** Content of the per-group "Manage" dropdown menu. Omit to hide the button. */
     menu?: Snippet<[GroupView]>
     onAdd: (folderId: string) => void
@@ -64,6 +69,8 @@
     onDragStop,
     onSelect,
     onResizeTile,
+    onActivateFolder,
+    flash = false,
     menu,
     onAdd,
     onBlocked,
@@ -173,10 +180,10 @@
   }))
 
   const placeholder = createGridPlaceholder(container.group)
-  function href(tile: TileView) {
+  function href(tile: Extract<TileView, { kind: 'bookmark' }>) {
     return safeUrl(tile.url)
   }
-  function launch(event: MouseEvent, tile: TileView) {
+  function launch(event: MouseEvent, tile: Extract<TileView, { kind: 'bookmark' }>) {
     if (dragging) {
       event.preventDefault()
       return
@@ -197,7 +204,7 @@
 
 <section
   data-testid='metro-group'
-  class='flex-none transition-[width] duration-140 motion-reduce:transition-none'
+  class={cn('flex-none transition-[width] duration-140 motion-reduce:transition-none', flash && 'animate-flash')}
   style:width='{visibleWidth}px'
   aria-label={group.path.join(' / ') || 'Ungrouped bookmarks'}
 >
@@ -267,6 +274,8 @@
   >
     {#each layout as entry (entry.i)}
       {@const tile = tiles[entry.i]}
+      {@const folderTile = tile?.kind === 'folder' ? tile : undefined}
+      {@const bookmarkTile = tile?.kind === 'bookmark' ? tile : undefined}
       {#if tile}
         {#if movable && tile.writable}
           <GridTile
@@ -277,22 +286,47 @@
             {preview}
             onselect={onSelect}
             onblocked={onBlocked}
+            onactivate={onActivateFolder}
             onresize={onResizeTile && (size => onResizeTile(entry.i, size))}
           />
-        {:else}
-          <MetroTile
-            {tile}
+        {:else if folderTile}
+          <FolderTile
+            tile={folderTile}
             size={sizeOf(entry)}
             selected={selectedId === entry.i}
-            domain={tile.domain}
+            ariaLabel="Folder {folderTile.title}. Activating scrolls to this folder's group."
+            onclick={() => onActivateFolder?.(entry.i)}
+            class='
+              block transition-[left,top,width,height] duration-140
+              motion-reduce:transition-none
+            '
+            style={`
+              position: absolute;
+              left: ${entry.x * (cell + GAP)}px;
+              top: ${entry.y * (cell + GAP)}px;
+              width: ${cellsToPx(entry.w, cell)}px;
+              height: ${cellsToPx(entry.h, cell)}px;
+            `}
+            dataTestId='folder-tile'
+            dataTileId={entry.i}
+            onresize={folderTile.writable && onResizeTile
+              ? size => onResizeTile(entry.i, size)
+              : undefined}
+          />
+        {:else if bookmarkTile}
+          <MetroTile
+            tile={bookmarkTile}
+            size={sizeOf(entry)}
+            selected={selectedId === entry.i}
+            domain={bookmarkTile.domain}
             showDomain={showDomains}
-            href={href(tile)}
+            href={href(bookmarkTile)}
             target={preview ? '_blank' : undefined}
-            ariaLabel="Open {tile.title}{showDomains
+            ariaLabel="Open {bookmarkTile.title}{showDomains
               && sizeOf(entry) !== 'small'
-              ? ` ${tile.domain}`
+              ? ` ${bookmarkTile.domain}`
               : ''}"
-            onclick={event => launch(event, tile)}
+            onclick={event => launch(event, bookmarkTile)}
             class='
               block transition-[left,top,width,height] duration-140
               motion-reduce:transition-none
@@ -306,7 +340,7 @@
             `}
             dataTestId='tile-slot'
             dataTileId={entry.i}
-            onresize={tile.writable && onResizeTile
+            onresize={bookmarkTile.writable && onResizeTile
               ? size => onResizeTile(entry.i, size)
               : undefined}
           />

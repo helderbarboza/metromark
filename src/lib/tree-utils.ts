@@ -1,3 +1,9 @@
+/** Stable accent index from a string (domains, folder ids). 0-7. */
+export function hashColorIndex(value: string): number {
+  const hash = [...value].reduce((n, letter) => (n * 31 + letter.charCodeAt(0)) >>> 0, 0)
+  return hash % 8
+}
+
 export function website(url: string): { domain: string, colorIndex: number } {
   let domain: string
   try {
@@ -6,6 +12,5 @@ export function website(url: string): { domain: string, colorIndex: number } {
   catch {
     domain = 'bookmark'
   }
-  const hash = [...domain].reduce((n, letter) => (n * 31 + letter.charCodeAt(0)) >>> 0, 0)
-  return { domain, colorIndex: hash % 8 }
+  return { domain, colorIndex: hashColorIndex(domain) }
 }

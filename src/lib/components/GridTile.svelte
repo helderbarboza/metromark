@@ -34,8 +34,10 @@
 </script>
 
 <script lang='ts'>
+
   import type { Gesture } from '$lib/interaction'
   import type { TileSize, TileView } from '$lib/types'
+  import FolderTile from '$lib/components/FolderTile.svelte'
   import MetroTile from '$lib/components/MetroTile.svelte'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
   import { sizeOf } from '$lib/layout'
@@ -52,6 +54,8 @@
     preview: boolean
     onselect: (id: string, event: PointerEvent) => void
     onblocked: (message: string) => void
+    /** Folder tiles activate by scrolling to their group instead of launching. */
+    onactivate?: (id: string) => void
     /** Omit to hide the quick grow/shrink button (read-only tiles). */
     onresize?: (size: TileSize) => void
   }
@@ -64,6 +68,7 @@
     preview,
     onselect,
     onblocked,
+    onactivate,
     onresize,
   }: Props = $props()
   // Snapgrid instances are keyed by immutable browser bookmark IDs.
@@ -80,8 +85,10 @@
   let gesture = $state<Gesture | null>(null)
   let swallowClick = false
   const revealed = $derived(!dragging && gesture?.state === 'armed')
+  const folderTile = $derived(tile.kind === 'folder' ? tile : undefined)
+  const bookmarkTile = $derived(tile.kind === 'bookmark' ? tile : undefined)
   // Unsupported addresses stay in the tree but must never be launched (see validateUrl).
-  const href = $derived(safeUrl(tile.url))
+  const href = $derived(bookmarkTile ? safeUrl(bookmarkTile.url) : undefined)
 
   function pointerdown(event: PointerEvent) {
     swallowClick = false
@@ -114,17 +121,25 @@
       onselect(id, event)
   }
   function click(event: MouseEvent) {
-    // A release that selected the tile, or ended a move, must not launch it.
+    // A release that selected the tile, or ended a move, must not activate it.
     if (swallowClick || dragging) {
       swallowClick = false
       event.preventDefault()
       return
     }
+    if (folderTile) {
+      // Folder tiles never launch; they scroll to the folder's group.
+      event.preventDefault()
+      onactivate?.(id)
+      return
+    }
     launch(event)
   }
   function launch(event: MouseEvent) {
+    if (!bookmarkTile)
+      return
     try {
-      validateUrl(tile.url)
+      validateUrl(bookmarkTile.url)
     }
     catch (error) {
       event.preventDefault()
@@ -141,7 +156,7 @@
    * to run before the sensor's listener on the tile itself; Space stays with the
    * sensor so a keyboard move is still possible.
    */
-  function keyGuard(node: HTMLAnchorElement) {
+  function keyGuard(node: HTMLElement) {
     const keydown = (event: KeyboardEvent) => {
       if (event.key !== 'Enter' || event.target !== node || item.isDragging)
         return
@@ -152,7 +167,7 @@
     document.addEventListener('keydown', keydown, true)
     return () => document.removeEventListener('keydown', keydown, true)
   }
-  const attachTile = (node: HTMLAnchorElement) => {
+  const attachTile = (node: HTMLElement) => {
     const cleanupDrag = item.attach(node)
     const cleanupKeys = keyGuard(node)
     return () => {
@@ -163,49 +178,86 @@
 
 </script>
 
-<MetroTile
+{#if folderTile}
+  <FolderTile
+    {@attach pauseOffscreen()}
+    tile={folderTile}
+    size={item.item ? sizeOf(item.item) : tile.size}
+    {selected}
+    {revealed}
+    ariaLabel={`Folder ${tile.title}. Right-click to select. Space to pick up and move; `
+      + 'arrow keys to move; Escape to cancel. Activating scrolls to this folder\'s group.'}
+    ariaRoleDescription='draggable folder'
+    draggable={false}
+    class={cn(
+      `
+        snapgrid-item block cursor-default
+        data-offscreen:paused
+        data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
+      `,
+      dragging && !item.isDragging && !reducedMotion && 'animate-float [&>button]:scale-93',
+      dragging && !item.isDragging && '[&>button]:opacity-85',
+      dragging && item.isDragging && !reducedMotion && '[&>button]:scale-104',
+      dragging && item.isDragging && '[&>button]:opacity-95',
+      dragging && item.isDragging && '[&>button]:shadow-[0_10px_30px_#0007]',
+    )}
+    style={item.style}
+    dataTestId='folder-tile'
+    dataGridId={id}
+    dataDragging={item.isDragging}
+    attach={attachTile}
+    {onresize}
+    onclick={click}
+    onpointerdown={pointerdown}
+    onpointermove={pointermove}
+    onpointerup={pointerup}
+    onpointercancel={() => (gesture = null)}
+  />
+{:else if bookmarkTile}
+  <MetroTile
   {@attach pauseOffscreen()}
-  {tile}
-  size={item.item ? sizeOf(item.item) : tile.size}
-  {selected}
-  {revealed}
-  domain={tile.domain}
-  showDomain={showDomains}
-  href={href}
-  target={preview ? '_blank' : undefined}
-  ariaLabel="Open {tile.title}{showDomains && tile.size !== 'small'
-    ? ` ${tile.domain}`
-    : ''}. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel."
-  ariaRoleDescription='draggable bookmark'
-  draggable={false}
-  class={cn(
-    `
-      snapgrid-item block cursor-default
-      data-offscreen:paused
-      data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
-    `,
-    // During a drag, sibling tiles shrink and dim while the dragged tile lifts.
+    tile={bookmarkTile}
+    size={item.item ? sizeOf(item.item) : tile.size}
+    {selected}
+    {revealed}
+    domain={bookmarkTile.domain}
+    showDomain={showDomains}
+    href={href}
+    target={preview ? '_blank' : undefined}
+    ariaLabel="Open {bookmarkTile.title}{showDomains && bookmarkTile.size !== 'small'
+      ? ` ${bookmarkTile.domain}`
+      : ''}. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel."
+    ariaRoleDescription='draggable bookmark'
+    draggable={false}
+    class={cn(
+      `
+        snapgrid-item block cursor-default
+        data-offscreen:paused
+        data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
+      `,
+      // During a drag, sibling tiles shrink and dim while the dragged tile lifts.
     // Tailwind v4 `scale-*` uses the CSS `scale` property, so it composes with the
     // transform FLIP that snapgrid animates. The dragged tile is the anchor (it is
     // position:fixed and floats with the pointer); its outer grid-item wrapper
     // stays behind at the origin, so the lift styles go on the anchor, not the
     // wrapper. dnd-kit also clones the anchor as an invisible inert ghost
     // (data-dnd-placeholder="hidden"), which needs no exclusion handling.
-    dragging && !item.isDragging && !reducedMotion && 'animate-float [&>a]:scale-93',
-    dragging && !item.isDragging && '[&>a]:opacity-85',
-    dragging && item.isDragging && !reducedMotion && '[&>a]:scale-104',
-    dragging && item.isDragging && '[&>a]:opacity-95',
-    dragging && item.isDragging && '[&>a]:shadow-[0_10px_30px_#0007]',
-  )}
-  style={item.style}
-  dataTestId='metro-tile'
-  dataGridId={id}
-  dataDragging={item.isDragging}
-  attach={attachTile}
-  {onresize}
-  onclick={click}
-  onpointerdown={pointerdown}
-  onpointermove={pointermove}
-  onpointerup={pointerup}
-  onpointercancel={() => (gesture = null)}
-/>
+      dragging && !item.isDragging && !reducedMotion && 'animate-float [&>a]:scale-93',
+      dragging && !item.isDragging && '[&>a]:opacity-85',
+      dragging && item.isDragging && !reducedMotion && '[&>a]:scale-104',
+      dragging && item.isDragging && '[&>a]:opacity-95',
+      dragging && item.isDragging && '[&>a]:shadow-[0_10px_30px_#0007]',
+    )}
+    style={item.style}
+    dataTestId='metro-tile'
+    dataGridId={id}
+    dataDragging={item.isDragging}
+    attach={attachTile}
+    {onresize}
+    onclick={click}
+    onpointerdown={pointerdown}
+    onpointermove={pointermove}
+    onpointerup={pointerup}
+    onpointercancel={() => (gesture = null)}
+  />
+{/if}

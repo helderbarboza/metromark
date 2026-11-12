@@ -13,12 +13,12 @@
   import { expect, fn, screen, userEvent } from 'storybook/test'
 
   const tiles: Record<string, TileView> = {
-    steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true },
-    github: { id: 'github', title: 'GitHub', url: 'https://github.com', domain: 'github.com', colorIndex: 1, size: 'medium', writable: true },
-    gmail: { id: 'gmail', title: 'Gmail', url: 'https://mail.google.com', domain: 'mail.google.com', colorIndex: 2, size: 'wide', writable: true },
-    notion: { id: 'notion', title: 'Notion', url: 'https://notion.so', domain: 'notion.so', colorIndex: 3, size: 'large', writable: true },
-    drive: { id: 'drive', title: 'Drive', url: 'https://drive.google.com', domain: 'drive.google.com', colorIndex: 4, size: 'medium', writable: true },
-    slack: { id: 'slack', title: 'Slack', url: 'https://slack.com', domain: 'slack.com', colorIndex: 5, size: 'small', writable: true },
+    steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true, kind: 'bookmark' },
+    github: { id: 'github', title: 'GitHub', url: 'https://github.com', domain: 'github.com', colorIndex: 1, size: 'medium', writable: true, kind: 'bookmark' },
+    gmail: { id: 'gmail', title: 'Gmail', url: 'https://mail.google.com', domain: 'mail.google.com', colorIndex: 2, size: 'wide', writable: true, kind: 'bookmark' },
+    notion: { id: 'notion', title: 'Notion', url: 'https://notion.so', domain: 'notion.so', colorIndex: 3, size: 'large', writable: true, kind: 'bookmark' },
+    drive: { id: 'drive', title: 'Drive', url: 'https://drive.google.com', domain: 'drive.google.com', colorIndex: 4, size: 'medium', writable: true, kind: 'bookmark' },
+    slack: { id: 'slack', title: 'Slack', url: 'https://slack.com', domain: 'slack.com', colorIndex: 5, size: 'small', writable: true, kind: 'bookmark' },
   }
 
   const layout: Layout = [
@@ -28,6 +28,29 @@
     { i: 'notion', x: 4, y: 0, w: 4, h: 4 },
     { i: 'drive', x: 0, y: 4, w: 2, h: 2 },
     { i: 'slack', x: 2, y: 4, w: 1, h: 1 },
+  ]
+
+  const folderTileId = 'design'
+  const folderTiles: Record<string, TileView> = {
+    ...tiles,
+    [folderTileId]: {
+      id: folderTileId,
+      kind: 'folder',
+      colorIndex: 4,
+      title: 'Design system',
+      size: 'medium',
+      writable: true,
+      preview: [
+        { id: 'mdn', kind: 'bookmark', title: 'MDN', url: 'https://developer.mozilla.org/', colorIndex: 5 },
+        { id: 'svelte', kind: 'bookmark', title: 'Svelte', url: 'https://svelte.dev/', colorIndex: 6 },
+        { id: 'tools', kind: 'folder', colorIndex: 4, title: 'Tools' },
+        { id: 'tailwind', kind: 'bookmark', title: 'Tailwind CSS', url: 'https://tailwindcss.com/', colorIndex: 3 },
+      ],
+    },
+  }
+  const folderLayout: Layout = [
+    ...layout.map(entry => entry.i === 'slack' ? { ...entry, x: 4 as const, y: 4 as const } : entry),
+    { i: folderTileId, x: 2, y: 4, w: 2, h: 2 },
   ]
 
   const group: GroupView = {
@@ -190,6 +213,16 @@
     await expect(canvas.queryByText('mail.google.com')).not.toBeInTheDocument()
   }}
 />
+<Story
+  name='With folder tile'
+  args={{ group: { ...group, layout: folderLayout, tiles: folderTiles }, layout: folderLayout, tiles: folderTiles }}
+  {template}
+  play={async ({ canvas }) => {
+    await expect(await canvas.findByRole('button', { name: /^Folder Design system/ })).toBeVisible()
+    await expect(canvas.getByRole('link', { name: /^Open Steam/ })).toBeVisible()
+  }}
+/>
+
 <Story
   name='Manage dropdown'
   {template}

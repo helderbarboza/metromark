@@ -259,3 +259,67 @@ describe('durable Undo', () => {
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', color: 'red' } } })).rejects.toThrow('six-digit hex')
   })
 })
+
+describe('folder tiles', () => {
+  it('moves a folder tile between groups and undoes the move', async () => {
+    const { coordinator } = fixture()
+    const groups = projectGroups(await coordinator.snapshot())
+    const source = groups.find(group => group.id === 'bar')!
+    const destination = groups.find(group => group.id === 'work')!
+    const moving = source.layout.find(entry => entry.i === 'learning')!
+    const result = await coordinator.execute({ type: 'layout.commit', layouts: {
+      bar: source.layout.filter(entry => entry.i !== 'learning'),
+      work: [...destination.layout, { ...moving, x: 4, y: 0 }],
+    } })
+    expect(indexTree(result.snapshot.tree).get('learning')?.parentId).toBe('work')
+    expect(projectGroups(result.snapshot).find(group => group.id === 'work')?.layout.some(entry => entry.i === 'learning')).toBe(true)
+    const undo = await coordinator.execute({ type: 'undo', id: result.notice!.undoId! })
+    expect(indexTree(undo.snapshot.tree).get('learning')?.parentId).toBe('bar')
+  })
+  it('rejects moving a folder into its own descendant via a tile drop', async () => {
+    const { coordinator } = fixture()
+    await expect(coordinator.execute({ type: 'layout.commit', layouts: {
+      tools: [{ i: 'learning', x: 4, y: 0, w: 2, h: 2 }],
+    } })).rejects.toThrow('A folder cannot be moved into itself or a descendant.')
+  })
+  it('rejects moving a folder tile into a managed destination', async () => {
+    const tree = demoTree()
+    indexTree(tree).get('work')!.unmodifiable = 'managed'
+    const bookmarks = new MemoryBookmarks(tree)
+    const coordinator = new BookmarkCoordinator(bookmarks, new MemoryPersistence(demoData()), SETTINGS_DEFAULTS, 'preview')
+    coordinators.push(coordinator)
+    const groups = projectGroups(await coordinator.snapshot())
+    const source = groups.find(group => group.id === 'bar')!
+    const destination = groups.find(group => group.id === 'work')!
+    const moving = source.layout.find(entry => entry.i === 'learning')!
+    await expect(coordinator.execute({ type: 'layout.commit', layouts: {
+      bar: source.layout.filter(entry => entry.i !== 'learning'),
+      work: [...destination.layout, { ...moving, x: 4, y: 0 }],
+    } })).rejects.toThrow('Choose a writable bookmark folder, not the protected technical root.')
+  })
+  it('customizes a folder tile color and size like a bookmark tile', async () => {
+    const { coordinator } = fixture()
+    const updated = await coordinator.execute({ type: 'tile.appearance', id: 'tools', patch: { colorIndex: 3, color: '#a1b2c3', size: 'large' } })
+    expect(updated.snapshot.appearance.tools).toMatchObject({ colorIndex: 3, color: '#a1b2c3', size: 'large' })
+    // Clearing the custom color keeps the chosen accent swatch.
+    const cleared = await coordinator.execute({ type: 'tile.appearance', id: 'tools', patch: { color: '' } })
+    expect(cleared.snapshot.appearance.tools).toMatchObject({ colorIndex: 3, color: '' })
+    await expect(coordinator.execute({ type: 'tile.appearance', id: 'tools', patch: { colorIndex: 8 } })).rejects.toThrow('Color index must be 0-7.')
+    await expect(coordinator.execute({ type: 'tile.appearance', id: 'tools', patch: { color: 'nope' } })).rejects.toThrow('Use a six-digit hex color.')
+  })
+  it('keeps folder tiles in the persisted layout through an appearance re-pack', async () => {
+    const { coordinator } = fixture()
+    await coordinator.execute({ type: 'tile.appearance', id: 'steam', patch: { size: 'medium' } })
+    const snapshot = await coordinator.snapshot()
+    expect(snapshot.layouts.bar?.some(entry => entry.i === 'learning')).toBe(true)
+  })
+  it('keeps the folder tile when the folder moves via the move command', async () => {
+    const { coordinator } = fixture()
+    const result = await coordinator.execute({ type: 'node.move', id: 'tools', parentId: 'work' })
+    const groups = projectGroups(result.snapshot)
+    expect(groups.find(group => group.id === 'work')!.layout.some(entry => entry.i === 'tools')).toBe(true)
+    expect(groups.find(group => group.id === 'learning')!.layout.some(entry => entry.i === 'tools')).toBe(false)
+    const undo = await coordinator.execute({ type: 'undo', id: result.notice!.undoId! })
+    expect(indexTree(undo.snapshot.tree).get('tools')?.parentId).toBe('learning')
+  })
+})

@@ -22,6 +22,8 @@ export { expect }
 export const group = (page: Page, title: string) => page.locator('[data-testid="metro-group"]').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
 /** Tiles are dnd-kit sortables, so they expose role="button" with an "Open …" name. */
 export const link = (page: Page, title: string) => page.getByRole('button', { name: new RegExp(`^Open ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
+/** Folder tiles are buttons named "Folder <name>…". */
+export const folderTile = (page: Page, title: string) => page.getByRole('button', { name: new RegExp(`^Folder ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
 export const draggable = (page: Page, id: string) => page.locator(`a[data-grid-id="${id}"]`)
 export const appBar = (page: Page) => page.getByRole('toolbar')
 /** Browser context runs outside this module; keep each evaluate body self-contained. */

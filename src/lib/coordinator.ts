@@ -13,6 +13,7 @@ import type {
   Snapshot,
   UndoRecord,
 } from '$lib/types'
+import { isLayoutable } from '$lib/folder-preview'
 import { normalizeImageBackgroundSettings, validateBackgroundUrl } from '$lib/image-background'
 import { freePosition, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
@@ -293,9 +294,11 @@ export class BookmarkCoordinator {
         const source = groups.find(group => group.id === node.parentId)
         const target = groups.find(group => group.id === command.parentId)
         const position = source?.layout.find(item => item.i === node.id)
-        const undo = await this.prepareUndo('Bookmark moved', { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: command.parentId, position })
+        const undo = await this.prepareUndo(isFolder(node) ? 'Folder moved' : 'Bookmark moved', { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: command.parentId, position })
         await this.bookmarks.move(node.id, { parentId: command.parentId })
-        if (isBookmark(node) && source && target && position) {
+        // Folder tiles keep their size and position through a Move-to-folder
+        // as part of the same layout sync.
+        if ((isBookmark(node) || isFolder(node)) && source && target && position) {
           this.data.layouts[source.id] = source.layout.filter(item => item.i !== node.id)
           this.data.layouts[target.id] = [...target.layout, freePosition(target.layout, position)]
         }
@@ -333,8 +336,8 @@ export class BookmarkCoordinator {
       }
       case 'tile.appearance': {
         const node = this.node(command.id)
-        if (!isBookmark(node))
-          throw new Error('Only bookmark tiles have an appearance.')
+        if (!isBookmark(node) && !isFolder(node))
+          throw new Error('Only tiles have an appearance.')
         const patch: Appearance = {}
         if (command.patch.size !== undefined) {
           if (!(command.patch.size in SIZES))
@@ -353,7 +356,7 @@ export class BookmarkCoordinator {
         const existing = { ...this.data.appearance[node.id] }
         this.data.appearance[node.id] = { ...existing, ...patch }
         if (group)
-          this.data.layouts[group.id] = reconcileLayout((this.node(group.id).children ?? []).filter(isBookmark), group.layout, this.data.appearance)
+          this.data.layouts[group.id] = reconcileLayout((this.node(group.id).children ?? []).filter(isLayoutable), group.layout, this.data.appearance)
         return undefined
       }
       case 'layout.commit': {
@@ -369,7 +372,7 @@ export class BookmarkCoordinator {
           const layout = validateLayout(raw)
           for (const item of layout) {
             const node = nodes.get(item.i)
-            if (!node || !isBookmark(node))
+            if (!node || (!isBookmark(node) && !isFolder(node)))
               throw new Error('A tile changed while you were moving it. Try again.')
             if (ownership.has(node.id))
               throw new Error('A tile cannot belong to two groups.')
@@ -383,17 +386,20 @@ export class BookmarkCoordinator {
           layouts[folderId] = layout
         }
         if (moves.length > 1)
-          throw new Error('Move one bookmark at a time between groups.')
+          throw new Error('Move one item at a time between groups.')
         let undo: UndoRecord | undefined
         if (moves.length > 0) {
           const { node, destination } = moves[0]
+          const folder = isFolder(node)
           const position = projectGroups(this.currentSnapshot()).find(group => group.id === node.parentId)?.layout.find(item => item.i === node.id)
-          undo = await this.prepareUndo('Bookmark moved', { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: destination, position })
+          undo = await this.prepareUndo(folder ? 'Folder moved' : 'Bookmark moved', { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: destination, position })
           await this.bookmarks.move(node.id, { parentId: destination })
           this.commitUndo(undo)
         }
         Object.assign(this.data.layouts, layouts)
-        return undo ? { message: 'Bookmark moved to its new folder.', undoId: undo.id } : undefined
+        return undo
+          ? { message: isFolder(moves[0].node) ? 'Folder moved to its new group.' : 'Bookmark moved to its new folder.', undoId: undo.id }
+          : undefined
       }
       case 'settings.update': {
         const patch = command.patch

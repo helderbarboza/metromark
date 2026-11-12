@@ -4,6 +4,7 @@ import { demoData, demoTree } from '$lib/demo'
 import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '$lib/icon-sources'
 import { overlaps, reconcileLayout, usedCols, validateLayout } from '$lib/layout'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, projectGroups } from '$lib/tree'
+import { hashColorIndex } from '$lib/tree-utils'
 import { validateUrl } from '$lib/url'
 import { describe, expect, it } from 'vitest'
 
@@ -14,7 +15,7 @@ describe('bookmark tree projection', () => {
     const groups = projectGroups(fixture())
     expect(groups.map(group => group.id)).toEqual(['bar', 'work', 'inspiration', 'learning', 'tools', 'other', 'mobile'])
     expect(groups.find(group => group.id === 'tools')?.path).toEqual(['Bookmarks bar', 'Learning', 'Tools'])
-    expect(groups.find(group => group.id === 'bar')?.layout).toHaveLength(5)
+    expect(groups.find(group => group.id === 'bar')?.layout).toHaveLength(8)
   })
   it('retains empty folders', () => {
     expect(projectGroups(fixture()).find(group => group.id === 'mobile')?.layout).toEqual([])
@@ -37,13 +38,13 @@ describe('bookmark tree projection', () => {
     const state = fixture()
     const bar = indexTree(state.tree).get('bar')!
     bar.children!.push({ id: 'duplicate', parentId: 'bar', title: 'Steam', url: 'https://store.steampowered.com/' })
-    expect(projectGroups(state)[0].layout).toHaveLength(6)
+    expect(projectGroups(state)[0].layout).toHaveLength(9)
     expect(Object.keys(projectGroups(state)[0].tiles)).toContain('duplicate')
   })
   it('does not render Firefox separators as bookmarks or groups', () => {
     const state = fixture()
     indexTree(state.tree).get('bar')!.children!.push({ id: 'separator', title: '', type: 'separator', parentId: 'bar' })
-    expect(projectGroups(state)[0].layout).toHaveLength(5)
+    expect(projectGroups(state)[0].layout).toHaveLength(8)
   })
   it('updates every descendant path on an ancestor rename', () => {
     const state = fixture()
@@ -58,7 +59,11 @@ describe('independent layouts', () => {
     const bar = indexTree(state.tree).get('bar')!
     const before = projectGroups(state)[0].layout
     bar.children!.reverse()
-    expect(projectGroups(state)[0].layout).toEqual(before)
+    // Bookmarks keep their saved positions regardless of sibling order; folder
+    // tiles that were never saved may pack afresh around them.
+    const bookmarkIds = new Set(['steam', 'linear', 'github', 'notion', 'gmail'])
+    expect(projectGroups(state)[0].layout.filter(entry => bookmarkIds.has(entry.i)))
+      .toEqual(before.filter(entry => bookmarkIds.has(entry.i)))
   })
   it('packs a newly added bookmark without overwriting saved positions', () => {
     const state = fixture()
@@ -137,5 +142,79 @@ describe('tile favicons', () => {
     expect(isFaviconEligible('http://example.com')).toBe(true)
     expect(isFaviconEligible('javascript:alert(1)')).toBe(false)
     expect(isFaviconEligible('')).toBe(false)
+  })
+})
+
+describe('folder tiles', () => {
+  const folderPreview = (groups: ReturnType<typeof projectGroups>, groupId: string, tileId: string) => {
+    const tile = groups.find(group => group.id === groupId)?.tiles[tileId]
+    if (tile?.kind !== 'folder')
+      throw new TypeError(`Expected a folder tile '${tileId}' in group '${groupId}'`)
+    return tile.preview
+  }
+  it('renders direct subfolders as tiles inside the parent group', () => {
+    const groups = projectGroups(fixture())
+    const bar = groups.find(group => group.id === 'bar')!
+    expect(bar.tiles.work?.kind).toBe('folder')
+    expect(bar.tiles.work?.title).toBe('Work')
+    expect(bar.tiles.inspiration?.kind).toBe('folder')
+    expect(bar.tiles.learning?.kind).toBe('folder')
+    expect(bar.layout.find(entry => entry.i === 'work')).toBeDefined()
+    // Folder tiles and bookmarks share one persisted layout.
+    expect(bar.layout.map(entry => entry.i)).toEqual(expect.arrayContaining(['steam', 'work', 'inspiration', 'learning']))
+  })
+  it('previews the folder’s children in layout order with a bookmark/folder split', () => {
+    const groups = projectGroups(fixture())
+    const preview = folderPreview(groups, 'bar', 'learning')
+    expect(preview).toHaveLength(5)
+    expect(preview.map(cell => cell.id)).toEqual(expect.arrayContaining(['mdn', 'svelte', 'typescript', 'tailwind', 'tools']))
+    // Preview order is the folder's own layout order, not sibling order.
+    const learning = groups.find(group => group.id === 'learning')!
+    expect(preview.map(cell => cell.id)).toEqual(learning.layout.map(entry => entry.i))
+    expect(preview.find(cell => cell.id === 'tools')?.kind).toBe('folder')
+    expect(preview.find(cell => cell.id === 'mdn')?.kind).toBe('bookmark')
+    // Bookmark preview cells carry a favicon source and their own tile colors.
+    expect(preview.find(cell => cell.id === 'mdn')?.url).toBe('https://developer.mozilla.org/')
+    expect(preview.find(cell => cell.id === 'mdn')?.colorIndex).toBeTypeOf('number')
+  })
+  it('caps the number of preview cells per tile size', () => {
+    const state = fixture()
+    state.appearance.learning = { ...state.appearance.learning, size: 'small' }
+    const groups = projectGroups(state)
+    const learning = groups.find(group => group.id === 'bar')?.tiles.learning
+    expect(learning?.size).toBe('small')
+    expect(folderPreview(groups, 'bar', 'learning')).toHaveLength(4)
+  })
+  it('renders managed folders as read-only folder tiles with a full preview', () => {
+    const state = fixture()
+    indexTree(state.tree).get('work')!.unmodifiable = 'managed'
+    const groups = projectGroups(state)
+    expect(groups.find(group => group.id === 'bar')?.tiles.work?.writable).toBe(false)
+    expect(folderPreview(groups, 'bar', 'work')).toHaveLength(4)
+  })
+  it('shows an empty mosaic for an empty folder', () => {
+    const state = fixture()
+    indexTree(state.tree).get('bar')!.children!.push({ id: 'quiet', parentId: 'bar', title: 'Quiet', children: [] })
+    const groups = projectGroups(state)
+    expect(groups.find(group => group.id === 'bar')?.tiles.quiet?.kind).toBe('folder')
+    expect(folderPreview(groups, 'bar', 'quiet')).toEqual([])
+  })
+  it('derives a stable default color from the folder id and honors stored appearance', () => {
+    const groups = projectGroups(fixture())
+    const bar = groups.find(group => group.id === 'bar')!
+    expect(bar.tiles.work?.colorIndex).toBe(hashColorIndex('work'))
+    expect(bar.tiles.work?.color).toBeUndefined()
+    const state = fixture()
+    state.appearance.tools = { colorIndex: 2, color: '#a1b2c3' }
+    const learning = projectGroups(state).find(group => group.id === 'learning')!
+    expect(learning.tiles.tools).toMatchObject({ kind: 'folder', colorIndex: 2, color: '#a1b2c3' })
+  })
+  it('survives layout repairs without duplicating folder tiles', () => {
+    const state = fixture()
+    const groups = projectGroups(state)
+    const tools = groups.find(group => group.id === 'tools')!
+    expect(tools.layout.map(entry => entry.i)).toEqual(expect.arrayContaining(['storybook', 'snapgrid']))
+    const flat = groups.flatMap(group => group.layout.map(entry => entry.i))
+    expect(new Set(flat).size).toBe(flat.length)
   })
 })
