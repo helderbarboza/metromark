@@ -1,10 +1,15 @@
-// Loading + Metro conversion for tile favicons, with an in-memory cache.
-// Plain module (not a Svelte component) so the cache stays non-reactive.
-// Converted silhouettes are never persisted: the browser favicon cache is
-// local and reconversion on reload is cheap.
+// Loading + Metro conversion for tile favicons, with an in-memory cache and a
+// persistent IndexedDB glyph cache (monochrome silhouettes only; the
+// unconverted favicons of the "Original favicons" mode are not stored).
+// The glyph cache is stale-while-revalidate: a cached glyph renders
+// immediately, and the source is re-fingerprinted at most once per 24 h so a
+// changed favicon replaces the stored glyph automatically. Conversion
+// failures never overwrite a good cached glyph.
 
 import type { Rgb } from '$lib/dominant-color'
 import { extractDominantColor, nearestSwatchIndex } from '$lib/dominant-color'
+import { fingerprintBytes, glyphCacheKey, needsRecheck } from '$lib/favicon-policy'
+import { loadCachedGlyph, saveCachedGlyph } from '$lib/favicon-store'
 import { cssColorToArgb, processIconImage } from '$lib/icon-convert'
 import { buildExtensionFaviconUrl, isFaviconEligible } from '$lib/icon-sources'
 
@@ -19,7 +24,14 @@ const dominantCache = new Map<string, Rgb>()
 /** The longest time to wait for a local favicon before keeping the hashed accent. */
 const DOMINANT_TIMEOUT = 5000
 
-/** Load a page's cached favicon and convert it to a Metro-tint silhouette. */
+/**
+ * Load a page's cached favicon and convert it to a Metro-tint silhouette.
+ * Fresh cache hits (last verified within 24 h) return the stored glyph with
+ * no image fetch at all. Otherwise the source is fingerprinted (16x16 decoded
+ * pixels) and only a real change triggers reconversion. Any revalidation
+ * failure falls back to the stored glyph; only when nothing is cached does it
+ * surface as an error so the caller can render the bundled fallback.
+ */
 export async function loadConvertedFavicon(
   pageUrl: string,
   tint: string,
@@ -36,12 +48,49 @@ export async function loadConvertedFavicon(
     return pending
 
   const task = (async () => {
+    const tintArgb = safeTintToArgb(tint)
+    const cacheKey = tintArgb === undefined ? undefined : glyphCacheKey(pageUrl, tintArgb)
+    const cached = cacheKey === undefined ? undefined : await loadCachedGlyph(cacheKey)
+    const now = Date.now()
+
+    if (cached && !needsRecheck(cached.lastChecked, now))
+      return finishConverted(key, cached.dataUrl)
+
     const source = buildExtensionFaviconUrl(pageUrl, 64, undefined, 2)
     // Null when the URL is not http(s) or the extension runtime helper is
-    // unavailable (web preview). Callers render the bundled fallback.
-    if (source == null)
+    // unavailable (web preview). Serve stale when we have it, otherwise the
+    // caller renders the bundled fallback.
+    if (source == null) {
+      if (cached)
+        return finishConverted(key, cached.dataUrl)
       throw new Error('No cached favicon available.')
-    const img = await loadImage(source)
+    }
+
+    let img: HTMLImageElement
+    try {
+      img = await loadImage(source)
+    }
+    catch (error) {
+      // The source is unreadable: prefer the stored glyph over an error.
+      if (cached)
+        return finishConverted(key, cached.dataUrl)
+      throw error
+    }
+
+    let fingerprint: number | undefined
+    try {
+      fingerprint = fingerprintImage(img)
+    }
+    catch {
+      // Fingerprinting failed; the conversion below re-reads the pixels anyway.
+      fingerprint = undefined
+    }
+
+    if (cached && fingerprint !== undefined && fingerprint === cached.fingerprint) {
+      void saveCachedGlyph({ ...cached, lastChecked: now })
+      return finishConverted(key, cached.dataUrl)
+    }
+
     // Convert at the bitmap's native decoded resolution. No cap, no resize.
     const dataUrl = await processIconImage(img, {
       tintArgb: cssColorToArgb(tint),
@@ -50,15 +99,49 @@ export async function loadConvertedFavicon(
       preserveTransparency: true,
       output: 'dataURL',
     })
-    convertedCache.set(key, dataUrl)
-
-    return dataUrl
+    if (cacheKey !== undefined && fingerprint !== undefined) {
+      void saveCachedGlyph({
+        key: cacheKey,
+        dataUrl,
+        created: now,
+        fingerprint,
+        lastChecked: now,
+      })
+    }
+    return finishConverted(key, dataUrl)
   })()
   pendingCache.set(key, task)
   task.catch(() => {}).finally(() => {
     pendingCache.delete(key)
   })
   return task
+}
+
+function safeTintToArgb(tint: string): number | undefined {
+  try {
+    return cssColorToArgb(tint)
+  }
+  catch {
+    return undefined
+  }
+}
+
+function finishConverted(key: string, dataUrl: string): string {
+  convertedCache.set(key, dataUrl)
+  return dataUrl
+}
+
+/** Fingerprint the decoded pixels of a 16x16 downscale. Not affected by PNG encoder drift. */
+function fingerprintImage(img: HTMLImageElement): number {
+  const canvas = document.createElement('canvas')
+  canvas.width = 16
+  canvas.height = 16
+  const ctx = canvas.getContext('2d')
+  if (!ctx)
+    throw new Error('2d canvas context is not available')
+  ctx.drawImage(img, 0, 0, 16, 16)
+  const { data } = ctx.getImageData(0, 0, 16, 16)
+  return fingerprintBytes(data)
 }
 
 /** Load a page's cached favicon as a regular data URL (no Metro conversion). */
