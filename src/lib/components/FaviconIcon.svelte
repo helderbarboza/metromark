@@ -1,13 +1,15 @@
 <script lang='ts'>
   import type { HTMLImgAttributes } from 'svelte/elements'
-  import { loadConvertedFavicon } from '$lib/favicon-cache'
+  import { loadConvertedFavicon, loadFavicon } from '$lib/favicon-cache'
   import { icons } from '$lib/icons'
+  import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import OfflineIcon from '@iconify/svelte/dist/OfflineIcon.svelte'
   import { cn } from 'tailwind-variants'
-  // Tile icon: the browser's local favicon cache, converted to a Metro-tint
-  // silhouette, with the bundled globe while converting and whenever the page
-  // has no cached favicon or conversion fails. Custom icon choices bypass this
-  // component entirely.
+  // Tile icon: the browser's local favicon cache. By default it is converted
+  // to a Metro-tint silhouette; with the "Original favicons" setting it keeps
+  // the site's full colors. The bundled globe shows while loading and whenever
+  // the page has no cached favicon or conversion fails. Custom icon choices
+  // bypass this component entirely.
   // The branches stack in one grid cell so the outroing branch and the
   // incoming branch overlap during the fade instead of laying out side-by-side.
 
@@ -35,7 +37,14 @@
       | { status: 'ready', dataUrl: string }
       | { status: 'failed' }
 
-  const keyOf = (url: string, shade: string) => `${url} ${shade}`
+  // "Original favicons" comes from the workspace context so deep tile
+  // components need no prop drilling. Stories without a provider get the
+  // monochrome default.
+  const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const originalFavicons = $derived(readWorkspace?.().originalFavicons ?? false)
+
+  const keyOf = (url: string, shade: string, original: boolean) =>
+    `${url} ${original ? 'original' : shade}`
   let state = $state<IconState>({ status: 'pending' })
   // Plain book-keeping, not reactive state: only the `state` signal drives the
   // template, and re-assigning it with the identical string is inert. null
@@ -43,13 +52,17 @@
   let currentKey: string | null = null
 
   $effect(() => {
-    const key = keyOf(pageUrl, tint)
+    const original = originalFavicons
+    const key = keyOf(pageUrl, tint, original)
     if (key === currentKey)
       return
     currentKey = key
     state = { status: 'pending' }
     let stale = false
-    loadConvertedFavicon(pageUrl, tint).then(
+    const load = original
+      ? () => loadFavicon(pageUrl)
+      : () => loadConvertedFavicon(pageUrl, tint)
+    load().then(
       (dataUrl) => {
         if (!stale)
           state = { status: 'ready', dataUrl }

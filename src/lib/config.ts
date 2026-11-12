@@ -52,6 +52,8 @@ export const SettingsSchema = v.object({
   density: v.union([v.literal('comfortable'), v.literal('compact')]),
   /** Show domain names on tiles */
   showDomains: v.boolean(),
+  /** Show the site's full-color favicon instead of a single-color Metro glyph */
+  originalFavicons: v.boolean(),
   /** Honor prefers-reduced-motion */
   reducedMotion: v.boolean(),
   /** Selected background shader id */
@@ -68,6 +70,7 @@ export type Settings = v.InferOutput<typeof SettingsSchema>
 export const SETTINGS_DEFAULTS: Settings = {
   density: 'comfortable',
   showDomains: true,
+  originalFavicons: false,
   reducedMotion: false,
   background: { type: 'color', auto: true, color: undefined },
 } as const
@@ -96,7 +99,7 @@ const ENV_PREFIX = 'METRO_'
 
 /**
  * Load settings from hierarchical sources:
- * 1. Environment variables (METRO_DENSITY, METRO_SHOW_DOMAINS, METRO_REDUCED_MOTION, METRO_SHADER_ID)
+ * 1. Environment variables (METRO_DENSITY, METRO_SHOW_DOMAINS, METRO_ORIGINAL_FAVICONS, METRO_REDUCED_MOTION, METRO_SHADER_ID)
  * 2. Fallback to defaults
  * Throws on validation failure (fail-fast)
  */
@@ -110,6 +113,9 @@ export function loadSettings(env: Record<string, string | undefined> = import.me
   }
   if (env[`${ENV_PREFIX}SHOW_DOMAINS`] !== undefined) {
     fromEnv.showDomains = env[`${ENV_PREFIX}SHOW_DOMAINS`] === 'true'
+  }
+  if (env[`${ENV_PREFIX}ORIGINAL_FAVICONS`] !== undefined) {
+    fromEnv.originalFavicons = env[`${ENV_PREFIX}ORIGINAL_FAVICONS`] === 'true'
   }
   if (env[`${ENV_PREFIX}REDUCED_MOTION`] !== undefined) {
     fromEnv.reducedMotion = env[`${ENV_PREFIX}REDUCED_MOTION`] === 'true'

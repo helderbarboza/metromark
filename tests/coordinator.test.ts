@@ -186,7 +186,7 @@ describe('durable Undo', () => {
   })
   it('resets presentation data and Undo history without changing bookmarks', async () => {
     const { coordinator, bookmarks, storage } = fixture()
-    await coordinator.execute({ type: 'settings.update', patch: { density: 'compact', showDomains: false, reducedMotion: true } })
+    await coordinator.execute({ type: 'settings.update', patch: { density: 'compact', showDomains: false, reducedMotion: true, originalFavicons: true } })
     await coordinator.execute({ type: 'tile.appearance', id: 'steam', patch: { color: '#123456' } })
     await coordinator.execute({ type: 'node.update', id: 'linear', title: 'Linear renamed' })
     const bookmarksBefore = await bookmarks.getTree()
@@ -198,6 +198,16 @@ describe('durable Undo', () => {
     expect(reset.notice?.undoId).toBeUndefined()
     expect(storage.data).toMatchObject({ appearance: {}, layouts: {}, settings: SETTINGS_DEFAULTS, undos: [] })
     expect(await bookmarks.getTree()).toEqual(bookmarksBefore)
+  })
+  it('stores the original favicons setting and rejects a non-boolean', async () => {
+    const { coordinator } = fixture()
+    const updated = await coordinator.execute({ type: 'settings.update', patch: { originalFavicons: true } })
+    expect(updated.snapshot.settings.originalFavicons).toBe(true)
+    const reverted = await coordinator.execute({ type: 'settings.update', patch: { originalFavicons: false } })
+    expect(reverted.snapshot.settings.originalFavicons).toBe(false)
+    // The command layer rejects a non-boolean at runtime even though the type forbids it.
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { originalFavicons: 1 } } as never)).rejects.toThrow('Invalid favicon setting')
   })
   it('stores a custom background color and rejects an invalid hex value', async () => {
     const { coordinator } = fixture()

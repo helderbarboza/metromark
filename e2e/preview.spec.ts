@@ -368,6 +368,7 @@ test('factory reset restores Metro defaults and keeps sample bookmarks', async (
   expect(saved.settings).toEqual({
     density: 'comfortable',
     showDomains: true,
+    originalFavicons: false,
     reducedMotion: false,
     background: { auto: true, type: 'color' },
   })

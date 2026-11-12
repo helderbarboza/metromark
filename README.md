@@ -26,7 +26,7 @@ The live web preview is an isolated **demo workspace**; it cannot access your re
 - Offers **30-second Undo** for deletion, moves, bookmark edits and layout resets. Folder deletion backs up the entire subtree and remaps recreated bookmark IDs on restoration.
 - Provides a confirmed factory reset for Metro appearance, settings and theme. It keeps all browser bookmarks.
 - Stores appearance and tile placement separately from the browser's bookmarks.
-- Includes title/URL/path search, browser-container filtering, horizontal group navigation, four themes, two densities and reduced-motion settings.
+- Includes title/URL/path search, browser-container filtering, horizontal group navigation, four themes, two densities and reduced-motion settings. Tiles can show original full-color favicons instead of single-color glyphs.
 - Offers a solid color background, an animated shader background, or an image background. Image backgrounds accept a remote http(s) URL or an image you upload (stored in your browser's IndexedDB on this device; PNG, JPEG, WebP, GIF or SVG, up to 25 MB), with cover/contain/fill/none fit, an opacity slider and an adjustable parallax zoom (1–4×).
 
 ### Arrangement rules

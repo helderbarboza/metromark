@@ -407,6 +407,8 @@ export class BookmarkCoordinator {
           throw new Error('Invalid density.')
         if (patch.showDomains !== undefined && typeof patch.showDomains !== 'boolean')
           throw new Error('Invalid domain setting.')
+        if (patch.originalFavicons !== undefined && typeof patch.originalFavicons !== 'boolean')
+          throw new Error('Invalid favicon setting.')
         if (patch.reducedMotion !== undefined && typeof patch.reducedMotion !== 'boolean')
           throw new Error('Invalid motion setting.')
         if (patch.background !== undefined) {

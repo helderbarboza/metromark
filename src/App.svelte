@@ -198,9 +198,10 @@
   const reducedMotion = $derived(
     snapshot?.settings.reducedMotion || osReducedMotion.current,
   )
+  const originalFavicons = $derived(snapshot?.settings.originalFavicons ?? false)
   // Workspace state for the canvas subtree (tiles read it via context). The getter
   // closure keeps consumers reactive without drilling props.
-  setWorkspace(() => ({ dragging, selectedId, reducedMotion }))
+  setWorkspace(() => ({ dragging, selectedId, reducedMotion, originalFavicons }))
 
   function applySnapshot(value: Snapshot) {
     snapshot = value

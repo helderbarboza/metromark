@@ -174,6 +174,31 @@
       />
     </SettingsCard>
     <SettingsCard
+      icon='color'
+      title='Original favicons'
+      helpText='Show the full-color favicon instead of a single-color Metro glyph'
+      controlId='original-favicons'
+    >
+      <input
+        id='original-favicons'
+        type='checkbox'
+        role='switch'
+        aria-describedby='original-favicons-help'
+        checked={settings.originalFavicons}
+        disabled={command.busy}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
+          bg-(--border) p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+        onchange={event => setting({ originalFavicons: event.currentTarget.checked })}
+      />
+    </SettingsCard>
+    <SettingsCard
       icon='pause'
       title='Reduce motion'
       helpText='Disables tile, menu, and background animations'

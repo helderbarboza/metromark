@@ -33,6 +33,7 @@ export default defineConfig({
     define: {
       'import.meta.env.METRO_DENSITY': JSON.stringify(process.env.METRO_DENSITY),
       'import.meta.env.METRO_SHOW_DOMAINS': JSON.stringify(process.env.METRO_SHOW_DOMAINS),
+      'import.meta.env.METRO_ORIGINAL_FAVICONS': JSON.stringify(process.env.METRO_ORIGINAL_FAVICONS),
       'import.meta.env.METRO_REDUCED_MOTION': JSON.stringify(process.env.METRO_REDUCED_MOTION),
     },
     plugins: [tailwindcss()],
