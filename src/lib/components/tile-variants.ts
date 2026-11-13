@@ -15,13 +15,13 @@ export const tileVariants = tv({
       after:outline-foreground/25 after:transition-[border-color]
       after:duration-160 after:ease-fluent after:content-['']
       after:outline-solid
-      hover:before:border-foreground/35
+      hover:before:border-foreground/70
       focus-visible:z-2 focus-visible:outline-3 focus-visible:outline-offset-3
       focus-visible:outline-(--primary)
       in-[.reduced]:before:transition-none
       in-[.reduced]:after:transition-none
       in-[.reduced]:active:transform-none
-      data-selected:before:inset-3
+      data-selected:before:-inset-px
       data-selected:after:outline-transparent
       motion-reduce:transition-none
       motion-reduce:before:transition-none
