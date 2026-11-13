@@ -278,22 +278,22 @@ test('touch cross-slide selects instead of launching, and picks the tile up past
 test('theme accent foreground contrast adapts to mode and theme', async ({ page }) => {
   await start(page)
 
-  // In metro-light (initial), Notion has colorIndex 3 -> base0B #6bb71f (bright green)
+  // In catppuccin-latte (initial), Notion has colorIndex 3 -> base0B #40a02b (green)
   // which should produce black text.
   const notion = link(page, 'Notion')
   await expect(notion).toHaveCSS('color', 'rgb(0, 0, 0)')
 
-  // Steam has colorIndex 0 -> base08 #b72c1f (dark red) which should produce white text.
+  // Steam has colorIndex 0 -> base08 #d20f39 (red) which should produce white text.
   const steam = link(page, 'Steam')
   await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 
-  // Switch to dark mode (metro-dark) via Appearance dialog
+  // Switch to dark mode (catppuccin-mocha) via Appearance dialog
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('radio', { name: 'dark', exact: true }).click()
   await page.keyboard.press('Escape')
 
-  // In metro-dark all accent colors are bright, so both tiles should have black text now.
+  // In catppuccin-mocha all accent colors are bright, so both tiles should have black text now.
   await expect(notion).toHaveCSS('color', 'rgb(0, 0, 0)')
   await expect(steam).toHaveCSS('color', 'rgb(0, 0, 0)')
 
@@ -303,7 +303,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await page.getByRole('radio', { name: 'light', exact: true }).click()
   await page.keyboard.press('Escape')
 
-  // Back to metro-light: Notion black, Steam white.
+  // Back to catppuccin-latte: Notion black, Steam white.
   await expect(notion).toHaveCSS('color', 'rgb(0, 0, 0)')
   await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 
@@ -341,7 +341,7 @@ test('factory reset restores Metro defaults and keeps sample bookmarks', async (
   await expect(page.getByRole('complementary', { name: 'Settings' })).toHaveCount(0)
   await expect(page.locator('[data-testid="toast-message"]')).toContainText('Metro reset to factory defaults')
   await expect(page.getByRole('button', { name: 'Undo', exact: true })).toHaveCount(0)
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'metro-light')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'catppuccin-latte')
   await expect(draggable(page, 'steam')).toBeVisible()
   const saved = await page.evaluate(() => {
     const value: unknown = JSON.parse(localStorage.getItem('metro.preview.presentation.v1') ?? '{}')

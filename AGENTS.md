@@ -68,6 +68,21 @@ Testing quirks:
 
 Put bookmark mutations behind coordinator commands. Keep browser API details in adapters and presentation logic out of the coordinator. Identify bookmarks and folders by browser IDs, not titles or assumed fixed root IDs. WXT uses `srcDir: src`; the Tailwind ESLint entry point is `src/styles.css`.
 
+## Theming
+
+- Themes come verbatim from Tinted Theming (<https://tinted-theming.github.io/tinted-gallery/>). Use `base16` schemes only. Do not adjust hex values.
+- Current set. Light: catppuccin-latte, github, one-light, solarized-light, tokyo-night-light. Dark: catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha, github-dark, one-dark, solarized-dark, tokyo-night-moon. Defaults: catppuccin-latte (light), catppuccin-mocha (dark).
+- Light blocks use `:root[data-theme='x'], .theme-preview[data-theme='x']`. Dark blocks use `.dark[data-theme='x'], .theme-preview.dark[data-theme='x']`.
+- Each block sets `--background`=base00, `--card`=base01, `--accent`=base02, `--border`=base02, `--foreground`=base05, `--muted-foreground`=base04, `--primary`=base0D, `--primary-foreground`=base00, `--destructive`=base08, plus `--base00` through `--base0F` verbatim. Popover, secondary, muted, ring, charts and sidebar stay in the shared `:root[data-theme]` derivation block; do not duplicate them per theme.
+- `--base00…--base0F` drive tile accent swatches, charts and theme previews. Do not hand-pick them.
+- To add a theme: copy the `base16` hex values from the gallery, then update these five places: the `src/styles.css` block, `LIGHT_THEMES`/`DARK_THEMES` in `src/lib/theme-picker.ts`, the `ThemeName` union in `src/lib/types.ts`, the `THEME_COLORS` map in `public/init-mode.js`, and the backgrounds option in `.storybook/preview.ts`. Optionally reference the theme in a story. The name is the gallery slug without the `base16-` prefix (for example `base16-tokyo-night-moon` becomes `tokyo-night-moon`).
+- To remove or rename a theme: remove the same five entries. Do not write migration code; `isOneOf` in `theme-picker.ts` falls back to the defaults for stale saved selections.
+- `public/init-mode.js` cannot import modules. Keep it a flat map of every theme to its base00 hex.
+- Keep the static `theme-color` meta in `index.html` and `src/entrypoints/newtab/index.html` synced to the light default base00 when you change the light default.
+- Theme edits do not update `release/` artifacts. Regenerate them with `npm run build` + `npm run package` when a themed release is needed.
+- Metro/Fluent theme palettes do not exist anymore; the Metro design language stays, but palettes are gallery `base16` only.
+- Verify theme changes with `npm run check`, `npm run lint`, `npm test`, and `npm run test:e2e` (the contrast test covers mode/theme switching).
+
 ## Product invariants
 
 1. Browser containers such as Bookmarks Bar/Toolbar, Other Bookmarks, and Bookmarks Menu stay separate named groups.

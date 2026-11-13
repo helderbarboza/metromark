@@ -52,7 +52,7 @@ export type ThemeName
     | 'one-dark'
     | 'github-dark'
     | 'solarized-dark'
-    | 'tokyo-night-dark'
+    | 'tokyo-night-moon'
     | 'catppuccin-mocha'
     | 'catppuccin-macchiato'
     | 'catppuccin-frappe'

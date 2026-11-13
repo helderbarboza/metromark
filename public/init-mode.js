@@ -3,15 +3,20 @@
 // static file (copied from public/ by Vite and WXT) before first paint.
 // Storage keys and defaults mirror mode-watcher's own conventions.
 ;(function () {
+  // theme-color per theme: the theme base00 (background) hex.
   var THEME_COLORS = {
-    'fluent-light': { dark: '#000000', light: '#ffffff' },
-    'fluent-dark': { dark: '#000000', light: '#ffffff' },
-    'metro-light': { dark: '#1F1F1F', light: '#F3F3F3' },
-    'metro-dark': { dark: '#1F1F1F', light: '#F3F3F3' },
-    midnight: { dark: '#101216', light: '#eceef1' },
-    dusk: { dark: '#201b2b', light: '#efeaf2' },
-    forest: { dark: '#14201c', light: '#e9efea' },
-    paper: { dark: '#1e1f22', light: '#eeece8' },
+    'catppuccin-latte': '#eff1f5',
+    'catppuccin-frappe': '#303446',
+    'catppuccin-macchiato': '#24273a',
+    'catppuccin-mocha': '#1e1e2e',
+    'github': '#ffffff',
+    'github-dark': '#0d1117',
+    'one-light': '#fafafa',
+    'one-dark': '#282c34',
+    'solarized-light': '#fdf6e3',
+    'solarized-dark': '#002b36',
+    'tokyo-night-light': '#d5d6db',
+    'tokyo-night-moon': '#222436',
   }
   var mode = localStorage.getItem('mode-watcher-mode')
   if (mode !== 'light' && mode !== 'dark' && mode !== 'system')
@@ -27,12 +32,8 @@
   catch {
     // A malformed selection falls back to mode-watcher's stored theme.
   }
-  if (typeof theme !== 'string' || theme === '')
-    theme = light ? 'fluent-light' : 'fluent-dark'
-  var colors = THEME_COLORS[theme]
-  var color = colors
-    ? colors[light ? 'light' : 'dark']
-    : (light ? '#ffffff' : '#000000')
+  if (typeof theme !== 'string' || !Object.prototype.hasOwnProperty.call(THEME_COLORS, theme))
+    theme = light ? 'catppuccin-latte' : 'catppuccin-mocha'
   var root = document.documentElement
   if (light)
     root.classList.remove('dark')
@@ -42,5 +43,5 @@
   root.setAttribute('data-theme', theme)
   var meta = document.querySelector('meta[name="theme-color"]')
   if (meta)
-    meta.setAttribute('content', color)
+    meta.setAttribute('content', THEME_COLORS[theme])
 })()

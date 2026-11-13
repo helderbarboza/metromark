@@ -1,8 +1,6 @@
 import { mode, setMode, setTheme, systemPrefersMode } from 'mode-watcher'
 
 export const LIGHT_THEMES = [
-  'metro-light',
-  'fluent-light',
   'catppuccin-latte',
   'github',
   'one-light',
@@ -11,15 +9,13 @@ export const LIGHT_THEMES = [
 ] as const
 
 export const DARK_THEMES = [
-  'metro-dark',
-  'fluent-dark',
   'catppuccin-frappe',
   'catppuccin-macchiato',
   'catppuccin-mocha',
   'github-dark',
   'one-dark',
   'solarized-dark',
-  'tokyo-night-dark',
+  'tokyo-night-moon',
 ] as const
 
 export type ThemeMode = 'light' | 'dark'
@@ -34,8 +30,8 @@ export interface ThemeSelections {
 
 const STORAGE_KEY = 'app-theme-selections'
 const DEFAULTS: ThemeSelections = {
-  light: 'metro-light',
-  dark: 'metro-dark',
+  light: 'catppuccin-latte',
+  dark: 'catppuccin-mocha',
 }
 
 export function isOneOf<T extends string>(value: unknown, values: readonly T[]): value is T {

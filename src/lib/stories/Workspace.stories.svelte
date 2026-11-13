@@ -23,7 +23,7 @@
 />
 <Story
   name='Tokyo Night Dark compact'
-  args={{ theme: 'tokyo-night-dark', compact: true }}
+  args={{ theme: 'tokyo-night-moon', compact: true }}
 />
 <Story
   name='Search interaction'

@@ -25,7 +25,7 @@ const preview: Preview = {
         'github': { name: 'GitHub Light', value: '#ffffff' },
         'solarized-dark': { name: 'Solarized Dark', value: '#002b36' },
         'solarized-light': { name: 'Solarized Light', value: '#fdf6e3' },
-        'tokyo-night-dark': { name: 'Tokyo Night Dark', value: '#1a1b26' },
+        'tokyo-night-moon': { name: 'Tokyo Night Moon', value: '#222436' },
         'tokyo-night-light': { name: 'Tokyo Night Light', value: '#d5d6db' },
         'catppuccin-macchiato': { name: 'Catppuccin Macchiato', value: '#24273a' },
         'catppuccin-frappe': { name: 'Catppuccin Frappe', value: '#303446' },
