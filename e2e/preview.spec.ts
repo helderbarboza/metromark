@@ -1,4 +1,19 @@
-import { appBar, draggable, expect, flat, folderTile, group, link, moreActions, presentation, rightClick, start, test, tree } from './helpers'
+import {
+  appBar,
+  draggable,
+  expect,
+  flat,
+  folderTile,
+  group,
+  link,
+  moreActions,
+  presentation,
+  rightClick,
+  rightClickGroup,
+  start,
+  test,
+  tree,
+} from './helpers'
 
 test('flat ancestry, separate roots, launcher tiles, and background context-menu keyboard navigation', async ({ page }) => {
   await start(page)
@@ -70,23 +85,37 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   await expect.poll(async () => flat(await tree(page)).filter(node => node.title === 'QA edited favorite').length).toBe(1)
 })
 
+test('group header opens its context menu from the keyboard; Escape closes and returns focus', async ({ page }) => {
+  await start(page)
+  const header = group(page, 'Work').locator('[data-testid="group-header"]')
+  await header.focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('menu', { name: 'Actions for Work' })).toBeVisible()
+  await expect(page.getByRole('menuitem', { name: 'Add bookmark here' })).toBeFocused()
+  await page.keyboard.press('ArrowDown')
+  await expect(page.getByRole('menuitem', { name: 'Create child folder' })).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('menu')).toHaveCount(0)
+  await expect(header).toBeFocused()
+})
+
 test('folder create/rename, flat nested paths, whole-subtree delete and Undo with remapped IDs', async ({ page }) => {
   await start(page)
-  await page.getByRole('button', { name: 'Manage Learning', exact: true }).click()
+  await rightClickGroup(page, 'Learning')
   await page.getByRole('menuitem', { name: 'Create child folder' }).click()
   await page.getByRole('dialog').getByLabel('Folder name').fill('QA child')
   await page.getByRole('button', { name: 'Create group' }).click()
   await expect(group(page, 'QA child').locator('[data-testid="group-path"]')).toHaveText('Bookmarks bar / Learning /')
-  await page.getByRole('button', { name: 'Manage QA child', exact: true }).click()
+  await rightClickGroup(page, 'QA child')
   await page.getByRole('menuitem', { name: 'Rename folder' }).click()
   await page.getByRole('dialog').getByLabel('Folder name').fill('QA renamed child')
   await page.getByRole('button', { name: 'Save changes' }).click()
-  await page.getByRole('button', { name: 'Manage QA renamed child', exact: true }).click()
+  await rightClickGroup(page, 'QA renamed child')
   await page.getByRole('menuitem', { name: 'Add bookmark here' }).click()
   await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('QA nested favorite')
   await page.getByRole('dialog').getByLabel('Website address', { exact: true }).fill('https://example.com/nested')
   await page.getByRole('dialog').getByRole('button', { name: 'Add bookmark', exact: true }).click()
-  await page.getByRole('button', { name: 'Manage Learning', exact: true }).click()
+  await rightClickGroup(page, 'Learning')
   await page.getByRole('menuitem', { name: 'Delete folder', exact: true }).click()
   await expect(page.getByRole('dialog')).toContainText('Delete this folder?')
   await page.getByRole('dialog').getByRole('button', { name: 'Delete folder', exact: true }).click()

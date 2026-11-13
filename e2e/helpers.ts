@@ -81,6 +81,20 @@ export async function rightClick(page: Page, title: string) {
   await link(page, title).click({ button: 'right' })
   await expect(appBar(page)).toBeVisible()
 }
+/**
+ * Right-clicks a group header, which opens the group's context menu.
+ * Pre-scrolls the canvas so the group is in view: a scroll event dismisses
+ * an open context menu, so scrolling must happen before the menu opens.
+ */
+export async function rightClickGroup(page: Page, title: string) {
+  const target = group(page, title)
+  await target.evaluate((el) => {
+    const canvas = document.querySelector('#canvas')
+    if (canvas && el instanceof HTMLElement)
+      canvas.scrollLeft = Math.max(0, el.offsetLeft - 68)
+  })
+  await target.locator('[data-testid="group-header"]').click({ button: 'right' })
+}
 /** Opens the app bar's overflow menu, where commands that are not bar commands live. */
 export async function moreActions(page: Page, title: string) {
   await page.getByRole('button', { name: `More actions for ${title}`, exact: true }).click()

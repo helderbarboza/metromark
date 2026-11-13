@@ -359,7 +359,10 @@
   function selectRoot(id: string) {
     rootFilter = id
     cancelSmoothScroll()
-    scroller?.scrollTo({ left: 0 })
+    scroller?.scrollTo({
+      left: 0,
+      behavior: snapshot?.settings.reducedMotion ? 'instant' : 'smooth',
+    })
   }
   /**
    * Folder tiles never launch; they pan the canvas to the folder's own group and
@@ -419,6 +422,12 @@
   }
   /** Canvas handler first, then bits-ui's handler (it opens the menu and honors preventDefault). */
   function forwardContextMenu(props: Record<string, unknown>, event: MouseEvent) {
+    // The group header owns its own context menu; swallow the event here.
+    if (event.target instanceof Element
+      && event.target.closest('[data-testid="group-header"]')) {
+      event.preventDefault()
+      return
+    }
     handleContextMenu(event)
     const triggerContextMenu = props.oncontextmenu
     if (typeof triggerContextMenu === 'function')
@@ -430,6 +439,10 @@
    */
   function handleContextMenu(event: MouseEvent) {
     const target = event.target
+    // The group header owns its own context menu; never let the canvas menu
+    // open alongside it (or instead of it, depending on event-ordering).
+    if (target instanceof Element && target.closest('[data-testid="group-header"]'))
+      return
     if (!(target instanceof Element))
       return
     const tileEl = target.closest<HTMLElement>('[data-grid-id], [data-tile-id]')
@@ -448,10 +461,18 @@
         return
       }
     }
+    // The group header handles its own right-click with its own context menu.
+    if (event.defaultPrevented)
+      return
     kbMenu = false
     const grid = target.closest<HTMLElement>('[data-testid="metro-grid"]')
-    menuTarget = { target: 'canvas', id: grid?.dataset.groupId ?? defaultFolder() }
-    menuOrigin = grid ?? scroller
+    if (grid) {
+      menuTarget = { target: 'canvas', id: grid.dataset.groupId ?? defaultFolder() }
+      menuOrigin = grid
+      return
+    }
+    menuTarget = { target: 'canvas', id: defaultFolder() }
+    menuOrigin = scroller
   }
   /** Return focus to the element that was right-clicked (or focused for Shift+F10). */
   function handleMenuCloseAutoFocus(event: Event) {
@@ -527,18 +548,16 @@
   const menuItems = $derived(
     menuTarget?.target === 'tile'
       ? buildTileMenuItems(contextTile, menuCallbacks)
-      : menuTarget?.target === 'canvas'
-      ? buildCanvasMenuItems({
+      : buildCanvasMenuItems({
         groups,
         selectedId,
-        contextId: menuTarget.id,
+        contextId: menuTarget?.id ?? '',
         defaultFolder: defaultFolder(),
         shaderActive: snapshot?.settings.background.type === 'shader',
         imageActive: snapshot?.settings.background.type === 'image'
           && snapshot.settings.background.url !== '',
         callbacks: menuCallbacks,
-      })
-      : [],
+      }),
   )
   interface MenuHeading {
     title: string
@@ -591,8 +610,6 @@
   let smoothFrame: number | null = null
 
   function updateScroll() {
-    if (menuOpen)
-      menuOpen = false
     if (!scroller)
       return
     const max = scroller.scrollWidth - scroller.clientWidth
@@ -610,6 +627,23 @@
       0,
       elements.findLastIndex(element => element.offsetLeft <= left),
     )
+  }
+
+  /**
+   * Timestamp of the last wheel event, used to tell user scrolls (dismiss the
+   * context menu) from incidental programmatic ones such as layout-transition
+   * clamps and scrollIntoView, which must not dismiss it.
+   */
+  let wheelIntentAt = 0
+
+  /**
+   * A user scroll (wheel/touchpad) dismisses the context menu. Incidental
+   * programmatic scrolls (layout transitions, scrollIntoView) do not.
+   */
+  function closeMenuOnCanvasScroll() {
+    if (menuOpen && performance.now() - wheelIntentAt < 600)
+      menuOpen = false
+    updateScroll()
   }
 
   function cancelSmoothScroll() {
@@ -643,6 +677,7 @@
   }
 
   function wheel(event: WheelEvent) {
+    wheelIntentAt = performance.now()
     if (
       !scroller
       || event.ctrlKey
@@ -836,7 +871,7 @@
 
     {#snippet groupMenu(group: GroupView)}
       <MenuItems
-        variant='dropdown'
+        variant='context'
         items={buildGroupMenuItems({
           node: nodes.get(group.id),
           group,
@@ -853,12 +888,11 @@
             {...props}
             id='canvas'
             class='
-              relative min-h-0 flex-1 scrollbar-none overflow-auto scroll-smooth
-              outline-none
+              relative min-h-0 flex-1 scrollbar-none overflow-auto outline-none
               [&::-webkit-scrollbar]:hidden
             '
             bind:this={scroller}
-            onscroll={updateScroll}
+            onscroll={closeMenuOnCanvasScroll}
             onwheel={wheel}
             onpointerdown={canvasPointerDown}
             oncontextmenu={event => forwardContextMenu(props, event)}

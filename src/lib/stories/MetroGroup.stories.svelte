@@ -10,7 +10,7 @@
   import WorkspaceProvider from '$lib/stories/WorkspaceProvider.svelte'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import { expect, fn, screen, userEvent } from 'storybook/test'
+  import { expect, fireEvent, fn, userEvent } from 'storybook/test'
 
   const tiles: Record<string, TileView> = {
     steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true, kind: 'bookmark' },
@@ -75,6 +75,18 @@
     writable: false,
   }
 
+  const narrowLayout: Layout = [
+    { i: 'steam', x: 0, y: 0, w: 1, h: 1 },
+    { i: 'slack', x: 1, y: 0, w: 1, h: 1 },
+  ]
+
+  const narrowGroup: GroupView = {
+    ...group,
+    id: 'group-narrow',
+    title: 'Design system components',
+    path: ['Bookmarks bar', 'Design system components'],
+  }
+
   const emptyGroup: GroupView = {
     id: 'group-empty',
     title: 'Reading list',
@@ -113,7 +125,7 @@
 
 {#snippet manageMenu(group: GroupView)}
   <MenuItems
-    variant='dropdown'
+    variant='context'
     items={[
       { label: 'Add bookmark here', icon: 'addBookmark', action: fn(), disabled: !group.writable },
       { label: 'Rename folder', icon: 'edit', action: rename, separator: true },
@@ -224,11 +236,25 @@
 />
 
 <Story
-  name='Manage dropdown'
+  name='Narrow group'
+  args={{ group: narrowGroup, layout: narrowLayout }}
   {template}
   play={async ({ canvas }) => {
-    await userEvent.click(canvas.getByRole('button', { name: 'Manage Design' }))
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Rename folder' }))
+    await expect(
+      await canvas.findByRole('heading', { name: 'Design system components' }),
+    ).toBeVisible()
+  }}
+/>
+
+<Story
+  name='Manage context menu'
+  {template}
+  play={async ({ canvas }) => {
+    const header = canvas.getByTestId('group-header')
+    await fireEvent.contextMenu(header)
+    const item = await canvas.findByRole('menuitem', { name: 'Rename folder' })
+    await expect(item).toBeVisible()
+    await userEvent.click(item)
     await expect(rename).toHaveBeenCalled()
   }}
 />

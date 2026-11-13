@@ -6,7 +6,7 @@
   import Icon from '$lib/components/Icon.svelte'
   import MetroTile from '$lib/components/MetroTile.svelte'
   import { Button } from '$lib/components/ui/button'
-  import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
+  import * as ContextMenu from '$lib/components/ui/context-menu'
   import * as Empty from '$lib/components/ui/empty'
   import { DRAG_PX } from '$lib/interaction'
   import {
@@ -50,7 +50,7 @@
     onActivateFolder?: (id: string) => void
     /** Brief highlight of this group after a folder tile scrolled it into view. */
     flash?: boolean
-    /** Content of the per-group "Manage" dropdown menu. Omit to hide the button. */
+    /** Content of the per-group context menu, rendered in the header's trigger. */
     menu?: Snippet<[GroupView]>
     onAdd: (folderId: string) => void
     onBlocked: (message: string) => void
@@ -200,66 +200,112 @@
       )
     }
   }
+  /**
+   * Keyboard activation for the header trigger: dispatches a contextmenu at the
+   * trigger's position. Deferred to a microtask so it does not run nested inside
+   * the current keydown's event-delegation walk, whose handler ordering differs.
+   */
+  function openGroupMenu(event: KeyboardEvent) {
+    const target = event.currentTarget
+    if (!(target instanceof HTMLElement))
+      return
+    const rect = target.getBoundingClientRect()
+    queueMicrotask(() => {
+      target.dispatchEvent(new MouseEvent('contextmenu', {
+        bubbles: true,
+        clientX: rect.left + 24,
+        clientY: rect.bottom,
+      }))
+    })
+  }
+
 </script>
 
 <section
   data-testid='metro-group'
+  data-group-id={group.id}
   class={cn('flex-none transition-[width] duration-140 motion-reduce:transition-none', flash && 'animate-flash')}
   style:width='{visibleWidth}px'
   aria-label={group.path.join(' / ') || 'Ungrouped bookmarks'}
 >
-  <header class='flex h-15 items-end justify-between gap-2 pb-4.25'>
+  {#snippet headerBody()}
     <div class='min-w-0'>
       <div
-        class='
-          mb-1.5 truncate text-xs tracking-[1.1px] text-(--muted-foreground) uppercase
-        '
+        class='mb-1.5 truncate text-xs tracking-[1.1px] text-foreground/60 uppercase'
         data-testid='group-path'
+        title={group.path.join(' / ')}
       >
         {group.path.length > 1
           ? `${group.path.slice(0, -1).join(' / ')} /`
           : 'BROWSER ROOT'}
       </div>
-      <div class='flex items-center gap-2.75'>
-        <h2 class='m-0 truncate text-[16px] leading-[1.1] font-semibold text-(--foreground)'>
+      <div class='flex items-start gap-2.75'>
+        <h2
+          class='
+            m-0 line-clamp-2 text-base leading-[1.15] font-semibold wrap-break-word
+            text-foreground
+          '
+          title={group.title}
+        >
           {group.title}
         </h2>
-        <span class='text-xs text-(--muted-foreground) tabular-nums'>
-          {String(layout.length).padStart(2, '0')}
-        </span>
         {#if !group.writable}
-          <Icon name='lock' size={12} />
+          <Icon name='lock' size={12} class='mt-1 shrink-0' />
         {/if}
       </div>
     </div>
-    {#if menu}
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger
-          aria-label="Manage {group.title || 'unnamed group'}"
-          class='
-            inline-flex size-9.5 shrink-0 items-center justify-center rounded-[3px] border
-            border-transparent bg-transparent text-(--muted-foreground) opacity-[.85]
-            hover:bg-(--accent) hover:text-(--foreground)
-            focus-visible:outline-2 focus-visible:outline-offset-2
-            focus-visible:outline-(--primary)
-          '
-        >
-          <Icon name='more' size={17} />
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          bind:ref={menuContentEl}
-          aria-label={`Actions for ${group.title || 'unnamed group'}`}
-          class='w-65'
-          onOpenAutoFocus={event => focusFirstMenuItem(event, menuContentEl)}
-        >
-          <DropdownMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
-            <strong class='truncate text-[12px] font-semibold'>{group.title || 'Unnamed group'}</strong>
-          </DropdownMenu.Label>
-          {@render menu(group)}
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
-    {/if}
-  </header>
+  {/snippet}
+
+  {#if menu}
+    <ContextMenu.Root>
+      <ContextMenu.Trigger>
+        {#snippet child({ props })}
+          <div
+            {...props}
+            class='
+              flex cursor-default items-end gap-2 pb-4.25 outline-none
+              focus-visible:outline-2 focus-visible:outline-offset-2
+              focus-visible:outline-(--primary)
+            '
+            tabindex='0'
+            role='button'
+            aria-haspopup='menu'
+            data-testid='group-header'
+            onkeydown={(event) => {
+              if (
+                event.key === 'Enter'
+                || event.key === ' '
+                || event.key === 'ArrowDown'
+                || (event.key === 'F10' && event.shiftKey)
+                || event.key === 'ContextMenu'
+              ) {
+                event.preventDefault()
+                openGroupMenu(event)
+              }
+            }}
+          >
+            {@render headerBody()}
+          </div>
+        {/snippet}
+      </ContextMenu.Trigger>
+      <ContextMenu.Content
+        bind:ref={menuContentEl}
+        aria-label={`Actions for ${group.title || 'unnamed group'}`}
+        class='w-65'
+        onOpenAutoFocus={event => focusFirstMenuItem(event, menuContentEl)}
+      >
+        <ContextMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
+          <strong class='truncate text-[12px] font-semibold'>{group.title || 'Unnamed group'}</strong>
+          <span class='truncate text-[11px] text-(--muted-foreground)'>{group.path.join(' / ')}</span>
+        </ContextMenu.Label>
+        {@render menu(group)}
+      </ContextMenu.Content>
+    </ContextMenu.Root>
+  {:else}
+    <div class='flex items-end gap-2 pb-4.25'>
+      {@render headerBody()}
+    </div>
+  {/if}
   <div
 {@attach container.attach}
     style='{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell)}px;'
