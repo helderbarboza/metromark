@@ -34,7 +34,7 @@
       `}
     aria-pressed={rootFilter === 'all'}
     onclick={() => onSelect('all')}
-  >All bookmarks <span class={rootFilter === 'all' ? 'text-xs text-(--primary)' : 'text-xs text-(--muted-foreground)'}>{bookmarkCount}</span></button>
+  >All bookmarks <span class={rootFilter === 'all' ? 'text-xs text-(--accent-foreground)' : 'text-xs text-(--muted-foreground)'}>{bookmarkCount}</span></button>
   {#each roots as root (root.id)}
     <button
       class={rootFilter === root.id
@@ -49,6 +49,6 @@
         `}
       aria-pressed={rootFilter === root.id}
       onclick={() => onSelect(root.id)}
-    >{root.title}<span class={rootFilter === root.id ? 'text-xs text-(--primary)' : 'text-xs text-(--muted-foreground)'}>{countBookmarks(root)}</span></button>
+    >{root.title}<span class={rootFilter === root.id ? 'text-xs text-(--accent-foreground)' : 'text-xs text-(--muted-foreground)'}>{countBookmarks(root)}</span></button>
   {/each}
 </nav>

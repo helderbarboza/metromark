@@ -43,19 +43,6 @@ export interface CreateNode {
   type?: 'separator'
 }
 export interface Appearance { size?: TileSize, colorIndex?: number, color?: string }
-export type ThemeName
-  = | 'one-light'
-    | 'github'
-    | 'solarized-light'
-    | 'tokyo-night-light'
-    | 'catppuccin-latte'
-    | 'one-dark'
-    | 'github-dark'
-    | 'solarized-dark'
-    | 'tokyo-night-moon'
-    | 'catppuccin-mocha'
-    | 'catppuccin-macchiato'
-    | 'catppuccin-frappe'
 export type { Settings }
 export interface DeletedBackup {
   node: BookmarkNode

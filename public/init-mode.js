@@ -4,20 +4,24 @@
 // Storage keys and defaults mirror mode-watcher's own conventions.
 ;(function () {
   // theme-color per theme: the theme base00 (background) hex.
+  // BEGIN GENERATED THEME COLORS - do not edit; run `npm run generate:themes` after editing src/lib/themes.ts
+  var DEFAULT_LIGHT_THEME = 'catppuccin-latte'
+  var DEFAULT_DARK_THEME = 'catppuccin-mocha'
   var THEME_COLORS = {
     'catppuccin-latte': '#eff1f5',
+    'github': '#ffffff',
+    'one-light': '#fafafa',
+    'solarized-light': '#fdf6e3',
+    'tokyo-night-light': '#d5d6db',
     'catppuccin-frappe': '#303446',
     'catppuccin-macchiato': '#24273a',
     'catppuccin-mocha': '#1e1e2e',
-    'github': '#ffffff',
     'github-dark': '#0d1117',
-    'one-light': '#fafafa',
     'one-dark': '#282c34',
-    'solarized-light': '#fdf6e3',
     'solarized-dark': '#002b36',
-    'tokyo-night-light': '#d5d6db',
     'tokyo-night-moon': '#222436',
   }
+  // END GENERATED THEME COLORS
   var mode = localStorage.getItem('mode-watcher-mode')
   if (mode !== 'light' && mode !== 'dark' && mode !== 'system')
     mode = 'system'
@@ -33,7 +37,7 @@
     // A malformed selection falls back to mode-watcher's stored theme.
   }
   if (typeof theme !== 'string' || !Object.prototype.hasOwnProperty.call(THEME_COLORS, theme))
-    theme = light ? 'catppuccin-latte' : 'catppuccin-mocha'
+    theme = light ? DEFAULT_LIGHT_THEME : DEFAULT_DARK_THEME
   var root = document.documentElement
   if (light)
     root.classList.remove('dark')

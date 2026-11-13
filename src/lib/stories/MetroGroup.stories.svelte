@@ -10,7 +10,7 @@
   import WorkspaceProvider from '$lib/stories/WorkspaceProvider.svelte'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import { expect, fireEvent, fn, userEvent } from 'storybook/test'
+  import { expect, fireEvent, fn, screen, userEvent, waitFor } from 'storybook/test'
 
   const tiles: Record<string, TileView> = {
     steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true, kind: 'bookmark' },
@@ -252,8 +252,11 @@
   play={async ({ canvas }) => {
     const header = canvas.getByTestId('group-header')
     await fireEvent.contextMenu(header)
-    const item = await canvas.findByRole('menuitem', { name: 'Rename folder' })
-    await expect(item).toBeVisible()
+    // The context menu renders in a floating-ui portal on <body>, outside the story canvas,
+    // so query it with screen rather than canvas (same pattern as Menus.stories.svelte).
+    const item = await screen.findByRole('menuitem', { name: 'Rename folder' })
+    // The menu content fades in (opacity transition); wait for it before asserting visibility.
+    await waitFor(() => expect(item).toBeVisible())
     await userEvent.click(item)
     await expect(rename).toHaveBeenCalled()
   }}

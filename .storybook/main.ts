@@ -8,6 +8,7 @@ const config: StorybookConfig = {
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y', '@storybook/addon-svelte-csf', '@storybook/addon-vitest'],
   framework: '@storybook/svelte-vite',
   core: { disableTelemetry: true },
+  features: { backgrounds: false },
   viteFinal: config => ({
     ...config,
     cacheDir: 'node_modules/.vite/storybook',

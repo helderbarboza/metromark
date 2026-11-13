@@ -182,10 +182,10 @@
     {#if size !== 'small'}
       <div class={ui.labelContainer()}>
         <div class={ui.label()}>
+          <span class={cn(ui.title(), 'order-2')}>{tile.title}</span>
           {#if showDomain && domain}
-            <span class={ui.domain()}>{domain}</span>
+            <span class={cn(ui.domain(), 'order-1')}>{domain}</span>
           {/if}
-          <span class={ui.title()}>{tile.title}</span>
         </div>
       </div>
     {/if}

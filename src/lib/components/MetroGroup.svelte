@@ -231,7 +231,9 @@
   {#snippet headerBody()}
     <div class='min-w-0'>
       <div
-        class='mb-1.5 truncate text-xs tracking-[1.1px] text-foreground/60 uppercase'
+        class='
+          mb-1.5 truncate text-xs tracking-[1.1px] text-(--muted-foreground) uppercase
+        '
         data-testid='group-path'
         title={group.path.join(' / ')}
       >

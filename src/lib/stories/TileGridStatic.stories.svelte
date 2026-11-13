@@ -5,6 +5,7 @@
   import type { TileSize } from '$lib/types'
   import type { ComponentProps } from 'svelte'
   import MetroTile from '$lib/components/MetroTile.svelte'
+  import { cellsToPx, SIZES } from '$lib/layout-constants'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
 
@@ -48,14 +49,17 @@
       background:var(--background);min-height:100vh'
   >
     {#each staticTiles as tile (tile.id)}
-      <MetroTile
-        tile={{ title: tile.title, colorIndex: tile.colorIndex, url: tile.href }}
-        size={tile.size}
-        domain={tile.domain}
-        showDomain={args.showDomain ?? true}
-        href={tile.href}
-        ariaLabel={label(tile, args.showDomain ?? true)}
-      />
+      {@const [w, h] = SIZES[tile.size]}
+      <div style={`width:${cellsToPx(w, 68)}px;height:${cellsToPx(h, 68)}px;--cell:68px`}>
+        <MetroTile
+          tile={{ title: tile.title, colorIndex: tile.colorIndex, url: tile.href }}
+          size={tile.size}
+          domain={tile.domain}
+          showDomain={args.showDomain ?? true}
+          href={tile.href}
+          ariaLabel={label(tile, args.showDomain ?? true)}
+        />
+      </div>
     {/each}
   </div>
 {/snippet}

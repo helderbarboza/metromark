@@ -19,11 +19,12 @@
 />
 <Story
   name='Catppuccin Latte'
-  args={{ theme: 'catppuccin-latte' }}
+  globals={{ theme: 'catppuccin-latte' }}
 />
 <Story
-  name='Tokyo Night Dark compact'
-  args={{ theme: 'tokyo-night-moon', compact: true }}
+  name='Tokyo Night Moon compact'
+  globals={{ theme: 'tokyo-night-moon' }}
+  args={{ compact: true }}
 />
 <Story
   name='Search interaction'
