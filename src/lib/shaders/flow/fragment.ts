@@ -1,3 +1,17 @@
+/**
+ * Flow - derived from "Gradient Flow" by Inigo Quilez (iq), iq/2014
+ * https://www.shadertoy.com/view/wdyczG
+ * License: CC BY-NC-SA 3.0 (Attribution-NonCommercial-ShareAlike 3.0
+ *   Unported; https://creativecommons.org/licenses/by-nc-sa/3.0/).
+ *
+ * Non-commercial use only. Redistribution and derivatives must keep this
+ * attribution and the same CC BY-NC-SA 3.0 license. MetroMark is distributed
+ * free of charge and does not use this work commercially.
+ *
+ * The `hash`/`noise` functions below are iq's original code (see the in-body
+ * notice). The rotating gradient-flow composition around them is adapted from
+ * the same upstream shader.
+ */
 export const FRAGMENT_SHADER = `
 precision highp float;
 uniform vec3 iResolution;

@@ -1,6 +1,10 @@
 /**
  * Swiss Alps, Common tab - https://www.shadertoy.com/view/ttcSD8
- * by piyushslayer - CC BY-NC-SA 3.0 (non-commercial).
+ * by piyushslayer - CC BY-NC-SA 3.0 (https://creativecommons.org/licenses/by-nc-sa/3.0/).
+ *
+ * Embedded: robobo1221's fake atmospheric scattering
+ * (https://www.shadertoy.com/view/4tVSRt), slightly modified. Its license is
+ * unverified; treat it as CC BY-NC-SA 3.0 as well.
  *
  * Copied verbatim from the export except for `getSun`, which now takes the sun's
  * position from `iTimeOfDay` (the viewer's local time of day) instead of running its

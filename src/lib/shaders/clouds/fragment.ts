@@ -1,6 +1,12 @@
 /**
  * Cloud Ten - https://www.shadertoy.com/view/XtS3DD (image pass 4dfGRr)
- * by nimitz, 2015 - CC BY-NC-SA 3.0 (non-commercial; see the notice in the body)
+ * by nimitz, 2015 - CC BY-NC-SA 3.0 (Attribution-NonCommercial-ShareAlike 3.0
+ *   Unported; https://creativecommons.org/licenses/by-nc-sa/3.0/).
+ *
+ * Non-commercial use only. Redistribution and derivatives must keep this
+ * attribution and the same CC BY-NC-SA 3.0 license. The author offers other
+ * licensing options on request (see the notice in the body); MetroMark is
+ * distributed free of charge and does not use this work commercially.
  *
  * "Drag mouse horizontally to change planet and vertically for time of day."
  *

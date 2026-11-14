@@ -2,6 +2,11 @@
  * Swiss Alps, Image tab: gaussian blur on the clouds, terrain/cloud composite, light
  * scattering through the cloud alpha, lens flare, luminance Reinhard tonemap and a
  * dither. Verbatim from the export.
+ *
+ * Embedded: lens flare routine from https://www.shadertoy.com/view/XdfXRX. Its
+ * license is unverified; treat it as CC BY-NC-SA 3.0 as well. Overall pass is
+ * by piyushslayer - CC BY-NC-SA 3.0
+ * (https://creativecommons.org/licenses/by-nc-sa/3.0/).
  */
 export const IMAGE = `
 /**

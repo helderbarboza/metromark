@@ -1,6 +1,17 @@
 /**
  * Swiss Alps - https://www.shadertoy.com/view/ttcSD8
- * by piyushslayer - CC BY-NC-SA 3.0 (non-commercial).
+ * by piyushslayer - CC BY-NC-SA 3.0 (Attribution-NonCommercial-ShareAlike 3.0
+ *   Unported; https://creativecommons.org/licenses/by-nc-sa/3.0/).
+ *
+ * Non-commercial use only. Redistribution and derivatives must keep this
+ * attribution and the same CC BY-NC-SA 3.0 license. MetroMark is distributed
+ * free of charge and does not use this work commercially.
+ *
+ * Embedded third-party material whose licenses are unverified; treat them as
+ * CC BY-NC-SA 3.0 as well:
+ *   - robobo1221's fake atmospheric scattering (https://www.shadertoy.com/view/4tVSRt),
+ *     slightly modified, in common.ts.
+ *   - the lens flare routine (https://www.shadertoy.com/view/XdfXRX), in image.ts.
  *
  * Five buffer passes and an image pass: A generates the tileable Perlin-Worley
  * noise, B ray marches the terrain, C ray marches the clouds, D runs TXAA over the

@@ -1,3 +1,17 @@
+/**
+ * Incense - an original arrangement of noise snippets from The Book of
+ * Shaders (https://thebookofshaders.com), after Morgan McGuire
+ * (https://www.shadertoy.com/view/4dS3Wd).
+ *
+ * The 2D `random`/`noise` functions below are The Book of Shaders' value-noise
+ * example (CC BY-NC-SA 3.0; https://creativecommons.org/licenses/by-nc-sa/3.0/).
+ * The Book of Shaders material is non-commercial; MetroMark is distributed
+ * free of charge and does not use this work commercially. Redistribution and
+ * derivatives must keep this attribution and the same license.
+ *
+ * The iterated smoke body and colour ramp around those functions are an
+ * original composition in the same style.
+ */
 export const FRAGMENT_SHADER = `
 precision highp float;
 uniform vec3 iResolution;

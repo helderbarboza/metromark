@@ -1,3 +1,27 @@
+/**
+ * Monterey wannabe - an interpretation of the macOS Monterey wallpaper.
+ * NdfyRM is where the `sRGB` helpers come from, not necessarily this shader.
+ *
+ * License summary. The upstream author released the original shader code as
+ * CC0. That dedication can only cover the author's own code; the embedded
+ * third-party pieces below keep their own licenses (the original ShaderToy
+ * page for this shader could not be verified from here, so the per-snippet
+ * notes in the body are the authority for each embedded piece):
+ *   - hsv2rgb (sam hocevar): WTFPL - https://spdx.org/licenses/WTFPL.html
+ *   - vnoise (Inigo Quilez, XslGRr): MIT - https://opensource.org/licenses/MIT
+ *   - sRGB (nimitz/nmz, from NdfyRM): license not stated at the source; nimitz
+ *     releases ShaderToy work under CC BY-NC-SA 3.0
+ *     (https://creativecommons.org/licenses/by-nc-sa/3.0/) - treat as BY-NC-SA 3.0.
+ *     Non-commercial use only; MetroMark is distributed free of charge.
+ *   - aces_approx (Matt Taylor, github.com/64): unverified - license not found;
+ *     treat as all rights reserved unless confirmed otherwise.
+ *   - alphaBlend, tanh_approx, hash (author unknown): unverified - license and
+ *     origin not found; treat as all rights reserved unless confirmed otherwise.
+ *
+ * WTFPL permits unrestricted copying and modification. MIT requires keeping
+ * the copyright notice. BY-NC-SA requires attribution and the same license;
+ * see this file and the upstream links above.
+ */
 export const FRAGMENT_SHADER = `
 precision highp float;
 uniform vec3 iResolution;
@@ -25,24 +49,26 @@ vec3 hsv2rgb(vec3 c) {
 //  Macro version of above to enable compile-time constants
 #define HSV2RGB(c)  (c.z * mix(hsv2rgb_K.xxx, clamp(abs(fract(c.xxx + hsv2rgb_K.xyz) * 6.0 - hsv2rgb_K.www) - hsv2rgb_K.xxx, 0.0, 1.0), c.y))
 
-// License: Unknown, author: Unknown, found: don't remember
+// License: unverified (origin not found), author: unknown - treat as all rights reserved unless confirmed
 vec4 alphaBlend(vec4 back, vec4 front) {
   float w = front.w + back.w*(1.0-front.w);
   vec3 xyz = (front.xyz*front.w + back.xyz*back.w*(1.0-front.w))/w;
   return w > 0.0 ? vec4(xyz, w) : vec4(0.0);
 }
 
-// License: Unknown, author: Unknown, found: don't remember
+// License: unverified (origin not found), author: unknown - treat as all rights reserved unless confirmed
 vec3 alphaBlend(vec3 back, vec4 front) {
   return mix(back, front.xyz, front.w);
 }
 
-// License: Unknown, author: nmz (twitter: @stormoid), found: https://www.shadertoy.com/view/NdfyRM
+// License: unverified; nimitz releases ShaderToy work under CC BY-NC-SA 3.0 (non-commercial) - treat as BY-NC-SA 3.0
+//   author: nmz (twitter: @stormoid), found: https://www.shadertoy.com/view/NdfyRM
 float sRGB(float t) { return mix(1.055*pow(t, 1./2.4) - 0.055, 12.92*t, step(t, 0.0031308)); }
-// License: Unknown, author: nmz (twitter: @stormoid), found: https://www.shadertoy.com/view/NdfyRM
+// License: unverified; nimitz releases ShaderToy work under CC BY-NC-SA 3.0 (non-commercial) - treat as BY-NC-SA 3.0
+//   author: nmz (twitter: @stormoid), found: https://www.shadertoy.com/view/NdfyRM
 vec3 sRGB(in vec3 c) { return vec3 (sRGB(c.x), sRGB(c.y), sRGB(c.z)); }
 
-// License: Unknown, author: Matt Taylor (https://github.com/64), found: https://64.github.io/tonemapping/
+// License: unverified (license not found), author: Matt Taylor (https://github.com/64), found: https://64.github.io/tonemapping/ - treat as all rights reserved unless confirmed
 vec3 aces_approx(vec3 v) {
   v = max(v, 0.0);
   v *= 0.6;
@@ -54,19 +80,19 @@ vec3 aces_approx(vec3 v) {
   return clamp((v*(a*v+b))/(v*(c*v+d)+e), 0.0, 1.0);
 }
 
-// License: Unknown, author: Unknown, found: don't remember
+// License: unverified (origin not found), author: unknown - treat as all rights reserved unless confirmed
 float tanh_approx(float x) {
   float x2 = x*x;
   return clamp(x*(27.0 + x2)/(27.0+9.0*x2), -1.0, 1.0);
 }
 
-// License: Unknown, author: Unknown, found: don't remember
+// License: unverified (origin not found), author: unknown - treat as all rights reserved unless confirmed
 float hash(vec2 p) {
   float a = dot (p, vec2 (127.1, 311.7));
   return fract(sin(a)*43758.5453123);
 }
 
-// License: MIT, author: Inigo Quilez, found: https://www.shadertoy.com/view/XslGRr
+// License: MIT - https://opensource.org/licenses/MIT (keep this notice), author: Inigo Quilez, found: https://www.shadertoy.com/view/XslGRr
 float vnoise(vec2 p) {
   vec2 i = floor(p);
   vec2 f = fract(p);
