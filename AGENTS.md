@@ -71,7 +71,7 @@ Put bookmark mutations behind coordinator commands. Keep browser API details in 
 ## Theming
 
 - Themes come verbatim from Tinted Theming (<https://tinted-theming.github.io/tinted-gallery/>). Use `base16` schemes only. Do not adjust hex values.
-- Single source of truth: `src/lib/themes.ts` holds every theme's palette and label. Everything else derives from it. Do not hand-sync theme lists or values anywhere else.
+- Single source of truth: `src/lib/themes.ts` holds every theme's palette and label. `label` is the gallery scheme `name` verbatim. Everything else derives from it. Do not hand-sync theme lists or values anywhere else.
 - `src/styles.css` and `public/init-mode.js` contain GENERATED regions between `BEGIN/END GENERATED THEMES` markers. Run `npm run generate:themes` after editing `src/lib/themes.ts`. Use `npm run generate:themes -- --check` to verify the regions are in sync. Commit the generated output; the generator is the only writer of those regions.
 - `LIGHT_THEMES`/`DARK_THEMES`, the `ThemeName`/`LightTheme`/`DarkTheme`/`ThemeChoice` types (`src/lib/themes.ts`, re-exported by `src/lib/theme-picker.ts`) and the Storybook backgrounds derive from `THEMES` at import time.
 - Defaults: catppuccin-latte (light), catppuccin-mocha (dark) — change only the `DEFAULT_*` constants in `src/lib/themes.ts`, never the consumers. The set itself lives in `src/lib/themes.ts`; do not duplicate the list here.

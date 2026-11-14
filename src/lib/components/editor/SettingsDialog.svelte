@@ -11,6 +11,7 @@
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { setSettingsContext } from '$lib/settings-context'
   import { getThemeSelections } from '$lib/theme-picker'
+  import { getTheme } from '$lib/themes.js'
   import { setMode, systemPrefersMode, userPrefersMode } from 'mode-watcher'
   import BackgroundSettings from './BackgroundSettings.svelte'
   import CollapsibleSection from './CollapsibleSection.svelte'
@@ -119,9 +120,9 @@
     >
       {#snippet control()}
         <div class='inline-flex items-center gap-2 text-sm'>
-          <span>{themes.light}</span>
+          <span>{getTheme(themes.light)?.label ?? themes.light}</span>
           <span aria-hidden='true' class='text-(--muted-foreground)'>·</span>
-          <span>{themes.dark}</span>
+          <span>{getTheme(themes.dark)?.label ?? themes.dark}</span>
         </div>
       {/snippet}
       <div class='p-4'>

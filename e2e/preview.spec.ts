@@ -211,7 +211,7 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('radio', { name: 'dark', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
-  await page.getByRole('button', { name: 'catppuccin-mocha', exact: true }).click()
+  await page.getByRole('button', { name: 'Catppuccin Mocha', exact: true }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'catppuccin-mocha')
   await expect(second.locator('html')).toHaveAttribute('data-theme', 'catppuccin-mocha')
   await page.keyboard.press('Escape')
@@ -340,7 +340,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
-  await page.getByRole('button', { name: 'one-light', exact: true }).click()
+  await page.getByRole('button', { name: 'One Light', exact: true }).click()
   await page.keyboard.press('Escape')
 
   // In one-light, colorIndex 3 -> base0B #50a14f (green) -> black
@@ -359,7 +359,7 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
   await page.getByRole('radio', { name: 'compact', exact: true }).click()
   await page.getByRole('tab', { name: 'Appearance', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
-  await page.getByRole('button', { name: 'one-light', exact: true }).click()
+  await page.getByRole('button', { name: 'One Light', exact: true }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'one-light')
 
   await page.getByRole('tab', { name: 'Reset', exact: true }).click()

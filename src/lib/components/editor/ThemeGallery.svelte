@@ -9,6 +9,7 @@
     setThemeForMode,
 
   } from '$lib/theme-picker'
+  import { getTheme } from '$lib/themes.js'
   import Button from '../ui/button/button.svelte'
 
   interface Props {
@@ -40,9 +41,10 @@
           mb-2.5 text-xs font-[550] tracking-[0.5px] text-(--muted-foreground) uppercase
         '
       >{mode} theme</h4>
-      <div class='grid grid-cols-2 gap-2'>
+      <div class='grid grid-cols-3 gap-2'>
         {#each modeTheme as theme (theme)}
           {@const selected = currentThemes[mode] === theme}
+          {@const label = getTheme(theme)?.label ?? theme}
           <Button
             type='button'
             class='flex h-auto flex-col items-start gap-0 truncate p-px text-left'
@@ -54,7 +56,7 @@
               <ThemePreview {theme} {mode} />
             </div>
             <span class='w-full items-center justify-between truncate p-2 text-xs'>
-              {theme}
+              {label}
             </span>
           </Button>
         {/each}
