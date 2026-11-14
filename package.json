@@ -1,7 +1,7 @@
 {
-  "name": "metro-bookmarks",
+  "name": "metromark",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "engines": {
     "node": ">=24"
@@ -23,7 +23,8 @@
     "storybook": "storybook dev -p 6006 --host 0.0.0.0 --no-open",
     "build-storybook": "storybook build",
     "package": "node scripts/package.mjs",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "generate:themes": "node scripts/generate-themes.mjs"
   },
   "dependencies": {
     "@dnd-kit/dom": "0.4.0",

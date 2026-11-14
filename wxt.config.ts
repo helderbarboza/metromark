@@ -1,9 +1,6 @@
-import process from 'node:process'
-import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'wxt'
-
-const libDir = fileURLToPath(new URL('./src/lib', import.meta.url))
+import { libAlias, metromarkDefines } from './build/shared.mjs'
 
 export default defineConfig({
   srcDir: 'src',
@@ -11,7 +8,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-svelte'],
   imports: false,
   manifest: ({ browser }) => ({
-    name: 'Metro — Bookmarks, beautifully arranged',
+    name: 'MetroMark — Bookmarks, beautifully arranged',
     description: 'A Metro-inspired new tab and bookmark manager. Local-first, with live bookmark updates and Undo.',
     // Chrome-only `favicon` permission for the local favicon-cache tier.
     // Firefox has no equivalent scheme, so it stays permission-free there.
@@ -20,7 +17,7 @@ export default defineConfig({
     ...(browser === 'firefox'
       ? { browser_specific_settings: {
           gecko: {
-            id: 'metro-bookmarks@local.example',
+            id: 'metromark@local.example',
             strict_min_version: '140.0',
             data_collection_permissions: { required: ['none'] },
           },
@@ -29,12 +26,8 @@ export default defineConfig({
   }),
   vite: () => ({
     build: { sourcemap: true },
-    resolve: { alias: { $lib: libDir } },
-    define: {
-      'import.meta.env.METRO_DENSITY': JSON.stringify(process.env.METRO_DENSITY),
-      'import.meta.env.METRO_SHOW_DOMAINS': JSON.stringify(process.env.METRO_SHOW_DOMAINS),
-      'import.meta.env.METRO_REDUCED_MOTION': JSON.stringify(process.env.METRO_REDUCED_MOTION),
-    },
+    resolve: { alias: libAlias },
+    define: metromarkDefines,
     plugins: [tailwindcss()],
   }),
 })

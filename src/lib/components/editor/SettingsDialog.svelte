@@ -9,6 +9,7 @@
   import { Button } from '$lib/components/ui/button'
   import * as Tabs from '$lib/components/ui/tabs'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
+  import { setSettingsContext } from '$lib/settings-context'
   import { getThemeSelections } from '$lib/theme-picker'
   import { setMode, systemPrefersMode, userPrefersMode } from 'mode-watcher'
   import BackgroundSettings from './BackgroundSettings.svelte'
@@ -44,6 +45,14 @@
   async function setting(patch: Partial<Settings>) {
     await send({ type: 'settings.update', patch }, false)
   }
+
+  // Provide settings to the dialog subtree (e.g. the Background tab) as a
+  // getter closure so consumers stay reactive without prop drilling.
+  setSettingsContext(() => ({
+    settings,
+    busy: command.busy,
+    update: patch => void setting(patch),
+  }))
 
   async function resetPreview() {
     await run(async () => {
@@ -174,6 +183,31 @@
       />
     </SettingsCard>
     <SettingsCard
+      icon='color'
+      title='Original favicons'
+      helpText='Show the full-color favicon instead of a single-color Metro glyph'
+      controlId='original-favicons'
+    >
+      <input
+        id='original-favicons'
+        type='checkbox'
+        role='switch'
+        aria-describedby='original-favicons-help'
+        checked={settings.originalFavicons}
+        disabled={command.busy}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
+          bg-(--border) p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+        onchange={event => setting({ originalFavicons: event.currentTarget.checked })}
+      />
+    </SettingsCard>
+    <SettingsCard
       icon='pause'
       title='Reduce motion'
       helpText='Disables tile, menu, and background animations'
@@ -200,7 +234,7 @@
     </SettingsCard>
   </Tabs.Content>
   <Tabs.Content value='background' class='mt-4 grid gap-1'>
-    <BackgroundSettings {settings} busy={command.busy} onchange={setting} />
+    <BackgroundSettings />
   </Tabs.Content>
   <Tabs.Content value='reset' class='mt-4 grid gap-1'>
 
@@ -243,7 +277,7 @@
       </p>
       {#if confirmFactory}
         <div class='mt-3.5'>
-          <p class='mb-3 text-xs'>Reset Metro to factory defaults?</p>
+          <p class='mb-3 text-xs'>Reset MetroMark to factory defaults?</p>
           <div class='flex w-full gap-1'>
             <Button class='grow' disabled={command.busy} onclick={() => (confirmFactory = false)}>
               Cancel
@@ -255,7 +289,7 @@
               onclick={() => send({ type: 'factory.reset' })}
             >
               <Icon name='buildingFactory' size={15} />
-              Reset Metro
+              Reset MetroMark
             </Button>
           </div>
         </div>

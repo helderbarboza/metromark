@@ -3,9 +3,9 @@
 // settings, Undo records and snapshot broadcasts only carry a short `idb:<uuid>`
 // reference instead of megabytes of base64.
 
-import { isMediaKey } from '$lib/image-background'
+import { isMediaKey } from '$lib/background-image'
 
-const DB_NAME = 'metro-media-v1'
+const DB_NAME = 'metromark-media-v1'
 const STORE_NAME = 'backgrounds'
 const DB_VERSION = 1
 

@@ -59,7 +59,7 @@ export default antfu(
   },
   {
     rules: {
-      '@typescript-eslint/consistent-type-assertions': ['warn', { assertionStyle: 'never' }],
+      '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
     },
   },
   // Node scripts and the Playwright config use the global `process` intentionally.

@@ -1,18 +1,16 @@
 <script lang='ts'>
-  // Decorative image layer for the new-tab background. Mirrors Background.svelte:
+  // Decorative image layer for the new-tab background. Mirrors ShaderBackground.svelte:
   // absolutely positioned, behind the page, hidden from the accessibility tree.
   // Sources: http(s) URLs, legacy data: URIs, and `idb:` references into the
   // IndexedDB media store (resolved once per mount to an object URL).
   // An image that fails to load hides itself and reports through `onerror`;
   // the base color layer stays visible.
 
-  import type { Settings } from '$lib/config'
+  import type { ImageBackgroundSettings } from '$lib/config'
+  import { isMediaKey } from '$lib/background-image'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
-  import { isMediaKey } from '$lib/image-background'
   import { loadBackgroundMedia } from '$lib/media-store'
   import { untrack } from 'svelte'
-
-  type ImageBackground = Extract<Settings['background'], { type: 'image' }>
 
   interface Props {
     /**
@@ -31,7 +29,7 @@
     /** Enable the scroll parallax. Forced off by reduced motion. */
     parallax?: boolean
     /** Layer scale as a percentage of the canvas size; bigger means wider layer and more travel */
-    parallaxZoom?: ImageBackground['parallaxZoom']
+    parallaxZoom?: ImageBackgroundSettings['parallaxZoom']
     reducedMotion?: boolean
     /** Called when the image fails to load. The layer hides itself. */
     onerror?: () => void

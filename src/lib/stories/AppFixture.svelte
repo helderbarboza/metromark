@@ -1,23 +1,20 @@
 <script lang='ts'>
-  import type { ThemeName } from '$lib/types'
   import { createPreviewClient } from '$lib/adapters/preview'
   import { SETTINGS_DEFAULTS } from '$lib/config'
-  import { setTheme } from 'mode-watcher'
   import { onMount } from 'svelte'
   import App from '../../App.svelte'
 
   const {
-    theme = 'catppuccin-mocha',
     compact = false,
-  }: { theme?: ThemeName, compact?: boolean } = $props()
+  }: { compact?: boolean } = $props()
   const density = $derived(compact ? 'compact' : 'comfortable')
   const client = $derived(
     createPreviewClient({ ...SETTINGS_DEFAULTS, density, reducedMotion: true }),
   )
   let ready = $state(false)
+
   onMount(() => {
     let cancelled = false
-    setTheme(theme)
     void client.execute({
       type: 'settings.update',
       patch: { density: compact ? 'compact' : 'comfortable', reducedMotion: true },

@@ -4,12 +4,23 @@ import type { Layout, LayoutItem } from '@snapgridjs/core'
 export type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
 
 export type TileSize = 'small' | 'medium' | 'wide' | 'large'
+export type TileKind = 'bookmark' | 'folder'
 export interface MetroTileDef {
   title: string
   colorIndex: number
   color?: string
   badge?: string | number
   url?: string
+}
+/** One preview cell inside a folder tile. Rendered read-only; not interactive. */
+export interface PreviewCell {
+  id: string
+  kind: TileKind
+  title: string
+  /** Bookmark cells only: favicon source and the bookmark's own tile colors. */
+  url?: string
+  colorIndex?: number
+  color?: string
 }
 
 export interface BookmarkNode {
@@ -32,19 +43,6 @@ export interface CreateNode {
   type?: 'separator'
 }
 export interface Appearance { size?: TileSize, colorIndex?: number, color?: string }
-export type ThemeName
-  = | 'one-light'
-    | 'github'
-    | 'solarized-light'
-    | 'tokyo-night-light'
-    | 'catppuccin-latte'
-    | 'one-dark'
-    | 'github-dark'
-    | 'solarized-dark'
-    | 'tokyo-night-dark'
-    | 'catppuccin-mocha'
-    | 'catppuccin-macchiato'
-    | 'catppuccin-frappe'
 export type { Settings }
 export interface DeletedBackup {
   node: BookmarkNode
@@ -109,13 +107,26 @@ export interface Snapshot {
   revision: number
   mode: 'preview' | 'extension'
 }
-export interface TileView extends MetroTileDef {
+export interface BookmarkTileView extends MetroTileDef {
   id: string
+  kind: 'bookmark'
   url: string
   domain: string
   size: TileSize
   writable: boolean
 }
+export interface FolderTileView {
+  id: string
+  kind: 'folder'
+  title: string
+  size: TileSize
+  writable: boolean
+  colorIndex: number
+  color?: string
+  /** First children of the folder in that folder's own layout order, capped per size. */
+  preview: PreviewCell[]
+}
+export type TileView = BookmarkTileView | FolderTileView
 export interface GroupView {
   id: string
   title: string

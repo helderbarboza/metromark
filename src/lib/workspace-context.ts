@@ -7,6 +7,8 @@ export interface WorkspaceState {
   selectedId: string | null
   /** The app "Reduce motion" setting or the OS reduced-motion preference. */
   reducedMotion: boolean
+  /** Show full-color favicons instead of single-color Metro glyphs. */
+  originalFavicons: boolean
 }
 
 /**

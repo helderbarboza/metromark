@@ -1,5 +1,6 @@
+import type { DialogSpec } from '$lib/components/editor/dialog-spec'
 import type { IconName } from '$lib/icons'
-import type { BookmarkNode, GroupView, TileView } from '$lib/types'
+import type { BookmarkNode, Command, FolderTileView, GroupView, TileView } from '$lib/types'
 import { BACKGROUND_DEFAULTS } from '$lib/config'
 
 export interface MenuItem {
@@ -14,9 +15,9 @@ export interface MenuItem {
 
 export interface MenuCallbacks {
   open: (url: string, disposition: 'tab' | 'window') => void
-  edit: (spec: any) => void
+  edit: (spec: DialogSpec) => void
   copy: (id: string) => void
-  execute: (command: any) => Promise<boolean>
+  execute: (command: Command) => Promise<boolean>
   clearSelection: () => void
   focusSearch: () => void
 }
@@ -42,6 +43,8 @@ export interface CanvasMenuInput {
 export function buildTileMenuItems(tile: TileView | undefined, callbacks: MenuCallbacks): MenuItem[] {
   if (!tile)
     return []
+  if (tile.kind === 'folder')
+    return buildFolderTileMenuItems(tile, callbacks)
   return [
     { label: 'Open in new tab', icon: 'openTab', action: () => { void callbacks.open(tile.url, 'tab') } },
     { label: 'Open in new window', icon: 'openWindow', action: () => { void callbacks.open(tile.url, 'window') } },
@@ -99,9 +102,25 @@ export function buildCanvasMenuItems(input: CanvasMenuInput): MenuItem[] {
   return items
 }
 
+/** Folder tiles are never deleted; they resize, recolor, move, and rename. */
+export function buildFolderTileMenuItems(tile: FolderTileView | undefined, callbacks: MenuCallbacks): MenuItem[] {
+  if (!tile)
+    return []
+  return [
+    { label: 'Move to folder', icon: 'folder', disabled: !tile.writable, action: () => callbacks.edit({ kind: 'move', id: tile.id }) },
+    { label: 'Rename folder', icon: 'edit', separator: true, disabled: !tile.writable, action: () => callbacks.edit({ kind: 'rename', id: tile.id }) },
+    { label: 'Customize tile', icon: 'customize', separator: true, action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
+  ]
+}
+
 export function buildAppBarMenuItems(tile: TileView | undefined, callbacks: MenuCallbacks): MenuItem[] {
   if (!tile)
     return []
+  if (tile.kind === 'folder') {
+    return [
+      { label: 'Customize tile', icon: 'customize', action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
+    ]
+  }
   return [
     { label: 'Open in new tab', icon: 'openTab', action: () => { void callbacks.open(tile.url, 'tab') } },
     { label: 'Open in new window', icon: 'openWindow', action: () => { void callbacks.open(tile.url, 'window') } },

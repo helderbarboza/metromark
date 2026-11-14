@@ -1,6 +1,13 @@
 <script lang='ts'>
-  import type { Settings } from '$lib/config'
+  import type { ImageBackgroundSettings, Settings, ShaderBackgroundSettings } from '$lib/config'
 
+  import {
+    clampDimensions,
+    isDataImageUri,
+    isMediaKey,
+    validateBackgroundUrl,
+    validateUploadFile,
+  } from '$lib/background-image'
   import Icon from '$lib/components/Icon.svelte'
   import { Button } from '$lib/components/ui/button'
   import { Input } from '$lib/components/ui/input'
@@ -8,14 +15,8 @@
   import { Slider } from '$lib/components/ui/slider'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
-  import {
-    clampDimensions,
-    isDataImageUri,
-    isMediaKey,
-    validateBackgroundUrl,
-    validateUploadFile,
-  } from '$lib/image-background'
   import { deleteBackgroundMedia, saveBackgroundMedia } from '$lib/media-store'
+  import { getSettingsContext } from '$lib/settings-context'
   import { NONE_SHADER_ID, shaders } from '$lib/shaders'
   import { BENCHMARK_LEVELS } from '$lib/shaders/benchmark'
   import { BENCHMARK_PRESENTATION } from '$lib/shaders/benchmark-ui'
@@ -26,20 +27,12 @@
   } from '$lib/shaders/benchmark.svelte'
   import { shaderMetrics } from '$lib/shaders/metrics.svelte'
   import { levelFps, levelFrame, levelWorst } from '$lib/shaders/quality'
-  import BackgroundColorMode from './BackgroundColorMode.svelte'
+  import BaseColorMode from './BaseColorMode.svelte'
   import CollapsibleSection from './CollapsibleSection.svelte'
   import SettingsRow from './SettingsRow.svelte'
   import ShaderThumb from './ShaderThumb.svelte'
 
-  interface Props {
-    settings: Settings
-    busy: boolean
-    onchange: (patch: Partial<Settings>) => void
-  }
-
   type BackgroundType = Settings['background']['type']
-  type ShaderBackground = Extract<Settings['background'], { type: 'shader' }>
-  type ImageBackground = Extract<Settings['background'], { type: 'image' }>
   const BACKGROUND_TYPES = ['color', 'image', 'shader'] as const satisfies readonly BackgroundType[]
   const BACKGROUND_TYPE_LABELS: Record<BackgroundType, string> = {
     color: 'Color',
@@ -49,7 +42,11 @@
   const SHADERS = Object.values(shaders)
   const IMAGE_FITS = ['cover', 'contain', 'fill', 'none'] as const
 
-  const { settings, busy, onchange }: Props = $props()
+  // The provider (SettingsDialog) owns the values; the closure stays reactive.
+  const ctx = getSettingsContext()
+  const settings = $derived(ctx().settings)
+  const busy = $derived(ctx().busy)
+  const onchange = (patch: Partial<Settings>) => ctx().update(patch)
 
   const nonePressed = $derived(
     settings.background.type === 'shader' && settings.background.shaderId === NONE_SHADER_ID,
@@ -81,13 +78,13 @@
     onchange({ background: { ...settings.background, auto, color } })
   }
 
-  function updateShader(patch: Partial<ShaderBackground>) {
+  function updateShader(patch: Partial<ShaderBackgroundSettings>) {
     if (settings.background.type !== 'shader')
       return
     onchange({ background: { ...settings.background, ...patch } })
   }
 
-  function updateImage(patch: Partial<ImageBackground>) {
+  function updateImage(patch: Partial<ImageBackgroundSettings>) {
     if (settings.background.type !== 'image')
       return
     onchange({ background: { ...settings.background, ...patch } })
@@ -562,7 +559,7 @@
     </Select.Root>
   {/snippet}
   {#if settings.background.type === 'color'}
-    <BackgroundColorMode
+    <BaseColorMode
       auto={autoColor}
       color={settings.background.color}
       {busy}
@@ -665,7 +662,7 @@
         <ToggleGroup.Item value='detail' class='grow'>Resolution</ToggleGroup.Item>
       </ToggleGroup.Root>
     </SettingsRow>
-    <BackgroundColorMode
+    <BaseColorMode
       auto={settings.background.auto ?? true}
       color={settings.background.color}
       {busy}
@@ -963,7 +960,7 @@
         {/each}
       </ToggleGroup.Root>
     </SettingsRow>
-    <BackgroundColorMode
+    <BaseColorMode
       auto={bg.auto ?? true}
       color={bg.color}
       busy={busy || uploading}

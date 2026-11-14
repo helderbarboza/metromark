@@ -78,7 +78,7 @@
     <SettingsCard
       icon='settings'
       title='Background effects'
-      helpText='Animated backgrounds can use more battery. Metro lowers the frame rate when hidden.'
+      helpText='Animated backgrounds use more battery. MetroMark lowers the frame rate when hidden'
       controlId='effects'
     >
       <select

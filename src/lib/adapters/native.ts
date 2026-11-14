@@ -3,8 +3,8 @@ import { normalizeTree } from '$lib/adapters/memory'
 import { validateUrl } from '$lib/url.js'
 import { browser } from 'wxt/browser'
 
-export const MESSAGE_SCOPE = 'metro-bookmarks/v1'
-export const STORAGE_KEY = 'metro.presentation.v1'
+export const MESSAGE_SCOPE = 'metromark/v1'
+export const STORAGE_KEY = 'metromark.presentation.v1'
 export function nativeBookmarks(): BookmarkPort {
   return {
     async getTree() { return normalizeTree(await browser.bookmarks.getTree()) },

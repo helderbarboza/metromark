@@ -1,14 +1,13 @@
 /**
  * Tile pointer interaction rules.
  *
- * uwp8.pdf, "Guidelines for cross-slide" (pp. 76-80) and "Guidelines for
- * targeting" (p. 104): touch has a small distance threshold (2.7 mm, roughly
+ * Cross-slide guidelines: touch has a small distance threshold (2.7 mm, roughly
  * 10 px at 1x) before a gesture counts as anything at all, and a larger one that
  * separates selecting an item from dragging it. A release before the larger
  * threshold selects; crossing it picks the tile up.
  *
- * The gesture must run perpendicular to the direction the surface pans (p. 76),
- * and this canvas pans horizontally - so only a mostly-vertical drag selects or
+ * The gesture must run perpendicular to the direction the surface pans, and
+ * this canvas pans horizontally - so only a mostly-vertical drag selects or
  * moves a tile. A horizontal swipe is left to the canvas to pan.
  */
 
@@ -70,9 +69,9 @@ export function releaseOutcome(gesture: Gesture): ReleaseOutcome {
 }
 
 /**
- * Selecting is marking without launching (uwp8 p. 79). Re-selecting the same
+ * Selecting is marking without launching. Re-selecting the same
  * tile cancels it, which is how a cross-slide on an already selected item
- * removes it from the selection (pp. 81-82). Multi-select is a planned
+ * removes it from the selection. Multi-select is a planned
  * follow-up for the app bar: swap the single id for a set here and in
  * `App.svelte`.
  */

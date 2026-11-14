@@ -1,31 +1,9 @@
+import type { DarkTheme, LightTheme, ThemeChoice, ThemeMode } from '$lib/themes.js'
+import { DARK_THEMES, DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME, LIGHT_THEMES } from '$lib/themes.js'
 import { mode, setMode, setTheme, systemPrefersMode } from 'mode-watcher'
 
-export const LIGHT_THEMES = [
-  'metro-light',
-  'fluent-light',
-  'catppuccin-latte',
-  'github',
-  'one-light',
-  'solarized-light',
-  'tokyo-night-light',
-] as const
-
-export const DARK_THEMES = [
-  'metro-dark',
-  'fluent-dark',
-  'catppuccin-frappe',
-  'catppuccin-macchiato',
-  'catppuccin-mocha',
-  'github-dark',
-  'one-dark',
-  'solarized-dark',
-  'tokyo-night-dark',
-] as const
-
-export type ThemeMode = 'light' | 'dark'
-export type LightTheme = (typeof LIGHT_THEMES)[number]
-export type DarkTheme = (typeof DARK_THEMES)[number]
-export type ThemeChoice = LightTheme | DarkTheme
+export { DARK_THEMES, LIGHT_THEMES } from '$lib/themes.js'
+export type { DarkTheme, LightTheme, ThemeChoice, ThemeMode } from '$lib/themes.js'
 
 export interface ThemeSelections {
   light: LightTheme
@@ -34,8 +12,8 @@ export interface ThemeSelections {
 
 const STORAGE_KEY = 'app-theme-selections'
 const DEFAULTS: ThemeSelections = {
-  light: 'metro-light',
-  dark: 'metro-dark',
+  light: DEFAULT_LIGHT_THEME,
+  dark: DEFAULT_DARK_THEME,
 }
 
 export function isOneOf<T extends string>(value: unknown, values: readonly T[]): value is T {

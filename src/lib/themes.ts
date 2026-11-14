@@ -1,0 +1,64 @@
+// Single source of truth for themes. Hex values come verbatim from the
+// Tinted Theming gallery (base16 schemes, https://tinted-theming.github.io/tinted-gallery/).
+// The theme blocks in src/styles.css and the THEME_COLORS map in public/init-mode.js
+// are GENERATED from this file. Run `npm run generate:themes` after editing; do not edit
+// the marked regions by hand.
+export interface Theme {
+  /** Theme name used in data-theme, localStorage and selectors. Gallery slug without 'base16-'. */
+  name: string
+  /** Gallery variant. */
+  mode: 'light' | 'dark'
+  /** Display name for UI (Storybook backgrounds). */
+  label: string
+  base00: string
+  base01: string
+  base02: string
+  base03: string
+  base04: string
+  base05: string
+  base06: string
+  base07: string
+  base08: string
+  base09: string
+  base0A: string
+  base0B: string
+  base0C: string
+  base0D: string
+  base0E: string
+  base0F: string
+}
+
+export const THEMES = [
+  { name: 'catppuccin-latte', mode: 'light', label: 'Catppuccin Latte', base00: '#eff1f5', base01: '#e6e9ef', base02: '#ccd0da', base03: '#bcc0cc', base04: '#acb0be', base05: '#4c4f69', base06: '#dc8a78', base07: '#7287fd', base08: '#d20f39', base09: '#fe640b', base0A: '#df8e1d', base0B: '#40a02b', base0C: '#179299', base0D: '#1e66f5', base0E: '#8839ef', base0F: '#dd7878' },
+  { name: 'github', mode: 'light', label: 'GitHub Light', base00: '#ffffff', base01: '#f6f8fa', base02: '#d1d9e0', base03: '#818b98', base04: '#59636e', base05: '#454c54', base06: '#25292e', base07: '#1f2328', base08: '#cf222e', base09: '#953800', base0A: '#9a6700', base0B: '#116329', base0C: '#1b7c83', base0D: '#0969da', base0E: '#8250df', base0F: '#a40e26' },
+  { name: 'one-light', mode: 'light', label: 'One Light', base00: '#fafafa', base01: '#f0f0f1', base02: '#e5e5e6', base03: '#a0a1a7', base04: '#696c77', base05: '#383a42', base06: '#202227', base07: '#090a0b', base08: '#ca1243', base09: '#d75f00', base0A: '#c18401', base0B: '#50a14f', base0C: '#0184bc', base0D: '#4078f2', base0E: '#a626a4', base0F: '#986801' },
+  { name: 'solarized-light', mode: 'light', label: 'Solarized Light', base00: '#fdf6e3', base01: '#eee8d5', base02: '#93a1a1', base03: '#839496', base04: '#657b83', base05: '#586e75', base06: '#073642', base07: '#002b36', base08: '#dc322f', base09: '#cb4b16', base0A: '#b58900', base0B: '#859900', base0C: '#2aa198', base0D: '#268bd2', base0E: '#6c71c4', base0F: '#d33682' },
+  { name: 'tokyo-night-light', mode: 'light', label: 'Tokyo Night Light', base00: '#d5d6db', base01: '#cbccd1', base02: '#dfe0e5', base03: '#9699a3', base04: '#4c505e', base05: '#343b59', base06: '#1a1b26', base07: '#1a1b26', base08: '#343b58', base09: '#965027', base0A: '#166775', base0B: '#485e30', base0C: '#3e6968', base0D: '#34548a', base0E: '#5a4a78', base0F: '#8c4351' },
+  { name: 'catppuccin-frappe', mode: 'dark', label: 'Catppuccin Frappe', base00: '#303446', base01: '#292c3c', base02: '#414559', base03: '#51576d', base04: '#626880', base05: '#c6d0f5', base06: '#f2d5cf', base07: '#babbf1', base08: '#e78284', base09: '#ef9f76', base0A: '#e5c890', base0B: '#a6d189', base0C: '#81c8be', base0D: '#8caaee', base0E: '#ca9ee6', base0F: '#eebebe' },
+  { name: 'catppuccin-macchiato', mode: 'dark', label: 'Catppuccin Macchiato', base00: '#24273a', base01: '#1e2030', base02: '#363a4f', base03: '#494d64', base04: '#5b6078', base05: '#cad3f5', base06: '#f4dbd6', base07: '#b7bdf8', base08: '#ed8796', base09: '#f5a97f', base0A: '#eed49f', base0B: '#a6da95', base0C: '#8bd5ca', base0D: '#8aadf4', base0E: '#c6a0f6', base0F: '#f0c6c6' },
+  { name: 'catppuccin-mocha', mode: 'dark', label: 'Catppuccin Mocha', base00: '#1e1e2e', base01: '#181825', base02: '#313244', base03: '#45475a', base04: '#585b70', base05: '#cdd6f4', base06: '#f5e0dc', base07: '#b4befe', base08: '#f38ba8', base09: '#fab387', base0A: '#f9e2af', base0B: '#a6e3a1', base0C: '#94e2d5', base0D: '#89b4fa', base0E: '#cba6f7', base0F: '#f2cdcd' },
+  { name: 'github-dark', mode: 'dark', label: 'GitHub Dark', base00: '#0d1117', base01: '#151b23', base02: '#2f3742', base03: '#656c76', base04: '#9198a1', base05: '#d1d7e0', base06: '#f0f6fc', base07: '#ffffff', base08: '#ff7b72', base09: '#ffa657', base0A: '#d29922', base0B: '#3fb950', base0C: '#39c5cf', base0D: '#58a6ff', base0E: '#be8fff', base0F: '#ffa198' },
+  { name: 'one-dark', mode: 'dark', label: 'One Dark', base00: '#282c34', base01: '#353b45', base02: '#3e4451', base03: '#545862', base04: '#565c64', base05: '#abb2bf', base06: '#b6bdca', base07: '#c8ccd4', base08: '#e06c75', base09: '#d19a66', base0A: '#e5c07b', base0B: '#98c379', base0C: '#56b6c2', base0D: '#61afef', base0E: '#c678dd', base0F: '#be5046' },
+  { name: 'solarized-dark', mode: 'dark', label: 'Solarized Dark', base00: '#002b36', base01: '#073642', base02: '#586e75', base03: '#657b83', base04: '#839496', base05: '#93a1a1', base06: '#eee8d5', base07: '#fdf6e3', base08: '#dc322f', base09: '#cb4b16', base0A: '#b58900', base0B: '#859900', base0C: '#2aa198', base0D: '#268bd2', base0E: '#6c71c4', base0F: '#d33682' },
+  { name: 'tokyo-night-moon', mode: 'dark', label: 'Tokyo Night Moon', base00: '#222436', base01: '#1e2030', base02: '#2d3f76', base03: '#3b4261', base04: '#636da6', base05: '#828bb8', base06: '#aeb4d1', base07: '#c8d3f5', base08: '#ff757f', base09: '#ffc777', base0A: '#ffdf77', base0B: '#c3e88d', base0C: '#86e1fc', base0D: '#82aaff', base0E: '#fca7ea', base0F: '#c53b53' },
+] as const satisfies readonly Theme[]
+
+export type ThemeName = (typeof THEMES)[number]['name']
+export type LightTheme = Extract<(typeof THEMES)[number], { mode: 'light' }>['name']
+export type DarkTheme = Extract<(typeof THEMES)[number], { mode: 'dark' }>['name']
+export type ThemeMode = (typeof THEMES)[number]['mode']
+export type ThemeChoice = ThemeName
+
+export const LIGHT_THEMES = THEMES.filter((theme): theme is Extract<(typeof THEMES)[number], { mode: 'light' }> => theme.mode === 'light').map(theme => theme.name) satisfies readonly LightTheme[]
+export const DARK_THEMES = THEMES.filter((theme): theme is Extract<(typeof THEMES)[number], { mode: 'dark' }> => theme.mode === 'dark').map(theme => theme.name) satisfies readonly DarkTheme[]
+
+export const DEFAULT_LIGHT_THEME: LightTheme = 'catppuccin-latte'
+export const DEFAULT_DARK_THEME: DarkTheme = 'catppuccin-mocha'
+
+export function getTheme(name: ThemeName | string): (typeof THEMES)[number] | undefined {
+  return THEMES.find(theme => theme.name === name)
+}
+
+export function themeBase00(name: ThemeName | string): string | undefined {
+  return getTheme(name)?.base00
+}

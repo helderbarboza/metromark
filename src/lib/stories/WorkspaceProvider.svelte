@@ -15,6 +15,7 @@
     dragging: state.dragging ?? false,
     selectedId: state.selectedId ?? null,
     reducedMotion: state.reducedMotion ?? false,
+    originalFavicons: state.originalFavicons ?? false,
   }))
 </script>
 

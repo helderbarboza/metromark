@@ -4,8 +4,8 @@ import { BookmarkCoordinator } from '$lib/coordinator'
 import { demoData, demoTree } from '$lib/demo'
 import { validateUrl } from '$lib/url.js'
 
-const TREE_KEY = 'metro.preview.bookmarks.v1'
-const DATA_KEY = 'metro.preview.presentation.v1'
+const TREE_KEY = 'metromark.preview.bookmarks.v1'
+const DATA_KEY = 'metromark.preview.presentation.v1'
 const MODE_KEY = 'mode-watcher-mode'
 const THEME_KEY = 'mode-watcher-theme'
 function isValidJson<T>(_value: unknown, _fallback: T): _value is T {

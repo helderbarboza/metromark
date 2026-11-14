@@ -1,8 +1,8 @@
 <script lang='ts'>
   import type { ShaderDefinition } from '$lib/shaders'
   import type { ShaderBenchmarkResult } from '$lib/shaders/benchmark.svelte'
-  import Background from '$lib/components/Background.svelte'
   import Icon from '$lib/components/Icon.svelte'
+  import ShaderBackground from '$lib/components/ShaderBackground.svelte'
   import { Button } from '$lib/components/ui/button'
   import { BENCHMARK_PRESENTATION } from '$lib/shaders/benchmark-ui'
 
@@ -59,7 +59,7 @@
 >
   {#if shader}
     <span class='relative isolate block aspect-video w-full overflow-hidden bg-black'>
-      <Background
+      <ShaderBackground
         {shader}
         reducedMotion={reducedMotion}
         animated={animated}

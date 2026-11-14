@@ -1,0 +1,113 @@
+name: Release
+
+# Manual dispatch only. Builds and packages the release artifacts, verifies the
+# checksums, and optionally attaches them to the GitHub Release for the tag.
+# Signing and store submission stay manual.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag of the GitHub Release to create or update (for example v0.2.0)
+        required: true
+        default: v0.2.0
+      version:
+        description: Version baked into the artifacts (must match package.json)
+        required: true
+        default: 0.2.0
+      publish_release:
+        description: Attach the artifacts to the GitHub Release for the tag
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Install Playwright chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Storybook tests
+        run: npm run test:stories
+
+      - name: Assert version matches package.json
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "$PKG_VERSION" != "$VERSION" ]; then
+            echo "package.json version $PKG_VERSION does not match the input $VERSION" >&2
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Package
+        run: npm run package
+
+      - name: Verify checksums
+        working-directory: release
+        run: sha256sum -c SHA256SUMS.txt
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: metromark-${{ inputs.version }}
+          path: |
+            release/*.zip
+            release/*.xpi
+            release/SHA256SUMS.txt
+            release/INSTALL.md
+            release/PRIVACY.md
+            release/NOTICE.md
+          retention-days: 30
+
+  release:
+    needs: build
+    if: inputs.publish_release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: metromark-${{ inputs.version }}
+          path: artifacts
+
+      - name: Create or update the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          NOTES="MetroMark $VERSION development builds, built by the release workflow. Not store-published. Firefox XPI is unsigned; permanent standard Firefox installs need Mozilla signing. Chrome loads through Load unpacked. See docs/INSTALL.md, PRIVACY.md and NOTICE.md in the repository."
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" artifacts/* --clobber
+          else
+            gh release create "$TAG" artifacts/* --title "MetroMark $VERSION" --notes "$NOTES"
+          fi

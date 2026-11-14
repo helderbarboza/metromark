@@ -1,6 +1,7 @@
 import type { BookmarkNode, GroupView, Snapshot } from '$lib/types'
+import { FOLDER_PREVIEW, isLayoutable, orderByLayout, toPreviewCell } from '$lib/folder-preview'
 import { reconcileLayout, sizeOf } from '$lib/layout-constants'
-import { tileFor } from '$lib/tile'
+import { tileFor, tileForFolder } from '$lib/tile'
 
 export const isBookmark = (node: BookmarkNode) => typeof node.url === 'string' && node.type !== 'separator'
 export const isFolder = (node: BookmarkNode) => !isBookmark(node) && node.type !== 'separator'
@@ -46,30 +47,27 @@ export function canAddTo(node: BookmarkNode, tree: BookmarkNode[]): boolean {
 }
 export function projectGroups(snapshot: Snapshot): GroupView[] {
   const nodes = indexTree(snapshot.tree)
-  const result: GroupView[] = []
+  // Phase 1: lay out every folder group. Layout order is shared with the
+  // folder tile preview, so all layouts must exist before tiles are built.
+  interface Draft {
+    node: BookmarkNode
+    path: string[]
+    rootId: string
+    layoutable: BookmarkNode[]
+    layout: ReturnType<typeof reconcileLayout>
+  }
+  const drafts: Draft[] = []
   const walk = (node: BookmarkNode, path: string[], rootId: string) => {
     if (!isFolder(node))
       return
     const currentPath = [...path, node.title || 'Untitled folder']
-    const links = (node.children ?? []).filter(isBookmark)
-    const layout = reconcileLayout(links, snapshot.layouts[node.id], snapshot.appearance)
-    const tiles = Object.fromEntries(links.map((bookmark) => {
-      const tile = tileFor(bookmark, snapshot.appearance[bookmark.id])
-      tile.writable = !isManaged(bookmark, nodes)
-      const item = layout.find(entry => entry.i === bookmark.id)
-      tile.size = item ? sizeOf(item) : tile.size
-      return [bookmark.id, tile]
-    }))
-    result.push({
-      id: node.id,
-      title: node.title || 'Untitled folder',
+    const layoutable = (node.children ?? []).filter(isLayoutable)
+    drafts.push({
+      node,
       path: currentPath,
       rootId,
-      isSystem: isContainer(node, snapshot.tree),
-      mutable: canModify(node, snapshot.tree),
-      writable: !isManaged(node, nodes),
-      layout,
-      tiles,
+      layoutable,
+      layout: reconcileLayout(layoutable, snapshot.layouts[node.id], snapshot.appearance),
     })
     for (const child of node.children ?? []) {
       if (isFolder(child))
@@ -81,6 +79,42 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
       if (isFolder(container))
         walk(container, [], container.id)
     }
+  }
+  const draftsById = new Map(drafts.map(draft => [draft.node.id, draft]))
+  // Phase 2: build groups. Folder children become folder tiles whose preview
+  // reads from the folder's own draft layout.
+  const result: GroupView[] = []
+  const buildTiles = (draft: Draft): Record<string, GroupView['tiles'][string]> => Object.fromEntries(draft.layoutable.map((child): [string, GroupView['tiles'][string]] => {
+    const item = draft.layout.find(entry => entry.i === child.id)
+    if (isFolder(child)) {
+      const tile = tileForFolder(child, snapshot.appearance[child.id])
+      tile.writable = !isManaged(child, nodes)
+      tile.size = item ? sizeOf(item) : tile.size
+      const childDraft = draftsById.get(child.id)
+      const ordered = childDraft ? orderByLayout(childDraft.layoutable, childDraft.layout) : []
+      tile.preview = ordered.slice(0, FOLDER_PREVIEW[tile.size]).map(node => toPreviewCell(node, snapshot.appearance))
+      return [child.id, tile]
+    }
+    const tile = tileFor(child, snapshot.appearance[child.id])
+    tile.writable = !isManaged(child, nodes)
+    tile.size = item ? sizeOf(item) : tile.size
+    return [child.id, tile]
+  }))
+  for (const draft of drafts) {
+    const { node, path, rootId, layout } = draft
+    result.push({
+      id: node.id,
+      title: node.title || 'Untitled folder',
+      path,
+      rootId,
+      isSystem: isContainer(node, snapshot.tree),
+      mutable: canModify(node, snapshot.tree),
+      writable: !isManaged(node, nodes),
+      layout,
+      tiles: buildTiles(draft),
+    })
+  }
+  for (const root of snapshot.tree) {
     const links = (root.children ?? []).filter(isBookmark)
     if (links.length) {
       result.unshift(

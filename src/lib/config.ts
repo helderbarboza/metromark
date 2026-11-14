@@ -52,6 +52,8 @@ export const SettingsSchema = v.object({
   density: v.union([v.literal('comfortable'), v.literal('compact')]),
   /** Show domain names on tiles */
   showDomains: v.boolean(),
+  /** Show the site's full-color favicon instead of a single-color Metro glyph */
+  originalFavicons: v.boolean(),
   /** Honor prefers-reduced-motion */
   reducedMotion: v.boolean(),
   /** Selected background shader id */
@@ -64,10 +66,15 @@ export const SettingsSchema = v.object({
 
 export type Settings = v.InferOutput<typeof SettingsSchema>
 
+export type ColorBackgroundSettings = Extract<Settings['background'], { type: 'color' }>
+export type ShaderBackgroundSettings = Extract<Settings['background'], { type: 'shader' }>
+export type ImageBackgroundSettings = Extract<Settings['background'], { type: 'image' }>
+
 /** Default values (used when config sources omit a key) */
 export const SETTINGS_DEFAULTS: Settings = {
   density: 'comfortable',
   showDomains: true,
+  originalFavicons: false,
   reducedMotion: false,
   background: { type: 'color', auto: true, color: undefined },
 } as const
@@ -92,37 +99,59 @@ export const BACKGROUND_DEFAULTS = {
 } satisfies Record<Settings['background']['type'], Settings['background']>
 
 /** Environment variable prefix for override */
-const ENV_PREFIX = 'METRO_'
+const ENV_PREFIX = 'METROMARK_'
+
+function invalidEnv(key: string, value: string, expected: string): Error {
+  return new Error(`Invalid ${key}: ${JSON.stringify(value)} (expected ${expected})`)
+}
+
+function parseBooleanEnv(key: string, value: string): boolean {
+  if (value === 'true')
+    return true
+  if (value === 'false')
+    return false
+  throw invalidEnv(key, value, '"true" or "false"')
+}
 
 /**
  * Load settings from hierarchical sources:
- * 1. Environment variables (METRO_DENSITY, METRO_SHOW_DOMAINS, METRO_REDUCED_MOTION, METRO_SHADER_ID)
+ * 1. Environment variables (METROMARK_DENSITY, METROMARK_SHOW_DOMAINS, METROMARK_ORIGINAL_FAVICONS, METROMARK_REDUCED_MOTION, METROMARK_SHADER_ID)
  * 2. Fallback to defaults
- * Throws on validation failure (fail-fast)
+ * Throws on validation failure (fail-fast). Throws if a recognized METROMARK_*
+ * variable holds an invalid value; the error names the key and the value.
  */
 export function loadSettings(env: Record<string, string | undefined> = import.meta.env): Settings {
   const fromEnv: Partial<Settings> = {}
-  if (env[`${ENV_PREFIX}DENSITY`] !== undefined) {
-    const density = env[`${ENV_PREFIX}DENSITY`]
-    if (density === 'comfortable' || density === 'compact') {
-      fromEnv.density = density
-    }
+  const densityEnv = env[`${ENV_PREFIX}DENSITY`]
+  if (densityEnv !== undefined) {
+    if (densityEnv !== 'comfortable' && densityEnv !== 'compact')
+      throw invalidEnv(`${ENV_PREFIX}DENSITY`, densityEnv, '"comfortable" or "compact"')
+    fromEnv.density = densityEnv
   }
-  if (env[`${ENV_PREFIX}SHOW_DOMAINS`] !== undefined) {
-    fromEnv.showDomains = env[`${ENV_PREFIX}SHOW_DOMAINS`] === 'true'
+  const showDomainsEnv = env[`${ENV_PREFIX}SHOW_DOMAINS`]
+  if (showDomainsEnv !== undefined) {
+    fromEnv.showDomains = parseBooleanEnv(`${ENV_PREFIX}SHOW_DOMAINS`, showDomainsEnv)
   }
-  if (env[`${ENV_PREFIX}REDUCED_MOTION`] !== undefined) {
-    fromEnv.reducedMotion = env[`${ENV_PREFIX}REDUCED_MOTION`] === 'true'
+  const originalFaviconsEnv = env[`${ENV_PREFIX}ORIGINAL_FAVICONS`]
+  if (originalFaviconsEnv !== undefined) {
+    fromEnv.originalFavicons = parseBooleanEnv(`${ENV_PREFIX}ORIGINAL_FAVICONS`, originalFaviconsEnv)
   }
-  if (env[`${ENV_PREFIX}SHADER_ID`] !== undefined) {
-    fromEnv.background = { type: 'shader', shaderId: env[`${ENV_PREFIX}SHADER_ID`], quality: 'motion' }
+  const reducedMotionEnv = env[`${ENV_PREFIX}REDUCED_MOTION`]
+  if (reducedMotionEnv !== undefined) {
+    fromEnv.reducedMotion = parseBooleanEnv(`${ENV_PREFIX}REDUCED_MOTION`, reducedMotionEnv)
+  }
+  const shaderIdEnv = env[`${ENV_PREFIX}SHADER_ID`]
+  if (shaderIdEnv !== undefined) {
+    if (shaderIdEnv.length === 0)
+      throw invalidEnv(`${ENV_PREFIX}SHADER_ID`, shaderIdEnv, 'a non-empty shader id')
+    fromEnv.background = { type: 'shader', shaderId: shaderIdEnv, quality: 'motion' }
   }
 
   const merged = { ...SETTINGS_DEFAULTS, ...fromEnv }
   const result = v.safeParse(SettingsSchema, merged)
   if (!result.success) {
     const issues = v.flatten(result.issues).nested
-    throw new Error(`Invalid Metro settings: ${JSON.stringify(issues)}`)
+    throw new Error(`Invalid MetroMark settings: ${JSON.stringify(issues)}`)
   }
   return result.output
 }

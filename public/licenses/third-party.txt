@@ -1,4 +1,4 @@
-Metro Bookmarks — dependency license notices
+MetroMark — dependency license notices
 
 The following texts are supplied by installed runtime dependencies. Some packages provide build-time parts in addition to browser runtime code.
 

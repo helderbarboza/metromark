@@ -1,7 +1,7 @@
 /**
  * Shared WebGL pipeline for the animated shaders.
  *
- * The live background (`Background.svelte`) and the offscreen benchmark
+ * The live background (`ShaderBackground.svelte`) and the offscreen benchmark
  * (`benchmark.ts`) build the same programs, buffers and textures through
  * `createPipeline`. The pipeline owns everything GL-related; callers own
  * scheduling (the animation frame loop, or the benchmark's timed loop).
@@ -609,13 +609,13 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
         }
         catch (error) {
           entry.failed = true
-          console.error('[Background] Unable to upload a shader texture.', error)
+          console.error('[shader-background] Unable to upload a shader texture.', error)
         }
       }
       image.onerror = () => {
         entry.failed = true
         console.error(
-          `[Background] Unable to load the shader texture "${url}"; using the generated noise.`,
+          `[shader-background] Unable to load the shader texture "${url}"; using the generated noise.`,
         )
       }
       image.src = url
@@ -690,7 +690,7 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
           if (!warnedChannels.has(key)) {
             warnedChannels.add(key)
             console.warn([
-              `[Background] The "${definition.id}" shader samples iChannel${i}, `,
+              `[shader-background] The "${definition.id}" shader samples iChannel${i}, `,
               'but no texture is bound to it. ',
               'The GPU reads an incomplete texture, which samples as black; ',
               'declare a channel source in the shader definition.',

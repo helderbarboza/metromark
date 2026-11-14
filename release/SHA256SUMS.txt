@@ -1,5 +1,0 @@
-1a9366cd4907b4c93fcd918797af4ce5a287aa374651d8c865b928c5e19cd186  metro-bookmarks-0.1.0-bundle.zip
-be2c9cf8564457fa8f5b071ce37fd5708b2dc441a8c107fad100997a97196863  metro-bookmarks-chrome-0.1.0.zip
-c13821b59fa163e6f48c4ec0bb94b221cd6e42c92cd9412ca23cb233669664a4  metro-bookmarks-firefox-0.1.0.zip
-c13821b59fa163e6f48c4ec0bb94b221cd6e42c92cd9412ca23cb233669664a4  metro-bookmarks-firefox-0.1.0-unsigned.xpi
-7b71992957e0162982b5da0312f4b19e32df707b9f7474c5107cc0526c932da5  metro-bookmarks-source-0.1.0.zip

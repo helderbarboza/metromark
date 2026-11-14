@@ -1,0 +1,73 @@
+<script lang='ts'>
+  import Icon from '$lib/components/Icon.svelte'
+  import { Button } from '$lib/components/ui/button'
+
+  interface Props {
+    /** Which empty/loading state to render. */
+    variant: 'loading' | 'no-results' | 'no-folders'
+    /** Loading variant only: the load failure, if any. */
+    loadError?: string
+    /** No-results variant only: the query that produced no matches. */
+    query?: string
+    /** No-results variant only: clear the search box. */
+    onclearsearch?: () => void
+  }
+
+  const { variant, loadError = '', query = '', onclearsearch }: Props = $props()
+</script>
+
+{#if variant === 'loading'}
+  <div
+    class='
+      flex size-full min-h-60 flex-col items-center justify-center text-center
+      text-(--muted-foreground)
+    '
+  >
+    {#if loadError}
+      <Icon name='lock' size={28} />
+      <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
+        Let's reconnect.
+      </h2>
+      <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
+      <button onclick={() => window.location.reload()}>
+        Reload page
+      </button>
+    {:else}
+      <span
+        class='
+          mb-5 size-6 animate-spin rounded-full border border-(--border)
+          border-t-(--primary)
+        '
+      >
+      </span>
+      <p class='mb-6 px-5 text-xs/relaxed'>
+        Finding your favorites…
+      </p>
+    {/if}
+  </div>
+{:else if variant === 'no-results'}
+  <div class='flex size-full min-h-60 flex-col items-center justify-center border'>
+    <Icon name='searchBookmarks' size={33} />
+    <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
+      No favorites found.
+    </h2>
+    <p class='mb-6 px-5 text-xs/relaxed'>
+      Nothing matches “{query}”. Try a title, website, or folder.
+    </p>
+    <Button onclick={onclearsearch}>Clear search</Button>
+  </div>
+{:else}
+  <div
+    class='
+      flex size-full min-h-60 flex-col items-center justify-center text-center
+      text-(--muted-foreground)
+    '
+  >
+    <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
+      No bookmark folders available.
+    </h2>
+    <p class='mb-6 px-5 text-xs/relaxed'>
+      Create a writable browser bookmark folder to get started.
+    </p>
+  </div>
+{/if}

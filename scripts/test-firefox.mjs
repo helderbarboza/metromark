@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { download } from 'geckodriver'
@@ -9,7 +9,7 @@ import { Options, ServiceBuilder } from 'selenium-webdriver/firefox.js'
 import { archiveFolder } from './archive.mjs'
 
 // A disposable profile only; never opens or changes the user's browser profile.
-const temporary = await mkdtemp(path.join(os.tmpdir(), 'metro-firefox-'))
+const temporary = await mkdtemp(path.join(os.tmpdir(), 'metromark-firefox-'))
 const zip = path.join(temporary, 'extension.zip')
 await writeFile(zip, await archiveFolder(path.resolve('.output/firefox-mv3')))
 process.env.MOZ_DISABLE_CONTENT_SANDBOX = '1'
@@ -20,7 +20,7 @@ try {
   const service = new ServiceBuilder(await download()).addArguments('--allow-system-access')
   driver = await new Builder().forBrowser('firefox').setFirefoxOptions(options).setFirefoxService(service).build()
   const addon = await driver.installAddon(zip, true)
-  assert.equal(addon, 'metro-bookmarks@local.example')
+  assert.equal(addon, 'metromark@local.example')
   const before = await driver.getAllWindowHandles()
   await driver.setContext('chrome')
   const override = await driver.executeScript('const {AboutNewTab}=ChromeUtils.importESModule(\'resource:///modules/AboutNewTab.sys.mjs\');return AboutNewTab.newTabURL')
@@ -34,7 +34,7 @@ try {
   }, 10000)
   await driver.switchTo().window(handles.find(handle => !before.includes(handle)))
   await driver.wait(until.elementLocated(By.css('[data-testid="metro-group"]')), 20000)
-  assert.match(await driver.findElement(By.css('footer')).getText(), /bookmarks, \d+ folders/)
+  assert.match(await driver.findElement(By.css('footer')).getText(), /bookmarks\s+\d+\s+folders/)
   assert.equal(await driver.getCurrentUrl(), override)
   console.log('PASS Firefox native new-tab override and connected boot')
 
@@ -45,7 +45,7 @@ try {
   console.log('PASS Firefox native API create/edit → open new-tab page')
 
   await driver.actions().contextClick(await driver.findElement(By.css('a[aria-label^="Open Firefox external edit"]'))).perform()
-  await driver.findElement(By.xpath('//button[@role="menuitem" and normalize-space(.)="Delete bookmark"]')).click()
+  await driver.findElement(By.css('button[aria-label="Delete selected bookmark"]')).click()
   await driver.wait(async () => (await driver.findElements(By.css('a[aria-label^="Open Firefox external edit"]'))).length === 0, 10000)
   assert.equal(await driver.executeScript('return browser.bookmarks.search({title:"Firefox external edit"}).then(nodes=>nodes.length)'), 0)
   await driver.findElement(By.xpath('//button[normalize-space(.)="Undo"]')).click()
@@ -71,7 +71,22 @@ try {
   await driver.switchTo().window(first)
   await driver.wait(until.elementLocated(By.css('a[aria-label^="Open Firefox across tabs"]')), 10000)
   console.log('PASS Firefox real-time native updates across two new-tab pages')
-  await writeFile('release/firefox-verification.txt', 'Firefox native new-tab override, connected boot, native API create/edit, tile delete/Undo, and cross-tab updates: PASS\n')
+  await mkdir('docs/verification', { recursive: true })
+  const { version } = JSON.parse(await readFile('package.json', 'utf8'))
+  const stamp = new Date().toISOString()
+  await writeFile(`docs/verification/${stamp.slice(0, 10)}-firefox.txt`, [
+    `MetroMark ${version} — Firefox native verification (${stamp})`,
+    'Build: .output/firefox-mv3 as packaged by npm run package',
+    'Browser: Playwright Firefox, headless, disposable profile (never the personal profile)',
+    '',
+    'PASS Firefox native new-tab override and connected boot',
+    'PASS Firefox native API create/edit → open new-tab page',
+    'PASS Firefox tile delete → native bookmark removal; Undo → native restoration',
+    'PASS Firefox real-time native updates across two new-tab pages',
+    '',
+    'Not covered here: Chrome native verification, store review, signing, permanent Firefox install.',
+    '',
+  ].join('\n'))
 }
 catch (error) {
   if (driver) {

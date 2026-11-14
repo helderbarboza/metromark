@@ -1,79 +1,3 @@
-<script lang='ts' module>
-  import { cn, tv } from 'tailwind-variants'
-
-  export const tileVariants = tv({
-    slots: {
-      root: `
-        metro-tile relative block size-full border border-border/50 bg-(--tile-bg)
-        font-sans text-(--tile-fg) no-underline
-        transition-[transform,scale,outline-color,box-shadow,opacity] duration-160
-        ease-fluent
-        hover:outline-2 hover:-outline-offset-2 hover:outline-(--tile-fg)/35
-        focus-visible:z-2 focus-visible:outline-[3px] focus-visible:outline-offset-3
-        focus-visible:outline-(--primary)
-        in-[.reduced]:active:transform-none
-        motion-reduce:transition-none
-        motion-reduce:active:transform-none
-      `,
-      icon: `absolute inset-0 flex items-center justify-center`,
-      label: `absolute inset-x-0 bottom-0 mx-4 mb-2 flex translate-y-1 flex-col text-left`,
-      title: 'truncate text-xs/tight font-normal',
-      domain: `truncate text-[10px]/tight font-normal`,
-      check: `
-        absolute top-0 right-0 flex items-start justify-end bg-(--tile-fg) pb-3 pl-3
-        text-(--tile-bg) [clip-path:polygon(100%_0,0_0,100%_100%)]
-      `,
-      badge: `
-        absolute top-2.5 left-3 flex h-5.5 min-w-5.5 items-center justify-center
-        rounded-[11px] bg-(--tile-fg) px-1.5 text-xs leading-none font-semibold
-        text-(--tile-bg)
-      `,
-    },
-    variants: {
-      size: {
-        small: {
-          icon: `pb-0`,
-        },
-        medium: {
-          icon: `pb-6`,
-        },
-        wide: {
-          icon: `pb-6`,
-        },
-        large: {
-          icon: `pb-6.5`,
-        },
-      },
-      selected: {
-        true: {
-          root: `
-            selected outline-[3px] outline-offset-[-3px] outline-(--tile-fg)
-            hover:outline-[3px] hover:outline-offset-[-3px] hover:outline-(--tile-fg)
-          `,
-        },
-      },
-      revealed: {
-        false: {
-          root: `
-            active:transform-[perspective(600px)_rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))_scale(.97)]
-          `,
-        },
-        true: {
-          root: `
-            revealed translate-y-1.5
-            active:transform-[translateY(6px)_perspective(600px)_rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))_scale(.97)]
-          `,
-        },
-      },
-    },
-    defaultVariants: {
-      size: 'medium',
-      selected: false,
-      revealed: false,
-    },
-  })
-</script>
-
 <script lang='ts'>
   import type { MetroTileDef, TileSize } from '$lib/types'
   import type { Snippet } from 'svelte'
@@ -85,6 +9,9 @@
   import { getTileGrid as getTileGridContext, hasTileGrid } from '$lib/tile-grid-context'
   import { safeUrl } from '$lib/url'
   import { mode, theme } from 'mode-watcher'
+  import { cn } from 'tailwind-variants'
+  import { tileVariants } from './tile-variants'
+  import { tilt } from './tilt'
   import Button from './ui/button/button.svelte'
 
   interface Props {
@@ -95,6 +22,8 @@
     domain?: string
     showDomain?: boolean
     children?: Snippet
+    /** Rendered element: 'a' when the tile launches a URL, 'button' otherwise. */
+    as?: 'a' | 'button'
     href?: string
     target?: string
     rel?: string
@@ -109,7 +38,7 @@
     /** Tile id for plain (non-draggable) tiles so context menus can find the owner. */
     dataTileId?: string
     dataDragging?: boolean
-    attach?: (node: HTMLAnchorElement) => void | (() => void)
+    attach?: (node: HTMLElement) => void | (() => void)
     /** Called with the target size on quick grow/shrink tap. Omit to hide it. */
     onresize?: (size: TileSize) => void
     onclick?: (event: MouseEvent) => void
@@ -127,6 +56,7 @@
     domain = '',
     showDomain = true,
     children,
+    as = 'a',
     href,
     target,
     rel = 'noopener noreferrer',
@@ -153,7 +83,11 @@
   const readTileGrid = hasTileGrid() ? getTileGridContext() : undefined
   const cell = $derived(readTileGrid?.().cell)
   const gap = $derived(readTileGrid?.().gap ?? GAP)
+  const isLink = $derived(as === 'a')
   const launchHref = $derived(href ?? safeUrl(tile.url ?? ''))
+  const elementProps = $derived(isLink
+    ? { href: launchHref, target, rel }
+    : { type: 'button' as const })
   const fallbackOpenLabel = $derived(
     `Open ${tile.title}${showDomain && domain && size !== 'small'
       ? ` ${domain}`
@@ -192,38 +126,7 @@
 
   const ui = $derived(tileVariants({ size, selected, revealed }))
 
-  // Metro "tilt": the tile leans away from where you press it. Purely decorative
-  // press feedback (uwp8 p. 108); CSS drops it under reduced motion. Attached
-  // imperatively so the visual wrapper needs no interactive ARIA role.
-  function tilt(node: HTMLElement) {
-    const lean = (event: PointerEvent) => {
-      const rect = node.getBoundingClientRect()
-      if (!rect.width || !rect.height)
-        return
-      node.style.setProperty(
-        '--tilt-x',
-        `${(-((event.clientY - rect.top) / rect.height - 0.5) * 14).toFixed(1)}deg`,
-      )
-      node.style.setProperty(
-        '--tilt-y',
-        `${(((event.clientX - rect.left) / rect.width - 0.5) * 14).toFixed(1)}deg`,
-      )
-    }
-    const settle = () => {
-      node.style.setProperty('--tilt-x', '0deg')
-      node.style.setProperty('--tilt-y', '0deg')
-    }
-    node.addEventListener('pointerdown', lean)
-    node.addEventListener('pointerup', settle)
-    node.addEventListener('pointercancel', settle)
-    node.addEventListener('pointerleave', settle)
-    return () => {
-      node.removeEventListener('pointerdown', lean)
-      node.removeEventListener('pointerup', settle)
-      node.removeEventListener('pointercancel', settle)
-      node.removeEventListener('pointerleave', settle)
-    }
-  }
+// tilt is shared with FolderTile.
 </script>
 
 <div
@@ -232,17 +135,16 @@
   style={style}
   {...rest}
 >
-  <a
+  <svelte:element
+    this={isLink ? 'a' : 'button'}
     class={ui.root()}
     data-testid={dataTestId}
     data-size={size}
     data-selected={selected || undefined}
     data-grid-id={dataGridId}
     data-tile-id={dataTileId}
-    href={launchHref}
-    {target}
-    {rel}
-    title={tooltip ?? `${tile.title} — ${tile.url}`}
+    {...elementProps}
+    title={tooltip ?? (tile.url ? `${tile.title} — ${tile.url}` : tile.title)}
     aria-label={openLabel}
     aria-roledescription={ariaRoleDescription}
     draggable={draggable}
@@ -262,7 +164,7 @@
       {@render children()}
     {:else}
       <div
-        class={ui.icon()}
+        class={cn(ui.icon(), ui.background())}
         aria-hidden='true'
       >
         <FaviconIcon
@@ -278,11 +180,13 @@
       </div>
     {/if}
     {#if size !== 'small'}
-      <div class={ui.label()}>
-        <span class={ui.title()}>{tile.title}</span>
-        {#if showDomain && domain}
-          <span class={ui.domain()}>{domain}</span>
-        {/if}
+      <div class={ui.labelContainer()}>
+        <div class={ui.label()}>
+          <span class={cn(ui.title(), 'order-2')}>{tile.title}</span>
+          {#if showDomain && domain}
+            <span class={cn(ui.domain(), 'order-1')}>{domain}</span>
+          {/if}
+        </div>
       </div>
     {/if}
     {#if checked}
@@ -293,7 +197,7 @@
     {#if tile.badge !== undefined}
       <span class={ui.badge()} aria-hidden='true'>{tile.badge}</span>
     {/if}
-  </a>
+  </svelte:element>
   {#if checked && quickResize}
     <Button
       variant='secondary'

@@ -5,9 +5,8 @@ import { BookmarkCoordinator } from '$lib/coordinator'
 import { browser } from 'wxt/browser'
 import { defineBackground } from 'wxt/utils/define-background'
 
-const settings = loadSettings()
-
 export default defineBackground(() => {
+  const settings = loadSettings()
   const coordinator = new BookmarkCoordinator(nativeBookmarks(), nativePersistence(), settings)
   coordinator.subscribe(() => {
     void browser.runtime.sendMessage({ scope: MESSAGE_SCOPE, kind: 'changed' }).catch(() => undefined)
