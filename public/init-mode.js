@@ -8,18 +8,29 @@
   var DEFAULT_LIGHT_THEME = 'catppuccin-latte'
   var DEFAULT_DARK_THEME = 'catppuccin-mocha'
   var THEME_COLORS = {
+    'ayu-light': '#f8f9fa',
     'catppuccin-latte': '#eff1f5',
     'github': '#ffffff',
     'one-light': '#fafafa',
     'solarized-light': '#fdf6e3',
     'tokyo-night-light': '#d5d6db',
+    'ayu-dark': '#0b0e14',
+    'ayu-mirage': '#1f2430',
+    'berlin': '#000000',
     'catppuccin-frappe': '#303446',
     'catppuccin-macchiato': '#24273a',
     'catppuccin-mocha': '#1e1e2e',
+    'dracula': '#282a36',
     'github-dark': '#0d1117',
+    'heetch': '#190134',
+    'material': '#263238',
     'one-dark': '#282c34',
     'solarized-dark': '#002b36',
     'tokyo-night-moon': '#222436',
+    'vice': '#17191e',
+    'windows-10': '#0c0c0c',
+    'yesterday': '#1d1f21',
+    'yesterday-night': '#343d46',
   }
   // END GENERATED THEME COLORS
   var mode = localStorage.getItem('mode-watcher-mode')

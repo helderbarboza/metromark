@@ -68,7 +68,6 @@ function themeBlock(theme) {
     `  --muted-foreground: ${mutedForeground(theme)}; /* derived: base05 blended toward base00 to 4.5:1 */`,
     `  --primary: ${theme.base0D};`,
     `  --primary-foreground: ${theme.base00};`,
-    `  --destructive: ${theme.base08};`,
     ...BASE_SLOTS.map(slot => `  --base${slot}: ${theme[`base${slot}`]};`),
   ]
   return `${selector}\n${vars.join('\n')}\n}`
