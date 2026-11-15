@@ -71,6 +71,20 @@
   ]
 
   let themes: ThemeSelections = $state(getThemeSelections())
+
+  const layoutsHelp = $derived(
+    confirmReset
+      ? 'Reset tile layouts for every group?'
+      : 'Reset positions to browser bookmark order. '
+        + 'Your colors, sizes, and bookmarks stay intact.',
+  )
+  const factoryHelp = $derived(
+    confirmFactory
+      ? 'Reset MetroMark to factory defaults?'
+      : 'Reset tile colors, sizes, placements, and display options. '
+        + 'This also resets your theme and mode and clears Undo history. '
+        + 'Your bookmarks stay. This cannot be undone.',
+  )
 </script>
 
 <Tabs.Root value={tabs[0].value}>
@@ -238,74 +252,57 @@
     <BackgroundSettings />
   </Tabs.Content>
   <Tabs.Content value='reset' class='mt-4 grid gap-1'>
-
-    <div class='mb-7.25'>
-      <h3 class='mb-3.25 text-xs font-[550]'>Reset layouts</h3>
-      <p class='m-0 text-xs/relaxed text-(--muted-foreground)'>
-        Reset positions to browser bookmark order. Your colors, sizes, and
-        bookmarks stay intact.
-      </p>
+    <SettingsCard
+      icon='refresh'
+      title='Reset layouts'
+      helpText={layoutsHelp}
+      controlId='reset-layouts'
+    >
       {#if confirmReset}
-        <div class='mt-3.5'>
-          <p class='mb-3 text-xs'>Reset tile layouts for every group?</p>
-          <div class='flex w-full gap-1'>
-            <Button class='grow' onclick={() => (confirmReset = false)}>Cancel</Button>
-            <Button
-              class='grow'
-              variant='default'
-              disabled={command.busy}
-              onclick={() => send({ type: 'layout.reset' })}
-            >
-              <Icon name='undo' size={15} />
-              Reset with Undo
-            </Button>
-          </div>
-        </div>
+        <Button onclick={() => (confirmReset = false)}>Cancel</Button>
+        <Button
+          variant='default'
+          disabled={command.busy}
+          aria-describedby='reset-layouts-help'
+          onclick={() => send({ type: 'layout.reset' })}
+        >
+          Reset with Undo
+        </Button>
       {:else}
-        <Button class='mt-3.75 w-full' onclick={() => (confirmReset = true)}>
-          <Icon name='refresh' size={15} />
+        <Button id='reset-layouts' onclick={() => (confirmReset = true)}>
           Reset tile layouts
         </Button>
       {/if}
-    </div>
+    </SettingsCard>
 
-    <div class='mb-7.25 border-t border-(--border) pt-5.5'>
-      <h3 class='mb-3.25 text-xs font-[550]'>Factory reset</h3>
-      <p class='mx-0 mt-0 mb-3.75 text-xs/relaxed text-(--muted-foreground)'>
-        Reset tile colors, sizes, placements, and display options. This also
-        resets your theme and mode and clears Undo history. Your bookmarks
-        stay. This cannot be undone.
-      </p>
+    <SettingsCard
+      icon='buildingFactory'
+      title='Factory reset'
+      helpText={factoryHelp}
+      controlId='factory-reset'
+    >
       {#if confirmFactory}
-        <div class='mt-3.5'>
-          <p class='mb-3 text-xs'>Reset MetroMark to factory defaults?</p>
-          <div class='flex w-full gap-1'>
-            <Button class='grow' disabled={command.busy} onclick={() => (confirmFactory = false)}>
-              Cancel
-            </Button>
-            <Button
-              class='grow'
-              variant='destructive'
-              disabled={command.busy}
-              onclick={() => send({ type: 'factory.reset' })}
-            >
-              <Icon name='buildingFactory' size={15} />
-              Reset MetroMark
-            </Button>
-          </div>
-        </div>
+        <Button disabled={command.busy} onclick={() => (confirmFactory = false)}>
+          Cancel
+        </Button>
+        <Button
+          variant='destructive'
+          disabled={command.busy}
+          aria-describedby='factory-reset-help'
+          onclick={() => send({ type: 'factory.reset' })}
+        >
+          Reset MetroMark
+        </Button>
       {:else}
         <Button
-          class='mt-3.75 w-full'
+          id='factory-reset'
           disabled={command.busy}
           onclick={() => (confirmFactory = true)}
         >
-          <Icon name='buildingFactory' size={15} />
           Factory reset
         </Button>
       {/if}
-    </div>
-
+    </SettingsCard>
   </Tabs.Content>
 </Tabs.Root>
 
