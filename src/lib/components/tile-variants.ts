@@ -1,6 +1,6 @@
 import { tv } from 'tailwind-variants'
 
-/** Shared Metro tile chrome. Used by MetroTile (bookmarks) and FolderTile. */
+/** Shared Metro tile chrome. Used by TileShell (root, check) and the concrete tiles for content slots. */
 export const tileVariants = tv({
   slots: {
     root: `
