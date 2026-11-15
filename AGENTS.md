@@ -57,7 +57,7 @@ Testing quirks:
 - shadcn-svelte is configured (`components.json`). UI primitives are in `src/lib/components/ui`. Prefer them over hand-rolled dialogs, menus and inputs.
 - `src/lib/adapters/native.ts`: native bookmark/storage APIs and privileged background messaging.
 - `src/lib/adapters/preview.ts`: isolated demo persistence and cross-tab updates.
-- `src/lib/components/`: adapted Metro UI and management components.
+- `src/lib/components/`: atoms, molecules and organisms. shadcn-svelte primitives live in `src/lib/components/ui` and stay registry-managed. `docs/atomic-design.md` states the hierarchy, the classification of each component and the presentational boundary. Prefer the shadcn primitives over hand-rolled dialogs, menus and inputs.
 - `src/lib/shaders/`: background shader registry and implementations.
 - `src/entrypoints/`: new-tab override and background coordinator.
 - `.storybook/` and `src/lib/stories/`: component docs, fixtures, interactions, accessibility config.
