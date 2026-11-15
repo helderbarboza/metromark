@@ -29,7 +29,7 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 
 - Components render UI. They take data through props and emit events through callbacks.
 - Data fetching, persistence and command dispatch live outside components, in adapters, the coordinator, or container components.
-- Visual properties use theme tokens. Do not hard-code color, spacing, radius or font-size values.
+- Visual properties use theme tokens. Sizes may use Tailwind utilities and arbitrary values when no token step matches (this repo uses exact 10–13 px type steps). Colors, however, always come from tokens.
 - Compose components. Do not add boolean flag props to switch a component into a different kind of thing.
 - Keep atoms under 50 lines and molecules under 100 lines. Split only at a real seam, never just to meet a number.
 - A component earns a place in the hierarchy only when it renders UI. Headless helpers stay outside the levels.
@@ -43,11 +43,11 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `ui/**` | shadcn-svelte primitives. Managed by the registry. Aliases live in `components.json`. |
 | `atoms/Icon.svelte` | Inline icon from the bundled registry. |
 | `atoms/FaviconIcon.svelte` | Presentational. Receives the resolved favicon state as props. |
-
 ### Molecules
 
 | Component | Notes |
 | --- | --- |
+| `molecules/FaviconImage.svelte` | Container. Resolves the browser favicon cache and passes the result to the atom. |
 | `molecules/IconButton.svelte` | Button + icon. |
 | `molecules/TileShell.svelte` | Shared tile shell. |
 | `molecules/Modal.svelte` | Dialog shell with focus handling. |
@@ -104,11 +104,11 @@ Atoms, molecules and organisms receive data through props and emit events throug
 
 Two documented exceptions remain:
 
-1. `atoms/FaviconIcon.svelte` reads no global state after the Phase 3 split. A container resolves the favicon cache and passes the result down.
+1. `atoms/FaviconIcon.svelte` reads no global state. The container `molecules/FaviconImage.svelte` resolves the favicon cache and passes the result down.
 2. `molecules/TileShell.svelte` and `organisms/*Tile.svelte` read `tile-grid-context` for the current grid cell size, and `TileShell` reads `mode-watcher` for the color mode. This avoids passing two extra props through every dragged tile. Do not add new readers of these contexts. New data flows through props.
 
 ## Tokens
 
-Use the theme tokens that `src/lib/themes.ts` and the generator define (`--background`, `--card`, `--accent`, `--border`, `--foreground`, `--muted-foreground`, `--primary`, `--base00` through `--base0F`, plus the fixed `--destructive` pair).
+Use the theme tokens that `src/lib/themes.ts` and the generator define (`--background`, `--card`, `--accent`, `--border`, `--foreground`, `--muted-foreground`, `--primary`, `--base00` through `--base0F`, plus the fixed `--destructive`, `--destructive-foreground` and `--success` constants).
 
-Do not hard-code hex values, pixel font sizes or radii in components. Use Tailwind utilities that reference tokens. If a fixed color is truly needed, define it in the generator's shared derivation block and regenerate. Never edit the GENERATED regions in `src/styles.css` or `public/init-mode.js` by hand.
+Do not hard-code hex values in components. Fixed constants live in the shared `:root[data-theme]` derivation block in `src/styles.css`, next to `--destructive`; the generator must not emit them. Never edit the GENERATED regions in `src/styles.css` or `public/init-mode.js` by hand. Computed contrast colors (white or black tile text) are data-dependent values, not design decisions, and may stay inline.

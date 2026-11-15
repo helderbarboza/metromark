@@ -1,8 +1,8 @@
 <script lang='ts'>
   import type { FolderTileView, PreviewCell } from '$lib/types'
   import type { CommonTileProps } from '../tile-props'
-  import FaviconIcon from '$lib/components/atoms/FaviconIcon.svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
+  import FaviconImage from '$lib/components/molecules/FaviconImage.svelte'
   import { FOLDER_COLUMNS, FOLDER_PREVIEW, FOLDER_ROWS } from '$lib/folder-preview'
   import { resolveTileColors } from '$lib/theme-colors'
   import { mode, theme } from 'mode-watcher'
@@ -88,7 +88,7 @@
             style:background={cell.bg}
             style:color={cell.tint}
           >
-            <FaviconIcon
+            <FaviconImage
               pageUrl={cell.cell.url ?? ''}
               tint={cell.tint}
               class='size-[55cqw]'

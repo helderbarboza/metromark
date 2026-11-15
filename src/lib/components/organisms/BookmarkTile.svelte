@@ -2,7 +2,7 @@
   import type { BookmarkTileDef } from '$lib/types'
   import type { Snippet } from 'svelte'
   import type { CommonTileProps, TileContentArgs } from '../tile-props'
-  import FaviconIcon from '$lib/components/atoms/FaviconIcon.svelte'
+  import FaviconImage from '$lib/components/molecules/FaviconImage.svelte'
 
   import { GAP } from '$lib/layout'
   import { getTileGrid as getTileGridContext, hasTileGrid } from '$lib/tile-grid-context'
@@ -76,7 +76,7 @@
         class={cn(ui.icon(), ui.background())}
         aria-hidden='true'
       >
-        <FaviconIcon
+        <FaviconImage
           pageUrl={tile.url ?? ''}
           tint={fg}
           class={cn({

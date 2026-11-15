@@ -199,7 +199,7 @@
       dragging && !item.isDragging && '[&>button]:opacity-85',
       dragging && item.isDragging && !reducedMotion && '[&>button]:scale-104',
       dragging && item.isDragging && '[&>button]:opacity-95',
-      dragging && item.isDragging && '[&>button]:shadow-[0_10px_30px_#0007]',
+      dragging && item.isDragging && '[&>button]:shadow-[0_10px_30px_color-mix(in_srgb,black_47%,transparent)]',
     )}
     style={item.style}
     dataTestId='folder-tile'
@@ -246,7 +246,7 @@
       dragging && !item.isDragging && '[&>a]:opacity-85',
       dragging && item.isDragging && !reducedMotion && '[&>a]:scale-104',
       dragging && item.isDragging && '[&>a]:opacity-95',
-      dragging && item.isDragging && '[&>a]:shadow-[0_10px_30px_#0007]',
+      dragging && item.isDragging && '[&>a]:shadow-[0_10px_30px_color-mix(in_srgb,black_47%,transparent)]',
     )}
     style={item.style}
     dataTestId='bookmark-tile'

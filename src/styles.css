@@ -81,6 +81,7 @@
   --accent-foreground: var(--foreground);
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
+  --success: #99b594;
   --input: var(--border);
   --ring: var(--primary);
   --chart-1: var(--base0D);
