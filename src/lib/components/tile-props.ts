@@ -1,7 +1,7 @@
 import type { TileSize } from '$lib/types'
 
 /**
- * Props shared by TileShell and the concrete tiles (MetroTile, FolderTile).
+ * Props shared by TileShell and the concrete tiles (BookmarkTile, FolderTile).
  * Keep these names stable: GridTile, MetroGroup and the stories pass them.
  */
 export interface CommonTileProps {

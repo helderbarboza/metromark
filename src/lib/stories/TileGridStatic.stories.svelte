@@ -4,7 +4,7 @@
 >
   import type { TileSize } from '$lib/types'
   import type { ComponentProps } from 'svelte'
-  import MetroTile from '$lib/components/MetroTile.svelte'
+  import BookmarkTile from '$lib/components/BookmarkTile.svelte'
   import { cellsToPx, SIZES } from '$lib/layout-constants'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
@@ -27,7 +27,7 @@
 
   const { Story } = defineMeta({
     title: 'Metro/Tile grid static',
-    component: MetroTile,
+    component: BookmarkTile,
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },
     args: {
@@ -43,7 +43,7 @@
   }
 </script>
 
-{#snippet template(args: ComponentProps<typeof MetroTile>)}
+{#snippet template(args: ComponentProps<typeof BookmarkTile>)}
   <div
     style='display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:32px;
       background:var(--background);min-height:100vh'
@@ -51,7 +51,7 @@
     {#each staticTiles as tile (tile.id)}
       {@const [w, h] = SIZES[tile.size]}
       <div style={`width:${cellsToPx(w, 68)}px;height:${cellsToPx(h, 68)}px;--cell:68px`}>
-        <MetroTile
+        <BookmarkTile
           tile={{ title: tile.title, colorIndex: tile.colorIndex, url: tile.href }}
           size={tile.size}
           domain={tile.domain}

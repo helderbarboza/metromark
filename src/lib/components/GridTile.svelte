@@ -37,8 +37,8 @@
 
   import type { Gesture } from '$lib/interaction'
   import type { TileSize, TileView } from '$lib/types'
+  import BookmarkTile from '$lib/components/BookmarkTile.svelte'
   import FolderTile from '$lib/components/FolderTile.svelte'
-  import MetroTile from '$lib/components/MetroTile.svelte'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
   import { sizeOf } from '$lib/layout'
   import { safeUrl, validateUrl } from '$lib/url'
@@ -214,7 +214,7 @@
     onpointercancel={() => (gesture = null)}
   />
 {:else if bookmarkTile}
-  <MetroTile
+  <BookmarkTile
   {@attach pauseOffscreen()}
     tile={bookmarkTile}
     size={item.item ? sizeOf(item.item) : tile.size}
@@ -249,7 +249,7 @@
       dragging && item.isDragging && '[&>a]:shadow-[0_10px_30px_#0007]',
     )}
     style={item.style}
-    dataTestId='metro-tile'
+    dataTestId='bookmark-tile'
     dataGridId={id}
     dataDragging={item.isDragging}
     attach={attachTile}

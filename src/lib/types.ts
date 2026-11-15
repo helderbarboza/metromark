@@ -5,7 +5,7 @@ export type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
 
 export type TileSize = 'small' | 'medium' | 'wide' | 'large'
 export type TileKind = 'bookmark' | 'folder'
-export interface MetroTileDef {
+export interface BookmarkTileDef {
   title: string
   colorIndex: number
   color?: string
@@ -107,7 +107,7 @@ export interface Snapshot {
   revision: number
   mode: 'preview' | 'extension'
 }
-export interface BookmarkTileView extends MetroTileDef {
+export interface BookmarkTileView extends BookmarkTileDef {
   id: string
   kind: 'bookmark'
   url: string

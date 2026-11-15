@@ -1,10 +1,10 @@
 <script lang='ts'>
   import type { GroupView, Layout, TileSize, TileView } from '$lib/types'
   import type { Snippet } from 'svelte'
+  import BookmarkTile from '$lib/components/BookmarkTile.svelte'
   import FolderTile from '$lib/components/FolderTile.svelte'
   import GridTile from '$lib/components/GridTile.svelte'
   import Icon from '$lib/components/Icon.svelte'
-  import MetroTile from '$lib/components/MetroTile.svelte'
   import { Button } from '$lib/components/ui/button'
   import * as ContextMenu from '$lib/components/ui/context-menu'
   import * as Empty from '$lib/components/ui/empty'
@@ -362,7 +362,7 @@
               : undefined}
           />
         {:else if bookmarkTile}
-          <MetroTile
+          <BookmarkTile
             tile={bookmarkTile}
             size={sizeOf(entry)}
             selected={selectedId === entry.i}

@@ -3,14 +3,14 @@
   lang='ts'
 >
   import type { ComponentProps } from 'svelte'
-  import MetroTile from '$lib/components/MetroTile.svelte'
+  import BookmarkTile from '$lib/components/BookmarkTile.svelte'
   import { cellsToPx, SIZES } from '$lib/layout'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
 
   const { Story } = defineMeta({
     title: 'Metro/Bookmark tile',
-    component: MetroTile,
+    component: BookmarkTile,
     tags: ['autodocs'],
     args: { tile: { title: 'Steam', colorIndex: 0, url: 'https://store.steampowered.com/' }, size: 'medium', domain: 'store.steampowered.com', showDomain: true },
     argTypes: {
@@ -20,8 +20,8 @@
     },
   })
 </script>
-{#snippet template(args: ComponentProps<typeof MetroTile>)}
-  <MetroTile
+{#snippet template(args: ComponentProps<typeof BookmarkTile>)}
+  <BookmarkTile
     {...args}
     href='https://store.steampowered.com/'
     ariaLabel="Open {args.tile.title}{args.showDomain && args.size !== 'small'

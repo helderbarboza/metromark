@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import type { MetroTileDef } from '$lib/types'
+  import type { BookmarkTileDef } from '$lib/types'
   import type { Snippet } from 'svelte'
   import type { CommonTileProps, TileContentArgs } from './tile-props'
   import FaviconIcon from '$lib/components/FaviconIcon.svelte'
@@ -11,7 +11,7 @@
   import TileShell from './TileShell.svelte'
 
   interface Props extends CommonTileProps {
-    tile: MetroTileDef
+    tile: BookmarkTileDef
     /** Rendered element: 'a' when the tile launches a URL, 'button' otherwise. */
     as?: 'a' | 'button'
     href?: string
@@ -34,7 +34,7 @@
     domain = '',
     showDomain = true,
     children,
-    dataTestId = 'metro-tile',
+    dataTestId = 'bookmark-tile',
     tooltip,
     ...rest
   }: Props = $props()

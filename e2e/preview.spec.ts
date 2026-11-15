@@ -69,7 +69,7 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
     await rightClick(page, 'QA edited favorite')
     await page.getByRole('button', { name: `Resize selected tile to ${size}`, exact: true }).click()
     // Small tiles intentionally have no visible title; address via the accessible name.
-    await expect(page.locator(`a[data-testid="metro-tile"][aria-label^="Open QA edited favorite"][data-size="${size}"]`)).toHaveCount(1)
+    await expect(page.locator(`a[data-testid="bookmark-tile"][aria-label^="Open QA edited favorite"][data-size="${size}"]`)).toHaveCount(1)
   }
   await rightClick(page, 'QA edited favorite')
   await page.getByRole('button', { name: 'Move selected bookmark to another folder' }).click()
@@ -81,7 +81,7 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   await page.getByRole('button', { name: 'Delete selected bookmark' }).click()
   await expect(link(page, 'QA edited favorite')).toHaveCount(0)
   await page.getByRole('button', { name: 'Undo', exact: true }).click()
-  await expect(group(page, 'Work').locator('a[data-testid="metro-tile"][aria-label^="Open QA edited favorite"][data-size="wide"]')).toHaveCount(1)
+  await expect(group(page, 'Work').locator('a[data-testid="bookmark-tile"][aria-label^="Open QA edited favorite"][data-size="wide"]')).toHaveCount(1)
   await expect.poll(async () => flat(await tree(page)).filter(node => node.title === 'QA edited favorite').length).toBe(1)
 })
 
@@ -241,7 +241,7 @@ test('right-click and keyboard selection open the app bar; Escape and the canvas
   await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
   await expect(bar).toContainText('Steam')
-  await expect(page.locator('[data-testid="metro-tile"][data-selected]')).toHaveCount(1)
+  await expect(page.locator('[data-testid="bookmark-tile"][data-selected]')).toHaveCount(1)
   // Right-clicking the same tile again keeps its commands open instead of toggling them away.
   await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
@@ -254,7 +254,7 @@ test('right-click and keyboard selection open the app bar; Escape and the canvas
   // Escape clears the selection and hands focus back to the tile it came from.
   await page.keyboard.press('Escape')
   await expect(bar).toHaveCount(0)
-  await expect(page.locator('[data-testid="metro-tile"][data-selected]')).toHaveCount(0)
+  await expect(page.locator('[data-testid="bookmark-tile"][data-selected]')).toHaveCount(0)
   await expect(steam).toBeFocused()
   // The keyboard path moves focus into the bar so its commands are reachable.
   await steam.focus()
@@ -288,7 +288,7 @@ test('touch cross-slide selects instead of launching, and picks the tile up past
   await touch('touchMove', { x, y: y + 14 })
   await touch('touchEnd')
   await expect(appBar(page)).toBeVisible()
-  await expect(page.locator('[data-testid="metro-tile"][data-selected]')).toHaveCount(1)
+  await expect(page.locator('[data-testid="bookmark-tile"][data-selected]')).toHaveCount(1)
   expect(popups).toEqual([])
   await page.keyboard.press('Escape')
   await expect(appBar(page)).toHaveCount(0)
