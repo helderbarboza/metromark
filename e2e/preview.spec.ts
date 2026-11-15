@@ -403,8 +403,8 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
     background: {
       auto: true,
       fit: 'cover',
-      opacity: 1,
-      parallax: false,
+      opacity: 0.7,
+      parallax: true,
       parallaxZoom: 1.25,
       type: 'image',
       url: 'https://images.unsplash.com/photo-1660526224364-8f71a4a09514?q=85&fm=jpg&cs=srgb',
