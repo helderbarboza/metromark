@@ -67,7 +67,7 @@
     { value: 'appearance', icon: 'paintBrush', label: 'Appearance' },
     { value: 'tiles', icon: 'customize', label: 'Tiles' },
     { value: 'background', icon: 'image', label: 'Background' },
-    { value: 'reset', icon: 'arrowReset', label: 'Reset' },
+    { value: 'advanced', icon: 'settings', label: 'Advanced' },
   ]
 
   let themes: ThemeSelections = $state(getThemeSelections())
@@ -247,14 +247,9 @@
         onchange={event => setting({ reducedMotion: event.currentTarget.checked })}
       />
     </SettingsCard>
-  </Tabs.Content>
-  <Tabs.Content value='background' class='mt-4 grid gap-1'>
-    <BackgroundSettings />
-  </Tabs.Content>
-  <Tabs.Content value='reset' class='mt-4 grid gap-1'>
     <SettingsCard
       icon='refresh'
-      title='Reset layouts'
+      title='Reset tile layouts'
       helpText={layoutsHelp}
       controlId='reset-layouts'
     >
@@ -274,7 +269,11 @@
         </Button>
       {/if}
     </SettingsCard>
-
+  </Tabs.Content>
+  <Tabs.Content value='background' class='mt-4 grid gap-1'>
+    <BackgroundSettings />
+  </Tabs.Content>
+  <Tabs.Content value='advanced' class='mt-4 grid gap-1'>
     <SettingsCard
       icon='buildingFactory'
       title='Factory reset'
