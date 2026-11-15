@@ -34,9 +34,9 @@ export const tileVariants = tv({
     `,
     icon: `absolute inset-0 flex items-center justify-center`,
     labelContainer: `absolute inset-x-0 bottom-0`,
-    label: `mx-4 mb-1 flex flex-col text-left`,
-    title: '-ms-px -me-px truncate text-xs/tight font-normal',
-    domain: `truncate text-[10px]/tight font-normal`,
+    label: `mx-3.5 mb-1 flex flex-col text-left`,
+    title: 'truncate text-xs/tight font-normal',
+    domain: `truncate text-[10px]/tight font-normal opacity-70`,
     check: `
       absolute top-0 right-0 flex items-start justify-end bg-background pb-3
       pl-3 text-foreground [clip-path:polygon(100%_0,0_0,100%_100%)]
