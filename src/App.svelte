@@ -346,6 +346,19 @@
     if (keyboard)
       focusRequest += 1
   }
+  /**
+   * Suppress the browser's native context menu in the whole app. The app opens
+   * its own menus and selects tiles on right-click. Editable fields keep the
+   * native menu so cut, copy, paste, and spellcheck stay available.
+   */
+  function blockNativeContextMenu(event: MouseEvent) {
+    const target = event.target
+    if (target instanceof Element
+      && target.closest('input, textarea, [contenteditable="true"]')) {
+      return
+    }
+    event.preventDefault()
+  }
   /** Canvas handler first, then bits-ui's handler (it opens the menu and honors preventDefault). */
   function forwardContextMenu(props: Record<string, unknown>, event: MouseEvent) {
     // The group header owns its own context menu; swallow the event here.
@@ -535,7 +548,7 @@
   }
 </script>
 
-<svelte:window onkeydown={keyboardNav.handleKey} />
+<svelte:window onkeydown={keyboardNav.handleKey} oncontextmenu={blockNativeContextMenu} />
 <ThemeSync />
 <div id='shell' class='flex h-full overflow-hidden'>
   <div
