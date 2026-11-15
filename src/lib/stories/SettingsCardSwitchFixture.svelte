@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { IconName } from '$lib/icons'
-  import SettingsCard from '$lib/components/editor/SettingsCard.svelte'
+  import SettingsCard from '$lib/components/molecules/SettingsCard.svelte'
 
   interface Props {
     icon: IconName

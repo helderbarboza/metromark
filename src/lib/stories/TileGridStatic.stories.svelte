@@ -4,7 +4,7 @@
 >
   import type { TileSize } from '$lib/types'
   import type { ComponentProps } from 'svelte'
-  import BookmarkTile from '$lib/components/BookmarkTile.svelte'
+  import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
   import { cellsToPx, SIZES } from '$lib/layout-constants'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'

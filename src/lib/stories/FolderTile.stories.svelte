@@ -4,7 +4,7 @@
 >
   import type { FolderTileView } from '$lib/types'
   import type { ComponentProps } from 'svelte'
-  import FolderTile from '$lib/components/FolderTile.svelte'
+  import FolderTile from '$lib/components/organisms/FolderTile.svelte'
   import { cellsToPx, SIZES } from '$lib/layout'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn } from 'storybook/test'

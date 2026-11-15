@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import Icon from '$lib/components/Icon.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
   import { Button } from '$lib/components/ui/button'
 
   interface Props {

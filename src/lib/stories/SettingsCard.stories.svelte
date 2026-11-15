@@ -2,7 +2,7 @@
   module
   lang='ts'
 >
-  import SettingsCard from '$lib/components/editor/SettingsCard.svelte'
+  import SettingsCard from '$lib/components/molecules/SettingsCard.svelte'
   import SettingsCardSwitchFixture from '$lib/stories/SettingsCardSwitchFixture.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, userEvent } from 'storybook/test'

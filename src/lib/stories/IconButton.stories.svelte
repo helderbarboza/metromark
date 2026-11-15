@@ -2,8 +2,8 @@
   module
   lang='ts'
 >
-  import Icon from '$lib/components/Icon.svelte'
-  import IconButton from '$lib/components/IconButton.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
+  import IconButton from '$lib/components/molecules/IconButton.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn, userEvent } from 'storybook/test'
 

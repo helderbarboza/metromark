@@ -2,8 +2,8 @@
   module
   lang='ts'
 >
-  import CollapsibleSection from '$lib/components/editor/CollapsibleSection.svelte'
-  import SettingsRow from '$lib/components/editor/SettingsRow.svelte'
+  import CollapsibleSection from '$lib/components/molecules/CollapsibleSection.svelte'
+  import SettingsRow from '$lib/components/molecules/SettingsRow.svelte'
   import { Button } from '$lib/components/ui/button'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, userEvent } from 'storybook/test'

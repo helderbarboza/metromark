@@ -1,8 +1,8 @@
 <script lang='ts'>
   import type { MenuItem } from '$lib/menus'
   import type { TileSize } from '$lib/types'
-  import MenuItems from '$lib/components/MenuItems.svelte'
-  import TileSizeGrid from '$lib/components/TileSizeGrid.svelte'
+  import MenuItems from '$lib/components/molecules/MenuItems.svelte'
+  import TileSizeGrid from '$lib/components/molecules/TileSizeGrid.svelte'
   import * as ContextMenu from '$lib/components/ui/context-menu'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
   import { focusFirstMenuItem } from '$lib/menu-focus'

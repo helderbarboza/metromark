@@ -1,4 +1,4 @@
-import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
 import type { IconName } from '$lib/icons'
 import type { BookmarkNode, Command, FolderTileView, GroupView, TileView } from '$lib/types'
 import { BACKGROUND_DEFAULTS } from '$lib/config'

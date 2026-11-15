@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+  import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type {
     Client,
     Command,
@@ -9,16 +9,16 @@
     TileSize,
   } from '$lib/types'
   import { isMediaKey } from '$lib/background-image'
-  import CanvasContextMenu from '$lib/components/CanvasContextMenu.svelte'
-  import Editor from '$lib/components/Editor.svelte'
-  import MenuItems from '$lib/components/MenuItems.svelte'
-  import MetroAppBar from '$lib/components/MetroAppBar.svelte'
-  import PageBackground from '$lib/components/PageBackground.svelte'
-  import RootsNav from '$lib/components/RootsNav.svelte'
-  import SettingsDrawer from '$lib/components/SettingsDrawer.svelte'
+  import MenuItems from '$lib/components/molecules/MenuItems.svelte'
+  import UndoToast from '$lib/components/molecules/UndoToast.svelte'
+  import WorkspaceFooter from '$lib/components/molecules/WorkspaceFooter.svelte'
+  import CanvasContextMenu from '$lib/components/organisms/CanvasContextMenu.svelte'
+  import Editor from '$lib/components/organisms/Editor.svelte'
+  import MetroAppBar from '$lib/components/organisms/MetroAppBar.svelte'
+  import PageBackground from '$lib/components/organisms/PageBackground.svelte'
+  import RootsNav from '$lib/components/organisms/RootsNav.svelte'
+  import SettingsDrawer from '$lib/components/organisms/SettingsDrawer.svelte'
   import ThemeSync from '$lib/components/ThemeSync.svelte'
-  import UndoToast from '$lib/components/UndoToast.svelte'
-  import WorkspaceFooter from '$lib/components/WorkspaceFooter.svelte'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { toggleSelection } from '$lib/interaction'
   import { KeyboardNav } from '$lib/keyboard-nav'

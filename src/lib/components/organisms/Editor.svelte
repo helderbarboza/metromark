@@ -1,14 +1,14 @@
 <script lang='ts'>
-  import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+  import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type { Command, Snapshot } from '$lib/types'
-  import AppearanceDialog from '$lib/components/editor/AppearanceDialog.svelte'
-  import BookmarkDialog from '$lib/components/editor/BookmarkDialog.svelte'
-  import CopyDialog from '$lib/components/editor/CopyDialog.svelte'
-  import DeleteDialog from '$lib/components/editor/DeleteDialog.svelte'
-  import DestinationDialog from '$lib/components/editor/DestinationDialog.svelte'
-  import { dialogEyebrow, dialogTitle } from '$lib/components/editor/dialog-spec'
-  import FolderDialog from '$lib/components/editor/FolderDialog.svelte'
-  import Modal from '$lib/components/Modal.svelte'
+  import Modal from '$lib/components/molecules/Modal.svelte'
+  import AppearanceDialog from '$lib/components/organisms/editor/AppearanceDialog.svelte'
+  import BookmarkDialog from '$lib/components/organisms/editor/BookmarkDialog.svelte'
+  import CopyDialog from '$lib/components/organisms/editor/CopyDialog.svelte'
+  import DeleteDialog from '$lib/components/organisms/editor/DeleteDialog.svelte'
+  import DestinationDialog from '$lib/components/organisms/editor/DestinationDialog.svelte'
+  import { dialogEyebrow, dialogTitle } from '$lib/components/organisms/editor/dialog-spec'
+  import FolderDialog from '$lib/components/organisms/editor/FolderDialog.svelte'
   import { indexTree } from '$lib/tree'
 
   interface Props {

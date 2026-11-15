@@ -1,10 +1,10 @@
 <script lang='ts'>
   import type { BookmarkNode, Command, Snapshot, TileSize } from '$lib/types'
 
-  import ColorSwatches from '$lib/components/editor/ColorSwatches.svelte'
-  import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
-  import DialogActions from '$lib/components/editor/DialogActions.svelte'
-  import DialogError from '$lib/components/editor/DialogError.svelte'
+  import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
+  import DialogActions from '$lib/components/molecules/DialogActions.svelte'
+  import DialogError from '$lib/components/molecules/DialogError.svelte'
+  import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { Button } from '$lib/components/ui/button'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { tileFor, tileForFolder } from '$lib/tile'

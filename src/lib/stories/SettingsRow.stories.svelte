@@ -2,7 +2,7 @@
   module
   lang='ts'
 >
-  import SettingsRow from '$lib/components/editor/SettingsRow.svelte'
+  import SettingsRow from '$lib/components/molecules/SettingsRow.svelte'
   import { Button } from '$lib/components/ui/button'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn, userEvent } from 'storybook/test'

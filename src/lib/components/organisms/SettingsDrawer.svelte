@@ -1,9 +1,9 @@
 <script lang='ts'>
   import type { Settings } from '$lib/config'
   import type { Command } from '$lib/types'
-  import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
-  import Icon from '$lib/components/Icon.svelte'
-  import IconButton from '$lib/components/IconButton.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
+  import IconButton from '$lib/components/molecules/IconButton.svelte'
+  import SettingsDialog from '$lib/components/organisms/editor/SettingsDialog.svelte'
 
   interface Props {
     /** Whether the drawer is expanded. The drawer stays mounted while closed. */

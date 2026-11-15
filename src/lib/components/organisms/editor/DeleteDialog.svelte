@@ -1,9 +1,9 @@
 <script lang='ts'>
   import type { BookmarkNode, Command } from '$lib/types'
-  import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
-  import DialogActions from '$lib/components/editor/DialogActions.svelte'
-  import DialogError from '$lib/components/editor/DialogError.svelte'
-  import Icon from '$lib/components/Icon.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
+  import DialogActions from '$lib/components/molecules/DialogActions.svelte'
+  import DialogError from '$lib/components/molecules/DialogError.svelte'
+  import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { Button } from '$lib/components/ui/button'
   import { countBookmarks, flatten, isFolder } from '$lib/tree'
 

@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { MenuItem } from '$lib/menus'
-  import Icon from '$lib/components/Icon.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
   import * as ContextMenu from '$lib/components/ui/context-menu'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
 

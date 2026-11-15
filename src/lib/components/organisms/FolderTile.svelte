@@ -1,14 +1,14 @@
 <script lang='ts'>
   import type { FolderTileView, PreviewCell } from '$lib/types'
-  import type { CommonTileProps } from './tile-props'
-  import FaviconIcon from '$lib/components/FaviconIcon.svelte'
-  import Icon from '$lib/components/Icon.svelte'
+  import type { CommonTileProps } from '../tile-props'
+  import FaviconIcon from '$lib/components/atoms/FaviconIcon.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
   import { FOLDER_COLUMNS, FOLDER_PREVIEW, FOLDER_ROWS } from '$lib/folder-preview'
   import { resolveTileColors } from '$lib/theme-colors'
   import { mode, theme } from 'mode-watcher'
   import { cn } from 'tailwind-variants'
-  import { tileVariants } from './tile-variants'
-  import TileShell from './TileShell.svelte'
+  import TileShell from '../molecules/TileShell.svelte'
+  import { tileVariants } from '../tile-variants'
 
   interface Props extends CommonTileProps {
     tile: FolderTileView

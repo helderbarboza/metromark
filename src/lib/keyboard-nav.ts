@@ -1,4 +1,4 @@
-import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
 import type { UndoSummary } from '$lib/types'
 
 export interface KeyboardNavDeps {

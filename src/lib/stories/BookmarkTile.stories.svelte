@@ -3,7 +3,7 @@
   lang='ts'
 >
   import type { ComponentProps } from 'svelte'
-  import BookmarkTile from '$lib/components/BookmarkTile.svelte'
+  import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
   import { cellsToPx, SIZES } from '$lib/layout'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'

@@ -1,8 +1,8 @@
 <script lang='ts'>
   import type { ShaderDefinition } from '$lib/shaders'
   import type { ShaderBenchmarkResult } from '$lib/shaders/benchmark.svelte'
-  import Icon from '$lib/components/Icon.svelte'
-  import ShaderBackground from '$lib/components/ShaderBackground.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
+  import ShaderBackground from '$lib/components/organisms/ShaderBackground.svelte'
   import { Button } from '$lib/components/ui/button'
   import { BENCHMARK_PRESENTATION } from '$lib/shaders/benchmark-ui'
 

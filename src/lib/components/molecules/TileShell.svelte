@@ -1,17 +1,17 @@
 <script lang='ts'>
   import type { TileSize } from '$lib/types'
   import type { Snippet } from 'svelte'
-  import type { CommonTileProps, TileContentArgs } from './tile-props'
-  import Icon from '$lib/components/Icon.svelte'
+  import type { CommonTileProps, TileContentArgs } from '../tile-props'
+  import Icon from '$lib/components/atoms/Icon.svelte'
 
   import { TILE_SIZES } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
   import { safeUrl } from '$lib/url'
   import { mode, theme } from 'mode-watcher'
   import { cn } from 'tailwind-variants'
-  import { tileVariants } from './tile-variants'
-  import { tilt } from './tilt'
-  import Button from './ui/button/button.svelte'
+  import { tileVariants } from '../tile-variants'
+  import { tilt } from '../tilt'
+  import Button from '../ui/button/button.svelte'
 
   /** Subset of the tile view the shell needs: label text and accent colors. */
   interface ShellTile {

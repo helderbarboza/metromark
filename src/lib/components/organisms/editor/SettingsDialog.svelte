@@ -2,10 +2,10 @@
   import type { IconName } from '$lib/icons'
   import type { ThemeSelections } from '$lib/theme-picker'
   import type { Command, Settings } from '$lib/types'
-  import { createDialogCommand } from '$lib/components/editor/dialog-command.svelte'
-  import DialogError from '$lib/components/editor/DialogError.svelte'
-  import ThemeGallery from '$lib/components/editor/ThemeGallery.svelte'
-  import Icon from '$lib/components/Icon.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
+  import DialogError from '$lib/components/molecules/DialogError.svelte'
+  import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
+  import ThemeGallery from '$lib/components/organisms/editor/ThemeGallery.svelte'
   import { Button } from '$lib/components/ui/button'
   import * as Tabs from '$lib/components/ui/tabs'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
@@ -13,9 +13,9 @@
   import { getThemeSelections } from '$lib/theme-picker'
   import { getTheme } from '$lib/themes.js'
   import { setMode, systemPrefersMode, userPrefersMode } from 'mode-watcher'
+  import CollapsibleSection from '../../molecules/CollapsibleSection.svelte'
+  import SettingsCard from '../../molecules/SettingsCard.svelte'
   import BackgroundSettings from './BackgroundSettings.svelte'
-  import CollapsibleSection from './CollapsibleSection.svelte'
-  import SettingsCard from './SettingsCard.svelte'
 
   interface Props {
     settings: Settings

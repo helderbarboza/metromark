@@ -1,9 +1,9 @@
 <script lang='ts'>
-  import type { DialogSpec } from '$lib/components/editor/dialog-spec'
+  import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type { Command, Snapshot } from '$lib/types'
   import { createPreviewClient } from '$lib/adapters/preview'
-  import Editor from '$lib/components/Editor.svelte'
-  import SettingsDialog from '$lib/components/editor/SettingsDialog.svelte'
+  import Editor from '$lib/components/organisms/Editor.svelte'
+  import SettingsDialog from '$lib/components/organisms/editor/SettingsDialog.svelte'
   import { Button } from '$lib/components/ui/button'
   import { SETTINGS_DEFAULTS } from '$lib/config'
   import { onMount } from 'svelte'

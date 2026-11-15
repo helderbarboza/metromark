@@ -1,7 +1,7 @@
 <script lang='ts'>
   import type { Snippet } from 'svelte'
-  import Icon from '$lib/components/Icon.svelte'
-  import IconButton from '$lib/components/IconButton.svelte'
+  import Icon from '$lib/components/atoms/Icon.svelte'
+  import IconButton from '$lib/components/molecules/IconButton.svelte'
   import { onMount } from 'svelte'
 
   interface Props {

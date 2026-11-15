@@ -37,8 +37,8 @@
 
   import type { Gesture } from '$lib/interaction'
   import type { TileSize, TileView } from '$lib/types'
-  import BookmarkTile from '$lib/components/BookmarkTile.svelte'
-  import FolderTile from '$lib/components/FolderTile.svelte'
+  import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
+  import FolderTile from '$lib/components/organisms/FolderTile.svelte'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
   import { sizeOf } from '$lib/layout'
   import { safeUrl, validateUrl } from '$lib/url'

@@ -4,9 +4,9 @@
   // the accessibility tree; every layer sits behind the page content.
 
   import type { Settings } from '$lib/config'
-  import ColorBackground from '$lib/components/ColorBackground.svelte'
-  import ImageBackground from '$lib/components/ImageBackground.svelte'
-  import ShaderBackground from '$lib/components/ShaderBackground.svelte'
+  import ColorBackground from '$lib/components/organisms/ColorBackground.svelte'
+  import ImageBackground from '$lib/components/organisms/ImageBackground.svelte'
+  import ShaderBackground from '$lib/components/organisms/ShaderBackground.svelte'
   import { getShader, NONE_SHADER_ID } from '$lib/shaders'
   import { shaderBenchmark } from '$lib/shaders/benchmark.svelte'
 
