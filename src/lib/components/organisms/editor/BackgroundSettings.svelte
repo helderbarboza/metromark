@@ -9,6 +9,10 @@
     validateUploadFile,
   } from '$lib/background-image'
   import Icon from '$lib/components/atoms/Icon.svelte'
+  import BaseColorMode from '$lib/components/molecules/BaseColorMode.svelte'
+  import CollapsibleSection from '$lib/components/molecules/CollapsibleSection.svelte'
+  import SettingsRow from '$lib/components/molecules/SettingsRow.svelte'
+  import ShaderThumb from '$lib/components/molecules/ShaderThumb.svelte'
   import { Button } from '$lib/components/ui/button'
   import { Input } from '$lib/components/ui/input'
   import * as Select from '$lib/components/ui/select'
@@ -27,10 +31,6 @@
   } from '$lib/shaders/benchmark.svelte'
   import { shaderMetrics } from '$lib/shaders/metrics.svelte'
   import { levelFps, levelFrame, levelWorst } from '$lib/shaders/quality'
-  import BaseColorMode from '../../molecules/BaseColorMode.svelte'
-  import CollapsibleSection from '../../molecules/CollapsibleSection.svelte'
-  import SettingsRow from '../../molecules/SettingsRow.svelte'
-  import ShaderThumb from '../../molecules/ShaderThumb.svelte'
 
   type BackgroundType = Settings['background']['type']
   const BACKGROUND_TYPES = ['color', 'image', 'shader'] as const satisfies readonly BackgroundType[]

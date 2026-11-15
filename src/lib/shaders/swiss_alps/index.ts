@@ -40,8 +40,8 @@
  * the pipeline takes 16 frames to fill in after a resize, and a moving sun needs
  * those frames to settle. It defaults to a reduced render scale.
  */
-import type { ShaderDefinition } from '../types'
-import { VERTEX_SHADER } from '../vertex'
+import type { ShaderDefinition } from '$lib/shaders/types'
+import { VERTEX_SHADER } from '$lib/shaders/vertex'
 import { EPILOGUE, PRELUDE } from './adapter'
 import { BUFFER_A } from './buffer-a'
 import { BUFFER_B } from './buffer-b'

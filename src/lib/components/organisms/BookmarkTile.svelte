@@ -1,14 +1,14 @@
 <script lang='ts'>
+  import type { CommonTileProps, TileContentArgs } from '$lib/components/tile-props'
   import type { BookmarkTileDef } from '$lib/types'
   import type { Snippet } from 'svelte'
-  import type { CommonTileProps, TileContentArgs } from '../tile-props'
   import FaviconImage from '$lib/components/molecules/FaviconImage.svelte'
 
+  import TileShell from '$lib/components/molecules/TileShell.svelte'
+  import { tileVariants } from '$lib/components/tile-variants'
   import { GAP } from '$lib/layout'
   import { getTileGrid as getTileGridContext, hasTileGrid } from '$lib/tile-grid-context'
   import { cn } from 'tailwind-variants'
-  import TileShell from '../molecules/TileShell.svelte'
-  import { tileVariants } from '../tile-variants'
 
   interface Props extends CommonTileProps {
     tile: BookmarkTileDef

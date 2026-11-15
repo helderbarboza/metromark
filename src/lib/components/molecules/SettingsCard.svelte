@@ -2,8 +2,8 @@
   import type { IconName } from '$lib/icons'
   import type { Snippet } from 'svelte'
   import type { HTMLAttributes } from 'svelte/elements'
+  import Icon from '$lib/components/atoms/Icon.svelte'
   import { cn } from '$lib/utils'
-  import Icon from '../atoms/Icon.svelte'
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
     icon: IconName

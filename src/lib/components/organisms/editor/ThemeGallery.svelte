@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { ThemeSelections } from '$lib/theme-picker'
   import ThemePreview from '$lib/components/molecules/ThemePreview.svelte'
+  import Button from '$lib/components/ui/button/button.svelte'
   import {
     DARK_THEMES,
     getThemeSelections,
@@ -10,7 +11,6 @@
 
   } from '$lib/theme-picker'
   import { getTheme } from '$lib/themes.js'
-  import Button from '../../ui/button/button.svelte'
 
   interface Props {
     themes: ThemeSelections
