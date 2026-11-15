@@ -3,6 +3,7 @@ import { clouds } from './clouds'
 import { flow } from './flow'
 import { incense } from './incense'
 import { monterey } from './monterey'
+import { prismFlow } from './prism-flow'
 import { swissAlps } from './swiss_alps'
 
 export type { PassChannel, ShaderDefinition, ShaderPass, TextureSource } from './types'
@@ -11,6 +12,7 @@ export const shaders = {
   flow,
   incense,
   monterey,
+  'prism-flow': prismFlow,
   'swiss-alps': swissAlps,
 } as const satisfies Record<string, ShaderDefinition>
 export type ShaderId = keyof typeof shaders

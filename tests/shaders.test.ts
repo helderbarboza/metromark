@@ -16,6 +16,10 @@ describe('shader registry', () => {
     expect(getShader('swiss-alps')).toBe(shaders['swiss-alps'])
   })
 
+  it('resolves the prism flow id', () => {
+    expect(getShader('prism-flow')).toBe(shaders['prism-flow'])
+  })
+
   it('returns undefined for an unknown id (no implicit default shader)', () => {
     expect(getShader('not-a-shader')).toBeUndefined()
   })
