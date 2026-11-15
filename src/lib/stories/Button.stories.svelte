@@ -10,7 +10,7 @@
   const clickFn = fn()
 
   const { Story } = defineMeta({
-    title: 'Base/Button',
+    title: 'Atoms/Button',
     component: Button,
     tags: ['autodocs'],
     args: {

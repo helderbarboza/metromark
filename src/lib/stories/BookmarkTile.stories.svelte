@@ -9,7 +9,7 @@
   import { expect } from 'storybook/test'
 
   const { Story } = defineMeta({
-    title: 'Metro/Bookmark tile',
+    title: 'Organisms/Bookmark tile',
     component: BookmarkTile,
     tags: ['autodocs'],
     args: { tile: { title: 'Steam', colorIndex: 0, url: 'https://store.steampowered.com/' }, size: 'medium', domain: 'store.steampowered.com', showDomain: true },

@@ -4,7 +4,7 @@
   import { expect, userEvent } from 'storybook/test'
 
   const { Story } = defineMeta({
-    title: 'Metro/Workspace',
+    title: 'Organisms/Workspace',
     component: AppFixture,
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },

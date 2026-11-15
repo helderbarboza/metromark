@@ -24,7 +24,7 @@
   ]
 
   const { Story } = defineMeta({
-    title: 'Metro/Folder tile',
+    title: 'Organisms/Folder tile',
     component: FolderTile,
     tags: ['autodocs'],
     args: {

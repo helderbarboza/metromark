@@ -8,7 +8,7 @@
   import { expect, userEvent } from 'storybook/test'
 
   const { Story } = defineMeta({
-    title: 'Base/Settings card',
+    title: 'Molecules/Settings card',
     component: SettingsCard,
     tags: ['autodocs'],
     parameters: { layout: 'padded' },

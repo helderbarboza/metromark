@@ -8,7 +8,7 @@
 
   const undo = fn()
   const { Story } = defineMeta({
-    title: 'Metro/Undo and notifications',
+    title: 'Molecules/Undo and notifications',
     component: UndoToast,
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },

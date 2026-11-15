@@ -101,7 +101,7 @@
 
   const rename = fn()
   const { Story } = defineMeta({
-    title: 'Metro/Tile grid',
+    title: 'Organisms/Tile grid',
     component: MetroGroup,
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },

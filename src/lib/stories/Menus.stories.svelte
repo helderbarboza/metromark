@@ -9,7 +9,7 @@
   const edit = fn()
   const resize = fn()
   const { Story } = defineMeta({
-    title: 'Metro/Menus',
+    title: 'Molecules/Menus',
     component: MenuFixture,
     tags: ['autodocs'],
     parameters: { layout: 'centered' },

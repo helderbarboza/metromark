@@ -9,7 +9,7 @@
   import { expect, userEvent } from 'storybook/test'
 
   const { Story } = defineMeta({
-    title: 'Base/Collapsible section',
+    title: 'Molecules/Collapsible section',
     component: CollapsibleSection,
     tags: ['autodocs'],
     parameters: { layout: 'padded' },

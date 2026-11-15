@@ -7,7 +7,7 @@
   import { expect } from 'storybook/test'
 
   const { Story } = defineMeta({
-    title: 'Metro/Icon convert playground',
+    title: 'Playground/Icon convert',
     component: IconConvertPlayground,
     tags: ['autodocs'],
     args: {

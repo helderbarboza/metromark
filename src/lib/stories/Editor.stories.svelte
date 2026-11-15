@@ -6,7 +6,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
 
   const { Story } = defineMeta({
-    title: 'Metro/Bookmark editor',
+    title: 'Organisms/Bookmark editor',
     component: EditorFixture,
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },

@@ -13,7 +13,7 @@
     + 'and choose Fill for your desktop image.'
 
   const { Story } = defineMeta({
-    title: 'Base/Settings row',
+    title: 'Molecules/Settings row',
     component: SettingsRow,
     tags: ['autodocs'],
     parameters: { layout: 'padded' },

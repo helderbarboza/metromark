@@ -26,7 +26,7 @@
   ]
 
   const { Story } = defineMeta({
-    title: 'Metro/Tile grid static',
+    title: 'Organisms/Tile grid static',
     component: BookmarkTile,
     tags: ['autodocs'],
     parameters: { layout: 'fullscreen' },
