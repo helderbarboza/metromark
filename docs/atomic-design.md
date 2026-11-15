@@ -29,7 +29,7 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 
 - Components render UI. They take data through props and emit events through callbacks.
 - Data fetching, persistence and command dispatch live outside components, in adapters, the coordinator, or container components.
-- Visual properties use theme tokens. Sizes may use Tailwind utilities and arbitrary values when no token step matches (this repo uses exact 10–13 px type steps). Colors, however, always come from tokens.
+- Visual properties use theme tokens and the default Tailwind scale. Use the closest default token for a value; never write an arbitrary size class when a default token is close. Arbitrary values are allowed only when no token is close: static type steps below `text-xs` (the 8–10 px Metro micro type), `calc()`-derived layout math (`--cell`, viewport units) and `min()` clamps such as `min(var(--radius-md), 8px)`. Colors always come from tokens.
 - Compose components. Do not add boolean flag props to switch a component into a different kind of thing.
 - Keep atoms under 50 lines and molecules under 100 lines. Split only at a real seam, never just to meet a number.
 - A component earns a place in the hierarchy only when it renders UI. Headless helpers stay outside the levels.

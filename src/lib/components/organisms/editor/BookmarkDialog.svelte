@@ -83,13 +83,13 @@
 </script>
 
 <form onsubmit={submit}>
-  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
+  <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
     {node
       ? 'Edit the real bookmark. Your tile arrangement stays right where it is.'
       : 'Save something worth coming back to.'}
   </p>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-[12px] font-medium text-(--foreground)'>Title</span>
+    <span class='text-xs font-medium text-(--foreground)'>Title</span>
     <input
       data-initial-focus
       bind:value={name}
@@ -99,13 +99,13 @@
       autocomplete='off'
       class='
         h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-        text-[13px] text-(--foreground) outline-offset-1
+        text-xs text-(--foreground) outline-offset-1
         placeholder:text-(--muted-foreground) placeholder:opacity-60
       '
     />
   </label>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-[12px] font-medium text-(--foreground)'>Website address</span>
+    <span class='text-xs font-medium text-(--foreground)'>Website address</span>
     <input
       bind:value={url}
       required
@@ -114,7 +114,7 @@
       spellcheck='false'
       class='
         h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-        text-[13px] text-(--foreground) outline-offset-1
+        text-xs text-(--foreground) outline-offset-1
         placeholder:text-(--muted-foreground) placeholder:opacity-60
       '
     />
@@ -125,7 +125,7 @@
   {#if node}
     <div
       class='
-        mb-5.25 flex items-center gap-2 text-[10px] leading-[1.7]
+        mb-5.25 flex items-center gap-2 text-[10px] leading-relaxed
         text-(--muted-foreground)
       '
     >

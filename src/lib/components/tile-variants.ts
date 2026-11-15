@@ -43,7 +43,7 @@ export const tileVariants = tv({
     `,
     badge: `
       absolute top-2.5 left-3 flex h-5.5 min-w-5.5 items-center justify-center
-      rounded-[11px] bg-(--tile-fg) px-1.5 text-xs leading-none font-semibold
+      rounded-xl bg-(--tile-fg) px-1.5 text-xs leading-none font-semibold
       text-(--tile-bg)
     `,
   },

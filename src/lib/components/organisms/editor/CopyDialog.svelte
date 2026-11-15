@@ -5,14 +5,14 @@
   const { url, onclose }: { url: string, onclose: () => void } = $props()
 </script>
 
-<p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
+<p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
   Clipboard access isn't available here. Select the address and press
   Ctrl/Cmd+C.
 </p>
 <input
   class='
-    h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-    text-[13px] text-(--foreground) outline-offset-1
+    h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25 text-xs
+    text-(--foreground) outline-offset-1
   '
   data-initial-focus
   readonly

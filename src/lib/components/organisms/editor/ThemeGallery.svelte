@@ -38,7 +38,7 @@
     <div>
       <h4
         class='
-          mb-2.5 text-xs font-[550] tracking-[0.5px] text-(--muted-foreground) uppercase
+          mb-2.5 text-xs font-[550] tracking-wider text-(--muted-foreground) uppercase
         '
       >{mode} theme</h4>
       <div class='grid grid-cols-3 gap-2'>

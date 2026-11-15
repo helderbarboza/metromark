@@ -28,7 +28,7 @@
   </span>
   <span
     data-testid='toast-message'
-    class='max-w-105 text-xs leading-[1.6]'
+    class='max-w-105 text-xs/relaxed'
     role='status'
     aria-live='polite'
   >{notice.message}</span>

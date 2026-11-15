@@ -71,19 +71,20 @@
 
 <form onsubmit={submit}>
   {#if tile}
-    <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
+    <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
       A little personality for <strong class='text-(--foreground)'>{tile.title}</strong>.
-      Appearance changes are local; {folder ? 'the folder itself' : 'the bookmark itself'} stays untouched.
+      Appearance changes are local;
+      {folder ? 'the folder itself' : 'the bookmark itself'} stays untouched.
     </p>
     <label class='mb-5.25 flex flex-col gap-2.25'>
-      <span class='text-[12px] font-medium text-(--foreground)' id='tile-size-label'>Tile size</span>
+      <span class='text-xs font-medium text-(--foreground)' id='tile-size-label'>Tile size</span>
       <select
         aria-labelledby='tile-size-label'
         bind:value={size}
         data-initial-focus
         class='
           h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-          pr-7 text-[13px] text-(--foreground) outline-offset-1
+          pr-7 text-xs text-(--foreground) outline-offset-1
         '
       >
         {#each ['small', 'medium', 'wide', 'large'] as preset (preset)}

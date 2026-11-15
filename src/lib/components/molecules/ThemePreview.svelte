@@ -78,11 +78,7 @@
   {#each boards as board (board.label)}
     <span class='flex w-full flex-col'>
       <span class='pb-0.5 text-[0.5rem] leading-none text-(--foreground)'>{board.label}</span>
-      <span
-        class='
-          grid min-h-6 auto-cols-2 grid-flow-col grid-rows-[repeat(4,0.5rem)] gap-px
-        '
-      >
+      <span class='grid min-h-6 auto-cols-2 grid-flow-col auto-rows-2 grid-rows-4 gap-px'>
         {#each board.tiles as tile, i (i)}
           <span class={tile}></span>
         {/each}

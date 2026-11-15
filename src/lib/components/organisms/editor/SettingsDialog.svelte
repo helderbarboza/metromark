@@ -172,8 +172,8 @@
         checked={settings.showDomains}
         disabled={command.busy}
         class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
-          bg-(--border) p-0.75
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
           before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
           before:transition-transform before:duration-130
           checked:bg-(--primary)
@@ -197,8 +197,8 @@
         checked={settings.originalFavicons}
         disabled={command.busy}
         class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
-          bg-(--border) p-0.75
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
           before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
           before:transition-transform before:duration-130
           checked:bg-(--primary)
@@ -222,8 +222,8 @@
         checked={settings.reducedMotion}
         disabled={command.busy}
         class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
-          bg-(--border) p-0.75
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
           before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
           before:transition-transform before:duration-130
           checked:bg-(--primary)
@@ -241,7 +241,7 @@
 
     <div class='mb-7.25'>
       <h3 class='mb-3.25 text-xs font-[550]'>Reset layouts</h3>
-      <p class='m-0 text-xs leading-[1.65] text-(--muted-foreground)'>
+      <p class='m-0 text-xs/relaxed text-(--muted-foreground)'>
         Reset positions to browser bookmark order. Your colors, sizes, and
         bookmarks stay intact.
       </p>
@@ -271,7 +271,7 @@
 
     <div class='mb-7.25 border-t border-(--border) pt-5.5'>
       <h3 class='mb-3.25 text-xs font-[550]'>Factory reset</h3>
-      <p class='mx-0 mt-0 mb-3.75 text-xs leading-[1.65] text-(--muted-foreground)'>
+      <p class='mx-0 mt-0 mb-3.75 text-xs/relaxed text-(--muted-foreground)'>
         Reset tile colors, sizes, placements, and display options. This also
         resets your theme and mode and clears Undo history. Your bookmarks
         stay. This cannot be undone.
@@ -313,8 +313,8 @@
 
 {#if isPreview}
   <div class='mt-7 rounded-sm border border-(--border) bg-(--background) p-4.25'>
-    <span class='text-[0.5rem] tracking-[1.1px] text-(--muted-foreground)'>DEMO WORKSPACE</span>
-    <p class='mt-2.25 mb-3.25 text-[10px] leading-[1.7] text-(--muted-foreground)'>
+    <span class='text-[0.5rem] tracking-widest text-(--muted-foreground)'>DEMO WORKSPACE</span>
+    <p class='mt-2.25 mb-3.25 text-[10px] leading-relaxed text-(--muted-foreground)'>
       This preview uses sample bookmarks, not your real browser data.
     </p>
     {#if confirmPreview}

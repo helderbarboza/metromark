@@ -232,7 +232,7 @@
     <div class='min-w-0'>
       <div
         class='
-          mb-1.5 truncate text-xs tracking-[1.1px] text-(--muted-foreground) uppercase
+          mb-1.5 truncate text-xs tracking-widest text-(--muted-foreground) uppercase
         '
         data-testid='group-path'
         title={group.path.join(' / ')}
@@ -244,8 +244,7 @@
       <div class='flex items-start gap-2.75'>
         <h2
           class='
-            m-0 line-clamp-2 text-base leading-[1.15] font-semibold wrap-break-word
-            text-foreground
+            m-0 line-clamp-2 text-base/tight font-semibold wrap-break-word text-foreground
           '
           title={group.title}
         >
@@ -297,8 +296,8 @@
         onOpenAutoFocus={event => focusFirstMenuItem(event, menuContentEl)}
       >
         <ContextMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
-          <strong class='truncate text-[12px] font-semibold'>{group.title || 'Unnamed group'}</strong>
-          <span class='truncate text-[11px] text-(--muted-foreground)'>{group.path.join(' / ')}</span>
+          <strong class='truncate text-xs font-semibold'>{group.title || 'Unnamed group'}</strong>
+          <span class='truncate text-xs text-(--muted-foreground)'>{group.path.join(' / ')}</span>
         </ContextMenu.Label>
         {@render menu(group)}
       </ContextMenu.Content>

@@ -40,10 +40,10 @@
       '
     >
       <div>
-        <div class='mb-2 text-[0.5rem] tracking-[1.7px] text-(--muted-foreground)'>
+        <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>
           MAKE YOURSELF AT HOME
         </div>
-        <h2 class='m-0 text-2xl font-[450] tracking-[-1px]'>
+        <h2 class='m-0 text-2xl font-[450] tracking-tighter'>
           Settings
         </h2>
       </div>

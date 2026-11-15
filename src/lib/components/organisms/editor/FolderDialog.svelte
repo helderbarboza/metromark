@@ -54,13 +54,13 @@
 </script>
 
 <form onsubmit={submit}>
-  <p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
+  <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
     {isRename
       ? 'Only this folder’s name changes. Descendant group paths update automatically.'
       : 'A bookmark folder becomes a tile group. Nested folders get their own group, too.'}
   </p>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-[12px] font-medium text-(--foreground)'>Folder name</span>
+    <span class='text-xs font-medium text-(--foreground)'>Folder name</span>
     <input
       data-initial-focus
       bind:value={name}
@@ -70,7 +70,7 @@
       autocomplete='off'
       class='
         h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-        text-[13px] text-(--foreground) outline-offset-1
+        text-xs text-(--foreground) outline-offset-1
         placeholder:text-(--muted-foreground) placeholder:opacity-60
       '
     />

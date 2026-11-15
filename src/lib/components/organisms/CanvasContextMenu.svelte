@@ -159,9 +159,9 @@
     onCloseAutoFocus={onCloseAutoFocus}
   >
     <ContextMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
-      <strong class='truncate text-[12px] font-semibold'>{menuHeading.title}</strong>
+      <strong class='truncate text-xs font-semibold'>{menuHeading.title}</strong>
       {#if menuHeading.subtitle}
-        <span class='truncate text-[12px] text-(--muted-foreground)'>{menuHeading.subtitle}</span>
+        <span class='truncate text-xs text-(--muted-foreground)'>{menuHeading.subtitle}</span>
       {/if}
     </ContextMenu.Label>
     <MenuItems items={menuItems} variant='context' />

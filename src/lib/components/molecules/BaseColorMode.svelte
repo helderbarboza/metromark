@@ -61,7 +61,7 @@
       value={color || DEFAULT_CUSTOM_COLOR}
       aria-describedby={`${idPrefix}-color-help`}
       class='
-        size-8 cursor-pointer rounded-[3px] border border-(--border) bg-transparent p-0.5
+        size-8 cursor-pointer rounded-xs border border-(--border) bg-transparent p-0.5
         disabled:cursor-not-allowed disabled:opacity-50
       '
       oninput={event => onchange(false, event.currentTarget.value)}

@@ -29,7 +29,7 @@
   }
 </script>
 
-<p class='mb-6.5 text-[13px] leading-[1.8] text-(--muted-foreground)'>
+<p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
   Delete <strong class='text-(--foreground)'>{node.title}</strong> and everything
   inside it? This removes the folder from {mode === 'preview'
     ? 'this demo workspace'
@@ -43,13 +43,13 @@
 >
   <Icon name='folder' size={24} />
   <div>
-    <strong class='mb-1.25 block text-[13px] font-medium'>{countBookmarks(node)} bookmarks</strong>
+    <strong class='mb-1.25 block text-xs font-medium'>{countBookmarks(node)} bookmarks</strong>
     <span class='text-xs text-(--muted-foreground)'>
       {flatten([node]).filter(isFolder).length - 1} nested folders
     </span>
   </div>
 </div>
-<p class='m-0 text-xs leading-[1.65] text-(--muted-foreground)'>
+<p class='m-0 text-xs/relaxed text-(--muted-foreground)'>
   You can Undo for 30 seconds. Restored bookmarks receive new browser IDs.
 </p>
 <DialogError error={command.error} />

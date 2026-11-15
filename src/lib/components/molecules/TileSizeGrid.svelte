@@ -16,15 +16,15 @@
   const { size, onresize }: Props = $props()
   const sizes: TileSize[] = ['small', 'medium', 'wide', 'large']
   const boxClass: Record<TileSize, string> = {
-    small: 'size-[7px]',
+    small: 'size-1.75',
     medium: 'size-3',
-    wide: 'h-[10px] w-5',
-    large: 'size-[14px]',
+    wide: 'h-2.5 w-5',
+    large: 'size-3.5',
   }
 </script>
 
 <ContextMenu.Separator />
-<ContextMenu.Label class='px-2 pt-2 pb-1.5 text-[11px] tracking-[1px] text-(--muted-foreground)'>
+<ContextMenu.Label class='px-2 pt-2 pb-1.5 text-xs tracking-widest text-(--muted-foreground)'>
   TILE SIZE
 </ContextMenu.Label>
 <ContextMenu.Group class='flex gap-1 px-1 pb-1.5'>

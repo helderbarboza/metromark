@@ -15,7 +15,7 @@
 </script>
 
 <div class='mb-5.25 flex flex-col gap-2.25'>
-  <span class='text-[12px] font-medium text-(--foreground)' id={uid}>
+  <span class='text-xs font-medium text-(--foreground)' id={uid}>
     Color
   </span>
   <div
@@ -30,7 +30,7 @@
         aria-label='Use theme color {i + 1}'
         aria-pressed={!customColor && colorIndex === i}
         class='
-          flex size-7.75 items-center justify-center rounded-[3px] text-white
+          flex size-7.75 items-center justify-center rounded-xs text-white
           aria-pressed:outline-2 aria-pressed:outline-offset-2
           aria-pressed:outline-(--foreground)
         '
@@ -50,7 +50,7 @@
       aria-label='Custom color'
       aria-pressed={!!customColor}
       class='
-        flex size-7.75 items-center justify-center rounded-[3px] text-white
+        flex size-7.75 items-center justify-center rounded-xs text-white
         aria-pressed:outline-2 aria-pressed:outline-offset-2
         aria-pressed:outline-(--foreground)
       '
@@ -74,8 +74,7 @@
         aria-label='Custom tile color'
         title='Custom color'
         class='
-          size-8 cursor-pointer rounded-[3px] border border-(--border) bg-transparent
-          p-0.5
+          size-8 cursor-pointer rounded-xs border border-(--border) bg-transparent p-0.5
         '
       />
     {/if}

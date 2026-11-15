@@ -46,7 +46,7 @@
       <div class='mt-7 flex justify-end gap-2.25'>
         <button
           class='
-            h-10.5 rounded-sm border border-(--border) bg-(--card) px-4.25 text-[12px]
+            h-10.5 rounded-sm border border-(--border) bg-(--card) px-4.25 text-xs
             font-medium text-(--foreground)
           '
           onclick={onclose}

@@ -607,7 +607,7 @@
             : shaderBenchmark.hasResults() ? 'Re-run benchmark' : 'Run benchmark'}
         </Button>
       </div>
-      <p class='mt-1.5 text-[10px] leading-[1.6] text-(--muted-foreground)'>
+      <p class='mt-1.5 text-[10px] leading-relaxed text-(--muted-foreground)'>
         Your GPU re-renders the background on every new tab, and shader cost differs
         a lot between shaders. This test renders each shader offscreen at a fixed
         size on this PC and measures the frame time, so you can pick one that keeps
@@ -781,7 +781,7 @@
         </div>
       </div>
     {:else}
-      <p class='p-4 text-[10px] leading-[1.6] text-(--muted-foreground)'>
+      <p class='p-4 text-[10px] leading-relaxed text-(--muted-foreground)'>
         No animated background is running.
       </p>
     {/if}
@@ -800,8 +800,8 @@
         disabled={busy}
         onchange={event => updateShader({ mouseInteraction: event.currentTarget.checked })}
         class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
-          bg-(--border) p-0.75
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
           before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
           before:transition-transform before:duration-130
           checked:bg-(--primary)
@@ -834,7 +834,7 @@
       {#if sourceTab === 'upload'}
         <p
           class='
-            mt-4 mb-2 text-[0.5rem] font-semibold tracking-[1.1px]
+            mt-4 mb-2 text-[0.5rem] font-semibold tracking-widest
             text-(--muted-foreground)
           '
         >
@@ -884,7 +884,7 @@
         <label
           for='image-url'
           class='
-            mt-4 mb-2 block text-[0.5rem] font-semibold tracking-[1.1px]
+            mt-4 mb-2 block text-[0.5rem] font-semibold tracking-widest
             text-(--muted-foreground)
           '
         >
@@ -1005,8 +1005,8 @@
         disabled={busy || uploading || settings.reducedMotion}
         onchange={event => updateImage({ parallax: event.currentTarget.checked })}
         class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-[20px]
-          bg-(--border) p-0.75
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
           before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
           before:transition-transform before:duration-130
           checked:bg-(--primary)
