@@ -17,13 +17,13 @@ import {
 
 test('flat ancestry, separate roots, launcher tiles, and background context-menu keyboard navigation', async ({ page }) => {
   await start(page)
-  await expect(page.locator('[data-testid="metro-group"]')).toHaveCount(7)
+  await expect(page.locator('[data-testid="metro-group"]')).toHaveCount(8)
   await expect(group(page, 'Tools').locator('[data-testid="group-path"]')).toHaveText('Bookmarks bar / Learning /')
   await expect(link(page, 'Steam')).toHaveAttribute('href', 'https://store.steampowered.com/')
   await expect(link(page, 'Steam')).toHaveAttribute('data-size', 'large')
   await page.getByRole('button', { name: /^Other bookmarks/ }).click()
   await expect(page.locator('[data-testid="metro-group"]')).toHaveCount(1)
-  await expect(page.locator('a[data-grid-id]')).toHaveCount(4)
+  await expect(page.locator('a[data-grid-id]')).toHaveCount(7)
   await expect(group(page, 'Other bookmarks')).toBeVisible()
   await page.getByRole('button', { name: /^All bookmarks/ }).click()
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
@@ -399,7 +399,16 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
     showDomains: true,
     originalFavicons: false,
     reducedMotion: false,
-    background: { auto: true, type: 'color' },
+    // Keep in sync with SETTINGS_DEFAULTS in src/lib/config.ts.
+    background: {
+      auto: true,
+      fit: 'cover',
+      opacity: 1,
+      parallax: false,
+      parallaxZoom: 1.25,
+      type: 'image',
+      url: 'https://images.unsplash.com/photo-1660526224364-8f71a4a09514?q=85&fm=jpg&cs=srgb',
+    },
   })
 })
 
