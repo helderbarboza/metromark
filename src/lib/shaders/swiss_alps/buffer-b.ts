@@ -167,7 +167,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                 + mix(vec3(smoothstep(.1, 0., sun.z)) * terrainNormal.y, fogCol, 
                       SAT(fogMask)) * (.012, .024, .048);
         }
-        col.a = terrainDist;
+        // Keep sky alpha well above CAMERA_FAR so float16 storage/sampling
+        // cannot round a sky hit (200.0, 200.0625] down to CAMERA_FAR (200.0).
+        col.a = terrainDist > CAMERA_FAR ? CAMERA_FAR + 10. : terrainDist;
     }
     
     fragColor = col;

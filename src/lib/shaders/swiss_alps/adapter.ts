@@ -11,6 +11,7 @@
 export const PRELUDE = `
 precision highp float;
 precision highp int;
+precision highp sampler2D;
 
 uniform vec3 iResolution;
 uniform float iTime;
