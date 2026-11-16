@@ -576,7 +576,7 @@
         />
       {/if}
 
-      <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
+      <header class='shrink-0 px-40 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
         <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
           <RootsNav
             {roots}

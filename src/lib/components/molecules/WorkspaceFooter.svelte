@@ -52,7 +52,7 @@
 
 <footer
   class='
-    flex min-h-16 shrink-0 items-center justify-between gap-5 px-16 pb-1.5
+    flex min-h-16 shrink-0 items-center justify-between gap-5 px-40 pb-1.5
     max-lg:px-9
     max-md:px-6
   '

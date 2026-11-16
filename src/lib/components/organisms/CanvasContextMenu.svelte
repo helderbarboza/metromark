@@ -113,7 +113,7 @@
             <SnapGridGroup>
               <div
                 class='
-                  flex h-fit w-max items-end gap-9 px-16
+                  flex h-fit w-max items-end gap-9 px-40
                   max-lg:gap-7 max-lg:px-9
                   max-md:px-6
                 '
