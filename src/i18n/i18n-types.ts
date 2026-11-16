@@ -619,14 +619,9 @@ type RootTranslation = {
 		 */
 		label: string
 		/**
-		 * A​l​l​ ​b​o​o​k​m​a​r​k​s​ ​·​ ​{​c​o​u​n​t​}
-		 * @param {unknown} count
-		 */
-		allBookmarks: RequiredParams<'count'>
-		/**
 		 * A​l​l​ ​b​o​o​k​m​a​r​k​s
 		 */
-		allBookmarksPlain: string
+		allBookmarks: string
 	}
 	status: {
 		/**
@@ -2113,13 +2108,9 @@ export type TranslationFunctions = {
 		 */
 		label: () => LocalizedString
 		/**
-		 * All bookmarks · {count}
-		 */
-		allBookmarks: (arg: { count: unknown }) => LocalizedString
-		/**
 		 * All bookmarks
 		 */
-		allBookmarksPlain: () => LocalizedString
+		allBookmarks: () => LocalizedString
 	}
 	status: {
 		/**

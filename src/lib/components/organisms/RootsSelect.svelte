@@ -2,7 +2,6 @@
   import type { BookmarkNode } from '$lib/types'
   import LL, { locale } from '$i18n/i18n-svelte'
   import * as Select from '$lib/components/ui/select'
-  import { countBookmarks } from '$lib/tree'
 
   interface Props {
     roots: BookmarkNode[]
@@ -14,15 +13,14 @@
   const {
     roots,
     rootFilter,
-    bookmarkCount,
     onSelect,
   }: Props = $props()
 
   function labelFor(id: string): string {
     if (id === 'all')
-      return $LL.roots.allBookmarks({ count: bookmarkCount })
+      return $LL.roots.allBookmarks()
     const root = roots.find(node => node.id === id)
-    return root ? `${root.title} · ${countBookmarks(root)}` : $LL.roots.allBookmarksPlain()
+    return root ? root.title : $LL.roots.allBookmarks()
   }
 
   const selectedLabel = $derived.by(() => {
@@ -48,9 +46,9 @@
   </Select.Trigger>
   <Select.Content>
     <Select.Group>
-      <Select.Item value='all'>{$LL.roots.allBookmarks({ count: bookmarkCount })}</Select.Item>
+      <Select.Item value='all'>{$LL.roots.allBookmarks()}</Select.Item>
       {#each roots as root (root.id)}
-        <Select.Item value={root.id}>{root.title} · {countBookmarks(root)}</Select.Item>
+        <Select.Item value={root.id}>{root.title}</Select.Item>
       {/each}
     </Select.Group>
   </Select.Content>

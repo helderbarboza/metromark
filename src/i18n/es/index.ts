@@ -164,8 +164,7 @@ const es: Translation = {
   },
   roots: {
     label: 'Raíz de marcadores',
-    allBookmarks: 'Todos los marcadores · {count}',
-    allBookmarksPlain: 'Todos los marcadores',
+    allBookmarks: 'Todos los marcadores',
   },
   status: {
     reconnectingTitle: 'Vamos a reconectar.',

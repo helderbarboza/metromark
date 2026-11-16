@@ -164,8 +164,7 @@ const pt: Translation = {
   },
   roots: {
     label: 'Raiz de favoritos',
-    allBookmarks: 'Todos os favoritos · {count}',
-    allBookmarksPlain: 'Todos os favoritos',
+    allBookmarks: 'Todos os favoritos',
   },
   status: {
     reconnectingTitle: 'Vamos reconectar.',

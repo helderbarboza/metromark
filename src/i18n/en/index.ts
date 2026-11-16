@@ -164,8 +164,7 @@ const en = {
   },
   roots: {
     label: 'Bookmark root',
-    allBookmarks: 'All bookmarks · {count}',
-    allBookmarksPlain: 'All bookmarks',
+    allBookmarks: 'All bookmarks',
   },
   status: {
     reconnectingTitle: 'Let’s reconnect.',
