@@ -26,7 +26,8 @@
     "screenshots": "node scripts/screenshot-profiles.mjs",
     "postinstall": "wxt prepare",
     "generate:themes": "node scripts/generate-themes.mjs",
-    "i18n": "typesafe-i18n --no-watch"
+    "i18n": "typesafe-i18n --no-watch",
+    "i18n:watch": "typesafe-i18n"
   },
   "dependencies": {
     "@dnd-kit/dom": "0.4.0",
