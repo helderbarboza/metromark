@@ -1,5 +1,6 @@
 <script lang='ts'>
   import FaviconIcon from '$lib/components/atoms/FaviconIcon.svelte'
+  import { SETTINGS_DEFAULTS } from '$lib/config'
   import { loadConvertedFavicon, loadFavicon } from '$lib/favicon-cache'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   // Container for the tile favicon: resolves the browser's favicon cache
@@ -38,7 +39,9 @@
   // components need no prop drilling. Stories without a provider get the
   // monochrome default.
   const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
-  const originalFavicons = $derived(readWorkspace?.().originalFavicons ?? false)
+  const originalFavicons = $derived(
+    readWorkspace?.().originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
+  )
 
   const keyOf = (url: string, shade: string, original: boolean) =>
     `${url} ${original ? 'original' : shade}`

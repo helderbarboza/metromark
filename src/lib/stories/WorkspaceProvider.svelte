@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { WorkspaceState } from '$lib/workspace-context'
   import type { Snippet } from 'svelte'
+  import { SETTINGS_DEFAULTS } from '$lib/config'
   import { TILE_SIZES } from '$lib/layout'
   import { setWorkspace } from '$lib/workspace-context'
 
@@ -15,8 +16,8 @@
   setWorkspace(() => ({
     dragging: state.dragging ?? false,
     selectedId: state.selectedId ?? null,
-    reducedMotion: state.reducedMotion ?? false,
-    originalFavicons: state.originalFavicons ?? false,
+    reducedMotion: state.reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion,
+    originalFavicons: state.originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
     sizes: state.sizes ?? TILE_SIZES,
   }))
 </script>

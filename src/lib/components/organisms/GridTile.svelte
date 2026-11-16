@@ -40,6 +40,7 @@
   import LL from '$i18n/i18n-svelte'
   import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
   import FolderTile from '$lib/components/organisms/FolderTile.svelte'
+  import { SETTINGS_DEFAULTS } from '$lib/config'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
   import { sizeOf } from '$lib/layout'
   import { safeUrl, validateUrl } from '$lib/url'
@@ -80,7 +81,7 @@
   const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
   const dragging = $derived(readWorkspace?.().dragging ?? false)
   const selected = $derived((readWorkspace?.().selectedId ?? null) === id)
-  const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? false)
+  const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion)
   // Cross-slide runs on touch and pen only; a mouse selects with the right button
   // and moves tiles with a plain drag.
   let gesture = $state<Gesture | null>(null)

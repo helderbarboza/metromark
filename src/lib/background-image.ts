@@ -1,4 +1,5 @@
 import type { Settings } from '$lib/config'
+import { BACKGROUND_DEFAULTS } from '$lib/config'
 import { getT } from '$lib/locale'
 
 // Validation and sizing math for image backgrounds. This module stays DOM-free
@@ -109,7 +110,7 @@ export function normalizeImageBackgroundSettings(settings: Settings): Settings {
     return settings
   const zoom = background.parallaxZoom
   if (!Number.isFinite(zoom))
-    return { ...settings, background: { ...background, parallaxZoom: 1.5 } }
+    return { ...settings, background: { ...background, parallaxZoom: BACKGROUND_DEFAULTS.image.parallaxZoom } }
   const factor = zoom > 4 ? zoom / 100 : zoom
   const clamped = Math.min(4, Math.max(1, factor))
   if (clamped === zoom)

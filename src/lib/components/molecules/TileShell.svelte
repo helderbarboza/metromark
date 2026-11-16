@@ -8,6 +8,7 @@
   import { tileVariants } from '$lib/components/tile-variants'
   import { tilt } from '$lib/components/tilt'
   import Button from '$lib/components/ui/button/button.svelte'
+  import { SETTINGS_DEFAULTS } from '$lib/config'
   import { TILE_SIZES } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
   import { safeUrl } from '$lib/url'
@@ -83,7 +84,7 @@
   // keeps opacity 1 (jest-dom treats opacity 0 as not visible); exit may fade.
   const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
   const allowedSizes = $derived(readWorkspace?.().sizes ?? TILE_SIZES)
-  const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? false)
+  const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion)
 
   const isLink = $derived(as === 'a')
   const launchHref = $derived(href ?? safeUrl(tile.url ?? ''))

@@ -21,7 +21,7 @@
   import SettingsDrawer from '$lib/components/organisms/SettingsDrawer.svelte'
   import ThemeSync from '$lib/components/ThemeSync.svelte'
   import * as Tooltip from '$lib/components/ui/tooltip'
-  import { BACKGROUND_DEFAULTS } from '$lib/config'
+  import { BACKGROUND_DEFAULTS, SETTINGS_DEFAULTS } from '$lib/config'
   import { toggleSelection } from '$lib/interaction'
   import { KeyboardNav } from '$lib/keyboard-nav'
   import { GAP, rowsForGridView, tileSizesForView } from '$lib/layout'
@@ -90,7 +90,7 @@
   let noticeUntil = $state(0)
   const smoothScroll = new SmoothScroller({
     getScroller: () => scroller,
-    isReducedMotion: () => snapshot?.settings.reducedMotion ?? false,
+    isReducedMotion: () => snapshot?.settings.reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion,
     isMenuOpen: () => menuOpen,
     closeMenu: () => {
       menuOpen = false
@@ -134,7 +134,7 @@
   const folderCount = $derived(
     groups.filter(group => !group.isSystem).length,
   )
-  const gridView = $derived(snapshot?.settings.gridView ?? 'classic')
+  const gridView = $derived(snapshot?.settings.gridView ?? SETTINGS_DEFAULTS.gridView)
   const sizes = $derived(tileSizesForView(gridView))
   const rows = $derived(rowsForGridView(gridView))
   const cell = $derived(
@@ -162,7 +162,9 @@
   const reducedMotion = $derived(
     snapshot?.settings.reducedMotion || osReducedMotion.current,
   )
-  const originalFavicons = $derived(snapshot?.settings.originalFavicons ?? false)
+  const originalFavicons = $derived(
+    snapshot?.settings.originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
+  )
   // Workspace state for the canvas subtree (tiles read it via context). The getter
   // closure keeps consumers reactive without drilling props.
   setWorkspace(() => ({
@@ -284,7 +286,7 @@
     }, 300)
     // Infer the language automatically unless the user picked one explicitly.
     const handleLanguageChange = () => {
-      if ((snapshot?.settings.language ?? 'auto') === 'auto')
+      if ((snapshot?.settings.language ?? SETTINGS_DEFAULTS.language) === 'auto')
         applyLocale('auto', { persist: false })
     }
     window.addEventListener('languagechange', handleLanguageChange)

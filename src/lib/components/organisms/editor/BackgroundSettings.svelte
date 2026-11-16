@@ -93,9 +93,11 @@
   // mount-time value on purpose; the effect below keeps them in sync after.
   const initialShader = () =>
     settings.background.type === 'shader' ? settings.background : undefined
-  let speedDraft = $state(initialShader()?.speed ?? 1)
-  let opacityDraft = $state(initialShader()?.opacity ?? 1)
-  let renderScaleDraft = $state(initialShader()?.renderScale ?? 0.5)
+  let speedDraft = $state(initialShader()?.speed ?? BACKGROUND_DEFAULTS.shader.speed)
+  let opacityDraft = $state(initialShader()?.opacity ?? BACKGROUND_DEFAULTS.shader.opacity)
+  let renderScaleDraft = $state(
+    initialShader()?.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale,
+  )
   let dragging = $state(false)
   // Target of the last commit, so a stale in-flight snapshot does not pull the
   // drafts back before the coordinator persists and republishes.
@@ -116,9 +118,9 @@
     }
     if (pending) {
       if (
-        (bg.speed ?? 1) === pending.speed
-        && (bg.opacity ?? 1) === pending.opacity
-        && (bg.renderScale ?? 0.5) === pending.renderScale
+        (bg.speed ?? BACKGROUND_DEFAULTS.shader.speed) === pending.speed
+        && (bg.opacity ?? BACKGROUND_DEFAULTS.shader.opacity) === pending.opacity
+        && (bg.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale) === pending.renderScale
       ) {
         pending = null
       }
@@ -126,9 +128,9 @@
     }
     if (dragging)
       return
-    speedDraft = bg.speed ?? 1
-    opacityDraft = bg.opacity ?? 1
-    renderScaleDraft = bg.renderScale ?? 0.5
+    speedDraft = bg.speed ?? BACKGROUND_DEFAULTS.shader.speed
+    opacityDraft = bg.opacity ?? BACKGROUND_DEFAULTS.shader.opacity
+    renderScaleDraft = bg.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale
   })
 
   $effect(() => () => clearTimeout(trailingTimer))
@@ -190,10 +192,10 @@
   let urlError = $state('')
   let checking = $state(false)
   let uploading = $state(false)
-  let imageOpacityDraft = $state(initialImage()?.opacity ?? 1)
+  let imageOpacityDraft = $state(initialImage()?.opacity ?? BACKGROUND_DEFAULTS.image.opacity)
   let opacityDragging = $state(false)
   let opacityPending = $state<number | null>(null)
-  let zoomDraft = $state(initialImage()?.parallaxZoom ?? 1.5)
+  let zoomDraft = $state(initialImage()?.parallaxZoom ?? BACKGROUND_DEFAULTS.image.parallaxZoom)
   let zoomDragging = $state(false)
   let zoomPending = $state<number | null>(null)
   let fileInput = $state<HTMLInputElement | null>(null)
@@ -222,22 +224,24 @@
     if (!urlDirty)
       urlDraft = isStoredMedia(bg.url) ? '' : (bg.url ?? '')
     if (opacityPending !== null) {
-      if ((bg.opacity ?? 1) === opacityPending)
+      if ((bg.opacity ?? BACKGROUND_DEFAULTS.image.opacity) === opacityPending)
         opacityPending = null
     }
-    if (zoomPending !== null && (bg.parallaxZoom ?? 1.5) === zoomPending)
+    if (zoomPending !== null
+      && (bg.parallaxZoom ?? BACKGROUND_DEFAULTS.image.parallaxZoom) === zoomPending) {
       zoomPending = null
+    }
     if (opacityDragging || zoomDragging) {
       if (!opacityDragging && opacityPending === null)
-        imageOpacityDraft = bg.opacity ?? 1
+        imageOpacityDraft = bg.opacity ?? BACKGROUND_DEFAULTS.image.opacity
       if (!zoomDragging && zoomPending === null)
-        zoomDraft = bg.parallaxZoom ?? 1.5
+        zoomDraft = bg.parallaxZoom ?? BACKGROUND_DEFAULTS.image.parallaxZoom
       return
     }
     if (opacityPending === null)
-      imageOpacityDraft = bg.opacity ?? 1
+      imageOpacityDraft = bg.opacity ?? BACKGROUND_DEFAULTS.image.opacity
     if (zoomPending === null)
-      zoomDraft = bg.parallaxZoom ?? 1.5
+      zoomDraft = bg.parallaxZoom ?? BACKGROUND_DEFAULTS.image.parallaxZoom
   })
 
   const COMMIT_OPACITY_INTERVAL_MS = 125
@@ -653,7 +657,7 @@
         value={(
           settings.background.type === 'shader'
             ? settings.background.quality
-            : 'motion')}
+            : BACKGROUND_DEFAULTS.shader.quality)}
         disabled={busy}
         onValueChange={(v) => {
           if (v !== 'motion' && v !== 'detail')
@@ -666,7 +670,7 @@
       </ToggleGroup.Root>
     </SettingsRow>
     <BaseColorMode
-      auto={settings.background.auto ?? true}
+      auto={settings.background.auto ?? BACKGROUND_DEFAULTS.shader.auto}
       color={settings.background.color}
       {busy}
       idPrefix='shader-background'
@@ -699,7 +703,9 @@
     >
       <ToggleGroup.Root
         type='single'
-        value={String(settings.background.targetFps ?? 60)}
+        value={String(
+          settings.background.targetFps ?? BACKGROUND_DEFAULTS.shader.targetFps,
+        )}
         onValueChange={v => updateShader({ targetFps: Number(v) })}
         id='shader-fps'
         aria-labelledby='shader-fps-title'
@@ -805,7 +811,8 @@
         type='checkbox'
         role='switch'
         aria-describedby='shader-mouse-help'
-        checked={settings.background.mouseInteraction ?? true}
+        checked={settings.background.mouseInteraction
+          ?? BACKGROUND_DEFAULTS.shader.mouseInteraction}
         disabled={busy}
         onchange={event => updateShader({ mouseInteraction: event.currentTarget.checked })}
         class='
@@ -970,7 +977,7 @@
       </ToggleGroup.Root>
     </SettingsRow>
     <BaseColorMode
-      auto={bg.auto ?? true}
+      auto={bg.auto ?? BACKGROUND_DEFAULTS.image.auto}
       color={bg.color}
       busy={busy || uploading}
       idPrefix='image-background'
@@ -1010,7 +1017,7 @@
         type='checkbox'
         role='switch'
         aria-describedby='image-parallax-help'
-        checked={bg.parallax ?? false}
+        checked={bg.parallax ?? BACKGROUND_DEFAULTS.image.parallax}
         disabled={busy || uploading || settings.reducedMotion}
         onchange={event => updateImage({ parallax: event.currentTarget.checked })}
         class='
@@ -1025,7 +1032,7 @@
       />
     </SettingsRow>
     {@const parallaxDisabled = busy || uploading || settings.reducedMotion
-      || !(bg.parallax ?? false)}
+      || !(bg.parallax ?? BACKGROUND_DEFAULTS.image.parallax)}
     <SettingsRow
       title={$LL.settings.parallaxZoom()}
       helpText={$LL.settings.parallaxZoomHelp()}

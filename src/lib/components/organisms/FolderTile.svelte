@@ -6,6 +6,7 @@
   import FaviconImage from '$lib/components/molecules/FaviconImage.svelte'
   import TileShell from '$lib/components/molecules/TileShell.svelte'
   import { tileVariants } from '$lib/components/tile-variants'
+  import { APPEARANCE_DEFAULTS } from '$lib/config'
   import { FOLDER_COLUMNS, FOLDER_PREVIEW, FOLDER_ROWS } from '$lib/folder-preview'
   import { resolveTileColors } from '$lib/theme-colors'
   import { mode, theme } from 'mode-watcher'
@@ -48,7 +49,8 @@
         return { kind: 'blank' } satisfies BlankSlot
       if (cell.kind === 'folder')
         return { kind: 'folder', cell } satisfies FolderSlot
-      const colors = resolveTileColors({ colorIndex: cell.colorIndex ?? 0, color: cell.color })
+      const colorIndex = cell.colorIndex ?? APPEARANCE_DEFAULTS.colorIndex
+      const colors = resolveTileColors({ colorIndex, color: cell.color })
       return {
         kind: 'bookmark',
         cell,

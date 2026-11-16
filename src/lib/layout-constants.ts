@@ -1,4 +1,5 @@
 import type { Appearance, BookmarkNode, Layout, LayoutItem, TileSize } from '$lib/types'
+import { APPEARANCE_DEFAULTS, SETTINGS_DEFAULTS } from '$lib/config'
 import { getT } from '$lib/locale'
 
 export const ROWS = 8
@@ -58,7 +59,8 @@ export const GRID_VIEWS = {
 
 export type GridView = keyof typeof GRID_VIEWS
 
-export const DEFAULT_GRID_VIEW: GridView = 'classic'
+/** The Classic view, matching SETTINGS_DEFAULTS.gridView. */
+export const DEFAULT_GRID_VIEW: GridView = SETTINGS_DEFAULTS.gridView
 
 /** Whether a value is one of the known grid view ids. */
 export function isGridView(value: unknown): value is GridView {
@@ -99,7 +101,7 @@ export function effectiveTileSize(size: TileSize, rows: number = ROWS): TileSize
 }
 
 export function sizeOf(item: Pick<LayoutItem, 'w' | 'h'>): TileSize {
-  return TILE_SIZES.find(size => SIZES[size][0] === item.w && SIZES[size][1] === item.h) ?? 'medium'
+  return TILE_SIZES.find(size => SIZES[size][0] === item.w && SIZES[size][1] === item.h) ?? APPEARANCE_DEFAULTS.size
 }
 
 export function overlaps(a: LayoutItem, b: LayoutItem): boolean {
@@ -144,7 +146,7 @@ export function reconcileLayout(
   for (const node of bookmarks) {
     if (seen.has(node.id))
       continue
-    const [w, h] = SIZES[effectiveTileSize(appearance[node.id]?.size ?? 'medium', rows)]
+    const [w, h] = SIZES[effectiveTileSize(appearance[node.id]?.size ?? APPEARANCE_DEFAULTS.size, rows)]
     occupied.push(freePosition(occupied, { i: node.id, x: 0, y: 0, w, h }, rows))
   }
   return occupied.sort((a, b) => a.x - b.x || a.y - b.y)

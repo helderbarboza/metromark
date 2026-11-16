@@ -92,9 +92,15 @@ export const SETTINGS_DEFAULTS: Settings = {
   },
 } as const
 
+/** Default values for tile appearance keys (used when a tile has no stored override) */
+export const APPEARANCE_DEFAULTS = {
+  size: 'medium',
+  colorIndex: 0,
+} as const
+
 export const BACKGROUND_DEFAULTS = {
   color: { type: 'color', auto: true, color: undefined },
-  image: { type: 'image', url: '', auto: true, color: undefined, parallaxZoom: 1.5 },
+  image: { type: 'image', url: '', auto: true, color: undefined, fit: 'cover', opacity: 1, parallax: false, parallaxZoom: 1.5 },
   shader: {
     // No shader runs by default: pick one in the background editor. This also
     // keeps a first benchmark run free of contention from a default background.

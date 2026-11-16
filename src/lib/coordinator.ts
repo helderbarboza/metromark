@@ -14,6 +14,7 @@ import type {
   UndoRecord,
 } from '$lib/types'
 import { normalizeImageBackgroundSettings, validateBackgroundUrl } from '$lib/background-image'
+import { APPEARANCE_DEFAULTS } from '$lib/config'
 import { isLayoutable } from '$lib/folder-preview'
 import { allowsLargeSize, effectiveTileSize, freePosition, GRID_VIEW_IDS, gridViewDef, isGridView, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
 import { applyLocale, getT } from '$lib/locale'
@@ -353,7 +354,7 @@ export class BookmarkCoordinator {
           const otherMap = this.data[other]
           const otherSource = (otherMap[source.id] ?? []).filter(item => item.i !== node.id)
           const otherDest = (otherMap[target.id] ?? []).filter(item => item.i !== node.id)
-          const [w, h] = SIZES[effectiveTileSize(this.data.appearance[node.id]?.size ?? 'medium', otherRows)]
+          const [w, h] = SIZES[effectiveTileSize(this.data.appearance[node.id]?.size ?? APPEARANCE_DEFAULTS.size, otherRows)]
           this.data[other] = {
             ...otherMap,
             [source.id]: otherSource,
@@ -486,7 +487,7 @@ export class BookmarkCoordinator {
           const otherMap = { ...this.data[other] }
           for (const [groupId, layout] of Object.entries(otherMap))
             otherMap[groupId] = layout.filter(item => item.i !== node.id)
-          const [w, h] = SIZES[effectiveTileSize(this.data.appearance[node.id]?.size ?? 'medium', otherRows)]
+          const [w, h] = SIZES[effectiveTileSize(this.data.appearance[node.id]?.size ?? APPEARANCE_DEFAULTS.size, otherRows)]
           const dest = otherMap[destination] ?? []
           otherMap[destination] = [...dest, freePosition(dest, { i: node.id, x: 0, y: 0, w, h }, otherRows)]
           this.data[other] = otherMap

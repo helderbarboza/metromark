@@ -6,7 +6,7 @@
 import type { Settings } from '$lib/config'
 import type { ThemeName } from '$lib/themes'
 import type { AppData, BookmarkNode, Layout, TileSize } from '$lib/types'
-import { SETTINGS_DEFAULTS } from '$lib/config'
+import { APPEARANCE_DEFAULTS, SETTINGS_DEFAULTS } from '$lib/config'
 import { emptyData } from '$lib/coordinator'
 
 const link = (id: string, title: string, url: string): BookmarkNode => ({ id, title, url })
@@ -41,7 +41,7 @@ export interface DemoProfile {
 
 function buildData(layouts: Record<string, Layout>, sizes: Record<string, TileSize>, colors: Record<string, number>, background: Settings['background']): AppData {
   const appearance: AppData['appearance'] = Object.fromEntries(
-    Object.keys(sizes).map(id => [id, { size: sizes[id], colorIndex: colors[id] ?? 0 }]),
+    Object.keys(sizes).map(id => [id, { size: sizes[id], colorIndex: colors[id] ?? APPEARANCE_DEFAULTS.colorIndex }]),
   )
   return {
     ...emptyData({ ...SETTINGS_DEFAULTS, density: 'compact', background }),

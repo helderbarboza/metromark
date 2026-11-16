@@ -7,6 +7,7 @@
   import ColorBackground from '$lib/components/organisms/ColorBackground.svelte'
   import ImageBackground from '$lib/components/organisms/ImageBackground.svelte'
   import ShaderBackground from '$lib/components/organisms/ShaderBackground.svelte'
+  import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { getShader, NONE_SHADER_ID } from '$lib/shaders'
   import { shaderBenchmark } from '$lib/shaders/benchmark.svelte'
 
@@ -56,10 +57,10 @@
   <ImageBackground
     src={background.url}
     color={baseColor}
-    fit={background.fit ?? 'cover'}
-    opacity={background.opacity ?? 1}
-    parallax={background.parallax ?? false}
-    parallaxZoom={background.parallaxZoom ?? 1.5}
+    fit={background.fit ?? BACKGROUND_DEFAULTS.image.fit}
+    opacity={background.opacity ?? BACKGROUND_DEFAULTS.image.opacity}
+    parallax={background.parallax ?? BACKGROUND_DEFAULTS.image.parallax}
+    parallaxZoom={background.parallaxZoom ?? BACKGROUND_DEFAULTS.image.parallaxZoom}
     {scrollProgress}
     {reducedMotion}
     {onerror}
@@ -70,12 +71,13 @@
     {reducedMotion}
     animated={!shaderBenchmark.running}
     color={baseColor}
-    speed={shaderBackground.speed ?? 1}
-    targetFps={shaderBackground.targetFps ?? 60}
-    quality={shaderBackground.quality ?? 'motion'}
-    opacity={shaderBackground.opacity ?? 1}
-    mouseInteraction={shaderBackground.mouseInteraction ?? true}
-    renderScale={shaderBackground.renderScale ?? 0.5}
+    speed={shaderBackground.speed ?? BACKGROUND_DEFAULTS.shader.speed}
+    targetFps={shaderBackground.targetFps ?? BACKGROUND_DEFAULTS.shader.targetFps}
+    quality={shaderBackground.quality ?? BACKGROUND_DEFAULTS.shader.quality}
+    opacity={shaderBackground.opacity ?? BACKGROUND_DEFAULTS.shader.opacity}
+    mouseInteraction={shaderBackground.mouseInteraction
+      ?? BACKGROUND_DEFAULTS.shader.mouseInteraction}
+    renderScale={shaderBackground.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale}
     {onstruggle}
   />
 {/if}

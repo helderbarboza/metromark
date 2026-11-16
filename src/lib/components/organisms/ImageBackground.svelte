@@ -38,10 +38,10 @@
   const {
     src = '',
     color,
-    fit = 'cover',
-    opacity = 1,
+    fit = BACKGROUND_DEFAULTS.image.fit,
+    opacity = BACKGROUND_DEFAULTS.image.opacity,
     scrollProgress = 0,
-    parallax = false,
+    parallax = BACKGROUND_DEFAULTS.image.parallax,
     parallaxZoom = BACKGROUND_DEFAULTS.image.parallaxZoom,
     reducedMotion = false,
     onerror,

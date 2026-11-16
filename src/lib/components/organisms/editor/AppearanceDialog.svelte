@@ -7,6 +7,7 @@
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { Button } from '$lib/components/ui/button'
+  import { APPEARANCE_DEFAULTS } from '$lib/config'
   import { tileSizesForView } from '$lib/layout'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { tileFor, tileForFolder } from '$lib/tile'
@@ -31,7 +32,7 @@
     () => onclose(),
   )
 
-  let size = $state<TileSize>('medium')
+  let size = $state<TileSize>(APPEARANCE_DEFAULTS.size)
   let colorIndex = $state(0)
   let customColor = $state('')
 
@@ -56,8 +57,8 @@
   onMount(() => {
     size = tile?.size === 'large' && !sizeOptions.includes('large')
       ? 'wide'
-      : (tile?.size ?? 'medium')
-    colorIndex = tile?.colorIndex ?? 0
+      : (tile?.size ?? APPEARANCE_DEFAULTS.size)
+    colorIndex = tile?.colorIndex ?? APPEARANCE_DEFAULTS.colorIndex
     customColor = tile?.color ?? ''
   })
 

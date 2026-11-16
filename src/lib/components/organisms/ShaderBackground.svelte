@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { ShaderDefinition } from '$lib/shaders'
   import type { ShaderMetrics } from '$lib/shaders/metrics.svelte'
+  import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { FrameHealth } from '$lib/shaders/health'
   import { publishMetrics } from '$lib/shaders/metrics.svelte'
   import { createPipeline, getContext } from '$lib/shaders/pipeline'
@@ -46,15 +47,15 @@
     reducedMotion = false,
     shader,
     color,
-    speed = 1,
-    targetFps = 60,
-    opacity = 1,
+    speed = BACKGROUND_DEFAULTS.shader.speed,
+    targetFps = BACKGROUND_DEFAULTS.shader.targetFps,
+    opacity = BACKGROUND_DEFAULTS.shader.opacity,
     renderScale,
-    quality = 'motion',
+    quality = BACKGROUND_DEFAULTS.shader.quality,
     animated = true,
     metrics = true,
     onstruggle,
-    mouseInteraction = true,
+    mouseInteraction = BACKGROUND_DEFAULTS.shader.mouseInteraction,
   }: Props = $props()
 
   // A live mirror of the setting, read by the render loop every frame. Deliberately
@@ -88,7 +89,9 @@
   // subscribes it to the whole snapshot, so every bookmark refresh (including the
   // focus refresh when returning to the tab) rebuilt the pipeline and restarted
   // the shader. Resolve the scale once and only rebuild when it really changes.
-  const effectiveScale = $derived(renderScale ?? shader.renderScale ?? 1)
+  const effectiveScale = $derived(
+    renderScale ?? shader.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale,
+  )
 
   $effect(() => {
     const element = canvas
