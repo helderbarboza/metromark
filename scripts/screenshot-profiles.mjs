@@ -43,7 +43,9 @@ let server = null
 if (!(await serverResponds())) {
   console.log('Starting the preview server on port', PORT)
   server = spawn('npx', ['vite', '--host', HOST, '--port', String(PORT), '--strictPort'], { stdio: 'ignore' })
-  process.on('exit', () => { server?.kill() })
+  process.on('exit', () => {
+    server?.kill()
+  })
   if (!(await waitForServer(60_000))) {
     server.kill()
     console.error('The preview server did not start within 60 seconds.')

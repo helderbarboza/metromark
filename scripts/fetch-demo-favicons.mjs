@@ -2,6 +2,7 @@
 // and rewrites src/lib/demo-favicons.ts with data URLs.
 // Run this when the demo bookmark list changes. Demo favicons are bundled so the
 // web preview renders real site icons with no network requests at runtime.
+import { Buffer } from 'node:buffer'
 import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
@@ -41,10 +42,12 @@ async function fetchImage(url) {
 }
 
 /** Google’s favicon cache serves the real site icon; used only at generation time. */
-const sources = host => [
-  `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`,
-  `https://${host}/favicon.ico`,
-]
+function sources(host) {
+  return [
+    `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`,
+    `https://${host}/favicon.ico`,
+  ]
+}
 
 const source = await readFile(SOURCE, 'utf8')
 const hosts = hostsFromSource(source)
