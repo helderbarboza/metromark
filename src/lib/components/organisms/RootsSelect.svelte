@@ -37,14 +37,15 @@
   <Select.Trigger
     size='sm'
     class='
-      h-7 gap-2 border-none bg-transparent px-2 text-xs shadow-none
-      data-[size=sm]:h-7
+      gap-2 border-none bg-transparent text-xs text-foreground shadow-none
+      backdrop-blur-lg transition-colors
+      [&_svg]:text-foreground
     '
     aria-label={$LL.roots.label()}
   >
     {selectedLabel}
   </Select.Trigger>
-  <Select.Content>
+  <Select.Content align='start'>
     <Select.Group>
       <Select.Item value='all'>{$LL.roots.allBookmarks()}</Select.Item>
       {#each roots as root (root.id)}
