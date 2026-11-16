@@ -88,7 +88,7 @@
 </script>
 
 <Tabs.Root value={tabs[0].value}>
-  <Tabs.List>
+  <Tabs.List variant='line'>
     {#each tabs as { value, label, icon } (value)}
       <Tabs.Trigger {value}>
         <Icon name={icon} />
