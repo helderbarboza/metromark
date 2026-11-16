@@ -8,8 +8,8 @@ export default defineConfig({
   modules: ['@wxt-dev/module-svelte'],
   imports: false,
   manifest: ({ browser }) => ({
-    name: 'MetroMark — Bookmarks, beautifully arranged',
-    description: 'A Metro-inspired new tab and bookmark manager. Local-first, with live bookmark updates and Undo.',
+    name: 'MetroMark — Your bookmarks at a glance',
+    description: 'Make your new tab your own: Metro-style tiles, themes and backgrounds, with your bookmarks arranged your way.',
     // Chrome-only `favicon` permission for the local favicon-cache tier.
     // Firefox has no equivalent scheme, so it stays permission-free there.
     permissions: browser === 'firefox' ? ['bookmarks', 'storage'] : ['bookmarks', 'storage', 'favicon'],
