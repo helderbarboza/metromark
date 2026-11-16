@@ -19,6 +19,7 @@
   import RootsNav from '$lib/components/organisms/RootsNav.svelte'
   import SettingsDrawer from '$lib/components/organisms/SettingsDrawer.svelte'
   import ThemeSync from '$lib/components/ThemeSync.svelte'
+  import * as Tooltip from '$lib/components/ui/tooltip'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { toggleSelection } from '$lib/interaction'
   import { KeyboardNav } from '$lib/keyboard-nav'
@@ -551,169 +552,170 @@
 
 <svelte:window onkeydown={keyboardNav.handleKey} oncontextmenu={blockNativeContextMenu} />
 <ThemeSync />
-<div id='shell' class='flex h-full overflow-hidden'>
-  <div
-    class='
-      relative flex h-dvh min-w-0 flex-1 flex-col overflow-hidden text-(--foreground)
-    '
-    class:reduced={snapshot?.settings.reducedMotion}
-  >
-    {#if snapshot}
-      <PageBackground
-        background={snapshot.settings.background}
-        {reducedMotion}
+<Tooltip.Provider>
+  <div id='shell' class='flex h-full overflow-hidden'>
+    <div
+      class='
+        relative flex h-dvh min-w-0 flex-1 flex-col overflow-hidden text-(--foreground)
+      '
+      class:reduced={snapshot?.settings.reducedMotion}
+    >
+      {#if snapshot}
+        <PageBackground
+          background={snapshot.settings.background}
+          {reducedMotion}
+          scrollProgress={smoothScroll.scrollProgress}
+          onstruggle={() => showNotice({
+            message: 'Animated background paused to keep this page fast.',
+            actionLabel: 'Turn off',
+          })}
+          onerror={() => showNotice({
+            message: 'The background image could not be loaded.',
+            actionLabel: 'Turn off',
+          })}
+        />
+      {/if}
+
+      <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
+        <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
+          <RootsNav
+            {roots}
+            {rootFilter}
+            {bookmarkCount}
+            onSelect={selectRoot}
+          />
+        </div>
+      </header>
+
+      {#snippet groupMenu(group: GroupView)}
+        <MenuItems
+          variant='context'
+          items={buildGroupMenuItems({
+            node: nodes.get(group.id),
+            group,
+            callbacks: menuCallbacks,
+          })}
+        />
+      {/snippet}
+
+      <CanvasContextMenu
+        bind:open={menuOpen}
+        bind:scroller
+        bind:contentEl={menuContentEl}
+        {snapshot}
+        {loadError}
+        {normalizedQuery}
+        {visibleGroups}
+        {cell}
+        tiles={allTiles}
+        {layoutStager}
+        {smoothScroll}
+        {flashGroup}
+        preview={client.mode === 'preview'}
+        {query}
+        onClearSearch={() => (query = '')}
+        onDragStart={canvasDragStart}
+        onDragStop={dragStop}
+        onSelect={selectByGesture}
+        onActivateFolder={activateFolder}
+        onResizeTile={resizeTile}
+        {groupMenu}
+        onAdd={parentId => edit({ kind: 'bookmark', parentId })}
+        onBlocked={message => showNotice({ message, tone: 'error' })}
+        onCanvasPointerDown={canvasPointerDown}
+        onForwardContextMenu={forwardContextMenu}
+        {menuTarget}
+        {contextTile}
+        {menuItems}
+        {menuHeading}
+        onCloseAutoFocus={handleMenuCloseAutoFocus}
+      />
+
+      <WorkspaceFooter
+        bind:query
+        bind:searchInput
+        {bookmarkCount}
+        {folderCount}
+        {visibleGroups}
+        activeGroup={smoothScroll.activeGroup}
+        canScroll={smoothScroll.canScroll}
         scrollProgress={smoothScroll.scrollProgress}
-        onstruggle={() => showNotice({
-          message: 'Animated background paused to keep this page fast.',
-          actionLabel: 'Turn off',
-        })}
-        onerror={() => showNotice({
-          message: 'The background image could not be loaded.',
-          actionLabel: 'Turn off',
-        })}
+        preview={client.mode === 'preview'}
+        {busy}
+        onSearch={handleSearch}
+        onJump={smoothScroll.jump}
+        onScroll={smoothScroll.scroll}
       />
-    {/if}
-
-    <header class='shrink-0 px-16 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
-      <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
-        <RootsNav
-          {roots}
-          {rootFilter}
-          {bookmarkCount}
-          onSelect={selectRoot}
-        />
-      </div>
-    </header>
-
-    {#snippet groupMenu(group: GroupView)}
-      <MenuItems
-        variant='context'
-        items={buildGroupMenuItems({
-          node: nodes.get(group.id),
-          group,
-          callbacks: menuCallbacks,
-        })}
-      />
-    {/snippet}
-
-    <CanvasContextMenu
-      bind:open={menuOpen}
-      bind:scroller
-      bind:contentEl={menuContentEl}
-      {snapshot}
-      {loadError}
-      {normalizedQuery}
-      {visibleGroups}
-      {cell}
-      tiles={allTiles}
-      {layoutStager}
-      {smoothScroll}
-      {flashGroup}
-      preview={client.mode === 'preview'}
-      {query}
-      onClearSearch={() => (query = '')}
-      onDragStart={canvasDragStart}
-      onDragStop={dragStop}
-      onSelect={selectByGesture}
-      onActivateFolder={activateFolder}
-      onResizeTile={resizeTile}
-      {groupMenu}
-      onAdd={parentId => edit({ kind: 'bookmark', parentId })}
-      onBlocked={message => showNotice({ message, tone: 'error' })}
-      onCanvasPointerDown={canvasPointerDown}
-      onForwardContextMenu={forwardContextMenu}
-      {menuTarget}
-      {contextTile}
-      {menuItems}
-      {menuHeading}
-      onCloseAutoFocus={handleMenuCloseAutoFocus}
+      {#if selectedTile && !dragging}
+        <div
+          class='fixed inset-x-0 bottom-0 z-50'
+          transition:fly={{ y: 64, duration: reducedMotion ? 0 : 200 }}
+        >
+          <MetroAppBar
+            title={selectedTile.title}
+            subtitle={tileSubtitle(selectedTile)}
+            size={selectedTile.size}
+            writable={selectedTile.writable}
+            kind={selectedTile.kind}
+            {focusRequest}
+            menuItems={appBarMenuItems}
+            onresize={size => resizeTile(selectedTile.id, size)}
+            onedit={selectedTile.kind === 'folder'
+              ? () => edit({ kind: 'rename', id: selectedTile.id })
+              : () => edit({ kind: 'bookmark', id: selectedTile.id })}
+            onmove={() => edit({ kind: 'move', id: selectedTile.id })}
+            ondelete={selectedTile.kind === 'folder'
+              ? undefined
+              : () => {
+                void execute({ type: 'node.remove', id: selectedTile.id })
+              }}
+            onclear={clearSelection}
+          />
+        </div>
+      {/if}
+      {#if dialog && snapshot && dialog.kind !== 'settings'}
+        {#key JSON.stringify(dialog)}
+          <Editor
+            spec={dialog}
+            {snapshot}
+            oncommand={execute}
+            onclose={() => (dialog = null)}
+          />
+        {/key}
+      {/if}
+      {#if notice}
+        <div
+          class='fixed bottom-19.5 left-1/2 z-80 -translate-x-1/2'
+          transition:fly={{ y: 16, duration: reducedMotion ? 0 : 180 }}
+        >
+          <UndoToast
+            {notice}
+            onundo={undo
+              ? () => performUndo(undo.id)
+              : notice.actionLabel
+              ? () => {
+                void execute({
+                  type: 'settings.update',
+                  patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+                })
+              }
+              : undefined}
+            onclose={() => (notice = null)}
+          />
+        </div>
+      {/if}
+    </div>
+    <SettingsDrawer
+      open={settingsOpen}
+      settings={snapshot?.settings}
+      oncommand={execute}
+      onclose={() => (dialog = null)}
+      onresetpreview={client.resetPreview
+        ? async () => {
+          applySnapshot(await client.resetPreview!())
+          showNotice({ message: 'Sample bookmarks restored.' })
+        }
+        : undefined}
     />
-
-    <WorkspaceFooter
-      bind:query
-      bind:searchInput
-      {bookmarkCount}
-      {folderCount}
-      {visibleGroups}
-      activeGroup={smoothScroll.activeGroup}
-      canScroll={smoothScroll.canScroll}
-      scrollProgress={smoothScroll.scrollProgress}
-      preview={client.mode === 'preview'}
-      {busy}
-      onSearch={handleSearch}
-      onJump={smoothScroll.jump}
-      onScroll={smoothScroll.scroll}
-    />
-    {#if selectedTile && !dragging}
-      <div
-        class='fixed inset-x-0 bottom-0 z-50'
-        transition:fly={{ y: 64, duration: reducedMotion ? 0 : 200 }}
-      >
-        <MetroAppBar
-          title={selectedTile.title}
-          subtitle={tileSubtitle(selectedTile)}
-          size={selectedTile.size}
-          writable={selectedTile.writable}
-          kind={selectedTile.kind}
-          {focusRequest}
-          menuItems={appBarMenuItems}
-          onresize={size => resizeTile(selectedTile.id, size)}
-          onedit={selectedTile.kind === 'folder'
-            ? () => edit({ kind: 'rename', id: selectedTile.id })
-            : () => edit({ kind: 'bookmark', id: selectedTile.id })}
-          onmove={() => edit({ kind: 'move', id: selectedTile.id })}
-          ondelete={selectedTile.kind === 'folder'
-            ? undefined
-            : () => {
-              void execute({ type: 'node.remove', id: selectedTile.id })
-            }}
-          onclear={clearSelection}
-        />
-      </div>
-    {/if}
-    {#if dialog && snapshot && dialog.kind !== 'settings'}
-      {#key JSON.stringify(dialog)}
-        <Editor
-          spec={dialog}
-          {snapshot}
-          oncommand={execute}
-          onclose={() => (dialog = null)}
-        />
-      {/key}
-    {/if}
-    {#if notice}
-      <div
-        class='fixed bottom-19.5 left-1/2 z-80 -translate-x-1/2'
-        transition:fly={{ y: 16, duration: reducedMotion ? 0 : 180 }}
-      >
-        <UndoToast
-          {notice}
-          onundo={undo
-            ? () => performUndo(undo.id)
-            : notice.actionLabel
-            ? () => {
-              void execute({
-                type: 'settings.update',
-                patch: { background: { ...BACKGROUND_DEFAULTS.color } },
-              })
-            }
-            : undefined}
-          onclose={() => (notice = null)}
-        />
-      </div>
-    {/if}
   </div>
-  <SettingsDrawer
-    open={settingsOpen}
-    settings={snapshot?.settings}
-    oncommand={execute}
-    onclose={() => (dialog = null)}
-    onresetpreview={client.resetPreview
-      ? async () => {
-        applySnapshot(await client.resetPreview!())
-        showNotice({ message: 'Sample bookmarks restored.' })
-      }
-      : undefined}
-  />
-
-</div>
+</Tooltip.Provider>

@@ -2,7 +2,9 @@
   import type { GroupView } from '$lib/types'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import IconButton from '$lib/components/molecules/IconButton.svelte'
+  import * as Tooltip from '$lib/components/ui/tooltip'
   import { cn } from '$lib/utils'
+  import { Tooltip as TooltipPrimitive } from 'bits-ui'
 
   interface Props {
     query?: string
@@ -35,6 +37,10 @@
     onJump,
     onScroll,
   }: Props = $props()
+
+  // One tether for every jump dot, so the singleton tooltip uses a single
+  // portal instead of one portal per dot.
+  const jumpTether = TooltipPrimitive.createTether<string>()
 
   function handleInput(event: Event) {
     const input = event.currentTarget instanceof HTMLInputElement ? event.currentTarget : null
@@ -100,33 +106,49 @@
     </label>
   </div>
   <div class='flex min-w-0 flex-1 items-center justify-center gap-5'>
-    <nav
-      class='
-        absolute left-1/2 flex -translate-x-1/2 px-2 transition-[background-color,opacity]
-        hover:bg-background
-        max-md:hidden
-      '
-      aria-label='Jump to bookmark group'
-    >
-      {#each visibleGroups as group, index (group.id)}
-        <button
-          class='group/button px-1 py-3'
-          aria-label="Jump to {group.path.join(' / ')}"
-          aria-current={activeGroup === index ? 'true' : undefined}
-          onclick={() => onJump(index)}
-          title={group.title}
+    <Tooltip.Root tether={jumpTether}>
+      {#snippet children({ payload })}
+        <nav
+          class='
+            absolute left-1/2 flex -translate-x-1/2 px-2
+            transition-[background-color,opacity]
+            hover:bg-background
+            max-md:hidden
+          '
+          aria-label='Jump to bookmark group'
         >
-          <span
-            class={cn(
-              activeGroup === index
-                ? 'h-1 w-4 bg-(--primary)'
-                : 'size-1 bg-(--muted-foreground)',
-              'block rounded-full p-0 transition-all group-hover/button:bg-(--foreground)',
-            )}
-          ></span>
-        </button>
-      {/each}
-    </nav>
+          {#each visibleGroups as group, index (group.id)}
+            <Tooltip.Trigger
+              tether={jumpTether}
+              payload={group.title}
+              class='group/button px-1 py-3'
+              aria-label="Jump to {group.path.join(' / ')}"
+              aria-current={activeGroup === index ? 'true' : undefined}
+              onclick={() => onJump(index)}
+            >
+              <span
+                class={cn(
+                  activeGroup === index
+                    ? 'h-1 w-4 bg-(--primary)'
+                    : 'size-1 bg-(--muted-foreground)',
+                  `
+                    block rounded-full p-0 transition-all
+                    group-hover/button:bg-(--foreground)
+                  `,
+                )}
+              ></span>
+            </Tooltip.Trigger>
+          {/each}
+        </nav>
+        <Tooltip.Content
+          class='
+            data-[state=instant-open]:animate-in data-[state=instant-open]:fade-in-0
+            data-[state=instant-open]:zoom-in-95
+          '
+          side='top'
+        >{payload}</Tooltip.Content>
+      {/snippet}
+    </Tooltip.Root>
   </div>
   <div class='flex shrink-0 items-center gap-4'>
     <div
