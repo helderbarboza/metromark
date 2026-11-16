@@ -555,7 +555,10 @@
     title: string
     subtitle?: string
   }
-  /** Accessible/domain line for menus and the app bar; folders get the translated word for folder. */
+  /**
+   * Accessible/domain line for menus and the app bar;
+   * folders get the translated word for folder.
+   */
   function tileSubtitle(tile: typeof contextTile): string | undefined {
     if (!tile)
       return undefined

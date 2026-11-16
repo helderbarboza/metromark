@@ -791,7 +791,9 @@
               ? 'text-(--warn)'
               : 'text-(--foreground)'}'
           >
-            {metrics.quality === 'motion' ? $LL.settings.frameRate() : $LL.settings.resolution()} · {metrics.level}
+            {metrics.quality === 'motion'
+              ? $LL.settings.frameRate()
+              : $LL.settings.resolution()} · {metrics.level}
           </div>
         </div>
       </div>

@@ -4,9 +4,8 @@ import { tv } from 'tailwind-variants'
 export const tileVariants = tv({
   slots: {
     root: `
-      metro-tile relative block size-full font-sans text-(--tile-fg)
-      no-underline transition-[transform,translate,opacity] duration-160
-      ease-fluent
+      relative block size-full font-sans text-(--tile-fg) no-underline
+      transition-[transform,translate,opacity] duration-160 ease-fluent
       before:pointer-events-none before:absolute before:inset-0 before:z-1
       before:border-2 before:border-transparent before:transition-[border-color]
       before:duration-160 before:ease-fluent before:content-['']
@@ -65,7 +64,6 @@ export const tileVariants = tv({
     selected: {
       true: {
         root: `
-          selected
           after:pointer-events-none after:absolute after:inset-0 after:border-3
           after:border-background after:content-['']
         `,
@@ -79,7 +77,7 @@ export const tileVariants = tv({
       },
       true: {
         root: `
-          revealed translate-y-1.5
+          translate-y-1.5
           active:transform-[perspective(600px)_rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))_scale(.97)]
           in-[.reduced]:translate-none
           motion-reduce:translate-none

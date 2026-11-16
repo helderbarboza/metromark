@@ -216,7 +216,13 @@
         if (!frozen && verdict === 'struggling' && now >= cooldownUntil) {
           const floor = loadFloor(preference, scale0(), fps0())
           load = nextLoad(load, 'decrease', floor)
-          const solution = solveQuality(preference, load, scale0(), fps0(), health.displayHz() || 60)
+          const solution = solveQuality(
+            preference,
+            load,
+            scale0(),
+            fps0(),
+            health.displayHz() || 60,
+          )
           pipeline.setScale(solution.scale)
           cooldownUntil = now + 10000
           healthySince = 0
@@ -231,7 +237,13 @@
           if (now - healthySince >= 10000) {
             const floor = loadFloor(preference, scale0(), fps0())
             load = nextLoad(load, 'increase', floor)
-            const solution = solveQuality(preference, load, scale0(), fps0(), health.displayHz() || 60)
+            const solution = solveQuality(
+              preference,
+              load,
+              scale0(),
+              fps0(),
+              health.displayHz() || 60,
+            )
             pipeline.setScale(solution.scale)
             healthySince = now
           }

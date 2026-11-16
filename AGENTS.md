@@ -108,13 +108,15 @@ typesafe-i18n is the only i18n mechanism. No ad-hoc string tables, no per-compon
 
 ```ts
 // src/i18n/en/index.ts
-app: {
-  openBookmark: 'Open {name}',
+const en = {
+  app: {
+    openBookmark: 'Open {name}',
+  }
 }
 ```
 
 ```svelte
-<button aria-label={$LL.app.openBookmark({ name: bookmark.title })}>
+<button aria-label={$LL.app.openBookmark({ name: bookmark.title })}></button>
 ```
 
 ```ts
