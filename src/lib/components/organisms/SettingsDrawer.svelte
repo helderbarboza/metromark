@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { Settings } from '$lib/config'
   import type { Command } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import IconButton from '$lib/components/molecules/IconButton.svelte'
   import SettingsDialog from '$lib/components/organisms/editor/SettingsDialog.svelte'
@@ -27,7 +28,7 @@
     !open && '-mr-(--settings-width) opacity-0 pointer-events-none',
   ].filter(Boolean).join(' ')}
   style='--settings-width: min(32rem, calc(100vw - 24px))'
-  aria-label='Settings'
+  aria-label={$LL.settings.settings()}
   aria-hidden={!open}
   inert={!open}
 >
@@ -41,15 +42,15 @@
     >
       <div>
         <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>
-          MAKE YOURSELF AT HOME
+          {$LL.settings.makeYourselfAtHome()}
         </div>
         <h2 class='m-0 text-2xl font-normal tracking-tighter'>
-          Settings
+          {$LL.settings.settings()}
         </h2>
       </div>
       <IconButton
         class='-mr-1.75'
-        label='Close settings'
+        label={$LL.settings.closeSettings()}
         onclick={onclose}
       >
         <Icon name='close' size={18} />

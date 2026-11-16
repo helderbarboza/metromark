@@ -1,4 +1,5 @@
 import type { Appearance, BookmarkNode, Layout, LayoutItem, TileSize } from '$lib/types'
+import { getT } from '$lib/locale'
 
 export const ROWS = 8
 export const GAP = 8
@@ -79,15 +80,15 @@ export function reconcileLayout(
 
 export function validateLayout(layout: unknown): Layout {
   if (!Array.isArray(layout) || layout.length > 50_000)
-    throw new Error('Invalid tile layout.')
+    throw new Error(getT().errors.invalidLayout())
   const seen = new Set<string>()
   return layout.map((item: LayoutItem | null) => {
     if (!item || typeof item.i !== 'string' || seen.has(item.i))
-      throw new Error('A tile cannot appear twice in a group.')
+      throw new Error(getT().errors.tileAppearsTwice())
     if (![item.x, item.y, item.w, item.h].every(Number.isInteger)
       || item.x < 0 || item.x > 1_000_000 || item.y < 0 || item.y + item.h > ROWS
       || !Object.values(SIZES).some(([w, h]) => item.w === w && item.h === h)) {
-      throw new Error('Invalid tile coordinates or size.')
+      throw new Error(getT().errors.invalidTileCoordinates())
     }
     seen.add(item.i)
     return { i: item.i, x: item.x, y: item.y, w: item.w, h: item.h }

@@ -1,5 +1,6 @@
 <script lang='ts'>
   import type { TileSize } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import * as ContextMenu from '$lib/components/ui/context-menu'
   import { cn } from '$lib/utils'
 
@@ -25,12 +26,12 @@
 
 <ContextMenu.Separator />
 <ContextMenu.Label class='px-2 pt-2 pb-1.5 text-xs tracking-widest text-(--muted-foreground)'>
-  TILE SIZE
+  {$LL.tileSizeGrid.tileSize()}
 </ContextMenu.Label>
 <ContextMenu.Group class='flex gap-1 px-1 pb-1.5'>
   {#each sizes as preset (preset)}
     <ContextMenu.Item
-      aria-label='Resize to {preset}'
+      aria-label={$LL.tileSizeGrid.resizeTo({ size: $LL.tileSizes[preset]() })}
       onSelect={() => onresize(preset)}
       class={cn(
         `
@@ -48,7 +49,7 @@
           size === preset && 'outline-2 outline-offset-2 outline-(--primary)',
         )}
       ></span>
-      <span>{preset}</span>
+      <span>{$LL.tileSizes[preset]()}</span>
     </ContextMenu.Item>
   {/each}
 </ContextMenu.Group>

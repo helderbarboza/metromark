@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
@@ -85,17 +86,17 @@
 <form onsubmit={submit}>
   <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
     {node
-      ? 'Edit the real bookmark. Your tile arrangement stays right where it is.'
-      : 'Save something worth coming back to.'}
+      ? $LL.dialogs.editIntro()
+      : $LL.dialogs.createIntro()}
   </p>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-xs font-medium text-(--foreground)'>Title</span>
+    <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.title()}</span>
     <input
       data-initial-focus
       bind:value={name}
       required
       maxlength='2048'
-      placeholder='A name you’ll recognize'
+      placeholder={$LL.dialogs.titlePlaceholder()}
       autocomplete='off'
       class='
         h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
@@ -105,11 +106,11 @@
     />
   </label>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-xs font-medium text-(--foreground)'>Website address</span>
+    <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.websiteAddress()}</span>
     <input
       bind:value={url}
       required
-      placeholder='https://example.com'
+      placeholder={$LL.dialogs.urlPlaceholder()}
       autocomplete='url'
       spellcheck='false'
       class='
@@ -120,7 +121,7 @@
     />
   </label>
   {#if !node}
-    <FolderSelect folders={folders} bind:value={parentId} label='Folder' />
+    <FolderSelect folders={folders} bind:value={parentId} label={$LL.dialogs.folder()} />
   {/if}
   {#if node}
     <div
@@ -135,17 +136,17 @@
   {/if}
   <DialogError error={command.error} />
   <DialogActions>
-    <Button type='button' onclick={onclose}>Cancel</Button>
+    <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button
       variant='default'
       type='submit'
       disabled={command.busy || (!node && !parentId)}
     >
       {command.busy
-        ? 'Saving…'
+        ? $LL.dialogs.saving()
         : !node
-        ? 'Add bookmark'
-        : 'Save changes'}
+        ? $LL.dialogs.addBookmark()
+        : $LL.dialogs.saveChanges()}
     </Button>
   </DialogActions>
 </form>

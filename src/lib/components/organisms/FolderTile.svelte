@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { CommonTileProps } from '$lib/components/tile-props'
   import type { FolderTileView, PreviewCell } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import FaviconImage from '$lib/components/molecules/FaviconImage.svelte'
   import TileShell from '$lib/components/molecules/TileShell.svelte'
@@ -66,7 +67,7 @@
   {revealed}
   dataTestId={dataTestId}
   defaultLabel={`Folder ${tile.title}`}
-  resizeNoun='folder tile'
+  resizeNoun={$LL.app.resizeNounFolderTile()}
 >
   {#snippet content()}
     <div

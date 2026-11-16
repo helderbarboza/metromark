@@ -62,7 +62,7 @@
   args={{ selected: true, onresize: () => {} }}
   {template}
   play={async ({ canvas }) => {
-    await expect(canvas.getByRole('button', { name: 'Grow Steam tile to wide' })).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Grow Steam tile to Wide' })).toBeVisible()
   }}
 />
 <Story
@@ -70,7 +70,7 @@
   args={{ selected: true, size: 'large', onresize: () => {} }}
   {template}
   play={async ({ canvas }) => {
-    await expect(canvas.getByRole('button', { name: 'Shrink Steam tile to small' })).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Shrink Steam tile to Small' })).toBeVisible()
   }}
 />
 <Story

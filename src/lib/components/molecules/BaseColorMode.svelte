@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import LL from '$i18n/i18n-svelte'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import SettingsRow from './SettingsRow.svelte'
 
@@ -25,8 +26,8 @@
 </script>
 
 <SettingsRow
-  title='Background color'
-  helpText='Auto matches the page theme; custom uses your color'
+  title={$LL.settings.backgroundColor()}
+  helpText={$LL.settings.backgroundColorHelp()}
   controlId={`${idPrefix}-source`}
   disabled={busy}
 >
@@ -43,14 +44,14 @@
       selectMode(mode)
     }}
   >
-    <ToggleGroup.Item value='auto' class='grow'>Auto</ToggleGroup.Item>
-    <ToggleGroup.Item value='custom' class='grow'>Custom</ToggleGroup.Item>
+    <ToggleGroup.Item value='auto' class='grow'>{$LL.settings.auto()}</ToggleGroup.Item>
+    <ToggleGroup.Item value='custom' class='grow'>{$LL.settings.custom()}</ToggleGroup.Item>
   </ToggleGroup.Root>
 </SettingsRow>
 {#if !auto}
   <SettingsRow
-    title='Custom color'
-    helpText='The color used as the background'
+    title={$LL.settings.customColor()}
+    helpText={$LL.settings.customColorHelp()}
     controlId={`${idPrefix}-color`}
     disabled={busy}
   >

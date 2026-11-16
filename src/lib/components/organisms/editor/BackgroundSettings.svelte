@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { ImageBackgroundSettings, Settings, ShaderBackgroundSettings } from '$lib/config'
 
+  import LL from '$i18n/i18n-svelte'
   import {
     clampDimensions,
     isDataImageUri,
@@ -19,6 +20,7 @@
   import { Slider } from '$lib/components/ui/slider'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
+  import { getT } from '$lib/locale'
   import { deleteBackgroundMedia, saveBackgroundMedia } from '$lib/media-store'
   import { getSettingsContext } from '$lib/settings-context'
   import { NONE_SHADER_ID, shaders } from '$lib/shaders'
@@ -34,11 +36,6 @@
 
   type BackgroundType = Settings['background']['type']
   const BACKGROUND_TYPES = ['color', 'image', 'shader'] as const satisfies readonly BackgroundType[]
-  const BACKGROUND_TYPE_LABELS: Record<BackgroundType, string> = {
-    color: 'Color',
-    image: 'Image',
-    shader: 'Shader',
-  }
   const SHADERS = Object.values(shaders)
   const IMAGE_FITS = ['cover', 'contain', 'fill', 'none'] as const
 
@@ -323,7 +320,7 @@
     return new Promise((resolve, reject) => {
       const image = new Image()
       image.onload = () => resolve(image)
-      image.onerror = () => reject(new Error('That file could not be decoded as an image.'))
+      image.onerror = () => reject(new Error(getT().backgroundErrors.undecodable()))
       image.src = src
     })
   }
@@ -335,7 +332,7 @@
     canvas.height = height
     const context = canvas.getContext('2d')
     if (!context)
-      return Promise.reject(new Error('Canvas is unavailable in this window.'))
+      return Promise.reject(new Error(getT().backgroundErrors.canvasUnavailable()))
     context.imageSmoothingEnabled = true
     context.imageSmoothingQuality = 'high'
     context.drawImage(image, 0, 0, width, height)
@@ -348,7 +345,7 @@
         return blob
       return jpeg(0.88).then((fallback) => {
         if (!fallback)
-          throw new Error('The image could not be encoded.')
+          throw new Error(getT().backgroundErrors.imageEncodeFailed())
         return fallback
       })
     })
@@ -378,7 +375,7 @@
       if (blob.size <= MAX_STORED_BYTES)
         return blob
     }
-    throw new Error('That image is still too large after resizing. Choose a simpler image.')
+    throw new Error(getT().backgroundErrors.imageStillTooLarge())
   }
 
   async function uploadFile(file: File) {
@@ -398,14 +395,17 @@
         URL.revokeObjectURL(probeUrl)
       }
       if (image.naturalWidth === 0 || image.naturalHeight === 0)
-        throw new Error('That file could not be decoded as an image.')
+        throw new Error(getT().backgroundErrors.undecodable())
       const blob = await encodeForStorage(file, image)
       const key = await saveBackgroundMedia(blob)
       onchange({ background: { ...bg, url: key } })
       urlDirty = false
     }
     catch (error) {
-      urlError = error instanceof Error ? error.message : 'That image could not be used.'
+      urlError
+        = error instanceof Error
+          ? error.message
+          : getT().backgroundErrors.imageCouldNotBeUsed()
     }
     finally {
       uploading = false
@@ -487,7 +487,7 @@
       validated = validateBackgroundUrl(urlDraft)
     }
     catch (error) {
-      urlError = error instanceof Error ? error.message : 'That address is not valid.'
+      urlError = error instanceof Error ? error.message : getT().backgroundErrors.addressNotValid()
       return
     }
     const current = bg.url ?? ''
@@ -501,7 +501,7 @@
         await preflightImage(validated)
       }
       catch {
-        urlError = 'That address did not load as an image. Check the URL and try again.'
+        urlError = getT().backgroundErrors.imageDidNotLoad()
         checking = false
         return
       }
@@ -529,8 +529,8 @@
 
 <CollapsibleSection
   open={true}
-  title='Background type'
-  helpText='Choose what renders behind your tiles'
+  title={$LL.settings.backgroundType()}
+  helpText={$LL.settings.backgroundTypeHelp()}
   icon='layer'
 >
   {#snippet control()}
@@ -545,14 +545,14 @@
     >
       <Select.Trigger
         class='w-20'
-        aria-label='Background type'
+        aria-label={$LL.settings.backgroundType()}
       >
-        {BACKGROUND_TYPE_LABELS[settings.background.type]}
+        {$LL.settings[settings.background.type]()}
       </Select.Trigger>
       <Select.Content>
         <Select.Group>
           {#each BACKGROUND_TYPES as type (type)}
-            <Select.Item value={type}>{BACKGROUND_TYPE_LABELS[type]}</Select.Item>
+            <Select.Item value={type}>{$LL.settings[type]()}</Select.Item>
           {/each}
         </Select.Group>
       </Select.Content>
@@ -591,7 +591,7 @@
     </div>
     <div class='border-t border-(--border) p-4'>
       <div class='flex flex-wrap items-center justify-between gap-2'>
-        <p class='text-xs font-semibold'>Shader performance</p>
+        <p class='text-xs font-semibold'>{$LL.settings.shaderPerformance()}</p>
         <Button
           variant='secondary'
           size='sm'
@@ -603,15 +603,14 @@
         >
           <Icon name={shaderBenchmark.running ? 'close' : 'gauge'} size={14} />
           {shaderBenchmark.running
-            ? 'Cancel'
-            : shaderBenchmark.hasResults() ? 'Re-run benchmark' : 'Run benchmark'}
+            ? $LL.dialogs.cancel()
+            : shaderBenchmark.hasResults()
+            ? $LL.settings.rerunBenchmark()
+            : $LL.settings.runBenchmark()}
         </Button>
       </div>
       <p class='mt-1.5 text-[10px] leading-relaxed text-(--muted-foreground)'>
-        Your GPU re-renders the background on every new tab, and shader cost differs
-        a lot between shaders. This test renders each shader offscreen at a fixed
-        size on this PC and measures the frame time, so you can pick one that keeps
-        your new tab fast. Results are kept in memory and disappear on reload.
+        {$LL.settings.benchmarkDescription()}
       </p>
       <div
         class='
@@ -622,23 +621,27 @@
         {#each BENCHMARK_LEVELS as level (level)}
           <span class='flex items-center gap-1'>
             <Icon name={BENCHMARK_PRESENTATION[level].icon} size={12} class={BENCHMARK_PRESENTATION[level].class} />
-            {BENCHMARK_PRESENTATION[level].short}
+            {$LL.benchmarkLevels[level]()}
           </span>
         {/each}
       </div>
       <div aria-live='polite' class='mt-1.5 text-[10px] text-(--muted-foreground)'>
         {#if shaderBenchmark.running && currentBenchmarkName !== null}
-          Testing {shaderBenchmark.done + 1} of {shaderBenchmark.total}: {currentBenchmarkName}…
+          {$LL.settings.benchmarkTesting({
+            current: shaderBenchmark.done + 1,
+            total: shaderBenchmark.total,
+            name: currentBenchmarkName ?? '',
+          })}
         {:else if shaderBenchmark.cancelled}
-          Benchmark cancelled.
+          {$LL.settings.benchmarkCancelled()}
         {:else if shaderBenchmark.failure !== null}
           <span class='text-(--destructive)'>{shaderBenchmark.failure}</span>
         {/if}
       </div>
     </div>
     <SettingsRow
-      title='Performance priority'
-      helpText='Prioritize frame rate or render resolution'
+      title={$LL.settings.performancePriority()}
+      helpText={$LL.settings.performancePriorityHelp()}
       controlId='shader-quality'
       disabled={busy}
     >
@@ -658,8 +661,8 @@
           updateShader({ quality: v })
         }}
       >
-        <ToggleGroup.Item value='motion' class='grow'>Frame rate</ToggleGroup.Item>
-        <ToggleGroup.Item value='detail' class='grow'>Resolution</ToggleGroup.Item>
+        <ToggleGroup.Item value='motion' class='grow'>{$LL.settings.frameRate()}</ToggleGroup.Item>
+        <ToggleGroup.Item value='detail' class='grow'>{$LL.settings.resolution()}</ToggleGroup.Item>
       </ToggleGroup.Root>
     </SettingsRow>
     <BaseColorMode
@@ -670,8 +673,8 @@
       onchange={(auto, color) => updateShader({ auto, color })}
     />
     <SettingsRow
-      title='Shader speed'
-      helpText='How fast the shader animates'
+      title={$LL.settings.shaderSpeed()}
+      helpText={$LL.settings.shaderSpeedHelp()}
       controlId='shader-speed'
     >
       <span>{speedDraft.toFixed(1)}x</span>
@@ -690,8 +693,8 @@
       />
     </SettingsRow>
     <SettingsRow
-      title='Maximum FPS'
-      helpText='Cap frames per second. Auto removes the cap'
+      title={$LL.settings.maximumFps()}
+      helpText={$LL.settings.maximumFpsHelp()}
       controlId='shader-fps'
     >
       <ToggleGroup.Root
@@ -704,14 +707,14 @@
       >
         {#each [15, 30, 60, 120, 0] as value (value)}
           <ToggleGroup.Item value={String(value)} class='grow'>
-            {value === 0 ? 'Auto' : value}
+            {value === 0 ? $LL.settings.auto() : value}
           </ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
     </SettingsRow>
     <SettingsRow
-      title='Opacity'
-      helpText='How visible the shader is'
+      title={$LL.settings.opacity()}
+      helpText={$LL.settings.shaderOpacityHelp()}
       controlId='shader-opacity'
     >
       <span>{Math.round(opacityDraft * 100)}%</span>
@@ -730,8 +733,8 @@
       />
     </SettingsRow>
     <SettingsRow
-      title='Maximum render scale'
-      helpText='Render below display resolution to save GPU'
+      title={$LL.settings.maximumRenderScale()}
+      helpText={$LL.settings.maximumRenderScaleHelp()}
       controlId='shader-render-scale'
     >
       <span>{renderScaleDraft}x</span>
@@ -753,41 +756,47 @@
     {#if metrics}
       <div
         class='grid grid-cols-2 gap-2 p-4 text-xs'
-        aria-label='Animated background performance'
+        aria-label={$LL.settings.animatedBackgroundPerformance()}
       >
         <div class='rounded-sm border border-(--border) p-2'>
-          <div class='text-[9px] text-(--muted-foreground)'>FPS</div>
+          <div class='text-[9px] text-(--muted-foreground)'>{$LL.settings.metricFps()}</div>
           <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--destructive)' : levelFps(metrics.fps, metrics.targetFps) === 'danger' ? 'text-(--destructive)' : levelFps(metrics.fps, metrics.targetFps) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
             {metrics.level === 'frozen' ? '—' : metrics.fps.toFixed(0)}
           </div>
         </div>
         <div class='rounded-sm border border-(--border) p-2'>
-          <div class='text-[9px] text-(--muted-foreground)'>Frame</div>
+          <div class='text-[9px] text-(--muted-foreground)'>{$LL.settings.metricFrame()}</div>
           <div class='font-mono tabular-nums {levelFrame(metrics.frameMs, metrics.nominalMs) === 'danger' ? 'text-(--destructive)' : levelFrame(metrics.frameMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
             {metrics.frameMs.toFixed(1)} ms
           </div>
         </div>
         <div class='rounded-sm border border-(--border) p-2'>
-          <div class='text-[9px] text-(--muted-foreground)'>Worst</div>
+          <div class='text-[9px] text-(--muted-foreground)'>{$LL.settings.metricWorst()}</div>
           <div class='font-mono tabular-nums {levelWorst(metrics.worstMs, metrics.nominalMs) === 'danger' ? 'text-(--destructive)' : levelWorst(metrics.worstMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
             {metrics.worstMs.toFixed(1)} ms
           </div>
         </div>
         <div class='rounded-sm border border-(--border) p-2'>
-          <div class='text-[9px] text-(--muted-foreground)'>Priority</div>
-          <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--destructive)' : metrics.level === 'reduced' ? 'text-(--warn)' : 'text-(--foreground)'}'>
-            {metrics.quality === 'motion' ? 'Frame rate' : 'Resolution'} · {metrics.level}
+          <div class='text-[9px] text-(--muted-foreground)'>{$LL.settings.metricPriority()}</div>
+          <div
+            class='font-mono tabular-nums {metrics.level === 'frozen'
+              ? 'text-(--destructive)'
+              : metrics.level === 'reduced'
+              ? 'text-(--warn)'
+              : 'text-(--foreground)'}'
+          >
+            {metrics.quality === 'motion' ? $LL.settings.frameRate() : $LL.settings.resolution()} · {metrics.level}
           </div>
         </div>
       </div>
     {:else}
       <p class='p-4 text-[10px] leading-relaxed text-(--muted-foreground)'>
-        No animated background is running.
+        {$LL.settings.noAnimatedBackground()}
       </p>
     {/if}
     <SettingsRow
-      title='Mouse interaction'
-      helpText='Let the shader follow your pointer'
+      title={$LL.settings.mouseInteraction()}
+      helpText={$LL.settings.mouseInteractionHelp()}
       controlId='shader-mouse'
       disabled={busy}
     >
@@ -818,7 +827,7 @@
       <ToggleGroup.Root
         type='single'
         id='image-source'
-        aria-label='Image source'
+        aria-label={$LL.settings.imageSource()}
         value={sourceTab}
         class='w-full'
         disabled={busy || uploading}
@@ -827,8 +836,8 @@
             sourceTab = v
         }}
       >
-        <ToggleGroup.Item value='upload' class='grow'>Upload</ToggleGroup.Item>
-        <ToggleGroup.Item value='url' class='grow'>From URL</ToggleGroup.Item>
+        <ToggleGroup.Item value='upload' class='grow'>{$LL.settings.upload()}</ToggleGroup.Item>
+        <ToggleGroup.Item value='url' class='grow'>{$LL.settings.fromUrl()}</ToggleGroup.Item>
       </ToggleGroup.Root>
 
       {#if sourceTab === 'upload'}
@@ -838,7 +847,7 @@
             text-(--muted-foreground)
           '
         >
-          IMAGE FILE
+          {$LL.settings.imageFile()}
         </p>
         <button
           id='image-upload'
@@ -863,10 +872,10 @@
         >
           <Icon name='imageAdd' size={32} class='text-(--muted-foreground)' />
           <span class='text-sm font-semibold'>
-            {uploading ? 'Reading…' : 'Click to browse or drop an image'}
+            {uploading ? $LL.settings.reading() : $LL.settings.clickToBrowse()}
           </span>
           <span id='image-upload-help' class='text-xs text-(--muted-foreground)'>
-            PNG, JPG, WebP, GIF or SVG · max 25 MB
+            {$LL.settings.imageUploadHelp()}
           </span>
         </button>
         <input
@@ -888,7 +897,7 @@
             text-(--muted-foreground)
           '
         >
-          IMAGE URL
+          {$LL.settings.imageUrl()}
         </label>
         <div class='flex items-center gap-2'>
           <Input
@@ -896,8 +905,8 @@
             type='text'
             inputmode='url'
             placeholder={isStoredMedia(bg.url)
-              ? 'Uploaded image in use'
-              : 'https://example.com/photo.jpg'}
+              ? $LL.settings.uploadedImageInUse()
+              : $LL.settings.imageUrlPlaceholder()}
             class='min-w-0 flex-1 text-sm'
             value={urlDraft}
             disabled={busy || uploading}
@@ -922,11 +931,11 @@
             disabled={busy || uploading || checking}
             onclick={() => void commitUrl()}
           >
-            {checking ? 'Checking…' : 'Apply'}
+            {checking ? $LL.settings.checking() : $LL.settings.apply()}
           </Button>
         </div>
         <p id='image-url-help' class='mt-2 text-xs text-(--muted-foreground)'>
-          An address that points directly at an image file
+          {$LL.settings.imageAddressHelp()}
         </p>
       {/if}
     </div>
@@ -937,8 +946,8 @@
       </p>
     {/if}
     <SettingsRow
-      title='Fit'
-      helpText='How the image fills the page'
+      title={$LL.settings.fit()}
+      helpText={$LL.settings.fitHelp()}
       controlId='image-fit'
       disabled={busy || uploading}
     >
@@ -956,7 +965,7 @@
         }}
       >
         {#each IMAGE_FITS as fit (fit)}
-          <ToggleGroup.Item value={fit} class='grow capitalize'>{fit}</ToggleGroup.Item>
+          <ToggleGroup.Item value={fit} class='grow'>{$LL.settings[fit === 'cover' ? 'fitCover' : fit === 'contain' ? 'fitContain' : fit === 'fill' ? 'fitFill' : 'fitNone']()}</ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
     </SettingsRow>
@@ -968,8 +977,8 @@
       onchange={(auto, color) => updateImage({ auto, color })}
     />
     <SettingsRow
-      title='Opacity'
-      helpText='How visible the image is'
+      title={$LL.settings.opacity()}
+      helpText={$LL.settings.imageOpacityHelp()}
       controlId='image-opacity'
       disabled={busy || uploading}
     >
@@ -989,10 +998,10 @@
       />
     </SettingsRow>
     <SettingsRow
-      title='Parallax'
+      title={$LL.settings.parallax()}
       helpText={settings.reducedMotion
-        ? 'Disabled because reduced motion is on'
-        : 'Nudge the image as you scroll'}
+        ? $LL.settings.parallaxDisabledHelp()
+        : $LL.settings.parallaxHelp()}
       controlId='image-parallax'
       disabled={busy || uploading || settings.reducedMotion}
     >
@@ -1018,8 +1027,8 @@
     {@const parallaxDisabled = busy || uploading || settings.reducedMotion
       || !(bg.parallax ?? false)}
     <SettingsRow
-      title='Parallax zoom'
-      helpText='More zoom gives the image room to shift'
+      title={$LL.settings.parallaxZoom()}
+      helpText={$LL.settings.parallaxZoomHelp()}
       controlId='image-parallax-zoom'
       disabled={parallaxDisabled}
     >
@@ -1041,8 +1050,8 @@
     </SettingsRow>
     {#if (bg.url ?? '') !== ''}
       <SettingsRow
-        title='Remove image'
-        helpText='Removes the image from the background'
+        title={$LL.settings.removeImage()}
+        helpText={$LL.settings.removeImageHelp()}
         controlId='image-remove'
         disabled={busy || uploading}
       >
@@ -1053,7 +1062,7 @@
           disabled={busy || uploading}
           onclick={removeImage}
         >
-          Remove image
+          {$LL.settings.removeImage()}
         </Button>
       </SettingsRow>
     {/if}

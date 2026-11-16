@@ -16,6 +16,7 @@ import type {
 import { normalizeImageBackgroundSettings, validateBackgroundUrl } from '$lib/background-image'
 import { isLayoutable } from '$lib/folder-preview'
 import { freePosition, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
+import { applyLocale, getT } from '$lib/locale'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
 import { validateUrl } from '$lib/url.js'
 
@@ -34,7 +35,7 @@ export function emptyData(settings: Settings): AppData {
 /** Validate a theme swatch index. Custom colors stay outside this range. */
 function checkedColorIndex(value: number): number {
   if (!Number.isInteger(value) || value < 0 || value > 7)
-    throw new Error('Color index must be 0-7.')
+    throw new Error(getT().errors.colorIndexRange())
   return value
 }
 
@@ -84,6 +85,7 @@ export class BookmarkCoordinator {
         }
       }
       await this.refresh()
+      applyLocale(this.data.settings.language, { persist: false })
       if (this.recoverPrepared())
         await this.save()
     })
@@ -118,39 +120,39 @@ export class BookmarkCoordinator {
 
   private node(id: string): BookmarkNode {
     if (typeof id !== 'string')
-      throw new Error('Invalid bookmark identifier.')
+      throw new Error(getT().errors.invalidIdentifier())
     const node = indexTree(this.tree).get(id)
     if (!node)
-      throw new Error('This bookmark or folder no longer exists.')
+      throw new Error(getT().errors.noLongerExists())
     return node
   }
 
   private editable(id: string) {
     const node = this.node(id)
     if (!canModify(node, this.tree))
-      throw new Error('This browser-owned or managed item is read-only.')
+      throw new Error(getT().errors.readOnly())
     return node
   }
 
   private destination(id: string) {
     const node = this.node(id)
     if (!canAddTo(node, this.tree))
-      throw new Error('Choose a writable bookmark folder, not the protected technical root.')
+      throw new Error(getT().errors.protectedDestination())
     return node
   }
 
   private title(value: string): string {
     if (typeof value !== 'string' || !value.trim())
-      throw new Error('Give this bookmark or folder a name.')
+      throw new Error(getT().errors.giveName())
     if (value.length > 2048)
-      throw new Error('That name is too long.')
+      throw new Error(getT().errors.nameTooLong())
     return value.trim()
   }
 
   private checkMove(node: BookmarkNode, parentId: string) {
     this.destination(parentId)
     if (flatten([node]).some(child => child.id === parentId))
-      throw new Error('A folder cannot be moved into itself or a descendant.')
+      throw new Error(getT().errors.cannotMoveIntoSelf())
   }
 
   private currentSnapshot(): Snapshot {
@@ -226,7 +228,7 @@ export class BookmarkCoordinator {
   async execute(command: Command): Promise<CommandResult> {
     return this.exclusive(async () => {
       if (typeof command?.type !== 'string')
-        throw new Error('Invalid bookmark command.')
+        throw new Error(getT().errors.invalidCommand())
       // Settings changes never touch the bookmark tree. Skip the tree reads so
       // high-frequency updates (slider drags) stay cheap.
       const settingsOnly = command.type === 'settings.update'
@@ -263,27 +265,27 @@ export class BookmarkCoordinator {
         const created = await this.bookmarks.create({ parentId: command.parentId, title: this.title(command.title), url: validateUrl(command.url) })
         if (command.colorIndex !== undefined)
           this.data.appearance[created.id] = { ...this.data.appearance[created.id], colorIndex: command.colorIndex }
-        return { message: 'Bookmark added. A new favorite, right at home.' }
+        return { message: getT().notices.bookmarkAdded() }
       }
       case 'folder.create': {
         this.destination(command.parentId)
         await this.bookmarks.create({ parentId: command.parentId, title: this.title(command.title) })
-        return { message: 'Folder created. Your new group is ready.' }
+        return { message: getT().notices.folderCreated() }
       }
       case 'node.update': {
         const node = this.editable(command.id)
         const after = { title: this.title(command.title), url: node.url }
         if (command.url !== undefined) {
           if (!isBookmark(node))
-            throw new Error('Folders cannot have website addresses.')
+            throw new Error(getT().errors.foldersNoUrl())
           after.url = validateUrl(command.url)
         }
         if (after.title === node.title && after.url === node.url)
           return undefined
-        const undo = await this.prepareUndo('Changes saved', { kind: 'update', nodeId: node.id, before: { title: node.title, url: node.url }, after })
+        const undo = await this.prepareUndo(getT().undoLabels.changesSaved(), { kind: 'update', nodeId: node.id, before: { title: node.title, url: node.url }, after })
         await this.bookmarks.update(node.id, after)
         this.commitUndo(undo)
-        return { message: 'Changes saved.', undoId: undo.id }
+        return { message: getT().notices.changesSaved(), undoId: undo.id }
       }
       case 'node.move': {
         const node = this.editable(command.id)
@@ -294,7 +296,7 @@ export class BookmarkCoordinator {
         const source = groups.find(group => group.id === node.parentId)
         const target = groups.find(group => group.id === command.parentId)
         const position = source?.layout.find(item => item.i === node.id)
-        const undo = await this.prepareUndo(isFolder(node) ? 'Folder moved' : 'Bookmark moved', { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: command.parentId, position })
+        const undo = await this.prepareUndo(isFolder(node) ? getT().undoLabels.folderMoved() : getT().undoLabels.bookmarkMoved(), { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: command.parentId, position })
         await this.bookmarks.move(node.id, { parentId: command.parentId })
         // Folder tiles keep their size and position through a Move-to-folder
         // as part of the same layout sync.
@@ -303,12 +305,12 @@ export class BookmarkCoordinator {
           this.data.layouts[target.id] = [...target.layout, freePosition(target.layout, position)]
         }
         this.commitUndo(undo)
-        return { message: isFolder(node) ? 'Folder moved.' : 'Bookmark moved.', undoId: undo.id }
+        return { message: isFolder(node) ? getT().notices.folderMoved() : getT().notices.bookmarkMoved(), undoId: undo.id }
       }
       case 'node.remove': {
         const node = this.editable(command.id)
         if (flatten([node]).some(child => !canModify(child, this.tree)))
-          throw new Error('This folder contains managed items and cannot be deleted.')
+          throw new Error(getT().errors.managedItems())
         const ids = new Set(flatten([node]).map(child => child.id))
         const siblings = this.node(node.parentId!).children ?? []
         const index = siblings.findIndex(sibling => sibling.id === node.id)
@@ -323,7 +325,9 @@ export class BookmarkCoordinator {
           layouts: Object.fromEntries(Object.entries(this.data.layouts).filter(([id]) => ids.has(id))),
           position: groups.find(group => group.id === node.parentId)?.layout.find(item => item.i === node.id),
         }
-        const label = isFolder(node) ? `“${node.title}” folder deleted` : `“${node.title}” deleted`
+        const label = isFolder(node)
+          ? getT().undoLabels.folderDeleted({ title: node.title })
+          : getT().undoLabels.bookmarkDeleted({ title: node.title })
         const undo = await this.prepareUndo(label, { kind: 'delete', backup })
         await this.bookmarks.remove(node.id, isFolder(node))
         for (const id of ids) {
@@ -337,11 +341,11 @@ export class BookmarkCoordinator {
       case 'tile.appearance': {
         const node = this.node(command.id)
         if (!isBookmark(node) && !isFolder(node))
-          throw new Error('Only tiles have an appearance.')
+          throw new Error(getT().errors.onlyTiles())
         const patch: Appearance = {}
         if (command.patch.size !== undefined) {
           if (!(command.patch.size in SIZES))
-            throw new Error('Choose a supported tile size.')
+            throw new Error(getT().errors.supportedSize())
           patch.size = command.patch.size
         }
         if (command.patch.colorIndex !== undefined) {
@@ -349,7 +353,7 @@ export class BookmarkCoordinator {
         }
         if (command.patch.color !== undefined) {
           if (command.patch.color !== '' && !/^#[0-9a-f]{6}$/i.test(command.patch.color))
-            throw new Error('Use a six-digit hex color.')
+            throw new Error(getT().errors.hexColor())
           patch.color = command.patch.color
         }
         const group = projectGroups(this.currentSnapshot()).find(entry => entry.id === node.parentId)
@@ -361,21 +365,21 @@ export class BookmarkCoordinator {
       }
       case 'layout.commit': {
         if (command.layouts == null || typeof command.layouts !== 'object')
-          throw new Error('Invalid group layouts.')
+          throw new Error(getT().errors.invalidGroupLayouts())
         const nodes = indexTree(this.tree)
         const layouts: Record<string, Layout> = {}
         const ownership = new Map<string, string>()
         const moves: { node: BookmarkNode, destination: string }[] = []
         for (const [folderId, raw] of Object.entries(command.layouts)) {
           if (!isFolder(this.node(folderId)))
-            throw new Error('A tile group must be a folder.')
+            throw new Error(getT().errors.groupMustBeFolder())
           const layout = validateLayout(raw)
           for (const item of layout) {
             const node = nodes.get(item.i)
             if (!node || (!isBookmark(node) && !isFolder(node)))
-              throw new Error('A tile changed while you were moving it. Try again.')
+              throw new Error(getT().errors.tileChanged())
             if (ownership.has(node.id))
-              throw new Error('A tile cannot belong to two groups.')
+              throw new Error(getT().errors.tileTwoGroups())
             ownership.set(node.id, folderId)
             if (node.parentId !== folderId) {
               this.editable(node.id)
@@ -386,115 +390,120 @@ export class BookmarkCoordinator {
           layouts[folderId] = layout
         }
         if (moves.length > 1)
-          throw new Error('Move one item at a time between groups.')
+          throw new Error(getT().errors.moveOneAtATime())
         let undo: UndoRecord | undefined
         if (moves.length > 0) {
           const { node, destination } = moves[0]
           const folder = isFolder(node)
           const position = projectGroups(this.currentSnapshot()).find(group => group.id === node.parentId)?.layout.find(item => item.i === node.id)
-          undo = await this.prepareUndo(folder ? 'Folder moved' : 'Bookmark moved', { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: destination, position })
+          undo = await this.prepareUndo(folder ? getT().undoLabels.folderMoved() : getT().undoLabels.bookmarkMoved(), { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: destination, position })
           await this.bookmarks.move(node.id, { parentId: destination })
           this.commitUndo(undo)
         }
         Object.assign(this.data.layouts, layouts)
         return undo
-          ? { message: isFolder(moves[0].node) ? 'Folder moved to its new group.' : 'Bookmark moved to its new folder.', undoId: undo.id }
+          ? { message: isFolder(moves[0].node) ? getT().notices.folderMovedNewGroup() : getT().notices.bookmarkMovedNewFolder(), undoId: undo.id }
           : undefined
       }
       case 'settings.update': {
         const patch = command.patch
         if (patch.density !== undefined && !['comfortable', 'compact'].includes(patch.density))
-          throw new Error('Invalid density.')
+          throw new Error(getT().errors.invalidDensity())
         if (patch.showDomains !== undefined && typeof patch.showDomains !== 'boolean')
-          throw new Error('Invalid domain setting.')
+          throw new Error(getT().errors.invalidDomainSetting())
         if (patch.originalFavicons !== undefined && typeof patch.originalFavicons !== 'boolean')
-          throw new Error('Invalid favicon setting.')
+          throw new Error(getT().errors.invalidFaviconSetting())
         if (patch.reducedMotion !== undefined && typeof patch.reducedMotion !== 'boolean')
-          throw new Error('Invalid motion setting.')
+          throw new Error(getT().errors.invalidMotionSetting())
+        if (patch.language !== undefined && !['auto', 'en', 'de', 'fr', 'es', 'pt'].includes(patch.language))
+          throw new Error(getT().errors.invalidLanguage())
         if (patch.background !== undefined) {
           const background = patch.background
           if (background.type === 'color') {
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
-              throw new Error('Invalid background mode.')
+              throw new Error(getT().errors.invalidBackgroundMode())
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))
-              throw new Error('Use a six-digit hex color.')
+              throw new Error(getT().errors.hexColor())
           }
           else if (background.type === 'image') {
             if (typeof background.url !== 'string')
-              throw new Error('Invalid background image.')
+              throw new Error(getT().errors.invalidBackgroundImage())
             try {
               validateBackgroundUrl(background.url)
             }
             catch (error) {
-              throw new Error(error instanceof Error ? error.message : 'Invalid background image.')
+              throw new Error(error instanceof Error ? error.message : getT().errors.invalidBackgroundImage())
             }
             if (background.fit !== undefined && !['cover', 'contain', 'fill', 'none'].includes(background.fit))
-              throw new Error('Invalid image fit.')
+              throw new Error(getT().errors.invalidImageFit())
             if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
-              throw new Error('Invalid image opacity.')
+              throw new Error(getT().errors.invalidImageOpacity())
             if (background.parallax !== undefined && typeof background.parallax !== 'boolean')
-              throw new Error('Invalid parallax setting.')
+              throw new Error(getT().errors.invalidParallax())
             if (background.parallaxZoom !== undefined && (!Number.isFinite(background.parallaxZoom) || background.parallaxZoom < 1 || background.parallaxZoom > 4))
-              throw new Error('Invalid parallax zoom setting.')
+              throw new Error(getT().errors.invalidParallaxZoom())
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
-              throw new Error('Invalid background mode.')
+              throw new Error(getT().errors.invalidBackgroundMode())
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))
-              throw new Error('Use a six-digit hex color.')
+              throw new Error(getT().errors.hexColor())
           }
           else if (background.type === 'shader') {
             if (background.shaderId !== undefined && typeof background.shaderId !== 'string')
-              throw new Error('Invalid shader setting.')
+              throw new Error(getT().errors.invalidShaderSetting())
             if (background.speed !== undefined && (typeof background.speed !== 'number' || !Number.isFinite(background.speed) || background.speed < 0))
-              throw new Error('Invalid shader speed.')
+              throw new Error(getT().errors.invalidShaderSpeed())
             if (background.targetFps !== undefined && (typeof background.targetFps !== 'number' || !Number.isFinite(background.targetFps)))
-              throw new Error('Invalid shader frame rate.')
+              throw new Error(getT().errors.invalidShaderFps())
             if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
-              throw new Error('Invalid shader opacity.')
+              throw new Error(getT().errors.invalidShaderOpacity())
             if (background.mouseInteraction !== undefined && typeof background.mouseInteraction !== 'boolean')
-              throw new Error('Invalid shader mouse setting.')
+              throw new Error(getT().errors.invalidShaderMouse())
             if (background.renderScale !== undefined && (typeof background.renderScale !== 'number' || !Number.isFinite(background.renderScale) || background.renderScale < 0.25 || background.renderScale > 1.5))
-              throw new Error('Invalid shader render scale.')
+              throw new Error(getT().errors.invalidShaderRenderScale())
             if (background.quality !== undefined && (typeof background.quality !== 'string' || !['motion', 'detail'].includes(background.quality)))
-              throw new Error('Invalid shader quality.')
+              throw new Error(getT().errors.invalidShaderQuality())
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
-              throw new Error('Invalid background mode.')
+              throw new Error(getT().errors.invalidBackgroundMode())
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))
-              throw new Error('Use a six-digit hex color.')
+              throw new Error(getT().errors.hexColor())
           }
         }
         this.data.settings = { ...this.data.settings, ...patch }
+        if (patch.language !== undefined)
+          applyLocale(this.data.settings.language, { persist: false })
         return undefined
       }
       case 'layout.reset': {
-        const undo: UndoRecord = { id: crypto.randomUUID(), label: 'Tile layouts reset', phase: 'committed', expiresAt: Date.now() + UNDO_TTL, payload: { kind: 'layouts', before: structuredClone(this.data.layouts) } }
+        const undo: UndoRecord = { id: crypto.randomUUID(), label: getT().undoLabels.layoutsReset(), phase: 'committed', expiresAt: Date.now() + UNDO_TTL, payload: { kind: 'layouts', before: structuredClone(this.data.layouts) } }
         this.data.undos.push(undo)
         this.data.layouts = {}
-        return { message: 'Tile layouts reset to bookmark order.', undoId: undo.id }
+        return { message: getT().notices.layoutsReset(), undoId: undo.id }
       }
       case 'factory.reset': {
         // Restore MetroMark presentation data only. Native bookmarks stay untouched.
         this.data = emptyData(this.settings)
-        return { message: 'MetroMark reset to factory defaults. Your bookmarks were not changed.' }
+        applyLocale(this.data.settings.language, { persist: false })
+        return { message: getT().notices.factoryResetDone() }
       }
       case 'undo': return this.undo(command.id, command.parentId)
-      default: throw new Error('Unknown bookmark command.')
+      default: throw new Error(getT().errors.unknownCommand())
     }
   }
 
   private async undo(id: string, destination?: string): Promise<Notice> {
     const undo = this.data.undos.find(record => record.id === id && record.phase === 'committed' && record.expiresAt > Date.now())
     if (!undo)
-      throw new Error('This undo has expired.')
+      throw new Error(getT().errors.undoExpired())
     const payload = undo.payload
     if (payload.kind === 'delete') {
       const target = destination ?? payload.destination ?? payload.backup.parentId
       this.destination(target)
       if (indexTree(this.tree).has(payload.backup.node.id) && !payload.restored) {
         this.data.undos = this.data.undos.filter(record => record.id !== id)
-        return { message: 'This item has already been restored.' }
+        return { message: getT().errors.alreadyRestored() }
       }
       if (payload.destination != null && payload.destination !== target && Object.keys(payload.restored ?? {}).length) {
-        throw new Error('Continue this partial restore in its original destination.')
+        throw new Error(getT().errors.partialRestore())
       }
       payload.destination = target
       payload.restored ??= {}
@@ -543,7 +552,7 @@ export class BookmarkCoordinator {
     else if (payload.kind === 'move') {
       const node = this.editable(payload.nodeId)
       if (node.parentId !== payload.expectedParent)
-        throw new Error('This item was moved again elsewhere. Undo would overwrite that change.')
+        throw new Error(getT().errors.movedAgain())
       this.checkMove(node, payload.oldParent)
       const length = this.node(payload.oldParent).children?.length ?? 0
       await this.bookmarks.move(node.id, { parentId: payload.oldParent, index: Math.min(payload.oldIndex, length) })
@@ -554,15 +563,15 @@ export class BookmarkCoordinator {
     else if (payload.kind === 'update') {
       const node = this.editable(payload.nodeId)
       if (node.title !== payload.after.title || node.url !== payload.after.url)
-        throw new Error('This item was edited elsewhere. Undo would overwrite that change.')
+        throw new Error(getT().errors.editedAgain())
       await this.bookmarks.update(node.id, payload.before)
     }
     else {
       if (Object.keys(this.data.layouts).length)
-        throw new Error('Tiles have been rearranged since the reset. Undo would overwrite the new layout.')
+        throw new Error(getT().errors.rearrangedSinceReset())
       this.data.layouts = payload.before
     }
     this.data.undos = this.data.undos.filter(record => record.id !== id)
-    return { message: 'Restored. Right where it belongs.' }
+    return { message: getT().notices.restored() }
   }
 }

@@ -1,6 +1,10 @@
 import * as v from 'valibot'
 
 const BackgroundFitSchema = v.picklist(['cover', 'contain', 'fill', 'none'])
+const LANGUAGE_SETTING_VALUES = ['auto', 'en', 'de', 'fr', 'es', 'pt'] as const
+
+// Keep in sync with the locales under src/i18n (base locale first). 'auto' infers the UI language from the browser.
+const LanguageSettingSchema = v.picklist(LANGUAGE_SETTING_VALUES)
 
 const ColorBackgroundSchema = v.object({
   type: v.literal('color'),
@@ -56,6 +60,8 @@ export const SettingsSchema = v.object({
   originalFavicons: v.boolean(),
   /** Honor prefers-reduced-motion */
   reducedMotion: v.boolean(),
+  /** Interface language; 'auto' infers from the browser */
+  language: LanguageSettingSchema,
   /** Selected background shader id */
   background: v.variant('type', [
     ShaderBackgroundSchema,
@@ -76,6 +82,7 @@ export const SETTINGS_DEFAULTS: Settings = {
   showDomains: true,
   originalFavicons: false,
   reducedMotion: false,
+  language: 'auto',
   background: {
     type: 'color',
     auto: true,
@@ -118,7 +125,7 @@ function parseBooleanEnv(key: string, value: string): boolean {
 
 /**
  * Load settings from hierarchical sources:
- * 1. Environment variables (METROMARK_DENSITY, METROMARK_SHOW_DOMAINS, METROMARK_ORIGINAL_FAVICONS, METROMARK_REDUCED_MOTION, METROMARK_SHADER_ID)
+ * 1. Environment variables (METROMARK_DENSITY, METROMARK_SHOW_DOMAINS, METROMARK_ORIGINAL_FAVICONS, METROMARK_REDUCED_MOTION, METROMARK_SHADER_ID, METROMARK_LANGUAGE)
  * 2. Fallback to defaults
  * Throws on validation failure (fail-fast). Throws if a recognized METROMARK_*
  * variable holds an invalid value; the error names the key and the value.
@@ -142,6 +149,13 @@ export function loadSettings(env: Record<string, string | undefined> = import.me
   const reducedMotionEnv = env[`${ENV_PREFIX}REDUCED_MOTION`]
   if (reducedMotionEnv !== undefined) {
     fromEnv.reducedMotion = parseBooleanEnv(`${ENV_PREFIX}REDUCED_MOTION`, reducedMotionEnv)
+  }
+  const languageEnv = env[`${ENV_PREFIX}LANGUAGE`]
+  if (languageEnv !== undefined) {
+    const language = LANGUAGE_SETTING_VALUES.find(candidate => candidate === languageEnv)
+    if (language === undefined)
+      throw invalidEnv(`${ENV_PREFIX}LANGUAGE`, languageEnv, '"auto", "en", "de", "fr", "es" or "pt"')
+    fromEnv.language = language
   }
   const shaderIdEnv = env[`${ENV_PREFIX}SHADER_ID`]
   if (shaderIdEnv !== undefined) {

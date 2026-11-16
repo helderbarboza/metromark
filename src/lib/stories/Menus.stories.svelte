@@ -41,7 +41,7 @@
   }}
   play={async ({ canvas }) => {
     await fireEvent.contextMenu(canvas.getByText('Right click here'))
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Resize to wide' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Resize to Wide' }))
     await expect(resize).toHaveBeenCalledWith('wide')
   }}
 />

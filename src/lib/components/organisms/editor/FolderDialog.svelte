@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import FolderSelect from '$lib/components/molecules/FolderSelect.svelte'
@@ -56,17 +57,17 @@
 <form onsubmit={submit}>
   <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
     {isRename
-      ? 'Only this folder’s name changes. Descendant group paths update automatically.'
-      : 'A bookmark folder becomes a tile group. Nested folders get their own group, too.'}
+      ? $LL.dialogs.renameIntro()
+      : $LL.dialogs.createGroupIntro()}
   </p>
   <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-xs font-medium text-(--foreground)'>Folder name</span>
+    <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.folderName()}</span>
     <input
       data-initial-focus
       bind:value={name}
       required
       maxlength='2048'
-      placeholder='e.g. Weekend reading'
+      placeholder={$LL.dialogs.folderNamePlaceholder()}
       autocomplete='off'
       class='
         h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
@@ -76,21 +77,21 @@
     />
   </label>
   {#if !isRename}
-    <FolderSelect folders={folders} bind:value={parentId} label='Create inside' />
+    <FolderSelect folders={folders} bind:value={parentId} label={$LL.dialogs.createInside()} />
   {/if}
   <DialogError error={command.error} />
   <DialogActions>
-    <Button type='button' onclick={onclose}>Cancel</Button>
+    <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button
       variant='default'
       type='submit'
       disabled={command.busy || (!isRename && !parentId)}
     >
       {command.busy
-        ? 'Saving…'
+        ? $LL.dialogs.saving()
         : isRename
-        ? 'Save changes'
-        : 'Create group'}
+        ? $LL.dialogs.saveChanges()
+        : $LL.dialogs.createGroup()}
     </Button>
   </DialogActions>
 </form>

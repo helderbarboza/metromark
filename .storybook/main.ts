@@ -2,6 +2,7 @@ import type { StorybookConfig } from '@storybook/svelte-vite'
 import { fileURLToPath } from 'node:url'
 
 const libDir = fileURLToPath(new URL('../src/lib', import.meta.url))
+const i18nDir = fileURLToPath(new URL('../src/i18n', import.meta.url))
 
 const config: StorybookConfig = {
   stories: ['../src/lib/stories/**/*.stories.@(ts|svelte)'],
@@ -12,7 +13,7 @@ const config: StorybookConfig = {
   viteFinal: config => ({
     ...config,
     cacheDir: 'node_modules/.vite/storybook',
-    resolve: { ...config.resolve, alias: { ...config.resolve?.alias, $lib: libDir } },
+    resolve: { ...config.resolve, alias: { ...config.resolve?.alias, $lib: libDir, $i18n: i18nDir } },
   }),
   docs: { defaultName: 'Documentation' },
   typescript: { check: false },

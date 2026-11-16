@@ -1,18 +1,20 @@
 <script lang='ts'>
   import type { Snippet } from 'svelte'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import IconButton from '$lib/components/molecules/IconButton.svelte'
   import { onMount } from 'svelte'
 
   interface Props {
     title: string
+    /** Override for the small eyebrow line; defaults to the translated "YOUR BOOKMARKS". */
     eyebrow?: string
     children: Snippet
     onclose: () => void
     drawer?: boolean
   }
 
-  const { title, eyebrow = 'YOUR BOOKMARKS', children, onclose, drawer = false }: Props = $props()
+  const { title, eyebrow, children, onclose, drawer = false }: Props = $props()
 
   let element: HTMLDialogElement
   onMount(() => {
@@ -54,10 +56,10 @@
   <div class='px-7.5 pt-7.25 pb-7.5 max-[480px]:p-6'>
     <header class='mb-6.5 flex items-center justify-between gap-2.5'>
       <div>
-        <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>{eyebrow}</div>
+        <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>{eyebrow ?? $LL.dialogs.yourBookmarks()}</div>
         <h2 class='m-0 text-2xl font-normal tracking-tighter'>{title}</h2>
       </div>
-      <IconButton class='-mr-1.75' label='Close dialog' onclick={onclose}>
+      <IconButton class='-mr-1.75' label={$LL.dialogs.closeDialog()} onclick={onclose}>
         <Icon name='close' size={18} />
       </IconButton>
     </header>

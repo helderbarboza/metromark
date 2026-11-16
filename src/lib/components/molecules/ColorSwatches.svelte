@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
 
   let {
@@ -16,7 +17,7 @@
 
 <div class='mb-5.25 flex flex-col gap-2.25'>
   <span class='text-xs font-medium text-(--foreground)' id={uid}>
-    Color
+    {$LL.colors.title()}
   </span>
   <div
     class='flex flex-wrap gap-1.75'
@@ -27,7 +28,7 @@
       <button
         type='button'
         style:background={swatch}
-        aria-label='Use theme color {i + 1}'
+        aria-label={$LL.colors.swatch({ index: i + 1 })}
         aria-pressed={!customColor && colorIndex === i}
         class='
           flex size-7.75 items-center justify-center rounded-xs text-white
@@ -47,7 +48,7 @@
     <button
       type='button'
       style:background={customColor || 'var(--card)'}
-      aria-label='Custom color'
+      aria-label={$LL.colors.customColor()}
       aria-pressed={!!customColor}
       class='
         flex size-7.75 items-center justify-center rounded-xs text-white
@@ -71,8 +72,8 @@
       <input
         type='color'
         bind:value={customColor}
-        aria-label='Custom tile color'
-        title='Custom color'
+        aria-label={$LL.colors.customTileColor()}
+        title={$LL.colors.customColor()}
         class='
           size-8 cursor-pointer rounded-xs border border-(--border) bg-transparent p-0.5
         '

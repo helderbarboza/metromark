@@ -1,5 +1,6 @@
 <script lang='ts'>
   import type { BookmarkNode, Command } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
@@ -24,16 +25,19 @@
     () => onclose(),
   )
 
+  const introParts = $derived.by(() => $LL.dialogs.deleteIntro({
+    target: mode === 'preview'
+      ? $LL.dialogs.demoWorkspaceTarget()
+      : $LL.dialogs.browserBookmarksTarget(),
+  }).split('<>'))
+
   async function remove() {
     return send({ type: 'node.remove', id: node.id })
   }
 </script>
 
 <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
-  Delete <strong class='text-(--foreground)'>{node.title}</strong> and everything
-  inside it? This removes the folder from {mode === 'preview'
-    ? 'this demo workspace'
-    : 'your browser bookmarks'} too.
+  {introParts[0]}<strong class='text-(--foreground)'>{node.title}</strong>{introParts[1]}
 </p>
 <div
   class='
@@ -43,24 +47,24 @@
 >
   <Icon name='folder' size={24} />
   <div>
-    <strong class='mb-1.25 block text-xs font-medium'>{countBookmarks(node)} bookmarks</strong>
+    <strong class='mb-1.25 block text-xs font-medium'>{$LL.dialogs.bookmarkCount({ count: countBookmarks(node) })}</strong>
     <span class='text-xs text-(--muted-foreground)'>
-      {flatten([node]).filter(isFolder).length - 1} nested folders
+      {$LL.dialogs.nestedFolderCount({ count: flatten([node]).filter(isFolder).length - 1 })}
     </span>
   </div>
 </div>
 <p class='m-0 text-xs/relaxed text-(--muted-foreground)'>
-  You can Undo for 30 seconds. Restored bookmarks receive new browser IDs.
+  {$LL.dialogs.undoHint()}
 </p>
 <DialogError error={command.error} />
 <DialogActions>
-  <Button type='button' onclick={onclose}>Keep folder</Button>
+  <Button type='button' onclick={onclose}>{$LL.dialogs.keepFolder()}</Button>
   <Button
     variant='destructive'
     disabled={command.busy}
     onclick={remove}
   >
     <Icon name='delete' size={15} />
-    {command.busy ? 'Deleting…' : 'Delete folder'}
+    {command.busy ? $LL.dialogs.deleting() : $LL.dialogs.deleteFolder()}
   </Button>
 </DialogActions>

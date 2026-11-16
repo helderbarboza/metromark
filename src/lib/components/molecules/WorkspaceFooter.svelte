@@ -1,5 +1,6 @@
 <script lang='ts'>
   import type { GroupView } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import IconButton from '$lib/components/molecules/IconButton.svelte'
   import * as Tooltip from '$lib/components/ui/tooltip'
@@ -57,7 +58,7 @@
     max-md:px-6
   '
 >
-  <span role='status' class='sr-only'>{busy ? 'Saving changes…' : ''}</span>
+  <span role='status' class='sr-only'>{busy ? $LL.footer.savingChanges() : ''}</span>
   <div class='flex shrink-0 items-center'>
     <label
       class='
@@ -74,8 +75,8 @@
         value={query}
         oninput={handleInput}
         type='search'
-        aria-label='Search bookmarks'
-        placeholder='Find a bookmark…'
+        aria-label={$LL.footer.searchBookmarks()}
+        placeholder={$LL.search.placeholder()}
         autocomplete='off'
         spellcheck='false'
         class='
@@ -86,7 +87,7 @@
       />
       {#if query}
         <button
-          aria-label='Clear search'
+          aria-label={$LL.search.clearSearch()}
           class='bg-transparent p-1 text-(--muted-foreground)'
           onclick={() => {
             query = ''
@@ -115,14 +116,14 @@
             hover:bg-background
             max-md:hidden
           '
-          aria-label='Jump to bookmark group'
+          aria-label={$LL.footer.jumpToGroup()}
         >
           {#each visibleGroups as group, index (group.id)}
             <Tooltip.Trigger
               tether={jumpTether}
               payload={group.title}
               class='group/button px-1 py-3'
-              aria-label="Jump to {group.path.join(' / ')}"
+              aria-label={$LL.footer.jumpToGroupPath({ path: group.path.join(' / ') })}
               aria-current={activeGroup === index ? 'true' : undefined}
               onclick={() => onJump(index)}
             >
@@ -157,8 +158,8 @@
       `)}
     >
       <span class='max-sm:hidden'>
-        <span>{bookmarkCount} bookmarks</span>
-        <span>{folderCount} folders</span>
+        <span>{$LL.footer.bookmarkCount({ count: bookmarkCount })}</span>
+        <span>{$LL.footer.folderCount({ count: folderCount })}</span>
       </span>
       <span class='inline-flex gap-2 sm:hidden'>
         <span class='inline-flex gap-0.5'><Icon name='bookmark' size={16} /><span>{bookmarkCount}</span></span>
@@ -170,13 +171,13 @@
             rounded-sm border border-(--border) px-1.5 py-0.5 text-xs
             text-(--muted-foreground)
           '
-          title='saved locally, not your real bookmarks'
-        >Demo</span>
+          title={$LL.footer.demoTitle()}
+        >{$LL.footer.demo()}</span>
       {/if}
     </div>
     <div class='flex items-center gap-0.5'>
       <IconButton
-        label='Scroll groups left'
+        label={$LL.footer.scrollLeft()}
         class='h-7 w-6 rounded-sm disabled:opacity-25'
         disabled={!canScroll || scrollProgress < 0.01}
         onclick={() => onScroll(-1)}
@@ -184,7 +185,7 @@
         <Icon name='arrowLeft' size={17} />
       </IconButton>
       <IconButton
-        label='Scroll groups right'
+        label={$LL.footer.scrollRight()}
         class='h-7 w-6 rounded-sm disabled:opacity-25'
         disabled={!canScroll || scrollProgress > 0.99}
         onclick={() => onScroll(1)}

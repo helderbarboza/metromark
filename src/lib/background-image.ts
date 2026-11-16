@@ -1,4 +1,5 @@
 import type { Settings } from '$lib/config'
+import { getT } from '$lib/locale'
 
 // Validation and sizing math for image backgrounds. This module stays DOM-free
 // so it can be unit tested in node; canvas encoding happens in the settings UI.
@@ -47,13 +48,13 @@ export function isHttpImageUrl(value: string): boolean {
 export function validateUploadFile(file: { type: string, size: number }): void {
   if (!ALLOWED_UPLOAD_TYPES.includes(file.type)) {
     throw new Error(
-      `Unsupported image type "${file.type || 'unknown'}". Use PNG, JPEG, WebP, GIF or SVG.`,
+      getT().backgroundErrors.unsupportedUploadType({ type: file.type || 'unknown' }),
     )
   }
   if (!(file.size > 0))
-    throw new Error('That file looks empty.')
+    throw new Error(getT().backgroundErrors.fileEmpty())
   if (file.size > MAX_UPLOAD_BYTES)
-    throw new Error('That file is larger than 25 MB.')
+    throw new Error(getT().backgroundErrors.fileTooLarge())
 }
 
 /**
@@ -69,23 +70,23 @@ export function validateBackgroundUrl(value: string): string {
   if (isMediaKey(url))
     return url
   if (url.length > MAX_STORED_CHARACTERS)
-    throw new Error('The background image is too large to store inline. Upload it again to store it locally in the browser.')
+    throw new Error(getT().backgroundErrors.tooLargeInline())
   if (/^data:/i.test(url)) {
     if (!isDataImageUri(url))
-      throw new Error('Unsupported image data. Upload a PNG, JPEG, WebP, GIF or SVG file.')
+      throw new Error(getT().backgroundErrors.unsupportedImageData())
     return url
   }
   if (/^idb:/i.test(url))
-    throw new Error('That stored image reference is not valid. Upload the image again.')
+    throw new Error(getT().backgroundErrors.badStoredReference())
   if (isHttpImageUrl(url))
     return url
   try {
     const parsed = new URL(url)
-    throw new Error(`Background addresses must start with http(s); "${parsed.protocol.slice(0, -1)}" is not allowed.`)
+    throw new Error(getT().backgroundErrors.backgroundHttpOnly({ scheme: parsed.protocol.slice(0, -1) }))
   }
   catch (error) {
     if (error instanceof TypeError)
-      throw new Error('Use a complete address, such as https://example.com/wallpaper.jpg.')
+      throw new Error(getT().urlErrors.invalid())
     throw error
   }
 }

@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import FolderSelect from '$lib/components/molecules/FolderSelect.svelte'
@@ -54,32 +55,31 @@
 <form onsubmit={submit}>
   <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
     {#if isRestore}
-      The original folder is no longer available. Choose a writable
-      destination to restore this item.
+      {$LL.dialogs.restoreIntro()}
     {:else}
-      Move <strong class='text-(--foreground)'>{node?.title}</strong> to another folder.
-      This changes its location in your browser bookmarks.
+      {@const [moveBefore, moveAfter] = $LL.dialogs.moveIntro().split('<>')}
+      {moveBefore}<strong class='text-(--foreground)'>{node?.title}</strong>{moveAfter}
     {/if}
   </p>
   <FolderSelect
     folders={folders}
     bind:value={parentId}
-    label='Folder'
+    label={$LL.dialogs.folder()}
     initialFocus={true}
   />
   <DialogError error={command.error} />
   <DialogActions>
-    <Button type='button' onclick={onclose}>Cancel</Button>
+    <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button
       variant='default'
       type='submit'
       disabled={command.busy || !parentId}
     >
       {command.busy
-        ? 'Saving…'
+        ? $LL.dialogs.saving()
         : isRestore
-        ? 'Restore here'
-        : 'Move here'}
+        ? $LL.dialogs.restoreHere()
+        : $LL.dialogs.moveHere()}
     </Button>
   </DialogActions>
 </form>

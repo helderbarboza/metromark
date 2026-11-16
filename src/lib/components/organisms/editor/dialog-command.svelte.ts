@@ -1,4 +1,5 @@
 import type { Command } from '$lib/types'
+import { getT } from '$lib/locale'
 
 export function createDialogCommand(
   oncommand: (command: Command) => Promise<boolean>,
@@ -7,7 +8,7 @@ export function createDialogCommand(
   const state = $state({ busy: false, error: '' })
 
   function fail(failure: unknown): void {
-    state.error = failure instanceof Error ? failure.message : 'Something went wrong.'
+    state.error = failure instanceof Error ? failure.message : getT().dialogs.somethingWrong()
   }
 
   async function run(task: () => Promise<void>): Promise<void> {
@@ -33,7 +34,7 @@ export function createDialogCommand(
         onclose()
       }
       else if (!ok) {
-        state.error = 'The operation could not be completed. See the notification for details.'
+        state.error = getT().dialogs.operationCouldNotComplete()
       }
     }
     catch (failure) {

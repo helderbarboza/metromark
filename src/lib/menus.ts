@@ -2,6 +2,9 @@ import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
 import type { IconName } from '$lib/icons'
 import type { BookmarkNode, Command, FolderTileView, GroupView, TileView } from '$lib/types'
 import { BACKGROUND_DEFAULTS } from '$lib/config'
+import { getT } from '$lib/locale'
+
+const t = () => getT().menus
 
 export interface MenuItem {
   label: string
@@ -46,13 +49,13 @@ export function buildTileMenuItems(tile: TileView | undefined, callbacks: MenuCa
   if (tile.kind === 'folder')
     return buildFolderTileMenuItems(tile, callbacks)
   return [
-    { label: 'Open in new tab', icon: 'openTab', action: () => { void callbacks.open(tile.url, 'tab') } },
-    { label: 'Open in new window', icon: 'openWindow', action: () => { void callbacks.open(tile.url, 'window') } },
-    { label: 'Edit bookmark', icon: 'edit', separator: true, disabled: !tile.writable, action: () => callbacks.edit({ kind: 'bookmark', id: tile.id }) },
-    { label: 'Move to folder', icon: 'folder', disabled: !tile.writable, action: () => callbacks.edit({ kind: 'move', id: tile.id }) },
-    { label: 'Customize tile', icon: 'customize', action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
-    { label: 'Copy website address', icon: 'copy', action: () => { void callbacks.copy(tile.id) } },
-    { label: 'Delete bookmark', icon: 'delete', separator: true, danger: true, disabled: !tile.writable, action: () => { void callbacks.execute({ type: 'node.remove', id: tile.id }) } },
+    { label: t().openInNewTab(), icon: 'openTab', action: () => { void callbacks.open(tile.url, 'tab') } },
+    { label: t().openInNewWindow(), icon: 'openWindow', action: () => { void callbacks.open(tile.url, 'window') } },
+    { label: t().editBookmark(), icon: 'edit', separator: true, disabled: !tile.writable, action: () => callbacks.edit({ kind: 'bookmark', id: tile.id }) },
+    { label: t().moveToFolder(), icon: 'folder', disabled: !tile.writable, action: () => callbacks.edit({ kind: 'move', id: tile.id }) },
+    { label: t().customizeTile(), icon: 'customize', action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
+    { label: t().copyWebsiteAddress(), icon: 'copy', action: () => { void callbacks.copy(tile.id) } },
+    { label: t().deleteBookmark(), icon: 'delete', separator: true, danger: true, disabled: !tile.writable, action: () => { void callbacks.execute({ type: 'node.remove', id: tile.id }) } },
   ]
 }
 
@@ -61,11 +64,11 @@ export function buildGroupMenuItems(input: GroupMenuInput): MenuItem[] {
   if (!node)
     return []
   return [
-    { label: 'Add bookmark here', icon: 'addBookmark', disabled: !group?.writable, action: () => callbacks.edit({ kind: 'bookmark', parentId: node.id }) },
-    { label: 'Create child folder', icon: 'folder', disabled: !group?.writable, action: () => callbacks.edit({ kind: 'folder', parentId: node.id }) },
-    { label: 'Rename folder', icon: 'edit', separator: true, disabled: !group?.mutable, action: () => callbacks.edit({ kind: 'rename', id: node.id }) },
-    { label: 'Move folder', icon: 'folder', disabled: !group?.mutable, action: () => callbacks.edit({ kind: 'move', id: node.id }) },
-    { label: 'Delete folder', icon: 'delete', separator: true, danger: true, disabled: !group?.mutable, action: () => callbacks.edit({ kind: 'delete', id: node.id }) },
+    { label: t().addBookmarkHere(), icon: 'addBookmark', disabled: !group?.writable, action: () => callbacks.edit({ kind: 'bookmark', parentId: node.id }) },
+    { label: t().createChildFolder(), icon: 'folder', disabled: !group?.writable, action: () => callbacks.edit({ kind: 'folder', parentId: node.id }) },
+    { label: t().renameFolder(), icon: 'edit', separator: true, disabled: !group?.mutable, action: () => callbacks.edit({ kind: 'rename', id: node.id }) },
+    { label: t().moveFolder(), icon: 'folder', disabled: !group?.mutable, action: () => callbacks.edit({ kind: 'move', id: node.id }) },
+    { label: t().deleteFolder(), icon: 'delete', separator: true, danger: true, disabled: !group?.mutable, action: () => callbacks.edit({ kind: 'delete', id: node.id }) },
   ]
 }
 
@@ -73,19 +76,19 @@ export function buildCanvasMenuItems(input: CanvasMenuInput): MenuItem[] {
   const { groups, selectedId, contextId, defaultFolder, shaderActive, imageActive, callbacks } = input
   const parentId = groups.find(item => item.id === contextId && item.writable)?.id ?? defaultFolder
   const items: MenuItem[] = [
-    { label: 'Add bookmark', icon: 'addBookmark', disabled: parentId.length === 0, action: () => callbacks.edit({ kind: 'bookmark', parentId }) },
-    { label: 'Create folder / group', icon: 'folder', disabled: parentId.length === 0, action: () => callbacks.edit({ kind: 'folder', parentId }) },
+    { label: t().addBookmark(), icon: 'addBookmark', disabled: parentId.length === 0, action: () => callbacks.edit({ kind: 'bookmark', parentId }) },
+    { label: t().createFolderGroup(), icon: 'folder', disabled: parentId.length === 0, action: () => callbacks.edit({ kind: 'folder', parentId }) },
   ]
   if (selectedId !== null) {
-    items.push({ label: 'Clear selection', icon: 'close', separator: true, action: () => callbacks.clearSelection() })
+    items.push({ label: t().clearSelection(), icon: 'close', separator: true, action: () => callbacks.clearSelection() })
   }
   items.push(
-    { label: 'Search bookmarks', icon: 'searchBookmarks', action: () => callbacks.focusSearch() },
-    { label: 'Appearance & settings', icon: 'settings', separator: true, action: () => callbacks.edit({ kind: 'settings' }) },
+    { label: t().searchBookmarks(), icon: 'searchBookmarks', action: () => callbacks.focusSearch() },
+    { label: t().appearanceSettings(), icon: 'settings', separator: true, action: () => callbacks.edit({ kind: 'settings' }) },
   )
   if (shaderActive) {
     items.push({
-      label: 'Turn off animated background',
+      label: t().turnOffAnimatedBackground(),
       icon: 'close',
       separator: true,
       action: () => { void callbacks.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: true, color: undefined } } }) },
@@ -93,7 +96,7 @@ export function buildCanvasMenuItems(input: CanvasMenuInput): MenuItem[] {
   }
   if (imageActive) {
     items.push({
-      label: 'Turn off background image',
+      label: t().turnOffBackgroundImage(),
       icon: 'close',
       separator: true,
       action: () => { void callbacks.execute({ type: 'settings.update', patch: { background: { ...BACKGROUND_DEFAULTS.color } } }) },
@@ -107,9 +110,9 @@ export function buildFolderTileMenuItems(tile: FolderTileView | undefined, callb
   if (!tile)
     return []
   return [
-    { label: 'Move to folder', icon: 'folder', disabled: !tile.writable, action: () => callbacks.edit({ kind: 'move', id: tile.id }) },
-    { label: 'Rename folder', icon: 'edit', separator: true, disabled: !tile.writable, action: () => callbacks.edit({ kind: 'rename', id: tile.id }) },
-    { label: 'Customize tile', icon: 'customize', separator: true, action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
+    { label: t().moveToFolder(), icon: 'folder', disabled: !tile.writable, action: () => callbacks.edit({ kind: 'move', id: tile.id }) },
+    { label: t().renameFolder(), icon: 'edit', separator: true, disabled: !tile.writable, action: () => callbacks.edit({ kind: 'rename', id: tile.id }) },
+    { label: t().customizeTile(), icon: 'customize', separator: true, action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
   ]
 }
 
@@ -118,13 +121,13 @@ export function buildAppBarMenuItems(tile: TileView | undefined, callbacks: Menu
     return []
   if (tile.kind === 'folder') {
     return [
-      { label: 'Customize tile', icon: 'customize', action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
+      { label: t().customizeTile(), icon: 'customize', action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
     ]
   }
   return [
-    { label: 'Open in new tab', icon: 'openTab', action: () => { void callbacks.open(tile.url, 'tab') } },
-    { label: 'Open in new window', icon: 'openWindow', action: () => { void callbacks.open(tile.url, 'window') } },
-    { label: 'Copy website address', icon: 'copy', action: () => { void callbacks.copy(tile.id) } },
-    { label: 'Customize tile', icon: 'customize', separator: true, action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
+    { label: t().openInNewTab(), icon: 'openTab', action: () => { void callbacks.open(tile.url, 'tab') } },
+    { label: t().openInNewWindow(), icon: 'openWindow', action: () => { void callbacks.open(tile.url, 'window') } },
+    { label: t().copyWebsiteAddress(), icon: 'copy', action: () => { void callbacks.copy(tile.id) } },
+    { label: t().customizeTile(), icon: 'customize', separator: true, action: () => callbacks.edit({ kind: 'appearance', id: tile.id }) },
   ]
 }

@@ -1,7 +1,9 @@
 <script lang='ts'>
   import type { IconName } from '$lib/icons'
+  import type { LanguageSetting } from '$lib/locale'
   import type { ThemeSelections } from '$lib/theme-picker'
   import type { Command, Settings } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import CollapsibleSection from '$lib/components/molecules/CollapsibleSection.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
@@ -9,8 +11,10 @@
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import ThemeGallery from '$lib/components/organisms/editor/ThemeGallery.svelte'
   import { Button } from '$lib/components/ui/button'
+  import * as Select from '$lib/components/ui/select'
   import * as Tabs from '$lib/components/ui/tabs'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
+  import { APP_LOCALES, LANGUAGE_NATIVE_NAMES, resolveLocale } from '$lib/locale'
   import { setSettingsContext } from '$lib/settings-context'
   import { getThemeSelections } from '$lib/theme-picker'
   import { getTheme } from '$lib/themes.js'
@@ -63,27 +67,35 @@
   }
 
   const isPreview = $derived(typeof onresetpreview === 'function')
-  const tabs: { value: string, icon: IconName, label: string }[] = [
-    { value: 'appearance', icon: 'paintBrush', label: 'Appearance' },
-    { value: 'tiles', icon: 'customize', label: 'Tiles' },
-    { value: 'background', icon: 'image', label: 'Background' },
-    { value: 'advanced', icon: 'settings', label: 'Advanced' },
-  ]
+  const tabs: { value: string, icon: IconName, label: string }[] = $derived([
+    { value: 'appearance', icon: 'paintBrush', label: $LL.settings.tabAppearance() },
+    { value: 'tiles', icon: 'customize', label: $LL.settings.tabTiles() },
+    { value: 'background', icon: 'image', label: $LL.settings.tabBackground() },
+    { value: 'advanced', icon: 'settings', label: $LL.settings.tabAdvanced() },
+  ])
 
   let themes: ThemeSelections = $state(getThemeSelections())
 
+  const systemsCaption = $derived(
+    systemPrefersMode.current === 'dark' ? $LL.settings.dark() : $LL.settings.light(),
+  )
+  const detectedLanguage = $derived(
+    LANGUAGE_NATIVE_NAMES[resolveLocale('auto')],
+  )
+  const languageLabel = $derived(
+    settings.language === 'auto'
+      ? $LL.settings.systemLanguage({ language: detectedLanguage })
+      : LANGUAGE_NATIVE_NAMES[settings.language],
+  )
   const layoutsHelp = $derived(
     confirmReset
-      ? 'Reset tile layouts for every group?'
-      : 'Reset positions to browser bookmark order. '
-        + 'Your colors, sizes, and bookmarks stay intact.',
+      ? $LL.settings.confirmResetHelp()
+      : $LL.settings.layoutsHelp(),
   )
   const factoryHelp = $derived(
     confirmFactory
-      ? 'Reset MetroMark to factory defaults?'
-      : 'Reset tile colors, sizes, placements, and display options. '
-        + 'This also resets your theme and mode and clears Undo history. '
-        + 'Your bookmarks stay. This cannot be undone.',
+      ? $LL.settings.confirmFactoryHelp()
+      : $LL.settings.factoryHelp(),
   )
 </script>
 
@@ -100,8 +112,8 @@
   <Tabs.Content value='appearance' class='mt-4 grid animate-rise-enter gap-1'>
     <SettingsCard
       icon='darkTheme'
-      title='Mode'
-      helpText='Light, dark, or match the system'
+      title={$LL.settings.mode()}
+      helpText={$LL.settings.modeHelp()}
       controlId='app-mode'
     >
       <ToggleGroup.Root
@@ -121,16 +133,56 @@
             value={mode}
             class={mode === 'system' ? 'grow' : 'grow capitalize'}
           >
-            {mode === 'system' ? `System (${systemPrefersMode.current})` : mode}
+            {mode === 'system'
+              ? $LL.settings.systemMode({ mode: systemsCaption })
+              : $LL.settings[mode]()}
           </ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
     </SettingsCard>
 
+    <SettingsCard
+      icon='globe'
+      title={$LL.settings.language()}
+      helpText={$LL.settings.languageHelp()}
+      controlId='language'
+    >
+      <Select.Root
+        type='single'
+        value={settings.language}
+        disabled={command.busy}
+        onValueChange={(v) => {
+          if (v === 'auto' || v === 'en' || v === 'de' || v === 'fr' || v === 'es' || v === 'pt') {
+            const language: LanguageSetting = v
+            setting({ language })
+          }
+        }}
+      >
+        <Select.Trigger
+          id='language'
+          class='w-44'
+          aria-labelledby='language-title'
+          aria-describedby='language-help'
+        >
+          {languageLabel}
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Group>
+            <Select.Item value='auto'>
+              {$LL.settings.systemLanguage({ language: detectedLanguage })}
+            </Select.Item>
+            {#each APP_LOCALES as lang (lang)}
+              <Select.Item value={lang}>{LANGUAGE_NATIVE_NAMES[lang]}</Select.Item>
+            {/each}
+          </Select.Group>
+        </Select.Content>
+      </Select.Root>
+    </SettingsCard>
+
     <CollapsibleSection
       icon='color'
-      title='Themes'
-      helpText='Pick the colors used in light and dark mode'
+      title={$LL.settings.themes()}
+      helpText={$LL.settings.themesHelp()}
     >
       {#snippet control()}
         <div class='inline-flex items-center gap-2 text-sm'>
@@ -148,8 +200,8 @@
   <Tabs.Content value='tiles' class='mt-4 grid animate-rise-enter gap-1'>
     <SettingsCard
       icon='density'
-      title='Tile density'
-      helpText='Comfortable adds space; compact fits more tiles'
+      title={$LL.settings.tileDensity()}
+      helpText={$LL.settings.tileDensityHelp()}
       controlId='tile-density'
     >
       <ToggleGroup.Root
@@ -166,16 +218,16 @@
         }}
       >
         {#each densities as density (density)}
-          <ToggleGroup.Item value={density} class='grow capitalize'>
-            {density}
+          <ToggleGroup.Item value={density} class='grow'>
+            {density === 'comfortable' ? $LL.settings.comfortable() : $LL.settings.compact()}
           </ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
     </SettingsCard>
     <SettingsCard
       icon='globe'
-      title='Show website addresses'
-      helpText='Show the domain under each tile title'
+      title={$LL.settings.showAddresses()}
+      helpText={$LL.settings.showAddressesHelp()}
       controlId='show-domains'
     >
       <input
@@ -199,8 +251,8 @@
     </SettingsCard>
     <SettingsCard
       icon='color'
-      title='Original favicons'
-      helpText='Show the full-color favicon instead of a single-color Metro glyph'
+      title={$LL.settings.originalFavicons()}
+      helpText={$LL.settings.originalFaviconsHelp()}
       controlId='original-favicons'
     >
       <input
@@ -224,8 +276,8 @@
     </SettingsCard>
     <SettingsCard
       icon='pause'
-      title='Reduce motion'
-      helpText='Disables tile, menu, and background animations'
+      title={$LL.settings.reduceMotion()}
+      helpText={$LL.settings.reduceMotionHelp()}
       controlId='reduce-motion'
     >
       <input
@@ -249,23 +301,23 @@
     </SettingsCard>
     <SettingsCard
       icon='refresh'
-      title='Reset tile layouts'
+      title={$LL.settings.resetLayouts()}
       helpText={layoutsHelp}
       controlId='reset-layouts'
     >
       {#if confirmReset}
-        <Button onclick={() => (confirmReset = false)}>Cancel</Button>
+        <Button onclick={() => (confirmReset = false)}>{$LL.dialogs.cancel()}</Button>
         <Button
           variant='default'
           disabled={command.busy}
           aria-describedby='reset-layouts-help'
           onclick={() => send({ type: 'layout.reset' })}
         >
-          Reset with Undo
+          {$LL.settings.resetWithUndo()}
         </Button>
       {:else}
         <Button id='reset-layouts' onclick={() => (confirmReset = true)}>
-          Reset tile layouts
+          {$LL.settings.resetLayouts()}
         </Button>
       {/if}
     </SettingsCard>
@@ -276,13 +328,13 @@
   <Tabs.Content value='advanced' class='mt-4 grid animate-rise-enter gap-1'>
     <SettingsCard
       icon='buildingFactory'
-      title='Factory reset'
+      title={$LL.settings.factoryReset()}
       helpText={factoryHelp}
       controlId='factory-reset'
     >
       {#if confirmFactory}
         <Button disabled={command.busy} onclick={() => (confirmFactory = false)}>
-          Cancel
+          {$LL.dialogs.cancel()}
         </Button>
         <Button
           variant='destructive'
@@ -290,7 +342,7 @@
           aria-describedby='factory-reset-help'
           onclick={() => send({ type: 'factory.reset' })}
         >
-          Reset MetroMark
+          {$LL.settings.resetMetroMark()}
         </Button>
       {:else}
         <Button
@@ -298,7 +350,7 @@
           disabled={command.busy}
           onclick={() => (confirmFactory = true)}
         >
-          Factory reset
+          {$LL.settings.factoryReset()}
         </Button>
       {/if}
     </SettingsCard>
@@ -309,20 +361,20 @@
 
 {#if isPreview}
   <div class='mt-7 rounded-sm border border-(--border) bg-(--background) p-4.25'>
-    <span class='text-[0.5rem] tracking-widest text-(--muted-foreground)'>DEMO WORKSPACE</span>
+    <span class='text-[0.5rem] tracking-widest text-(--muted-foreground)'>{$LL.settings.demoWorkspace()}</span>
     <p class='mt-2.25 mb-3.25 text-[10px] leading-relaxed text-(--muted-foreground)'>
-      This preview uses sample bookmarks, not your real browser data.
+      {$LL.settings.demoWorkspaceText()}
     </p>
     {#if confirmPreview}
       <Button disabled={command.busy} onclick={resetPreview}>
-        Confirm demo reset
+        {$LL.settings.confirmDemoReset()}
       </Button>
     {:else}
       <button
         class='bg-transparent p-0 text-[10px] text-(--primary)'
         onclick={() => (confirmPreview = true)}
       >
-        Restore sample bookmarks
+        {$LL.settings.restoreSample()}
       </button>
     {/if}
   </div>

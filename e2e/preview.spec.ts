@@ -67,11 +67,11 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   })
   await dialog.getByRole('button', { name: 'Save changes' }).click()
   await expect(link(page, 'QA edited favorite')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  for (const size of ['small', 'medium', 'large', 'wide']) {
+  for (const [raw, display] of [['small', 'Small'], ['medium', 'Medium'], ['large', 'Large'], ['wide', 'Wide']] as const) {
     await rightClick(page, 'QA edited favorite')
-    await page.getByRole('button', { name: `Resize selected tile to ${size}`, exact: true }).click()
+    await page.getByRole('button', { name: `Resize selected tile to ${display}`, exact: true }).click()
     // Small tiles intentionally have no visible title; address via the accessible name.
-    await expect(page.locator(`a[data-testid="bookmark-tile"][aria-label^="Open QA edited favorite"][data-size="${size}"]`)).toHaveCount(1)
+    await expect(page.locator(`a[data-testid="bookmark-tile"][aria-label^="Open QA edited favorite"][data-size="${raw}"]`)).toHaveCount(1)
   }
   await rightClick(page, 'QA edited favorite')
   await page.getByRole('button', { name: 'Move selected bookmark to another folder' }).click()
@@ -211,7 +211,7 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await expect(link(second, 'QA across tabs')).toBeVisible()
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await page.getByRole('radio', { name: 'dark', exact: true }).click()
+  await page.getByRole('radio', { name: 'Dark', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
   await page.getByRole('button', { name: 'Catppuccin Mocha', exact: true }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'catppuccin-mocha')
@@ -321,7 +321,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   // Switch to dark mode (catppuccin-mocha) via Appearance dialog
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await page.getByRole('radio', { name: 'dark', exact: true }).click()
+  await page.getByRole('radio', { name: 'Dark', exact: true }).click()
   await page.keyboard.press('Escape')
 
   // In catppuccin-mocha all accent colors are bright, so both tiles should have black text now.
@@ -331,7 +331,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   // Switch back to light mode
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
-  await page.getByRole('radio', { name: 'light', exact: true }).click()
+  await page.getByRole('radio', { name: 'Light', exact: true }).click()
   await page.keyboard.press('Escape')
 
   // Back to catppuccin-latte: Notion black, Steam white.
@@ -358,7 +358,7 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
   await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('tab', { name: 'Tiles', exact: true }).click()
-  await page.getByRole('radio', { name: 'compact', exact: true }).click()
+  await page.getByRole('radio', { name: 'Compact', exact: true }).click()
   await page.getByRole('tab', { name: 'Appearance', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
   await page.getByRole('button', { name: 'One Light', exact: true }).click()
@@ -401,6 +401,7 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
     showDomains: true,
     originalFavicons: false,
     reducedMotion: false,
+    language: 'auto',
     // Keep in sync with SETTINGS_DEFAULTS in src/lib/config.ts.
     background: {
       auto: true,
@@ -436,7 +437,7 @@ test('folder tiles resize, rename, move and cannot be deleted', async ({ page })
   await expect(bar).toContainText('Work')
   await expect(page.getByRole('button', { name: 'Delete selected bookmark' })).toHaveCount(0)
   // Resize via the app bar presets.
-  await page.getByRole('button', { name: 'Resize selected tile to large', exact: true }).click()
+  await page.getByRole('button', { name: 'Resize selected tile to Large', exact: true }).click()
   await expect(group(page, 'Bookmarks bar').locator('button[data-grid-id="work"]')).toHaveAttribute('data-size', 'large')
   // Rename via the app bar.
   await folderTile(page, 'Work').click({ button: 'right' })

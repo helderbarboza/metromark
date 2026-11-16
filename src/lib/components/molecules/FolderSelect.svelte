@@ -1,11 +1,12 @@
 <script lang='ts'>
   import type { GroupView } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
 
   let {
     folders,
     value = $bindable(''),
     label,
-    hint = 'Browser roots are kept separate. There are no virtual groups.',
+    hint,
     initialFocus = false,
     disabled = false,
   }: {
@@ -37,10 +38,10 @@
     '
   >
     {#each folders as folder (folder.id)}
-      <option value={folder.id}>{folder.path.join(' / ') || 'Unnamed group'}</option>
+      <option value={folder.id}>{folder.path.join(' / ') || $LL.app.unnamedGroup()}</option>
     {/each}
   </select>
   <span class='m-0 text-xs/relaxed text-(--muted-foreground)' id={`${uid}-hint`}>
-    {hint}
+    {hint ?? $LL.dialogs.folderHint()}
   </span>
 </label>

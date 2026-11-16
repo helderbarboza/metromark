@@ -2,8 +2,9 @@
   import type { CommonTileProps, TileContentArgs } from '$lib/components/tile-props'
   import type { TileSize } from '$lib/types'
   import type { Snippet } from 'svelte'
-  import Icon from '$lib/components/atoms/Icon.svelte'
+  import LL from '$i18n/i18n-svelte'
 
+  import Icon from '$lib/components/atoms/Icon.svelte'
   import { tileVariants } from '$lib/components/tile-variants'
   import { tilt } from '$lib/components/tilt'
   import Button from '$lib/components/ui/button/button.svelte'
@@ -176,8 +177,16 @@
         shadow-sm
       '
       aria-label={quickResize.direction === 'grow'
-        ? `Grow ${tile.title} ${resizeNoun} to ${quickResize.target}`
-        : `Shrink ${tile.title} ${resizeNoun} to ${quickResize.target}`}
+        ? $LL.app.growTile({
+          name: tile.title,
+          noun: resizeNoun,
+          size: $LL.tileSizes[quickResize.target](),
+        })
+        : $LL.app.shrinkTile({
+          name: tile.title,
+          noun: resizeNoun,
+          size: $LL.tileSizes[quickResize.target](),
+        })}
       onpointerdown={event => event.stopPropagation()}
       onclick={(event) => {
         event.preventDefault()

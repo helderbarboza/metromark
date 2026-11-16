@@ -1,5 +1,6 @@
 <script lang='ts'>
   import type { ThemeSelections } from '$lib/theme-picker'
+  import LL from '$i18n/i18n-svelte'
   import ThemePreview from '$lib/components/molecules/ThemePreview.svelte'
   import Button from '$lib/components/ui/button/button.svelte'
   import {
@@ -38,7 +39,7 @@
   {#each themeGroupsEntries as [mode, modeTheme] (mode)}
     <div>
       <h4 class={cn('mb-2.5 text-xs font-medium tracking-wider text-(--muted-foreground) uppercase')}>
-        {mode} theme
+        {mode === 'light' ? $LL.settings.lightTheme() : $LL.settings.darkTheme()}
       </h4>
       <div class='grid grid-cols-3 gap-2'>
         {#each modeTheme as theme (theme)}

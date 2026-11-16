@@ -140,7 +140,7 @@
   {template}
   play={async ({ canvas }) => {
     await expect(canvas
-      .getByRole('button', { name: 'Grow Design system folder tile to wide' })).toBeVisible()
+      .getByRole('button', { name: 'Grow Design system folder tile to Wide' })).toBeVisible()
   }}
 />
 <Story
@@ -153,7 +153,7 @@
   {template}
   play={async ({ canvas }) => {
     await expect(canvas
-      .getByRole('button', { name: 'Shrink Design system folder tile to small' })).toBeVisible()
+      .getByRole('button', { name: 'Shrink Design system folder tile to Small' })).toBeVisible()
   }}
 />
 <Story

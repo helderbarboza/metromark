@@ -1,6 +1,8 @@
 <script lang='ts'>
   import type { Notice } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
+
   import IconButton from '$lib/components/molecules/IconButton.svelte'
 
   interface Props {
@@ -40,11 +42,11 @@
       '
       onclick={onundo}
     >
-      <Icon name='undo' size={14} />{notice.actionLabel ?? 'Undo'}
+      <Icon name='undo' size={14} />{notice.actionLabel ?? $LL.toast.undo()}
     </button>
   {/if}
   <IconButton
-    label='Dismiss notification'
+    label={$LL.toast.dismiss()}
     data-testid='toast-close'
     class='size-6.25! shrink-0'
     onclick={onclose}

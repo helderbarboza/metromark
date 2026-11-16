@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import LL from '$i18n/i18n-svelte'
   import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import { Button } from '$lib/components/ui/button'
 
@@ -6,8 +7,7 @@
 </script>
 
 <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
-  Clipboard access isn't available here. Select the address and press
-  Ctrl/Cmd+C.
+  {$LL.dialogs.copyIntro()}
 </p>
 <input
   class='
@@ -17,9 +17,9 @@
   data-initial-focus
   readonly
   value={url}
-  aria-label='Website address to copy'
+  aria-label={$LL.dialogs.websiteAddressToCopy()}
   onfocus={event => event.currentTarget.select()}
 />
 <DialogActions>
-  <Button variant='default' onclick={onclose}>Done</Button>
+  <Button variant='default' onclick={onclose}>{$LL.dialogs.done()}</Button>
 </DialogActions>

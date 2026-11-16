@@ -8,6 +8,7 @@
  * tab discards the results.
  */
 import type { ShaderBenchmarkResult } from './benchmark'
+import { getT } from '$lib/locale'
 import { SvelteMap } from 'svelte/reactivity'
 import { benchmarkShader } from './benchmark'
 import { shaders } from './index'
@@ -91,7 +92,7 @@ export async function runShaderBenchmarks(): Promise<void> {
   if (controller.signal.aborted)
     cancelled = true
   else if (failedCount === BENCHMARK_SHADERS.length)
-    failure = 'WebGL is unavailable; the shaders cannot be benchmarked on this device.'
+    failure = getT().settings.benchmarkUnavailable()
   currentShaderId = null
   activeRun = null
   running = false

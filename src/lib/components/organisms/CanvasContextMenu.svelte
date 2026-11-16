@@ -4,6 +4,7 @@
   import type { SmoothScroller } from '$lib/smooth-scroll.svelte'
   import type { GroupView, Snapshot, TileSize, TileView } from '$lib/types'
   import type { Snippet } from 'svelte'
+  import LL from '$i18n/i18n-svelte'
   import CanvasStatus from '$lib/components/molecules/CanvasStatus.svelte'
   import MenuItems from '$lib/components/molecules/MenuItems.svelte'
   import TileSizeGrid from '$lib/components/molecules/TileSizeGrid.svelte'
@@ -101,7 +102,7 @@
         onwheel={smoothScroll.wheel}
         onpointerdown={onCanvasPointerDown}
         oncontextmenu={event => onForwardContextMenu(props, event)}
-        aria-label='Bookmark tile canvas'
+        aria-label={$LL.app.bookmarkCanvas()}
         tabindex='-1'
       >
         <div class='flex h-full flex-row items-center'>
@@ -153,8 +154,8 @@
     bind:ref={contentEl}
     class='w-65'
     aria-label={menuTarget?.target === 'tile'
-      ? `Actions for ${contextTile?.title ?? 'tile'}`
-      : 'Canvas actions'}
+      ? $LL.app.actionsFor({ title: contextTile?.title ?? $LL.app.tile() })
+      : $LL.app.canvasActions()}
     onOpenAutoFocus={event => focusFirstMenuItem(event, contentEl)}
     onCloseAutoFocus={onCloseAutoFocus}
   >

@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import { Button } from '$lib/components/ui/button'
 
@@ -26,11 +27,11 @@
     {#if loadError}
       <Icon name='lock' size={28} />
       <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
-        Let's reconnect.
+        {$LL.status.reconnectingTitle()}
       </h2>
       <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
       <button onclick={() => window.location.reload()}>
-        Reload page
+        {$LL.status.reloadPage()}
       </button>
     {:else}
       <span
@@ -41,7 +42,7 @@
       >
       </span>
       <p class='mb-6 px-5 text-xs/relaxed'>
-        Finding your favorites…
+        {$LL.status.findingFavorites()}
       </p>
     {/if}
   </div>
@@ -49,12 +50,12 @@
   <div class='flex size-full min-h-60 flex-col items-center justify-center border'>
     <Icon name='searchBookmarks' size={33} />
     <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
-      No favorites found.
+      {$LL.search.noFavoritesFound()}
     </h2>
     <p class='mb-6 px-5 text-xs/relaxed'>
-      Nothing matches “{query}”. Try a title, website, or folder.
+      {$LL.search.noFavoritesDetail({ query })}
     </p>
-    <Button onclick={onclearsearch}>Clear search</Button>
+    <Button onclick={onclearsearch}>{$LL.search.clearSearch()}</Button>
   </div>
 {:else}
   <div
@@ -64,10 +65,10 @@
     '
   >
     <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
-      No bookmark folders available.
+      {$LL.status.noFoldersTitle()}
     </h2>
     <p class='mb-6 px-5 text-xs/relaxed'>
-      Create a writable browser bookmark folder to get started.
+      {$LL.status.noFoldersDetail()}
     </p>
   </div>
 {/if}

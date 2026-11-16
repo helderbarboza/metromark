@@ -1,4 +1,5 @@
 import type { BookmarkNode, GroupView, Snapshot } from '$lib/types'
+import { getT } from '$lib/locale'
 import { flatten, isFolder, projectGroups } from '$lib/tree'
 
 export interface DialogSpec {
@@ -18,32 +19,34 @@ export interface DialogSpec {
 }
 
 export function dialogTitle(spec: DialogSpec, node?: BookmarkNode): string {
+  const t = getT().dialogs
   switch (spec.kind) {
     case 'bookmark':
-      return node ? 'Edit bookmark' : 'A new favorite'
+      return node ? t.editBookmark() : t.aNewFavorite()
     case 'folder':
-      return 'Make a little room'
+      return t.makeALittleRoom()
     case 'rename':
-      return 'Rename folder'
+      return t.renameFolder()
     case 'move':
-      return 'Find a new home'
+      return t.findNewHome()
     case 'delete':
-      return 'Delete this folder?'
+      return t.deleteThisFolder()
     case 'appearance':
-      return 'Make it your own'
+      return t.makeItYourOwn()
     case 'restore':
-      return 'Restore to a folder'
+      return t.restoreToFolder()
     case 'copy':
-      return 'Copy website address'
+      return t.copyWebsiteAddress()
     case 'settings':
-      return 'Settings'
+      return t.settings()
   }
 }
 
 export function dialogEyebrow(spec: DialogSpec): string {
+  const t = getT().dialogs
   if (spec.kind === 'delete')
-    return 'DESTRUCTIVE ACTION'
-  return 'YOUR BOOKMARKS'
+    return t.destructiveAction()
+  return t.yourBookmarks()
 }
 
 export function writableGroups(snapshot: Snapshot): GroupView[] {

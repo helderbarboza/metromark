@@ -2,6 +2,7 @@
   import type { CommonTileProps, TileContentArgs } from '$lib/components/tile-props'
   import type { BookmarkTileDef } from '$lib/types'
   import type { Snippet } from 'svelte'
+  import LL from '$i18n/i18n-svelte'
   import FaviconImage from '$lib/components/molecules/FaviconImage.svelte'
 
   import TileShell from '$lib/components/molecules/TileShell.svelte'
@@ -43,9 +44,9 @@
   const cell = $derived(readTileGrid?.().cell)
   const gap = $derived(readTileGrid?.().gap ?? GAP)
   const fallbackOpenLabel = $derived(
-    `Open ${tile.title}${showDomain && domain && size !== 'small'
-      ? ` ${domain}`
-      : ''}`,
+    $LL.app.openBookmarkName({
+      name: showDomain && domain && size !== 'small' ? `${tile.title} ${domain}` : tile.title,
+    }),
   )
 
   const ui = $derived(tileVariants({ size, selected, revealed }))
@@ -65,7 +66,7 @@
   cell={cell}
   gap={gap}
   defaultLabel={fallbackOpenLabel}
-  resizeNoun='tile'
+  resizeNoun={$LL.app.resizeNounTile()}
   tooltip={tooltip ?? (tile.url ? `${tile.title} — ${tile.url}` : tile.title)}
 >
   {#snippet content({ fg }: TileContentArgs)}

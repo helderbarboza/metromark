@@ -2,11 +2,14 @@ import type { Command } from '$lib/types'
 import { MESSAGE_SCOPE, nativeBookmarks, nativePersistence } from '$lib/adapters/native'
 import { loadSettings } from '$lib/config'
 import { BookmarkCoordinator } from '$lib/coordinator'
+import { applyLocale } from '$lib/locale'
 import { browser } from 'wxt/browser'
 import { defineBackground } from 'wxt/utils/define-background'
 
 export default defineBackground(() => {
   const settings = loadSettings()
+  // Provisional locale for messages thrown before the stored settings arrive.
+  applyLocale(settings.language, { persist: false })
   const coordinator = new BookmarkCoordinator(nativeBookmarks(), nativePersistence(), settings)
   coordinator.subscribe(() => {
     void browser.runtime.sendMessage({ scope: MESSAGE_SCOPE, kind: 'changed' }).catch(() => undefined)

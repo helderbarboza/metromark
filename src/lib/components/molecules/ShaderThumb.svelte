@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { ShaderDefinition } from '$lib/shaders'
   import type { ShaderBenchmarkResult } from '$lib/shaders/benchmark.svelte'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import ShaderBackground from '$lib/components/organisms/ShaderBackground.svelte'
   import { Button } from '$lib/components/ui/button'
@@ -33,14 +34,17 @@
   const signal = $derived.by(() => {
     if (shader == null || benchmark?.status !== 'ok' || !benchmark.level)
       return null
-    const detail = `${benchmark.avgFrameMs.toFixed(1)} ms avg frame`
-    const presentation = BENCHMARK_PRESENTATION[benchmark.level]
+    const level = benchmark.level
+    const presentation = BENCHMARK_PRESENTATION[level]
+    const time = benchmark.avgFrameMs.toFixed(1)
+    const levelName = $LL.benchmarkLevels[level]()
+    const detail = $LL.benchmark.avgFrameDetail({ time })
     return {
       icon: presentation.icon,
       class: presentation.class,
-      avgFrameTime: benchmark.avgFrameMs.toFixed(1),
-      label: `Performance: ${presentation.short.toLowerCase()} (${detail})`,
-      title: `${presentation.short} · ${detail}`,
+      avgFrameTime: time,
+      label: $LL.benchmark.performanceLabel({ level: levelName.toLowerCase(), detail }),
+      title: $LL.benchmark.levelTitle({ level: levelName, time }),
     }
   })
 </script>
@@ -88,7 +92,7 @@
   {/if}
   <span class='flex w-full items-center justify-between gap-1 px-0.5'>
     <span class='truncate text-xs'>
-      {shader?.name ?? 'None'}
+      {shader?.name ?? $LL.settings.shaderNone()}
     </span>
   </span>
 </Button>

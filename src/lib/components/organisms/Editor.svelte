@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type { Command, Snapshot } from '$lib/types'
+  import LL, { locale } from '$i18n/i18n-svelte'
   import Modal from '$lib/components/molecules/Modal.svelte'
   import AppearanceDialog from '$lib/components/organisms/editor/AppearanceDialog.svelte'
   import BookmarkDialog from '$lib/components/organisms/editor/BookmarkDialog.svelte'
@@ -22,8 +23,15 @@
 
   const nodes = $derived(indexTree(snapshot.tree))
   const node = $derived(spec.id ? nodes.get(spec.id) : undefined)
-  const title = $derived(dialogTitle(spec, node))
-  const eyebrow = $derived(dialogEyebrow(spec))
+  // Dialog title/eyebrow are translated, so track the locale.
+  const title = $derived.by(() => {
+    void $locale
+    return dialogTitle(spec, node)
+  })
+  const eyebrow = $derived.by(() => {
+    void $locale
+    return dialogEyebrow(spec)
+  })
 
 </script>
 <Modal
@@ -41,7 +49,7 @@
       />
     {:else}
       <p class='mb-6.5 text-sm/relaxed text-(--muted-foreground)'>
-        This folder is no longer available.
+        {$LL.dialogs.folderUnavailable()}
       </p>
       <div class='mt-7 flex justify-end gap-2.25'>
         <button
@@ -51,7 +59,7 @@
           '
           onclick={onclose}
         >
-          Close
+          {$LL.dialogs.close()}
         </button>
       </div>
     {/if}

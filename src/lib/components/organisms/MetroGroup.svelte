@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { GroupView, Layout, TileSize, TileView } from '$lib/types'
   import type { Snippet } from 'svelte'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
   import FolderTile from '$lib/components/organisms/FolderTile.svelte'
@@ -196,7 +197,7 @@
       onBlocked(
         error instanceof Error
           ? error.message
-          : 'Unable to open this bookmark.',
+          : $LL.app.unableToOpenBookmark(),
       )
     }
   }
@@ -226,7 +227,7 @@
   data-group-id={group.id}
   class={cn('flex-none transition-[width] duration-140 motion-reduce:transition-none', flash && 'animate-flash')}
   style:width='{visibleWidth}px'
-  aria-label={group.path.join(' / ') || 'Ungrouped bookmarks'}
+  aria-label={group.path.join(' / ') || $LL.app.ungroupedBookmarks()}
 >
   {#snippet headerBody()}
     <div class='min-w-0'>
@@ -239,7 +240,7 @@
       >
         {group.path.length > 1
           ? `${group.path.slice(0, -1).join(' / ')} /`
-          : 'BROWSER ROOT'}
+          : $LL.app.browserRoot()}
       </div>
       <div class='flex items-start gap-2.75'>
         <h2
@@ -291,12 +292,12 @@
       </ContextMenu.Trigger>
       <ContextMenu.Content
         bind:ref={menuContentEl}
-        aria-label={`Actions for ${group.title || 'unnamed group'}`}
+        aria-label={$LL.app.actionsFor({ title: group.title || $LL.app.unnamedGroup() })}
         class='w-65'
         onOpenAutoFocus={event => focusFirstMenuItem(event, menuContentEl)}
       >
         <ContextMenu.Label class='flex flex-col gap-1.5 border-b px-2.5 pt-2.5 pb-3 select-none'>
-          <strong class='truncate text-xs font-semibold'>{group.title || 'Unnamed group'}</strong>
+          <strong class='truncate text-xs font-semibold'>{group.title || $LL.app.unnamedGroup()}</strong>
           <span class='truncate text-xs text-(--muted-foreground)'>{group.path.join(' / ')}</span>
         </ContextMenu.Label>
         {@render menu(group)}
@@ -316,7 +317,7 @@
     )}
     data-testid='metro-grid'
     role='group'
-    aria-label="Tiles in {group.path.join(' / ')}"
+    aria-label={$LL.app.tilesIn({ path: group.path.join(' / ') })}
     data-group-id={group.id}
   >
     {#each layout as entry (entry.i)}
@@ -341,7 +342,7 @@
             tile={folderTile}
             size={sizeOf(entry)}
             selected={selectedId === entry.i}
-            ariaLabel="Folder {folderTile.title}. Activating scrolls to this folder's group."
+            ariaLabel={$LL.app.folderTileSummary({ title: folderTile.title })}
             onclick={() => onActivateFolder?.(entry.i)}
             class='
               block transition-[left,top,width,height] duration-140
@@ -369,10 +370,11 @@
             showDomain={showDomains}
             href={href(bookmarkTile)}
             target={preview ? '_blank' : undefined}
-            ariaLabel="Open {bookmarkTile.title}{showDomains
-              && sizeOf(entry) !== 'small'
-              ? ` ${bookmarkTile.domain}`
-              : ''}"
+            ariaLabel={$LL.app.openBookmarkName({
+              name: showDomains && sizeOf(entry) !== 'small'
+                ? `${bookmarkTile.title} ${bookmarkTile.domain}`
+                : bookmarkTile.title,
+            })}
             onclick={event => launch(event, bookmarkTile)}
             class='
               block transition-[left,top,width,height] duration-140
@@ -413,15 +415,15 @@
           <Empty.Media variant='icon'>
             <Icon name='folder' size={22} />
           </Empty.Media>
-          <Empty.Title>This folder is empty</Empty.Title>
+          <Empty.Title>{$LL.app.emptyFolderTitle()}</Empty.Title>
           <Empty.Description>
-            Add a bookmark or move tiles here from any other group.
+            {$LL.app.emptyFolderDescription()}
           </Empty.Description>
         </Empty.Header>
         {#if group.writable}
           <Empty.Content>
             <Button variant='outline' size='sm' onclick={() => onAdd(group.id)}>
-              <Icon name='addBookmark' />Add a bookmark
+              <Icon name='addBookmark' />{$LL.app.addBookmark()}
             </Button>
           </Empty.Content>
         {/if}

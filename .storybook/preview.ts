@@ -1,8 +1,13 @@
 import type { Preview } from '@storybook/svelte'
+import { applyLocale } from '../src/lib/locale'
 import { DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME, getTheme, THEMES } from '../src/lib/themes.js'
 import steamFaviconUrl from './steam-favicon.ico?url'
 import ThemeDecorator from './ThemeDecorator.svelte'
 import '../src/styles.css'
+
+// Stories render the English base locale deterministically; the language
+// itself can still be exercised through the settings drawer stories.
+applyLocale('en', { persist: false })
 
 // Storybook has no browser favicon cache (the web preview has no extension
 // runtime), so point tile icons at one fixed sample favicon. The normal

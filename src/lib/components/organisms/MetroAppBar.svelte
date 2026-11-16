@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { MenuItem } from '$lib/menus'
   import type { TileSize } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import MenuItems from '$lib/components/molecules/MenuItems.svelte'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
@@ -53,14 +54,13 @@
   })
 
   const presets = ['small', 'medium', 'wide', 'large'] as const
-  const actionNoun = $derived(kind === 'folder' ? 'folder' : 'bookmark')
 </script>
 
 <div
   bind:this={bar}
   class='app-bar'
   role='toolbar'
-  aria-label='Actions for {title}'
+  aria-label={$LL.app.actionsFor({ title })}
 >
   <span class='selected-label'>
     <span class='selection-dot'></span>{title}
@@ -69,14 +69,18 @@
     <button
       data-initial-focus
       disabled={!writable}
-      aria-label={kind === 'folder' ? 'Rename selected folder' : 'Edit selected bookmark'}
+      aria-label={kind === 'folder'
+        ? $LL.appBar.renameSelectedFolder()
+        : $LL.appBar.editSelectedBookmark()}
       onclick={onedit}
     >
       <Icon name='edit' size={15} />
     </button>
     <button
       disabled={!writable}
-      aria-label={`Move selected ${actionNoun} to another folder`}
+      aria-label={kind === 'folder'
+        ? $LL.appBar.moveSelectedFolder()
+        : $LL.appBar.moveSelectedBookmark()}
       onclick={onmove}
     >
       <Icon name='folder' size={15} />
@@ -85,7 +89,7 @@
       <button
         class='delete'
         disabled={!writable}
-        aria-label='Delete selected bookmark'
+        aria-label={$LL.appBar.deleteSelectedBookmark()}
         onclick={ondelete}
       >
         <Icon name='delete' size={15} />
@@ -97,22 +101,22 @@
       <button
         class:active={size === preset}
         aria-pressed={size === preset}
-        aria-label='Resize selected tile to {preset}'
+        aria-label={$LL.appBar.resizeSelectedTile({ size: $LL.tileSizes[preset]() })}
         onclick={() => onresize(preset)}
       >
-        {preset}
+        {$LL.tileSizes[preset]()}
       </button>
     {/each}
   </div>
   <div class='bar-actions'>
     {#if menuItems.length > 0}
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger aria-label='More actions for {title}'>
+        <DropdownMenu.Trigger aria-label={$LL.app.moreActionsFor({ title })}>
           <Icon name='more' size={16} />
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           bind:ref={menuContentEl}
-          aria-label='Actions for {title}'
+          aria-label={$LL.app.actionsFor({ title })}
           class='w-65'
           side='top'
           align='end'
@@ -128,7 +132,7 @@
         </DropdownMenu.Content>
       </DropdownMenu.Root>
     {/if}
-    <button aria-label='Clear selection' onclick={onclear}>
+    <button aria-label={$LL.menus.clearSelection()} onclick={onclear}>
       <Icon name='close' size={16} />
     </button>
   </div>

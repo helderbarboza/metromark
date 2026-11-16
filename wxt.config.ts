@@ -4,7 +4,7 @@ import { libAlias, metromarkDefines } from './build/shared.mjs'
 
 export default defineConfig({
   srcDir: 'src',
-  alias: { $lib: 'src/lib' },
+  alias: { $lib: 'src/lib', $i18n: 'src/i18n' },
   modules: ['@wxt-dev/module-svelte'],
   imports: false,
   manifest: ({ browser }) => ({

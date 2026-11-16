@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { BookmarkNode, Command, Snapshot, TileSize } from '$lib/types'
 
+  import LL from '$i18n/i18n-svelte'
   import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
   import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
@@ -39,6 +40,11 @@
       : tileFor(node, snapshot.appearance[node.id])
     : undefined)
   const folder = $derived(node ? isFolder(node) : false)
+  const introParts = $derived.by(() =>
+    $LL.dialogs.appearanceIntro({
+      target: folder ? $LL.dialogs.folderTarget() : $LL.dialogs.bookmarkTarget(),
+    }).split('<>'),
+  )
 
   const themeColors = $derived.by(() => {
     void theme.current
@@ -72,12 +78,10 @@
 <form onsubmit={submit}>
   {#if tile}
     <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
-      A little personality for <strong class='text-(--foreground)'>{tile.title}</strong>.
-      Appearance changes are local;
-      {folder ? 'the folder itself' : 'the bookmark itself'} stays untouched.
+      {introParts[0]}<strong class='text-(--foreground)'>{tile.title}</strong>{introParts[1]}
     </p>
     <label class='mb-5.25 flex flex-col gap-2.25'>
-      <span class='text-xs font-medium text-(--foreground)' id='tile-size-label'>Tile size</span>
+      <span class='text-xs font-medium text-(--foreground)' id='tile-size-label'>{$LL.dialogs.tileSize()}</span>
       <select
         aria-labelledby='tile-size-label'
         bind:value={size}
@@ -87,8 +91,8 @@
           pr-7 text-xs text-(--foreground) outline-offset-1
         '
       >
-        {#each ['small', 'medium', 'wide', 'large'] as preset (preset)}
-          <option value={preset}>{preset[0].toUpperCase() + preset.slice(1)}</option>
+        {#each ['small', 'medium', 'wide', 'large'] as const as preset (preset)}
+          <option value={preset}>{$LL.tileSizes[preset]()}</option>
         {/each}
       </select>
     </label>
@@ -96,9 +100,9 @@
   {/if}
   <DialogError error={command.error} />
   <DialogActions>
-    <Button type='button' onclick={onclose}>Cancel</Button>
+    <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button variant='default' type='submit' disabled={command.busy}>
-      {command.busy ? 'Saving…' : 'Save changes'}
+      {command.busy ? $LL.dialogs.saving() : $LL.dialogs.saveChanges()}
     </Button>
   </DialogActions>
 </form>

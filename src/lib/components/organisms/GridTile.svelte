@@ -37,6 +37,7 @@
 
   import type { Gesture } from '$lib/interaction'
   import type { TileSize, TileView } from '$lib/types'
+  import LL from '$i18n/i18n-svelte'
   import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
   import FolderTile from '$lib/components/organisms/FolderTile.svelte'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
@@ -90,9 +91,11 @@
   // Unsupported addresses stay in the tree but must never be launched (see validateUrl).
   const href = $derived(bookmarkTile ? safeUrl(bookmarkTile.url) : undefined)
   const bookmarkLabel = $derived(bookmarkTile
-    ? `Open ${bookmarkTile.title}${
-      showDomains && bookmarkTile.size !== 'small' ? ` ${bookmarkTile.domain}` : ''
-    }. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel.`
+    ? $LL.app.openBookmark({
+      name: showDomains && bookmarkTile.size !== 'small'
+        ? `${bookmarkTile.title} ${bookmarkTile.domain}`
+        : bookmarkTile.title,
+    })
     : '')
 
   function pointerdown(event: PointerEvent) {
@@ -151,7 +154,7 @@
       onblocked(
         error instanceof Error
           ? error.message
-          : 'Unable to open this bookmark.',
+          : $LL.app.unableToOpenBookmark(),
       )
     }
   }
@@ -190,9 +193,8 @@
     size={item.item ? sizeOf(item.item) : tile.size}
     {selected}
     {revealed}
-    ariaLabel={`Folder ${tile.title}. Right-click to select. Space to pick up and move; `
-      + 'arrow keys to move; Escape to cancel. Activating scrolls to this folder\'s group.'}
-    ariaRoleDescription='draggable folder'
+    ariaLabel={$LL.app.folderTileLabel({ title: tile.title })}
+    ariaRoleDescription={$LL.app.draggableFolder()}
     draggable={false}
     class={cn(
       `
@@ -230,7 +232,7 @@
     href={href}
     target={preview ? '_blank' : undefined}
     ariaLabel={bookmarkLabel}
-    ariaRoleDescription='draggable bookmark'
+    ariaRoleDescription={$LL.app.draggableBookmark()}
     draggable={false}
     class={cn(
       `

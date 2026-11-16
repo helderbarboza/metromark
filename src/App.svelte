@@ -8,6 +8,7 @@
     Snapshot,
     TileSize,
   } from '$lib/types'
+  import LL, { locale } from '$i18n/i18n-svelte'
   import { isMediaKey } from '$lib/background-image'
   import MenuItems from '$lib/components/molecules/MenuItems.svelte'
   import UndoToast from '$lib/components/molecules/UndoToast.svelte'
@@ -25,6 +26,7 @@
   import { KeyboardNav } from '$lib/keyboard-nav'
   import { GAP, ROWS } from '$lib/layout'
   import { LayoutStager } from '$lib/layout-stager.svelte'
+  import { applyLocale, provisionalLanguageSetting } from '$lib/locale'
   import { sweepBackgroundMedia } from '$lib/media-store'
   import {
     buildAppBarMenuItems,
@@ -46,6 +48,10 @@
   import { onMount } from 'svelte'
   import { MediaQuery } from 'svelte/reactivity'
   import { fly } from 'svelte/transition'
+
+  // Provisional locale before the settings snapshot arrives: the persisted
+  // `language` setting wins once it loads, this keeps first paint translated.
+  applyLocale(provisionalLanguageSetting(), { persist: false })
 
   const { client, hideDemoBadge = false }: { client: Client, hideDemoBadge?: boolean } = $props()
   let snapshot = $state.raw<Snapshot | null>(null)
@@ -160,6 +166,7 @@
 
   function applySnapshot(value: Snapshot) {
     snapshot = value
+    applyLocale(value.settings.language)
     // Reclaim background-media blobs that are no longer referenced (orphans
     // from a factory reset land here on the next page load). Once per session.
     if (!sweptMedia) {
@@ -222,7 +229,7 @@
     catch (error) {
       showNotice({
         message:
-          error instanceof Error ? error.message : 'The operation failed.',
+          error instanceof Error ? error.message : $LL.app.operationFailed(),
         tone: 'error',
       })
       try {
@@ -255,7 +262,7 @@
       })
       .catch((error: unknown) => {
         loadError
-          = error instanceof Error ? error.message : 'Unable to load bookmarks.'
+          = error instanceof Error ? error.message : $LL.app.unableToLoad()
       })
     const resize = () => {
       viewportHeight = window.innerHeight
@@ -266,8 +273,15 @@
     const clock = setInterval(() => {
       now = Date.now()
     }, 300)
+    // Infer the language automatically unless the user picked one explicitly.
+    const handleLanguageChange = () => {
+      if ((snapshot?.settings.language ?? 'auto') === 'auto')
+        applyLocale('auto', { persist: false })
+    }
+    window.addEventListener('languagechange', handleLanguageChange)
     return () => {
       unsubscribe()
+      window.removeEventListener('languagechange', handleLanguageChange)
       client.dispose()
       window.removeEventListener('resize', resize)
       clearInterval(clock)
@@ -465,7 +479,7 @@
         message:
           error instanceof Error
             ? error.message
-            : 'Unable to open this address.',
+            : $LL.app.unableToOpen(),
         tone: 'error',
       })
     }
@@ -479,7 +493,7 @@
       return
     try {
       await navigator.clipboard.writeText(url)
-      showNotice({ message: 'Website address copied.' })
+      showNotice({ message: $LL.app.addressCopied() })
     }
     catch {
       edit({ kind: 'copy', id })
@@ -493,8 +507,10 @@
     clearSelection,
     focusSearch: () => searchInput?.focus(),
   }
-  const menuItems = $derived(
-    menuTarget?.target === 'tile'
+  const menuItems = $derived.by(() => {
+    // Menu labels are translated at build time, so track the locale.
+    void $locale
+    return menuTarget?.target === 'tile'
       ? buildTileMenuItems(contextTile, menuCallbacks)
       : buildCanvasMenuItems({
         groups,
@@ -505,28 +521,30 @@
         imageActive: snapshot?.settings.background.type === 'image'
           && snapshot.settings.background.url !== '',
         callbacks: menuCallbacks,
-      }),
-  )
+      })
+  })
   interface MenuHeading {
     title: string
     subtitle?: string
   }
-  /** Accessible/domain line for menus and the app bar; folders are labeled 'Folder'. */
+  /** Accessible/domain line for menus and the app bar; folders get the translated word for folder. */
   function tileSubtitle(tile: typeof contextTile): string | undefined {
     if (!tile)
       return undefined
-    return tile.kind === 'folder' ? 'Folder' : tile.domain
+    return tile.kind === 'folder' ? $LL.app.folder() : tile.domain
   }
-  const menuHeading = $derived<MenuHeading>(
-    menuTarget?.target === 'tile'
-      ? { title: contextTile?.title ?? 'Your canvas', subtitle: tileSubtitle(contextTile) }
-      : { title: 'Your canvas' },
-  )
+  const menuHeading = $derived.by<MenuHeading>(() => {
+    void $locale
+    return menuTarget?.target === 'tile'
+      ? { title: contextTile?.title ?? $LL.app.yourCanvas(), subtitle: tileSubtitle(contextTile) }
+      : { title: $LL.app.yourCanvas() }
+  })
   // Commands that stay off the app bar itself live in a menu opened from one of
   // its buttons, so they are not duplicated as bar commands.
-  const appBarMenuItems = $derived(
-    buildAppBarMenuItems(selectedTile, menuCallbacks),
-  )
+  const appBarMenuItems = $derived.by(() => {
+    void $locale
+    return buildAppBarMenuItems(selectedTile, menuCallbacks)
+  })
   function resizeTile(id: string, size: TileSize) {
     void execute({ type: 'tile.appearance', id, patch: { size } })
   }
@@ -573,12 +591,12 @@
           {reducedMotion}
           scrollProgress={smoothScroll.scrollProgress}
           onstruggle={() => showNotice({
-            message: 'Animated background paused to keep this page fast.',
-            actionLabel: 'Turn off',
+            message: $LL.app.animatedBackgroundPaused(),
+            actionLabel: $LL.app.turnOff(),
           })}
           onerror={() => showNotice({
-            message: 'The background image could not be loaded.',
-            actionLabel: 'Turn off',
+            message: $LL.app.backgroundImageFailed(),
+            actionLabel: $LL.app.turnOff(),
           })}
         />
       {/if}
@@ -720,7 +738,7 @@
       onresetpreview={client.resetPreview
         ? async () => {
           applySnapshot(await client.resetPreview!())
-          showNotice({ message: 'Sample bookmarks restored.' })
+          showNotice({ message: $LL.app.sampleRestored() })
         }
         : undefined}
     />
