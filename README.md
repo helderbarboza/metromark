@@ -65,7 +65,7 @@ npm run package           # Persistent release packages and editable source
 
 Available optional verification commands are `npm run check`, `npm run lint`, `npm test`, `npm run test:stories` and `npm run test:e2e`. Browser tooling needs Playwright browsers installed. `scripts/test-firefox.mjs` exercises the Firefox extension in a disposable profile after a Firefox build. No command uses your personal browser profile.
 
-For v0.2.1 (a manifest-only rebrand: extension name and description), the checks run are: `npm run check` (0 errors, 0 warnings), `npm run lint` (0 errors), `npm test` (204 passed), `npm run test:stories` (81 passed), `npm run test:e2e` (16 passed, at v0.2.0), and `node scripts/test-firefox.mjs` (4 native Firefox checks passed in a disposable profile at v0.2.0; see [docs/verification/2026-11-14-firefox.txt](docs/verification/2026-11-14-firefox.txt)). The release itself is produced by the release workflow, which re-runs the same gate. **Chrome native verification, store review and signing are not covered.**
+For v0.3.0 (solid theme-color default background; seeded preview demo profiles; the extension bundle excludes the preview-only bundled favicons), the checks run are: `npm run check` (0 errors, 0 warnings), `npm run lint` (0 errors, 3 pre-existing warnings), `npm test` (204 passed), `npm run test:stories` (81 passed), `npm run test:e2e` (16 passed), and `node scripts/test-firefox.mjs` (4 native Firefox checks passed in a disposable profile at v0.3.0; see [docs/verification/2026-11-16-firefox.txt](docs/verification/2026-11-16-firefox.txt)). The release itself is produced by the release workflow, which re-runs the same gate. **Chrome native verification, store review and signing are not covered.**
 
 ## Architecture
 

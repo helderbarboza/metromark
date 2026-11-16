@@ -4,7 +4,7 @@
 
 ## Chrome
 
-1. Extract `metromark-0.2.1-bundle.zip` and locate `chrome-mv3/`. Alternatively, extract the separate Chrome ZIP.
+1. Extract `metromark-0.3.0-bundle.zip` and locate `chrome-mv3/`. Alternatively, extract the separate Chrome ZIP.
 2. Open `chrome://extensions`.
 3. Enable **Developer mode**.
 4. Click **Load unpacked** and select the directory containing `manifest.json`.
@@ -14,7 +14,7 @@ Keep the unpacked folder in a stable location. Other new-tab extensions may comp
 
 ## Firefox — temporary installation
 
-1. Extract the complete bundle, or download `metromark-firefox-0.2.1-unsigned.xpi`.
+1. Extract the complete bundle, or download `metromark-firefox-0.3.0-unsigned.xpi`.
 2. Open `about:debugging#/runtime/this-firefox`.
 3. Click **Load Temporary Add-on…**.
 4. Select the unsigned XPI, or `firefox-mv3/manifest.json` from the extracted bundle.
@@ -46,6 +46,6 @@ Removing or disabling MetroMark restores the browser's normal new-tab behavior. 
 
 ## Source
 
-The bundle includes `metromark-source-0.2.1.zip`. Extract it, install Node.js 24+, and run `npm ci`. The source includes Svelte 5 runes, TypeScript, ESLint, Tailwind, Snapgrid and Storybook; Prettier is not used.
+The bundle includes `metromark-source-0.3.0.zip`. Extract it, install Node.js 24+, and run `npm ci`. The source includes Svelte 5 runes, TypeScript, ESLint, Tailwind, Snapgrid and Storybook; Prettier is not used.
 
 Further test runs were stopped on request. The source README records the checks completed earlier; no final complete verification run is claimed.

@@ -1,0 +1,10 @@
+MetroMark 0.3.0 — Firefox native verification (2026-11-16T05:02:59.369Z)
+Build: .output/firefox-mv3 as packaged by npm run package
+Browser: Playwright Firefox, headless, disposable profile (never the personal profile)
+
+PASS Firefox native new-tab override and connected boot
+PASS Firefox native API create/edit → open new-tab page
+PASS Firefox tile delete → native bookmark removal; Undo → native restoration
+PASS Firefox real-time native updates across two new-tab pages
+
+Not covered here: Chrome native verification, store review, signing, permanent Firefox install.

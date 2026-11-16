@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Tag of the GitHub Release to create or update (for example v0.2.1)
+        description: Tag of the GitHub Release to create or update (for example v0.3.0)
         required: true
-        default: v0.2.1
+        default: v0.3.0
       version:
         description: Version baked into the artifacts (must match package.json)
         required: true
-        default: 0.2.1
+        default: 0.3.0
       publish_release:
         description: Attach the artifacts to the GitHub Release for the tag
         type: boolean
