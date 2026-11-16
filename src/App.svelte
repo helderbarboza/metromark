@@ -24,7 +24,7 @@
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { toggleSelection } from '$lib/interaction'
   import { KeyboardNav } from '$lib/keyboard-nav'
-  import { GAP, rowsForGridView } from '$lib/layout'
+  import { GAP, rowsForGridView, tileSizesForView } from '$lib/layout'
   import { LayoutStager } from '$lib/layout-stager.svelte'
   import { applyLocale, provisionalLanguageSetting } from '$lib/locale'
   import { sweepBackgroundMedia } from '$lib/media-store'
@@ -135,6 +135,7 @@
     groups.filter(group => !group.isSystem).length,
   )
   const gridView = $derived(snapshot?.settings.gridView ?? 'classic')
+  const sizes = $derived(tileSizesForView(gridView))
   const rows = $derived(rowsForGridView(gridView))
   const cell = $derived(
     Math.max(
@@ -169,7 +170,7 @@
     selectedId,
     reducedMotion,
     originalFavicons,
-    largeAvailable: gridView !== 'dock',
+    sizes,
   }))
 
   function applySnapshot(value: Snapshot) {
@@ -690,7 +691,7 @@
             size={selectedTile.size}
             writable={selectedTile.writable}
             kind={selectedTile.kind}
-            allowLarge={gridView !== 'dock'}
+            sizes={sizes}
             {focusRequest}
             menuItems={appBarMenuItems}
             onresize={size => resizeTile(selectedTile.id, size)}

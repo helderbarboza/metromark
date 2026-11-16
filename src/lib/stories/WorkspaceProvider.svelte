@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { WorkspaceState } from '$lib/workspace-context'
   import type { Snippet } from 'svelte'
+  import { TILE_SIZES } from '$lib/layout'
   import { setWorkspace } from '$lib/workspace-context'
 
   interface Props {
@@ -16,7 +17,7 @@
     selectedId: state.selectedId ?? null,
     reducedMotion: state.reducedMotion ?? false,
     originalFavicons: state.originalFavicons ?? false,
-    largeAvailable: state.largeAvailable ?? true,
+    sizes: state.sizes ?? TILE_SIZES,
   }))
 </script>
 

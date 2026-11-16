@@ -5,7 +5,7 @@
   import type { FolderTileView } from '$lib/types'
   import type { ComponentProps } from 'svelte'
   import FolderTile from '$lib/components/organisms/FolderTile.svelte'
-  import { cellsToPx, SIZES } from '$lib/layout'
+  import { cellsToPx, SIZES, TILE_SIZES } from '$lib/layout'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, fn } from 'storybook/test'
 
@@ -40,7 +40,7 @@
       size: 'medium',
     },
     argTypes: {
-      size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] },
+      size: { control: 'radio', options: [...TILE_SIZES] },
       selected: { control: 'boolean' },
       revealed: { control: 'boolean' },
     },

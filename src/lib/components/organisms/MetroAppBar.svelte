@@ -5,6 +5,7 @@
   import Icon from '$lib/components/atoms/Icon.svelte'
   import MenuItems from '$lib/components/molecules/MenuItems.svelte'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'
+  import { TILE_SIZES } from '$lib/layout'
   import { focusFirstMenuItem } from '$lib/menu-focus'
 
   interface Props {
@@ -15,8 +16,8 @@
     writable: boolean
     /** Tile kind; folder tiles rename instead of editing and cannot be deleted. */
     kind?: 'bookmark' | 'folder'
-    /** False in the Dock view, where the 4x4 Large preset is unavailable. */
-    allowLarge?: boolean
+    /** Presets the active view offers, smallest first. */
+    sizes?: readonly TileSize[]
     /** Increments when a selection was made from the keyboard, so focus can move here. */
     focusRequest?: number
     /** Commands that stay off the app bar itself. */
@@ -34,7 +35,7 @@
     subtitle,
     size,
     writable,
-    allowLarge = true,
+    sizes = TILE_SIZES,
     kind = 'bookmark',
     focusRequest = 0,
     menuItems,
@@ -56,9 +57,6 @@
     }
   })
 
-  const allPresets: TileSize[] = ['small', 'medium', 'wide', 'large']
-  const noLargePresets: TileSize[] = ['small', 'medium', 'wide']
-  const presets = $derived(allowLarge ? allPresets : noLargePresets)
 </script>
 
 <div
@@ -102,7 +100,7 @@
     {/if}
   </div>
   <div class='size-options'>
-    {#each presets as preset (preset)}
+    {#each sizes as preset (preset)}
       <button
         class:active={size === preset}
         aria-pressed={size === preset}

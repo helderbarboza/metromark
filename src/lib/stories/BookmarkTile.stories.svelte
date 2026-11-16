@@ -4,7 +4,7 @@
 >
   import type { ComponentProps } from 'svelte'
   import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
-  import { cellsToPx, SIZES } from '$lib/layout'
+  import { cellsToPx, SIZES, TILE_SIZES } from '$lib/layout'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
 
@@ -14,7 +14,7 @@
     tags: ['autodocs'],
     args: { tile: { title: 'Steam', colorIndex: 0, url: 'https://store.steampowered.com/' }, size: 'medium', domain: 'store.steampowered.com', showDomain: true },
     argTypes: {
-      size: { control: 'radio', options: ['small', 'medium', 'wide', 'large'] },
+      size: { control: 'radio', options: [...TILE_SIZES] },
       selected: { control: 'boolean' },
       revealed: { control: 'boolean' },
     },

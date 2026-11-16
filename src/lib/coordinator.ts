@@ -15,7 +15,7 @@ import type {
 } from '$lib/types'
 import { normalizeImageBackgroundSettings, validateBackgroundUrl } from '$lib/background-image'
 import { isLayoutable } from '$lib/folder-preview'
-import { DOCK_ROWS, effectiveTileSize, freePosition, reconcileLayout, ROWS, rowsForGridView, SIZES, validateLayout } from '$lib/layout'
+import { allowsLargeSize, effectiveTileSize, freePosition, GRID_VIEW_IDS, gridViewDef, isGridView, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
 import { applyLocale, getT } from '$lib/locale'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
 import { validateUrl } from '$lib/url.js'
@@ -161,22 +161,37 @@ export class BookmarkCoordinator {
       throw new Error(getT().errors.cannotMoveIntoSelf())
   }
 
+  /** All registered grid views, in definition order. */
+  private viewDefs() {
+    return GRID_VIEW_IDS.map(gridViewDef)
+  }
+
+  /** Defs of every view other than the active one. */
+  private otherDefs() {
+    return this.viewDefs().filter(def => def.id !== gridViewDef(this.data.settings.gridView).id)
+  }
+
+  /** The def of the active view. */
+  private activeDef() {
+    return gridViewDef(this.data.settings.gridView)
+  }
+
   /** Which layouts map the active view uses. */
   private activeKey(): 'layouts' | 'dockLayouts' {
-    return this.data.settings.gridView === 'dock' ? 'dockLayouts' : 'layouts'
+    return this.activeDef().layoutsKey
   }
 
   private activeRows(): number {
-    return rowsForGridView(this.data.settings.gridView)
+    return this.activeDef().rows
   }
 
   /** Map used by the other view; kept in sync by the move/commit paths. */
   private inactiveKey(): 'layouts' | 'dockLayouts' {
-    return this.activeKey() === 'dockLayouts' ? 'layouts' : 'dockLayouts'
+    return this.otherDefs()[0]?.layoutsKey ?? 'dockLayouts'
   }
 
   private inactiveRows(): number {
-    return this.activeKey() === 'dockLayouts' ? ROWS : DOCK_ROWS
+    return this.otherDefs()[0]?.rows ?? this.activeRows()
   }
 
   private currentSnapshot(): Snapshot {
@@ -374,15 +389,15 @@ export class BookmarkCoordinator {
         await this.bookmarks.remove(node.id, isFolder(node))
         for (const id of ids) {
           delete this.data.appearance[id]
-          delete this.data.layouts[id]
-          delete this.data.dockLayouts[id]
+          for (const def of this.viewDefs())
+            delete this.data[def.layoutsKey][id]
         }
-        for (const key of ['layouts', 'dockLayouts'] as const) {
-          const map = { ...this.data[key] }
+        for (const def of this.viewDefs()) {
+          const map = { ...this.data[def.layoutsKey] }
           for (const [groupId, layout] of Object.entries(map)) {
             map[groupId] = layout.filter(item => !ids.has(item.i))
           }
-          this.data[key] = map
+          this.data[def.layoutsKey] = map
         }
         this.commitUndo(undo)
         return { message: label, undoId: undo.id }
@@ -395,7 +410,7 @@ export class BookmarkCoordinator {
         if (command.patch.size !== undefined) {
           if (!(command.patch.size in SIZES))
             throw new Error(getT().errors.supportedSize())
-          if (command.patch.size === 'large' && this.data.settings.gridView === 'dock')
+          if (!allowsLargeSize(this.activeRows()) && command.patch.size === 'large')
             throw new Error(getT().errors.invalidTileSize())
           patch.size = command.patch.size
         }
@@ -412,8 +427,14 @@ export class BookmarkCoordinator {
         this.data.appearance[node.id] = { ...existing, ...patch }
         if (parentId !== undefined) {
           const children = (this.node(parentId).children ?? []).filter(isLayoutable)
-          this.data.layouts[parentId] = reconcileLayout(children, this.data.layouts[parentId], this.data.appearance, ROWS)
-          this.data.dockLayouts[parentId] = reconcileLayout(children, this.data.dockLayouts[parentId], this.data.appearance, DOCK_ROWS)
+          for (const def of this.viewDefs()) {
+            this.data[def.layoutsKey][parentId] = reconcileLayout(
+              children,
+              this.data[def.layoutsKey][parentId],
+              this.data.appearance,
+              def.rows,
+            )
+          }
         }
         return undefined
       }
@@ -478,7 +499,7 @@ export class BookmarkCoordinator {
         const patch = command.patch
         if (patch.density !== undefined && !['comfortable', 'compact'].includes(patch.density))
           throw new Error(getT().errors.invalidDensity())
-        if (patch.gridView !== undefined && !['classic', 'dock'].includes(patch.gridView))
+        if (patch.gridView !== undefined && !isGridView(patch.gridView))
           throw new Error(getT().errors.invalidGridView())
         if (patch.showDomains !== undefined && typeof patch.showDomains !== 'boolean')
           throw new Error(getT().errors.invalidDomainSetting())
@@ -606,18 +627,20 @@ export class BookmarkCoordinator {
       }
       // Remap restored folder ids in both view maps. Legacy records without a
       // Dock map restore as empty; that view re-places tiles on next read.
-      for (const [key, backupMap] of [['layouts', payload.backup.layouts], ['dockLayouts', payload.backup.dockLayouts]] as const) {
+      for (const def of this.viewDefs()) {
+        const backupMap = def.layoutsKey === 'layouts' ? payload.backup.layouts : payload.backup.dockLayouts
         for (const [oldId, layout] of Object.entries(backupMap ?? {})) {
           if (map[oldId]) {
-            this.data[key][map[oldId]] = layout.filter(item => map[item.i]).map(item => ({ ...item, i: map[item.i] }))
+            this.data[def.layoutsKey][map[oldId]] = layout.filter(item => map[item.i]).map(item => ({ ...item, i: map[item.i] }))
           }
         }
       }
       if (payload.backup.position) {
         const newId = map[payload.backup.node.id]
         if (newId) {
-          for (const key of ['layouts', 'dockLayouts'] as const) {
-            const rows = key === 'dockLayouts' ? DOCK_ROWS : ROWS
+          for (const def of this.viewDefs()) {
+            const key = def.layoutsKey
+            const rows = def.rows
             const rest = (this.data[key][target] ?? []).filter(item => item.i !== newId)
             // A stale-view position may not fit this map; drop it and let
             // reconcileLayout re-place the tile on the next read.
@@ -635,15 +658,17 @@ export class BookmarkCoordinator {
       this.checkMove(node, payload.oldParent)
       const length = this.node(payload.oldParent).children?.length ?? 0
       await this.bookmarks.move(node.id, { parentId: payload.oldParent, index: Math.min(payload.oldIndex, length) })
-      for (const key of ['layouts', 'dockLayouts'] as const) {
+      for (const def of this.viewDefs()) {
+        const key = def.layoutsKey
         const filtered = { ...this.data[key] }
         for (const [groupId, layout] of Object.entries(filtered))
           filtered[groupId] = layout.filter(item => item.i !== node.id)
         this.data[key] = filtered
       }
       if (payload.position) {
-        for (const key of ['layouts', 'dockLayouts'] as const) {
-          const rows = key === 'dockLayouts' ? DOCK_ROWS : ROWS
+        for (const def of this.viewDefs()) {
+          const key = def.layoutsKey
+          const rows = def.rows
           const rest = this.data[key][payload.oldParent] ?? []
           if (fitsRows(payload.position, rows))
             this.data[key] = { ...this.data[key], [payload.oldParent]: [...rest, payload.position] }
@@ -657,7 +682,7 @@ export class BookmarkCoordinator {
       await this.bookmarks.update(node.id, payload.before)
     }
     else {
-      if (Object.keys(this.data.layouts).length || Object.keys(this.data.dockLayouts).length)
+      if (this.viewDefs().some(def => Object.keys(this.data[def.layoutsKey]).length))
         throw new Error(getT().errors.rearrangedSinceReset())
       this.data.layouts = payload.before
       this.data.dockLayouts = payload.beforeDock ?? {}

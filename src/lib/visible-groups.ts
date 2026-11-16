@@ -1,3 +1,4 @@
+import type { GridView } from '$lib/layout'
 import type { GroupView, Snapshot } from '$lib/types'
 import { reconcileLayout, rowsForGridView } from '$lib/layout'
 
@@ -12,7 +13,7 @@ export function filterVisibleGroups(
   rootFilter: string,
   normalizedQuery: string,
   appearance: Snapshot['appearance'] | undefined,
-  gridView?: 'classic' | 'dock',
+  gridView?: GridView,
 ): GroupView[] {
   const rows = rowsForGridView(gridView)
   const filtered = groups.filter(

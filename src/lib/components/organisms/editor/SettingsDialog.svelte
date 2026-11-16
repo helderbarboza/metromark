@@ -1,5 +1,6 @@
 <script lang='ts'>
   import type { IconName } from '$lib/icons'
+  import type { GridView } from '$lib/layout'
   import type { LanguageSetting } from '$lib/locale'
   import type { ThemeSelections } from '$lib/theme-picker'
   import type { Command, Settings } from '$lib/types'
@@ -14,6 +15,7 @@
   import * as Select from '$lib/components/ui/select'
   import * as Tabs from '$lib/components/ui/tabs'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
+  import { GRID_VIEW_IDS, isGridView } from '$lib/layout'
   import { APP_LOCALES, LANGUAGE_NATIVE_NAMES, resolveLocale } from '$lib/locale'
   import { setSettingsContext } from '$lib/settings-context'
   import { getThemeSelections } from '$lib/theme-picker'
@@ -41,7 +43,11 @@
   )
 
   const densities = ['comfortable', 'compact'] as const
-  const gridViews = ['classic', 'dock'] as const
+  const gridViews = GRID_VIEW_IDS
+  const gridViewLabels: Record<GridView, () => string> = {
+    classic: $LL.settings.classic,
+    dock: $LL.settings.dock,
+  }
   const modes = ['system', 'light', 'dark'] as const
 
   let confirmReset = $state(false)
@@ -213,14 +219,14 @@
         value={settings.gridView}
         disabled={command.busy}
         onValueChange={(v) => {
-          if (v !== 'classic' && v !== 'dock')
+          if (!isGridView(v))
             return
           setting({ gridView: v })
         }}
       >
         {#each gridViews as view (view)}
           <ToggleGroup.Item value={view} class='grow'>
-            {view === 'classic' ? $LL.settings.classic() : $LL.settings.dock()}
+            {gridViewLabels[view]()}
           </ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>

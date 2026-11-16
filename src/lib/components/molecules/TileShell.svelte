@@ -82,7 +82,7 @@
   // conflict with the CSS transform transitions for tilt and reveal. Enter
   // keeps opacity 1 (jest-dom treats opacity 0 as not visible); exit may fade.
   const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
-  const largeAvailable = $derived(readWorkspace?.().largeAvailable ?? true)
+  const allowedSizes = $derived(readWorkspace?.().sizes ?? TILE_SIZES)
   const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? false)
 
   const isLink = $derived(as === 'a')
@@ -110,21 +110,17 @@
 
   const ui = $derived(tileVariants({ size, selected, revealed }))
 
-  // Quick resize: grow through small → medium → wide → large, then wrap
-  // straight back to small. Null when the parent does not want the button
+  // Quick resize: grow through the view's preset list, then wrap straight
+  // back to the first. Null when the parent does not want the button
   // (e.g. read-only tiles).
   const quickResize = $derived.by(():
     { target: TileSize, direction: 'grow' | 'shrink' } | null => {
     if (!onresize)
       return null
-    if (size === 'large')
-      return { target: 'small', direction: 'shrink' }
-    const index = TILE_SIZES.indexOf(size)
-    const next = TILE_SIZES[index + 1]
-    // In the Dock view Large is unavailable, so growing past Wide wraps to Small.
-    if (!largeAvailable && next === 'large')
-      return { target: 'small', direction: 'shrink' }
-    return { target: next, direction: 'grow' }
+    const index = allowedSizes.indexOf(size)
+    if (index === -1 || index === allowedSizes.length - 1)
+      return { target: allowedSizes[0], direction: 'shrink' }
+    return { target: allowedSizes[index + 1], direction: 'grow' }
   })
 </script>
 

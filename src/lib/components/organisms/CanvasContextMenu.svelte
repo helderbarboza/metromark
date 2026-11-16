@@ -10,7 +10,7 @@
   import TileSizeGrid from '$lib/components/molecules/TileSizeGrid.svelte'
   import MetroGroup from '$lib/components/organisms/MetroGroup.svelte'
   import * as ContextMenu from '$lib/components/ui/context-menu'
-  import { rowsForGridView } from '$lib/layout'
+  import { gridViewDef, tileSizesForView } from '$lib/layout'
   import { focusFirstMenuItem } from '$lib/menu-focus'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { cn } from 'cn'
@@ -89,8 +89,10 @@
     onCloseAutoFocus,
   }: Props = $props()
 
-  const dock = $derived(snapshot?.settings.gridView === 'dock')
-  const rows = $derived(rowsForGridView(snapshot?.settings.gridView))
+  const view = $derived(snapshot?.settings.gridView)
+  const def = $derived(gridViewDef(view))
+  const rows = $derived(def.rows)
+  const sizes = $derived(tileSizesForView(view))
   const osReducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)')
   const reducedMotion = $derived(snapshot?.settings.reducedMotion || osReducedMotion.current)
 
@@ -101,11 +103,11 @@
   // before the wrapper classes change, then slide it into the new position.
   $effect.pre(() => {
     // Tracked read: capture the pre-change rect on every mode flip.
-    void dock
+    void view
     previousRect = containerEl?.getBoundingClientRect() ?? null
   })
   $effect(() => {
-    void dock
+    void view
     const el = containerEl
     const from = previousRect
     if (!el || !from)
@@ -141,7 +143,10 @@
         aria-label={$LL.app.bookmarkCanvas()}
         tabindex='-1'
       >
-        <div class={cn('flex h-full flex-row', dock ? 'items-end pb-8' : 'items-center')}>
+        <div
+          class={cn('flex h-full flex-row', def.anchor === 'end' ? 'items-end' : 'items-center')}
+          style:padding-bottom={def.anchor === 'end' ? `${def.inset ?? 0}px` : undefined}
+        >
           {#if !snapshot}
             <CanvasStatus variant='loading' {loadError} />
           {:else if normalizedQuery && !visibleGroups.length}
@@ -207,7 +212,7 @@
     {#if contextTile}
       <TileSizeGrid
         size={contextTile.size}
-        allowLarge={!dock}
+        sizes={sizes}
         onresize={size => onResizeTile(contextTile.id, size)}
       />
     {/if}

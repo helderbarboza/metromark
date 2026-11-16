@@ -7,6 +7,7 @@
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { Button } from '$lib/components/ui/button'
+  import { tileSizesForView } from '$lib/layout'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { tileFor, tileForFolder } from '$lib/tile'
   import { isFolder } from '$lib/tree'
@@ -40,11 +41,7 @@
       : tileFor(node, snapshot.appearance[node.id])
     : undefined)
   const folder = $derived(node ? isFolder(node) : false)
-  const sizeOptions = $derived(
-    snapshot.settings.gridView === 'dock'
-      ? (['small', 'medium', 'wide'] as const)
-      : (['small', 'medium', 'wide', 'large'] as const),
-  )
+  const sizeOptions = $derived(tileSizesForView(snapshot.settings.gridView))
   const introParts = $derived.by(() =>
     $LL.dialogs.appearanceIntro({
       target: folder ? $LL.dialogs.folderTarget() : $LL.dialogs.bookmarkTarget(),
@@ -57,8 +54,9 @@
   })
 
   onMount(() => {
-    const dock = snapshot.settings.gridView === 'dock'
-    size = dock && tile?.size === 'large' ? 'wide' : (tile?.size ?? 'medium')
+    size = tile?.size === 'large' && !sizeOptions.includes('large')
+      ? 'wide'
+      : (tile?.size ?? 'medium')
     colorIndex = tile?.colorIndex ?? 0
     customColor = tile?.color ?? ''
   })

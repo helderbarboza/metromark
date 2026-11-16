@@ -27,15 +27,66 @@ export function cellsToPx(n: number, cell: number, gap = GAP): number {
   return Math.max(0, n * cell + (n - 1) * gap)
 }
 
-export const TILE_SIZES: TileSize[] = ['small', 'medium', 'wide', 'large']
+export const TILE_SIZES: readonly TileSize[] = ['small', 'medium', 'wide', 'large']
 
 export function tileSizesForRows(rows: number): TileSize[] {
   return TILE_SIZES.filter(size => SIZES[size][1] <= rows)
 }
 
+/**
+ * Registry of the grid views. Adding a view is one entry here plus a storage
+ * key, an i18n label and an icon; every other consumer derives from the def.
+ * Persisted settings and the Dock/Classic storage maps are keyed by `id`.
+ */
+export interface GridViewDef {
+  /** Stable id persisted in settings. */
+  readonly id: string
+  /** Grid row count of this view. */
+  readonly rows: number
+  /** Vertical anchor of the group row inside the canvas. */
+  readonly anchor: 'center' | 'end'
+  /** Bottom inset in px for end-anchored views. */
+  readonly inset?: number
+  /** Storage map for this view's layouts in the persisted snapshot. */
+  readonly layoutsKey: 'layouts' | 'dockLayouts'
+}
+
+export const GRID_VIEWS = {
+  classic: { id: 'classic', rows: ROWS, anchor: 'center', layoutsKey: 'layouts' },
+  dock: { id: 'dock', rows: DOCK_ROWS, anchor: 'end', inset: 32, layoutsKey: 'dockLayouts' },
+} as const satisfies Record<string, GridViewDef>
+
+export type GridView = keyof typeof GRID_VIEWS
+
+export const DEFAULT_GRID_VIEW: GridView = 'classic'
+
+/** Whether a value is one of the known grid view ids. */
+export function isGridView(value: unknown): value is GridView {
+  if (typeof value !== 'string')
+    return false
+  return Object.hasOwn(GRID_VIEWS, value)
+}
+
+export const GRID_VIEW_IDS: GridView[] = Object.keys(GRID_VIEWS).filter(isGridView)
+
+/** The def for a persisted view id; anything unknown falls back to the Classic def. */
+export function gridViewDef(view: string | undefined): GridViewDef {
+  return isGridView(view) ? GRID_VIEWS[view] : GRID_VIEWS[DEFAULT_GRID_VIEW]
+}
+
 /** Row count for a grid view; anything unknown falls back to the Classic grid. */
-export function rowsForGridView(gridView: 'classic' | 'dock' | undefined): number {
-  return gridView === 'dock' ? DOCK_ROWS : ROWS
+export function rowsForGridView(gridView: string | undefined): number {
+  return gridViewDef(gridView).rows
+}
+
+/** Tile sizes the given view can host, smallest first. */
+export function tileSizesForView(view: string | undefined): TileSize[] {
+  return tileSizesForRows(gridViewDef(view).rows)
+}
+
+/** Whether the grid at the given row count can host the large (4x4) preset. */
+export function allowsLargeSize(rows: number): boolean {
+  return SIZES.large[1] <= rows
 }
 
 /**

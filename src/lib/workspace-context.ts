@@ -1,3 +1,4 @@
+import type { TileSize } from '$lib/types'
 import { createContext } from 'svelte'
 
 export interface WorkspaceState {
@@ -9,8 +10,8 @@ export interface WorkspaceState {
   reducedMotion: boolean
   /** Show full-color favicons instead of single-color Metro glyphs. */
   originalFavicons: boolean
-  /** False in the Dock view, where the 4x4 Large preset is unavailable. */
-  largeAvailable: boolean
+  /** Tile sizes the active view offers, smallest first. */
+  sizes: readonly TileSize[]
 }
 
 /**

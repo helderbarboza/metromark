@@ -2,6 +2,7 @@
   import type { TileSize } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import * as ContextMenu from '$lib/components/ui/context-menu'
+  import { TILE_SIZES } from '$lib/layout'
   import { cn } from '$lib/utils'
 
   /**
@@ -11,15 +12,12 @@
    */
   interface Props {
     size: TileSize
-    /** False in the Dock view, where the 4x4 Large preset is unavailable. */
-    allowLarge?: boolean
+    /** Presets the active view offers, smallest first. */
+    sizes?: readonly TileSize[]
     onresize: (size: TileSize) => void
   }
 
-  const { size, allowLarge = true, onresize }: Props = $props()
-  const sizes: TileSize[] = $derived(
-    allowLarge ? ['small', 'medium', 'wide', 'large'] : ['small', 'medium', 'wide'],
-  )
+  const { size, sizes = TILE_SIZES, onresize }: Props = $props()
   const boxClass: Record<TileSize, string> = {
     small: 'size-1.75',
     medium: 'size-3',
