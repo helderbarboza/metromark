@@ -16,6 +16,7 @@
     selectedId: state.selectedId ?? null,
     reducedMotion: state.reducedMotion ?? false,
     originalFavicons: state.originalFavicons ?? false,
+    largeAvailable: state.largeAvailable ?? true,
   }))
 </script>
 

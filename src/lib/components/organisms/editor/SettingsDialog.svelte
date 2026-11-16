@@ -41,6 +41,7 @@
   )
 
   const densities = ['comfortable', 'compact'] as const
+  const gridViews = ['classic', 'dock'] as const
   const modes = ['system', 'light', 'dark'] as const
 
   let confirmReset = $state(false)
@@ -198,6 +199,32 @@
   </Tabs.Content>
 
   <Tabs.Content value='tiles' class='mt-4 grid animate-rise-enter gap-1'>
+    <SettingsCard
+      icon='customize'
+      title={$LL.settings.gridView()}
+      helpText={$LL.settings.gridViewHelp()}
+      controlId='grid-view'
+    >
+      <ToggleGroup.Root
+        type='single'
+        id='grid-view'
+        aria-labelledby='grid-view-title'
+        aria-describedby='grid-view-help'
+        value={settings.gridView}
+        disabled={command.busy}
+        onValueChange={(v) => {
+          if (v !== 'classic' && v !== 'dock')
+            return
+          setting({ gridView: v })
+        }}
+      >
+        {#each gridViews as view (view)}
+          <ToggleGroup.Item value={view} class='grow'>
+            {view === 'classic' ? $LL.settings.classic() : $LL.settings.dock()}
+          </ToggleGroup.Item>
+        {/each}
+      </ToggleGroup.Root>
+    </SettingsCard>
     <SettingsCard
       icon='density'
       title={$LL.settings.tileDensity()}

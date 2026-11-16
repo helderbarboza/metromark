@@ -398,6 +398,7 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
   expect(saved.undos).toEqual([])
   expect(saved.settings).toEqual({
     density: 'comfortable',
+    gridView: 'classic',
     showDomains: true,
     originalFavicons: false,
     reducedMotion: false,

@@ -222,7 +222,7 @@
   />
 {:else if bookmarkTile}
   <BookmarkTile
-  {@attach pauseOffscreen()}
+    {@attach pauseOffscreen()}
     tile={bookmarkTile}
     size={item.item ? sizeOf(item.item) : tile.size}
     {selected}

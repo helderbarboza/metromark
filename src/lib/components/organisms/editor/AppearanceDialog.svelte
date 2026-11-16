@@ -40,6 +40,11 @@
       : tileFor(node, snapshot.appearance[node.id])
     : undefined)
   const folder = $derived(node ? isFolder(node) : false)
+  const sizeOptions = $derived(
+    snapshot.settings.gridView === 'dock'
+      ? (['small', 'medium', 'wide'] as const)
+      : (['small', 'medium', 'wide', 'large'] as const),
+  )
   const introParts = $derived.by(() =>
     $LL.dialogs.appearanceIntro({
       target: folder ? $LL.dialogs.folderTarget() : $LL.dialogs.bookmarkTarget(),
@@ -52,7 +57,8 @@
   })
 
   onMount(() => {
-    size = tile?.size ?? 'medium'
+    const dock = snapshot.settings.gridView === 'dock'
+    size = dock && tile?.size === 'large' ? 'wide' : (tile?.size ?? 'medium')
     colorIndex = tile?.colorIndex ?? 0
     customColor = tile?.color ?? ''
   })
@@ -91,7 +97,7 @@
           pr-7 text-xs text-(--foreground) outline-offset-1
         '
       >
-        {#each ['small', 'medium', 'wide', 'large'] as const as preset (preset)}
+        {#each sizeOptions as preset (preset)}
           <option value={preset}>{$LL.tileSizes[preset]()}</option>
         {/each}
       </select>

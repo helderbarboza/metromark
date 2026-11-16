@@ -120,6 +120,7 @@ app: {
 ```ts
 // src/lib/example.ts
 import { getT } from '$lib/locale'
+
 throw new Error(getT().errors.noLongerExists())
 ```
 

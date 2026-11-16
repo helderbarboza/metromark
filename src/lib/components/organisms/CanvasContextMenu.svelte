@@ -10,8 +10,12 @@
   import TileSizeGrid from '$lib/components/molecules/TileSizeGrid.svelte'
   import MetroGroup from '$lib/components/organisms/MetroGroup.svelte'
   import * as ContextMenu from '$lib/components/ui/context-menu'
+  import { rowsForGridView } from '$lib/layout'
   import { focusFirstMenuItem } from '$lib/menu-focus'
   import { SnapGridGroup } from '@snapgridjs/svelte'
+  import { cn } from 'cn'
+  import { tick } from 'svelte'
+  import { MediaQuery } from 'svelte/reactivity'
 
   interface Props {
     /** Context menu open state (bindable). */
@@ -84,6 +88,38 @@
     menuHeading,
     onCloseAutoFocus,
   }: Props = $props()
+
+  const dock = $derived(snapshot?.settings.gridView === 'dock')
+  const rows = $derived(rowsForGridView(snapshot?.settings.gridView))
+  const osReducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)')
+  const reducedMotion = $derived(snapshot?.settings.reducedMotion || osReducedMotion.current)
+
+  let containerEl = $state<HTMLDivElement | null>(null)
+  let previousRect: DOMRect | null = null
+
+  // FLIP the canvas container across view-mode switches: remember its position
+  // before the wrapper classes change, then slide it into the new position.
+  $effect.pre(() => {
+    // Tracked read: capture the pre-change rect on every mode flip.
+    void dock
+    previousRect = containerEl?.getBoundingClientRect() ?? null
+  })
+  $effect(() => {
+    void dock
+    const el = containerEl
+    const from = previousRect
+    if (!el || !from)
+      return
+    void tick().then(() => {
+      const dy = from.top - el.getBoundingClientRect().top
+      if (reducedMotion || dy === 0)
+        return
+      el.animate(
+        [{ transform: `translateY(${dy}px)` }, { transform: 'translateY(0)' }],
+        { duration: 150, easing: 'ease-out' },
+      )
+    })
+  })
 </script>
 
 <!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
@@ -105,7 +141,7 @@
         aria-label={$LL.app.bookmarkCanvas()}
         tabindex='-1'
       >
-        <div class='flex h-full flex-row items-center'>
+        <div class={cn('flex h-full flex-row', dock ? 'items-end pb-8' : 'items-center')}>
           {#if !snapshot}
             <CanvasStatus variant='loading' {loadError} />
           {:else if normalizedQuery && !visibleGroups.length}
@@ -113,6 +149,7 @@
           {:else}
             <SnapGridGroup>
               <div
+                bind:this={containerEl}
                 class='
                   flex h-fit w-max items-end gap-9 px-40
                   max-lg:gap-7 max-lg:px-9
@@ -125,6 +162,7 @@
                     layout={layoutStager.draftLayouts[group.id] ?? group.layout}
                     tiles={tiles}
                     {cell}
+                    {rows}
                     draggable={!normalizedQuery}
                     showDomains={snapshot.settings.showDomains}
                     {preview}
@@ -169,6 +207,7 @@
     {#if contextTile}
       <TileSizeGrid
         size={contextTile.size}
+        allowLarge={!dock}
         onresize={size => onResizeTile(contextTile.id, size)}
       />
     {/if}

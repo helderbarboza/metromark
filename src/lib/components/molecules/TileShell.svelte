@@ -82,6 +82,7 @@
   // conflict with the CSS transform transitions for tilt and reveal. Enter
   // keeps opacity 1 (jest-dom treats opacity 0 as not visible); exit may fade.
   const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const largeAvailable = $derived(readWorkspace?.().largeAvailable ?? true)
   const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? false)
 
   const isLink = $derived(as === 'a')
@@ -119,7 +120,11 @@
     if (size === 'large')
       return { target: 'small', direction: 'shrink' }
     const index = TILE_SIZES.indexOf(size)
-    return { target: TILE_SIZES[index + 1], direction: 'grow' }
+    const next = TILE_SIZES[index + 1]
+    // In the Dock view Large is unavailable, so growing past Wide wraps to Small.
+    if (!largeAvailable && next === 'large')
+      return { target: 'small', direction: 'shrink' }
+    return { target: next, direction: 'grow' }
   })
 </script>
 

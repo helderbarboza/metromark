@@ -38,6 +38,8 @@
     layout: Layout
     tiles: Record<string, TileView>
     cell: number
+    /** Grid row count: 8 in Classic, 2 in Dock. */
+    rows?: number
     draggable: boolean
     showDomains: boolean
     preview: boolean
@@ -62,6 +64,7 @@
     layout,
     tiles,
     cell,
+    rows = ROWS,
     draggable,
     showDomains,
     preview,
@@ -102,6 +105,18 @@
   ))
   const movable = $derived(draggable && group.writable)
 
+  // Split entries: snapgrid-managed tiles (positioned by the engine) and
+  // static tiles (positioned by the flip wrapper below).
+  const draggableEntries = $derived(layout.flatMap((entry) => {
+    const tile = tiles[entry.i]
+    return movable && tile?.writable ? [{ entry, tile }] : []
+  }))
+
+  const staticEntries = $derived(layout.flatMap((entry) => {
+    const tile = tiles[entry.i]
+    return tile && !(movable && tile.writable) ? [{ entry, tile }] : []
+  }))
+
   const container = createGridContainer(() => ({
     /*
     Must be stable and unique for this Start group.
@@ -133,7 +148,7 @@
 
       Do not tie this directly to the device’s raw 768/1080 resolution.
     */
-      maxRows: ROWS,
+      maxRows: rows,
     },
 
     compactor: horizontalCompactor,
@@ -225,7 +240,7 @@
 <section
   data-testid='metro-group'
   data-group-id={group.id}
-  class={cn('flex-none transition-[width] duration-140 motion-reduce:transition-none', flash && 'animate-flash')}
+  class={cn('flex-none transition-[width] duration-150 motion-reduce:transition-none', flash && 'animate-flash')}
   style:width='{visibleWidth}px'
   aria-label={group.path.join(' / ') || $LL.app.ungroupedBookmarks()}
 >
@@ -310,7 +325,7 @@
   {/if}
   <div
 {@attach container.attach}
-    style='{container.style} width: {visibleWidth}px; height: {cellsToPx(ROWS, cell)}px;'
+    style='{container.style} width: {visibleWidth}px; height: {cellsToPx(rows, cell)}px;'
     class={cn(
       'relative',
       container.isDropTarget && 'outline outline-offset-[6px] outline-(--primary)',
@@ -320,41 +335,39 @@
     aria-label={$LL.app.tilesIn({ path: group.path.join(' / ') })}
     data-group-id={group.id}
   >
-    {#each layout as entry (entry.i)}
-      {@const tile = tiles[entry.i]}
-      {@const folderTile = tile?.kind === 'folder' ? tile : undefined}
-      {@const bookmarkTile = tile?.kind === 'bookmark' ? tile : undefined}
-      {#if tile}
-        {#if movable && tile.writable}
-          <GridTile
-            id={entry.i}
-            group={container.group}
-            {tile}
-            {showDomains}
-            {preview}
-            onselect={onSelect}
-            onblocked={onBlocked}
-            onactivate={onActivateFolder}
-            onresize={onResizeTile && (size => onResizeTile(entry.i, size))}
-          />
-        {:else if folderTile}
+    {#each draggableEntries as { entry, tile } (entry.i)}
+      <GridTile
+        id={entry.i}
+        group={container.group}
+        {tile}
+        {showDomains}
+        {preview}
+        onselect={onSelect}
+        onblocked={onBlocked}
+        onactivate={onActivateFolder}
+        onresize={onResizeTile && (size => onResizeTile(entry.i, size))}
+      />
+    {/each}
+    {#each staticEntries as { entry, tile } (entry.i)}
+      {@const folderTile = tile.kind === 'folder' ? tile : undefined}
+      {@const bookmarkTile = tile.kind === 'bookmark' ? tile : undefined}
+      <div
+        class='absolute'
+        style={`
+          left: ${entry.x * (cell + GAP)}px;
+          top: ${entry.y * (cell + GAP)}px;
+          width: ${cellsToPx(entry.w, cell)}px;
+          height: ${cellsToPx(entry.h, cell)}px;
+        `}
+      >
+        {#if folderTile}
           <FolderTile
             tile={folderTile}
             size={sizeOf(entry)}
             selected={selectedId === entry.i}
             ariaLabel={$LL.app.folderTileSummary({ title: folderTile.title })}
             onclick={() => onActivateFolder?.(entry.i)}
-            class='
-              block transition-[left,top,width,height] duration-140
-              motion-reduce:transition-none
-            '
-            style={`
-              position: absolute;
-              left: ${entry.x * (cell + GAP)}px;
-              top: ${entry.y * (cell + GAP)}px;
-              width: ${cellsToPx(entry.w, cell)}px;
-              height: ${cellsToPx(entry.h, cell)}px;
-            `}
+            class='block size-full'
             dataTestId='folder-tile'
             dataTileId={entry.i}
             onresize={folderTile.writable && onResizeTile
@@ -376,17 +389,7 @@
                 : bookmarkTile.title,
             })}
             onclick={event => launch(event, bookmarkTile)}
-            class='
-              block transition-[left,top,width,height] duration-140
-              motion-reduce:transition-none
-            '
-            style={`
-              position: absolute;
-              left: ${entry.x * (cell + GAP)}px;
-              top: ${entry.y * (cell + GAP)}px;
-              width: ${cellsToPx(entry.w, cell)}px;
-              height: ${cellsToPx(entry.h, cell)}px;
-            `}
+            class='block size-full'
             dataTestId='tile-slot'
             dataTileId={entry.i}
             onresize={bookmarkTile.writable && onResizeTile
@@ -394,7 +397,7 @@
               : undefined}
           />
         {/if}
-      {/if}
+      </div>
     {/each}
     {#if placeholder.current}
       <div

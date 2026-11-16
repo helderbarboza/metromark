@@ -11,11 +11,15 @@
    */
   interface Props {
     size: TileSize
+    /** False in the Dock view, where the 4x4 Large preset is unavailable. */
+    allowLarge?: boolean
     onresize: (size: TileSize) => void
   }
 
-  const { size, onresize }: Props = $props()
-  const sizes: TileSize[] = ['small', 'medium', 'wide', 'large']
+  const { size, allowLarge = true, onresize }: Props = $props()
+  const sizes: TileSize[] = $derived(
+    allowLarge ? ['small', 'medium', 'wide', 'large'] : ['small', 'medium', 'wide'],
+  )
   const boxClass: Record<TileSize, string> = {
     small: 'size-1.75',
     medium: 'size-3',
@@ -35,7 +39,7 @@
       onSelect={() => onresize(preset)}
       class={cn(
         `
-          flex h-16 w-1/4 flex-col items-center justify-center gap-1.5 p-0 text-[10px]
+          flex h-16 flex-1 flex-col items-center justify-center gap-1.5 p-0 text-[10px]
           text-(--muted-foreground) capitalize
         `,
         size === preset && 'bg-(--accent) text-(--foreground)',

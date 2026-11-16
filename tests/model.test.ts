@@ -2,7 +2,7 @@ import type { Snapshot } from '$lib/types'
 import { normalizeTree } from '$lib/adapters/memory'
 import { demoData, demoTree } from '$lib/demo'
 import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFaviconEligible } from '$lib/icon-sources'
-import { overlaps, reconcileLayout, usedCols, validateLayout } from '$lib/layout'
+import { DOCK_ROWS, effectiveTileSize, overlaps, reconcileLayout, ROWS, usedCols, validateLayout } from '$lib/layout'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, projectGroups } from '$lib/tree'
 import { hashColorIndex } from '$lib/tree-utils'
 import { validateUrl } from '$lib/url'
@@ -92,6 +92,44 @@ describe('independent layouts', () => {
     expect(() => validateLayout([{ i: 'a', x: -1, y: 0, w: 2, h: 2 }])).toThrow()
     expect(() => validateLayout([{ i: 'a', x: 0, y: 0, w: 3, h: 3 }])).toThrow()
     expect(() => validateLayout([{ i: 'a', x: 0, y: 0, w: 2, h: 2 }, { i: 'a', x: 2, y: 0, w: 2, h: 2 }])).toThrow()
+  })
+})
+
+describe('dock grid view', () => {
+  it('projects the same tree into two rows and remaps Large tiles to Wide', () => {
+    const state = fixture()
+    state.settings = { ...state.settings, gridView: 'dock' }
+    const groups = projectGroups(state)
+    const bar = groups.find(group => group.id === 'bar')!
+    expect(bar.layout.length).toBeGreaterThan(0)
+    expect(bar.layout.every(entry => entry.y >= 0 && entry.y + entry.h <= DOCK_ROWS)).toBe(true)
+    expect(bar.tiles.steam?.size).toBe('wide')
+    expect(bar.tiles.linear?.size).toBe('medium')
+    expect(bar.layout.find(entry => entry.i === 'steam')).toMatchObject({ w: 4, h: 2 })
+  })
+  it('keeps the classic 8-row projection untouched in classic view', () => {
+    const state = fixture()
+    const bar = projectGroups(state).find(group => group.id === 'bar')!
+    expect(bar.tiles.steam?.size).toBe('large')
+    expect(bar.layout.find(entry => entry.i === 'steam')).toMatchObject({ h: 4 })
+  })
+  it('validates dock commits against 2 rows only', () => {
+    expect(validateLayout([{ i: 'a', x: 0, y: 1, w: 1, h: 1 }], DOCK_ROWS)).toHaveLength(1)
+    expect(() => validateLayout([{ i: 'a', x: 0, y: 1, w: 2, h: 2 }], DOCK_ROWS)).toThrow()
+    expect(() => validateLayout([{ i: 'a', x: 0, y: 0, w: 4, h: 4 }], DOCK_ROWS)).toThrow()
+    // The same 4x4 item is valid in the classic grid.
+    expect(validateLayout([{ i: 'a', x: 0, y: 4, w: 4, h: 4 }], ROWS)).toHaveLength(1)
+  })
+  it('remaps a stored classic Large tile instead of overflowing the dock grid', () => {
+    const links = [{ id: 'a', title: 'a', url: 'https://a.com' }]
+    const result = reconcileLayout(links, [{ i: 'a', x: 0, y: 5, w: 4, h: 4 }], { a: { size: 'large' } }, DOCK_ROWS)
+    expect(result[0].h).toBe(2)
+    expect(result[0].y + result[0].h).toBeLessThanOrEqual(DOCK_ROWS)
+  })
+  it('resolves effective sizes without rewriting the stored appearance', () => {
+    expect(effectiveTileSize('large', DOCK_ROWS)).toBe('wide')
+    expect(effectiveTileSize('large', ROWS)).toBe('large')
+    expect(effectiveTileSize('medium', DOCK_ROWS)).toBe('medium')
   })
 })
 

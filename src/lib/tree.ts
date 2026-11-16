@@ -1,6 +1,6 @@
 import type { BookmarkNode, GroupView, Snapshot } from '$lib/types'
 import { FOLDER_PREVIEW, isLayoutable, orderByLayout, toPreviewCell } from '$lib/folder-preview'
-import { reconcileLayout, sizeOf } from '$lib/layout-constants'
+import { effectiveTileSize, reconcileLayout, rowsForGridView, sizeOf } from '$lib/layout-constants'
 import { tileFor, tileForFolder } from '$lib/tile'
 
 export const isBookmark = (node: BookmarkNode) => typeof node.url === 'string' && node.type !== 'separator'
@@ -47,6 +47,7 @@ export function canAddTo(node: BookmarkNode, tree: BookmarkNode[]): boolean {
 }
 export function projectGroups(snapshot: Snapshot): GroupView[] {
   const nodes = indexTree(snapshot.tree)
+  const rows = rowsForGridView(snapshot.settings?.gridView)
   // Phase 1: lay out every folder group. Layout order is shared with the
   // folder tile preview, so all layouts must exist before tiles are built.
   interface Draft {
@@ -67,7 +68,7 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
       path: currentPath,
       rootId,
       layoutable,
-      layout: reconcileLayout(layoutable, snapshot.layouts[node.id], snapshot.appearance),
+      layout: reconcileLayout(layoutable, snapshot.layouts[node.id], snapshot.appearance, rows),
     })
     for (const child of node.children ?? []) {
       if (isFolder(child))
@@ -126,8 +127,12 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
           isSystem: true,
           mutable: false,
           writable: false,
-          layout: reconcileLayout(links, snapshot.layouts[root.id], snapshot.appearance),
-          tiles: Object.fromEntries(links.map(node => [node.id, tileFor(node, snapshot.appearance[node.id], snapshot.tree)])),
+          layout: reconcileLayout(links, snapshot.layouts[root.id], snapshot.appearance, rows),
+          tiles: Object.fromEntries(links.map((node) => {
+            const tile = tileFor(node, snapshot.appearance[node.id], snapshot.tree)
+            tile.size = effectiveTileSize(tile.size, rows)
+            return [node.id, tile]
+          })),
         },
       )
     }

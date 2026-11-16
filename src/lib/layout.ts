@@ -1,5 +1,7 @@
 export {
   cellsToPx,
+  DOCK_ROWS,
+  effectiveTileSize,
   EMPTY_GROUP_COLS,
   ENGINE_COL_HEADROOM,
   freePosition,
@@ -10,9 +12,11 @@ export {
   overlaps,
   reconcileLayout,
   ROWS,
+  rowsForGridView,
   sizeOf,
   SIZES,
   TILE_SIZES,
+  tileSizesForRows,
   usedCols,
   validateLayout,
 } from '$lib/layout-constants.js'

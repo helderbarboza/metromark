@@ -766,6 +766,22 @@ type RootTranslation = {
 		 */
 		languagePortuguese: string
 		/**
+		 * G​r​i​d​ ​v​i​e​w
+		 */
+		gridView: string
+		/**
+		 * C​l​a​s​s​i​c​ ​s​p​r​e​a​d​s​ ​t​i​l​e​s​ ​a​c​r​o​s​s​ ​t​h​e​ ​c​a​n​v​a​s​;​ ​D​o​c​k​ ​p​a​c​k​s​ ​t​h​e​m​ ​a​l​o​n​g​ ​t​h​e​ ​b​o​t​t​o​m​ ​e​d​g​e
+		 */
+		gridViewHelp: string
+		/**
+		 * C​l​a​s​s​i​c
+		 */
+		classic: string
+		/**
+		 * D​o​c​k
+		 */
+		dock: string
+		/**
 		 * T​i​l​e​ ​d​e​n​s​i​t​y
 		 */
 		tileDensity: string
@@ -1379,6 +1395,14 @@ type RootTranslation = {
 		 * C​h​o​o​s​e​ ​a​ ​s​u​p​p​o​r​t​e​d​ ​t​i​l​e​ ​s​i​z​e​.
 		 */
 		supportedSize: string
+		/**
+		 * T​h​e​ ​L​a​r​g​e​ ​t​i​l​e​ ​s​i​z​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​t​h​e​ ​D​o​c​k​ ​v​i​e​w​.
+		 */
+		invalidTileSize: string
+		/**
+		 * I​n​v​a​l​i​d​ ​g​r​i​d​ ​v​i​e​w​.
+		 */
+		invalidGridView: string
 		/**
 		 * U​s​e​ ​a​ ​s​i​x​-​d​i​g​i​t​ ​h​e​x​ ​c​o​l​o​r​.
 		 */
@@ -2241,6 +2265,22 @@ export type TranslationFunctions = {
 		 */
 		languagePortuguese: () => LocalizedString
 		/**
+		 * Grid view
+		 */
+		gridView: () => LocalizedString
+		/**
+		 * Classic spreads tiles across the canvas; Dock packs them along the bottom edge
+		 */
+		gridViewHelp: () => LocalizedString
+		/**
+		 * Classic
+		 */
+		classic: () => LocalizedString
+		/**
+		 * Dock
+		 */
+		dock: () => LocalizedString
+		/**
 		 * Tile density
 		 */
 		tileDensity: () => LocalizedString
@@ -2842,6 +2882,14 @@ export type TranslationFunctions = {
 		 * Choose a supported tile size.
 		 */
 		supportedSize: () => LocalizedString
+		/**
+		 * The Large tile size is not available in the Dock view.
+		 */
+		invalidTileSize: () => LocalizedString
+		/**
+		 * Invalid grid view.
+		 */
+		invalidGridView: () => LocalizedString
 		/**
 		 * Use a six-digit hex color.
 		 */

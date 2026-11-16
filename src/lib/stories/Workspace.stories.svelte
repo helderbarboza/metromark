@@ -27,6 +27,10 @@
   args={{ compact: true }}
 />
 <Story
+  name='Dock view'
+  args={{ dock: true }}
+/>
+<Story
   name='Search interaction'
   play={async ({ canvas }) => {
     const input = await canvas.findByRole('searchbox', { name: 'Search bookmarks' })

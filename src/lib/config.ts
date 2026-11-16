@@ -54,6 +54,8 @@ const ImageBackgroundSchema = v.object({
 export const SettingsSchema = v.object({
   /** Tile density: 'comfortable' (68px) or 'compact' (54px) */
   density: v.union([v.literal('comfortable'), v.literal('compact')]),
+  /** Grid view: 'classic' (8 rows) or 'dock' (2 rows anchored to the bottom) */
+  gridView: v.union([v.literal('classic'), v.literal('dock')]),
   /** Show domain names on tiles */
   showDomains: v.boolean(),
   /** Show the site's full-color favicon instead of a single-color Metro glyph */
@@ -79,6 +81,7 @@ export type ImageBackgroundSettings = Extract<Settings['background'], { type: 'i
 /** Default values (used when config sources omit a key) */
 export const SETTINGS_DEFAULTS: Settings = {
   density: 'comfortable',
+  gridView: 'classic',
   showDomains: true,
   originalFavicons: false,
   reducedMotion: false,
@@ -125,7 +128,7 @@ function parseBooleanEnv(key: string, value: string): boolean {
 
 /**
  * Load settings from hierarchical sources:
- * 1. Environment variables (METROMARK_DENSITY, METROMARK_SHOW_DOMAINS, METROMARK_ORIGINAL_FAVICONS, METROMARK_REDUCED_MOTION, METROMARK_SHADER_ID, METROMARK_LANGUAGE)
+ * 1. Environment variables (METROMARK_DENSITY, METROMARK_GRIDVIEW, METROMARK_SHOW_DOMAINS, METROMARK_ORIGINAL_FAVICONS, METROMARK_REDUCED_MOTION, METROMARK_SHADER_ID, METROMARK_LANGUAGE)
  * 2. Fallback to defaults
  * Throws on validation failure (fail-fast). Throws if a recognized METROMARK_*
  * variable holds an invalid value; the error names the key and the value.
@@ -137,6 +140,12 @@ export function loadSettings(env: Record<string, string | undefined> = import.me
     if (densityEnv !== 'comfortable' && densityEnv !== 'compact')
       throw invalidEnv(`${ENV_PREFIX}DENSITY`, densityEnv, '"comfortable" or "compact"')
     fromEnv.density = densityEnv
+  }
+  const gridViewEnv = env[`${ENV_PREFIX}GRIDVIEW`]
+  if (gridViewEnv !== undefined) {
+    if (gridViewEnv !== 'classic' && gridViewEnv !== 'dock')
+      throw invalidEnv(`${ENV_PREFIX}GRIDVIEW`, gridViewEnv, '"classic" or "dock"')
+    fromEnv.gridView = gridViewEnv
   }
   const showDomainsEnv = env[`${ENV_PREFIX}SHOW_DOMAINS`]
   if (showDomainsEnv !== undefined) {

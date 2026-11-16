@@ -6,7 +6,8 @@ const PRESENTATION_FALLBACK: AppData = {
   schema: 1,
   appearance: {},
   layouts: {},
-  settings: { density: 'comfortable', showDomains: true, originalFavicons: false, reducedMotion: false, language: 'auto', background: { type: 'color', auto: true } },
+  dockLayouts: {},
+  settings: { density: 'comfortable', gridView: 'classic', showDomains: true, originalFavicons: false, reducedMotion: false, language: 'auto', background: { type: 'color', auto: true } },
   undos: [],
 }
 

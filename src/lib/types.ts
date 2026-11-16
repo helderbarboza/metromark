@@ -52,6 +52,8 @@ export interface DeletedBackup {
   followingId?: string
   appearance: Record<string, Appearance>
   layouts: Record<string, Layout>
+  /** Layout for the 2-row Dock view; the 8-row Classic map stays in `layouts`. */
+  dockLayouts: Record<string, Layout>
   position?: LayoutItem
 }
 export interface UndoRecord {
@@ -83,12 +85,17 @@ export interface UndoRecord {
     | {
       kind: 'layouts'
       before: Record<string, Layout>
+      /** Dock-view map captured at the same time; absent in pre-Dock records. */
+      beforeDock?: Record<string, Layout>
     }
 }
 export interface AppData {
   schema: 1
   appearance: Record<string, Appearance>
+  /** Classic-view layouts, keyed by group id. */
   layouts: Record<string, Layout>
+  /** Dock-view layouts, keyed by group id. Present since the Dock view shipped. */
+  dockLayouts: Record<string, Layout>
   settings: Settings
   undos: UndoRecord[]
 }

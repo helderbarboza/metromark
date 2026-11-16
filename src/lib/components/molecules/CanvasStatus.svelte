@@ -47,7 +47,7 @@
     {/if}
   </div>
 {:else if variant === 'no-results'}
-  <div class='flex size-full min-h-60 flex-col items-center justify-center border'>
+  <div class='flex size-full min-h-60 flex-col items-center justify-center'>
     <Icon name='searchBookmarks' size={33} />
     <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
       {$LL.search.noFavoritesFound()}

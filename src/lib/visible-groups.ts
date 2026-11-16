@@ -1,5 +1,5 @@
 import type { GroupView, Snapshot } from '$lib/types'
-import { reconcileLayout } from '$lib/layout'
+import { reconcileLayout, rowsForGridView } from '$lib/layout'
 
 /**
  * Filters groups by the selected browser-container root and the search query.
@@ -12,7 +12,9 @@ export function filterVisibleGroups(
   rootFilter: string,
   normalizedQuery: string,
   appearance: Snapshot['appearance'] | undefined,
+  gridView?: 'classic' | 'dock',
 ): GroupView[] {
+  const rows = rowsForGridView(gridView)
   const filtered = groups.filter(
     group => rootFilter === 'all' || group.rootId === rootFilter,
   )
@@ -46,6 +48,7 @@ export function filterVisibleGroups(
           })),
           [],
           sizes,
+          rows,
         ),
       }
     })

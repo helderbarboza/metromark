@@ -24,7 +24,7 @@
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { toggleSelection } from '$lib/interaction'
   import { KeyboardNav } from '$lib/keyboard-nav'
-  import { GAP, ROWS } from '$lib/layout'
+  import { GAP, rowsForGridView } from '$lib/layout'
   import { LayoutStager } from '$lib/layout-stager.svelte'
   import { applyLocale, provisionalLanguageSetting } from '$lib/locale'
   import { sweepBackgroundMedia } from '$lib/media-store'
@@ -134,18 +134,20 @@
   const folderCount = $derived(
     groups.filter(group => !group.isSystem).length,
   )
+  const gridView = $derived(snapshot?.settings.gridView ?? 'classic')
+  const rows = $derived(rowsForGridView(gridView))
   const cell = $derived(
     Math.max(
       34,
       Math.min(
         snapshot?.settings.density === 'compact' ? 54 : 56,
-        Math.floor((viewportHeight - 279 - (ROWS - 1) * GAP) / ROWS),
+        Math.floor((viewportHeight - 279 - (rows - 1) * GAP) / rows),
       ),
     ),
   )
   const normalizedQuery = $derived(query.trim().toLowerCase())
   const visibleGroups = $derived(
-    filterVisibleGroups(groups, rootFilter, normalizedQuery, snapshot?.appearance),
+    filterVisibleGroups(groups, rootFilter, normalizedQuery, snapshot?.appearance, gridView),
   )
   const undo = $derived(
     notice?.undoId
@@ -162,7 +164,13 @@
   const originalFavicons = $derived(snapshot?.settings.originalFavicons ?? false)
   // Workspace state for the canvas subtree (tiles read it via context). The getter
   // closure keeps consumers reactive without drilling props.
-  setWorkspace(() => ({ dragging, selectedId, reducedMotion, originalFavicons }))
+  setWorkspace(() => ({
+    dragging,
+    selectedId,
+    reducedMotion,
+    originalFavicons,
+    largeAvailable: gridView !== 'dock',
+  }))
 
   function applySnapshot(value: Snapshot) {
     snapshot = value
@@ -682,6 +690,7 @@
             size={selectedTile.size}
             writable={selectedTile.writable}
             kind={selectedTile.kind}
+            allowLarge={gridView !== 'dock'}
             {focusRequest}
             menuItems={appBarMenuItems}
             onresize={size => resizeTile(selectedTile.id, size)}

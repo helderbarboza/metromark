@@ -101,6 +101,29 @@
     tiles: {},
   }
 
+  // Dock: 2-row grid, Large remapped to Wide
+  const dockTiles: Record<string, TileView> = Object.fromEntries(
+    Object.entries(tiles).map(([id, tile]) => [
+      id,
+      { ...tile, size: tile.size === 'large' ? 'wide' : tile.size },
+    ]),
+  )
+  const dockLayout: Layout = [
+    { i: 'steam', x: 0, y: 0, w: 2, h: 2 },
+    { i: 'github', x: 2, y: 0, w: 2, h: 2 },
+    { i: 'slack', x: 4, y: 1, w: 1, h: 1 },
+    { i: 'gmail', x: 5, y: 0, w: 4, h: 2 },
+    { i: 'drive', x: 9, y: 0, w: 2, h: 2 },
+    { i: 'notion', x: 11, y: 0, w: 4, h: 2 },
+  ]
+  const dockGroup: GroupView = {
+    ...group,
+    id: 'group-dock',
+    title: 'Dock view',
+    layout: dockLayout,
+    tiles: dockTiles,
+  }
+
   const rename = fn()
   const { Story } = defineMeta({
     title: 'Organisms/Tile grid',
@@ -272,5 +295,15 @@
     await waitFor(() => expect(item).toBeVisible())
     await userEvent.click(item)
     await expect(rename).toHaveBeenCalled()
+  }}
+/>
+
+<Story
+  name='Dock grid'
+  args={{ group: dockGroup, layout: dockLayout, tiles: dockTiles, rows: 2 }}
+  {template}
+  play={async ({ canvas }) => {
+    await expect(await canvas.findByRole('heading', { name: 'Dock view' })).toBeVisible()
+    await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
   }}
 />

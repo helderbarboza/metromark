@@ -15,6 +15,8 @@
     writable: boolean
     /** Tile kind; folder tiles rename instead of editing and cannot be deleted. */
     kind?: 'bookmark' | 'folder'
+    /** False in the Dock view, where the 4x4 Large preset is unavailable. */
+    allowLarge?: boolean
     /** Increments when a selection was made from the keyboard, so focus can move here. */
     focusRequest?: number
     /** Commands that stay off the app bar itself. */
@@ -32,6 +34,7 @@
     subtitle,
     size,
     writable,
+    allowLarge = true,
     kind = 'bookmark',
     focusRequest = 0,
     menuItems,
@@ -53,7 +56,9 @@
     }
   })
 
-  const presets = ['small', 'medium', 'wide', 'large'] as const
+  const allPresets: TileSize[] = ['small', 'medium', 'wide', 'large']
+  const noLargePresets: TileSize[] = ['small', 'medium', 'wide']
+  const presets = $derived(allowLarge ? allPresets : noLargePresets)
 </script>
 
 <div
