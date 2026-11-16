@@ -15,9 +15,8 @@
 <div
   data-testid='toast'
   class='
-    fixed bottom-19.5 left-1/2 z-80 flex max-w-[calc(100vw-32px)] -translate-x-1/2
-    items-center gap-3 rounded-md border border-(--border) bg-(--card) py-2.75 pr-3 pl-4
-    text-(--foreground) shadow-(--shadow)
+    flex max-w-[calc(100vw-32px)] items-center gap-3 rounded-md border border-(--border)
+    bg-(--card) py-2.75 pr-3 pl-4 text-(--foreground) shadow-(--shadow)
   '
 >
   <span

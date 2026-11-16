@@ -78,7 +78,6 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `organisms/MetroAppBar.svelte` | Selection app bar. |
 | `organisms/RootsNav.svelte` | Root filter navigation. |
 | `organisms/CanvasContextMenu.svelte` | Canvas context menu. |
-| `organisms/MetroSplash.svelte` | Startup splash. |
 | `organisms/PageBackground.svelte` | Composes the configured background. |
 | `organisms/ColorBackground.svelte` | Color background. |
 | `organisms/ImageBackground.svelte` | Image background. |

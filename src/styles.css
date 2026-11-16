@@ -901,3 +901,35 @@ button:focus:not(:focus-visible) {
   0%, 100% { transform: translateY(-0.1rem); }
   50%      { transform: translateY(0.1rem); }
 }
+/* Mount entrances for elements that unmount from several call sites, so no
+   exit animation is attempted. These animate motion properties only, not
+   opacity: elements entering at opacity 0 fail visibility checks in the
+   story interaction tests (jest-dom treats opacity 0 as not visible), even
+   though the elements are interactive. The individual scale property and
+   transform keep these composable with snapgrid's FLIP and with Tailwind's
+   centering translate property. */
+@utility animate-rise-enter {
+  animation: rise-enter 200ms ease-out;
+}
+
+@utility animate-pop-enter {
+  animation: pop-enter 180ms ease-out;
+}
+
+@keyframes rise-enter {
+  from { transform: translateY(0.75rem); }
+}
+
+@keyframes pop-enter {
+  from { scale: 0.94; }
+}
+
+@keyframes fade-enter {
+  from { opacity: 0; }
+}
+
+/* A utility cannot reach ::backdrop, so the dialog backdrop fade is a plain
+   rule. */
+dialog[open]::backdrop {
+  animation: fade-enter 150ms ease-out;
+}

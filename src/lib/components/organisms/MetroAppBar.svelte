@@ -138,10 +138,6 @@
   /* Edge-docked command bar: full-bleed bottom edge, icon commands at the
      48x48 px minimum size with 2 mm padding between targets. */
   .app-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -151,7 +147,6 @@
     border-top: 1px solid var(--border);
     background: var(--card);
     padding: 8px 16px max(8px, env(safe-area-inset-bottom));
-    z-index: 50;
     box-shadow: var(--shadow);
   }
   .selected-label {

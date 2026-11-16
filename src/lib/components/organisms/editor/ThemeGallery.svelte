@@ -11,6 +11,7 @@
 
   } from '$lib/theme-picker'
   import { getTheme } from '$lib/themes.js'
+  import { cn } from '$lib/utils'
 
   interface Props {
     themes: ThemeSelections
@@ -36,11 +37,9 @@
 <div class='flex flex-col gap-5'>
   {#each themeGroupsEntries as [mode, modeTheme] (mode)}
     <div>
-      <h4
-        class='
-          mb-2.5 text-xs font-[550] tracking-wider text-(--muted-foreground) uppercase
-        '
-      >{mode} theme</h4>
+      <h4 class={cn('mb-2.5 text-xs font-medium tracking-wider text-(--muted-foreground) uppercase')}>
+        {mode} theme
+      </h4>
       <div class='grid grid-cols-3 gap-2'>
         {#each modeTheme as theme (theme)}
           {@const selected = currentThemes[mode] === theme}

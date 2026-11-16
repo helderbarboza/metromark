@@ -97,7 +97,7 @@
     {/each}
   </Tabs.List>
 
-  <Tabs.Content value='appearance' class='mt-4 grid gap-1'>
+  <Tabs.Content value='appearance' class='mt-4 grid animate-rise-enter gap-1'>
     <SettingsCard
       icon='darkTheme'
       title='Mode'
@@ -145,7 +145,7 @@
     </CollapsibleSection>
   </Tabs.Content>
 
-  <Tabs.Content value='tiles' class='mt-4 grid gap-1'>
+  <Tabs.Content value='tiles' class='mt-4 grid animate-rise-enter gap-1'>
     <SettingsCard
       icon='density'
       title='Tile density'
@@ -270,10 +270,10 @@
       {/if}
     </SettingsCard>
   </Tabs.Content>
-  <Tabs.Content value='background' class='mt-4 grid gap-1'>
+  <Tabs.Content value='background' class='mt-4 grid animate-rise-enter gap-1'>
     <BackgroundSettings />
   </Tabs.Content>
-  <Tabs.Content value='advanced' class='mt-4 grid gap-1'>
+  <Tabs.Content value='advanced' class='mt-4 grid animate-rise-enter gap-1'>
     <SettingsCard
       icon='buildingFactory'
       title='Factory reset'

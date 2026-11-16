@@ -43,6 +43,7 @@
   import { setWorkspace } from '$lib/workspace-context'
   import { onMount } from 'svelte'
   import { MediaQuery } from 'svelte/reactivity'
+  import { fly } from 'svelte/transition'
 
   const { client }: { client: Client } = $props()
   let snapshot = $state.raw<Snapshot | null>(null)
@@ -644,26 +645,31 @@
       onScroll={smoothScroll.scroll}
     />
     {#if selectedTile && !dragging}
-      <MetroAppBar
-        title={selectedTile.title}
-        subtitle={tileSubtitle(selectedTile)}
-        size={selectedTile.size}
-        writable={selectedTile.writable}
-        kind={selectedTile.kind}
-        {focusRequest}
-        menuItems={appBarMenuItems}
-        onresize={size => resizeTile(selectedTile.id, size)}
-        onedit={selectedTile.kind === 'folder'
-          ? () => edit({ kind: 'rename', id: selectedTile.id })
-          : () => edit({ kind: 'bookmark', id: selectedTile.id })}
-        onmove={() => edit({ kind: 'move', id: selectedTile.id })}
-        ondelete={selectedTile.kind === 'folder'
-          ? undefined
-          : () => {
-            void execute({ type: 'node.remove', id: selectedTile.id })
-          }}
-        onclear={clearSelection}
-      />
+      <div
+        class='fixed inset-x-0 bottom-0 z-50'
+        transition:fly={{ y: 64, duration: reducedMotion ? 0 : 200 }}
+      >
+        <MetroAppBar
+          title={selectedTile.title}
+          subtitle={tileSubtitle(selectedTile)}
+          size={selectedTile.size}
+          writable={selectedTile.writable}
+          kind={selectedTile.kind}
+          {focusRequest}
+          menuItems={appBarMenuItems}
+          onresize={size => resizeTile(selectedTile.id, size)}
+          onedit={selectedTile.kind === 'folder'
+            ? () => edit({ kind: 'rename', id: selectedTile.id })
+            : () => edit({ kind: 'bookmark', id: selectedTile.id })}
+          onmove={() => edit({ kind: 'move', id: selectedTile.id })}
+          ondelete={selectedTile.kind === 'folder'
+            ? undefined
+            : () => {
+              void execute({ type: 'node.remove', id: selectedTile.id })
+            }}
+          onclear={clearSelection}
+        />
+      </div>
     {/if}
     {#if dialog && snapshot && dialog.kind !== 'settings'}
       {#key JSON.stringify(dialog)}
@@ -676,20 +682,25 @@
       {/key}
     {/if}
     {#if notice}
-      <UndoToast
-        {notice}
-        onundo={undo
-          ? () => performUndo(undo.id)
-          : notice.actionLabel
-          ? () => {
-            void execute({
-              type: 'settings.update',
-              patch: { background: { ...BACKGROUND_DEFAULTS.color } },
-            })
-          }
-          : undefined}
-        onclose={() => (notice = null)}
-      />
+      <div
+        class='fixed bottom-19.5 left-1/2 z-80 -translate-x-1/2'
+        transition:fly={{ y: 16, duration: reducedMotion ? 0 : 180 }}
+      >
+        <UndoToast
+          {notice}
+          onundo={undo
+            ? () => performUndo(undo.id)
+            : notice.actionLabel
+            ? () => {
+              void execute({
+                type: 'settings.update',
+                patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+              })
+            }
+            : undefined}
+          onclose={() => (notice = null)}
+        />
+      </div>
     {/if}
   </div>
   <SettingsDrawer

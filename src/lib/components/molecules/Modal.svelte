@@ -42,8 +42,7 @@
 <dialog
   bind:this={element}
   class={[
-    'p-0 border border-(--border) bg-(--card) text-(--foreground) shadow-(--shadow) overflow-auto',
-    'backdrop:bg-black/40 backdrop:backdrop-blur-[1px]',
+    `animate-pop-enter p-0 border border-(--border) bg-(--card) text-(--foreground) shadow-(--shadow) overflow-auto backdrop:bg-black/40 backdrop:backdrop-blur-[1px]`,
     drawer && 'fixed top-3 right-3 bottom-3 left-auto m-0',
     drawer && 'w-[min(410px,calc(100vw-24px))] h-[calc(100vh-24px)] max-h-none rounded-md',
     !drawer && 'w-[min(480px,calc(100vw-32px))] max-h-[calc(100vh-48px)] m-auto rounded-lg',
@@ -56,7 +55,7 @@
     <header class='mb-6.5 flex items-center justify-between gap-2.5'>
       <div>
         <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>{eyebrow}</div>
-        <h2 class='m-0 text-2xl font-[450] tracking-tighter'>{title}</h2>
+        <h2 class='m-0 text-2xl font-normal tracking-tighter'>{title}</h2>
       </div>
       <IconButton class='-mr-1.75' label='Close dialog' onclick={onclose}>
         <Icon name='close' size={18} />

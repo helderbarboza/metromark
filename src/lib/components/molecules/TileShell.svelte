@@ -10,7 +10,10 @@
   import { TILE_SIZES } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
   import { safeUrl } from '$lib/url'
+  import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import { mode, theme } from 'mode-watcher'
+  import { quadOut } from 'svelte/easing'
+  import { scale } from 'svelte/transition'
   import { cn } from 'tailwind-variants'
 
   /** Subset of the tile view the shell needs: label text and accent colors. */
@@ -74,6 +77,12 @@
     ...rest
   }: Props = $props()
 
+  // Tile enter/exit motion. Svelte transitions run on WAAPI, so they do not
+  // conflict with the CSS transform transitions for tilt and reveal. Enter
+  // keeps opacity 1 (jest-dom treats opacity 0 as not visible); exit may fade.
+  const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? false)
+
   const isLink = $derived(as === 'a')
   const launchHref = $derived(href ?? safeUrl(tile.url ?? ''))
   const elementProps = $derived(isLink
@@ -132,6 +141,13 @@
     aria-label={openLabel}
     aria-roledescription={ariaRoleDescription}
     draggable={draggable}
+    in:scale|global={{
+      start: 0.94,
+      opacity: 0.8,
+      easing: quadOut,
+      duration: reducedMotion ? 0 : 360,
+    }}
+    out:scale={{ start: 0.94, opacity: 0, duration: reducedMotion ? 0 : 360 }}
     style:--tile-bg={bg}
     style:--tile-fg={fg}
     style:--cell={cell !== undefined ? `${cell}px` : undefined}

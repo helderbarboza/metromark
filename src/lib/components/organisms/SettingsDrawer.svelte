@@ -43,7 +43,7 @@
         <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>
           MAKE YOURSELF AT HOME
         </div>
-        <h2 class='m-0 text-2xl font-[450] tracking-tighter'>
+        <h2 class='m-0 text-2xl font-normal tracking-tighter'>
           Settings
         </h2>
       </div>
