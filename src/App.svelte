@@ -35,6 +35,7 @@
     buildTileMenuItems,
   } from '$lib/menus'
   import { loadRootFilter, resetRootFilter, saveRootFilter } from '$lib/root-filter'
+  import { SettingsDebouncer } from '$lib/settings-debounce'
   import { SmoothScroller } from '$lib/smooth-scroll.svelte'
   import { resetThemePreferences } from '$lib/theme-picker'
   import {
@@ -208,7 +209,7 @@
     noticeUntil
       = expiration ?? Date.now() + (value.tone === 'error' ? 9000 : 4500)
   }
-  async function execute(command: Command): Promise<boolean> {
+  async function runCommand(command: Command): Promise<boolean> {
     busy = true
     try {
       const result = await client.execute(command)
@@ -255,6 +256,22 @@
       busy = false
     }
   }
+  // High-frequency settings changes (slider drags, color inputs) coalesce
+  // into one command per quiet window. Other commands flush first.
+  const settingsDebouncer = new SettingsDebouncer(200, runCommand)
+  async function execute(command: Command): Promise<boolean> {
+    if (command.type === 'settings.update') {
+      busy = true
+      try {
+        return await settingsDebouncer.enqueue(command)
+      }
+      finally {
+        busy = false
+      }
+    }
+    await settingsDebouncer.flush()
+    return runCommand(command)
+  }
   onMount(() => {
     const unsubscribe = client.subscribe(applySnapshot)
     void client
@@ -293,6 +310,7 @@
     return () => {
       unsubscribe()
       window.removeEventListener('languagechange', handleLanguageChange)
+      void settingsDebouncer.flush()
       client.dispose()
       window.removeEventListener('resize', resize)
       clearInterval(clock)
