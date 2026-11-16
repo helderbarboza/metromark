@@ -76,7 +76,7 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `organisms/GridTile.svelte` | Drag-and-drop tile item. |
 | `organisms/MetroGroup.svelte` | One folder group with its tiles. |
 | `organisms/MetroAppBar.svelte` | Selection app bar. |
-| `organisms/RootsNav.svelte` | Root filter navigation. |
+| `organisms/RootsSelect.svelte` | Root filter select. |
 | `organisms/CanvasContextMenu.svelte` | Canvas context menu. |
 | `organisms/PageBackground.svelte` | Composes the configured background. |
 | `organisms/ColorBackground.svelte` | Color background. |

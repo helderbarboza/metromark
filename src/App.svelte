@@ -16,7 +16,7 @@
   import Editor from '$lib/components/organisms/Editor.svelte'
   import MetroAppBar from '$lib/components/organisms/MetroAppBar.svelte'
   import PageBackground from '$lib/components/organisms/PageBackground.svelte'
-  import RootsNav from '$lib/components/organisms/RootsNav.svelte'
+  import RootsSelect from '$lib/components/organisms/RootsSelect.svelte'
   import SettingsDrawer from '$lib/components/organisms/SettingsDrawer.svelte'
   import ThemeSync from '$lib/components/ThemeSync.svelte'
   import * as Tooltip from '$lib/components/ui/tooltip'
@@ -32,6 +32,7 @@
     buildGroupMenuItems,
     buildTileMenuItems,
   } from '$lib/menus'
+  import { loadRootFilter, resetRootFilter, saveRootFilter } from '$lib/root-filter'
   import { SmoothScroller } from '$lib/smooth-scroll.svelte'
   import { resetThemePreferences } from '$lib/theme-picker'
   import {
@@ -52,7 +53,7 @@
   let sweptMedia = false
   let loadError = $state('')
   let query = $state('')
-  let rootFilter = $state('all')
+  let rootFilter = $state(loadRootFilter())
   let dragging = $state(false)
   // Single selection for now: selection is marking without launching, and
   // `toggleSelection` is the one place a future multi-select
@@ -202,6 +203,8 @@
           // The stored bookmark data is already reset. Theme changes are best-effort.
           console.error('Theme reset failed:', error)
         }
+        rootFilter = 'all'
+        resetRootFilter()
       }
       applySnapshot(result.snapshot)
       if (result.notice) {
@@ -277,6 +280,10 @@
   $effect(() => {
     if (notice && now >= noticeUntil)
       notice = null
+  })
+  $effect(() => {
+    // The root filter persists across sessions; every change path funnels here.
+    saveRootFilter(rootFilter)
   })
   $effect(() => {
     void visibleGroups
@@ -578,7 +585,7 @@
 
       <header class='shrink-0 px-40 pt-8 max-lg:px-9 max-md:px-6 max-md:pt-6'>
         <div class='flex items-center justify-between gap-5 pb-3.5 max-sm:pb-2.5'>
-          <RootsNav
+          <RootsSelect
             {roots}
             {rootFilter}
             {bookmarkCount}
