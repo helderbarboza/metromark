@@ -76,9 +76,15 @@
   class:dark={mode === 'dark'}
 >
   {#each boards as board (board.label)}
-    <span class='flex w-full flex-col'>
+    <span class='flex flex-col'>
       <span class='pb-0.5 text-[0.5rem] leading-none text-(--foreground)'>{board.label}</span>
-      <span class='grid min-h-6 auto-cols-2 grid-flow-col auto-rows-2 grid-rows-4 gap-px'>
+      <span
+        style:--cell-size='0.5rem'
+        class='
+          grid auto-cols-(--cell-size) grid-flow-col auto-rows-(--cell-size)
+          grid-rows-[repeat(4,var(--cell-size))] gap-px
+        '
+      >
         {#each board.tiles as tile, i (i)}
           <span class={tile}></span>
         {/each}
