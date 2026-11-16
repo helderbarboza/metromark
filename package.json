@@ -23,6 +23,7 @@
     "storybook": "storybook dev -p 6006 --host 0.0.0.0 --no-open",
     "build-storybook": "storybook build",
     "package": "node scripts/package.mjs",
+    "screenshots": "node scripts/screenshot-profiles.mjs",
     "postinstall": "wxt prepare",
     "generate:themes": "node scripts/generate-themes.mjs"
   },

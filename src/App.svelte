@@ -47,7 +47,7 @@
   import { MediaQuery } from 'svelte/reactivity'
   import { fly } from 'svelte/transition'
 
-  const { client }: { client: Client } = $props()
+  const { client, hideDemoBadge = false }: { client: Client, hideDemoBadge?: boolean } = $props()
   let snapshot = $state.raw<Snapshot | null>(null)
   // Plain guard: the media sweep runs once per page load, not on every snapshot.
   let sweptMedia = false
@@ -647,7 +647,7 @@
         activeGroup={smoothScroll.activeGroup}
         canScroll={smoothScroll.canScroll}
         scrollProgress={smoothScroll.scrollProgress}
-        preview={client.mode === 'preview'}
+        preview={client.mode === 'preview' && !hideDemoBadge}
         {busy}
         onSearch={handleSearch}
         onJump={smoothScroll.jump}

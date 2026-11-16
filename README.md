@@ -4,7 +4,7 @@ A Metro-inspired new-tab launcher and bookmark manager for Chrome and Firefox. B
 
 ## Deliverables
 
-Download the current artifacts from [GitHub Releases](https://github.com/helderbarboza/metro_tab/releases), or from the **Artifacts** of the latest successful run of the release workflow. The bundles are built by CI (`.github/workflows/release.yml`, manual dispatch) and are **not committed** to this repository; `release/` is local scratch output.
+Download the current artifacts from [GitHub Releases](https://github.com/helderbarboza/metromark/releases), or from the **Artifacts** of the latest successful run of the release workflow. The bundles are built by CI (`.github/workflows/release.yml`, manual dispatch) and are **not committed** to this repository; `release/` is local scratch output.
 
 Each release carries:
 
@@ -19,7 +19,7 @@ See the [installation guide](docs/INSTALL.md).
 
 These are **development builds**, not store-published extensions, and they are **not signed**. Firefox's unsigned build is for temporary installation; a permanent standard Firefox install needs Mozilla signing. Chrome loads through **Load unpacked**. Manifest minimum versions are Chrome 128 and Firefox 140.
 
-The live web preview is an isolated **demo workspace**; it cannot access your real bookmarks. Installed extension builds use the actual browser bookmark APIs.
+The live web preview is an isolated **demo workspace**; it cannot access your real bookmarks. Installed extension builds use the actual browser bookmark APIs. The preview also ships three seeded demo profiles at `/?profile=gamer`, `/?profile=traveler` and `/?profile=home-cook`; `npm run screenshots` captures them into `release/screenshots/`.
 
 ## What it does
 

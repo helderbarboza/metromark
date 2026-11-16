@@ -70,9 +70,6 @@ export type ColorBackgroundSettings = Extract<Settings['background'], { type: 'c
 export type ShaderBackgroundSettings = Extract<Settings['background'], { type: 'shader' }>
 export type ImageBackgroundSettings = Extract<Settings['background'], { type: 'image' }>
 
-/** Default photo background. Remote Unsplash image at full resolution (5886x3924). */
-export const DEFAULT_IMAGE_BACKGROUND_URL = 'https://images.unsplash.com/photo-1660526224364-8f71a4a09514?q=85&fm=jpg&cs=srgb'
-
 /** Default values (used when config sources omit a key) */
 export const SETTINGS_DEFAULTS: Settings = {
   density: 'comfortable',
@@ -80,12 +77,7 @@ export const SETTINGS_DEFAULTS: Settings = {
   originalFavicons: false,
   reducedMotion: false,
   background: {
-    type: 'image',
-    url: DEFAULT_IMAGE_BACKGROUND_URL,
-    fit: 'cover',
-    opacity: 0.7,
-    parallax: true,
-    parallaxZoom: 1.25,
+    type: 'color',
     auto: true,
   },
 } as const

@@ -27,7 +27,7 @@ export default defineConfig({
   vite: () => ({
     build: { sourcemap: true },
     resolve: { alias: libAlias },
-    define: metromarkDefines,
+    define: { ...metromarkDefines, 'import.meta.env.METROMARK_PREVIEW': JSON.stringify(false) },
     plugins: [tailwindcss()],
   }),
 })

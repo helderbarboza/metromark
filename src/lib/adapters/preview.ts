@@ -8,6 +8,8 @@ const TREE_KEY = 'metromark.preview.bookmarks.v1'
 const DATA_KEY = 'metromark.preview.presentation.v1'
 const MODE_KEY = 'mode-watcher-mode'
 const THEME_KEY = 'mode-watcher-theme'
+const THEME_SELECTIONS_KEY = 'app-theme-selections'
+const PROFILE_KEY = 'metromark.preview.profile'
 function isValidJson<T>(_value: unknown, _fallback: T): _value is T {
   return true
 }
@@ -77,6 +79,8 @@ export function createPreviewClient(settings: Settings, persistent = true): Clie
         localStorage.removeItem(DATA_KEY)
         localStorage.removeItem(MODE_KEY)
         localStorage.removeItem(THEME_KEY)
+        localStorage.removeItem(THEME_SELECTIONS_KEY)
+        localStorage.removeItem(PROFILE_KEY)
       }
       coordinator.dispose()
       unsubscribe()

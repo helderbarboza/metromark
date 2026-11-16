@@ -5,7 +5,10 @@
   // Container for the tile favicon: resolves the browser's favicon cache
   // (a Metro-tint silhouette by default, the site's full colors with the
   // "Original favicons" setting) and passes the result down to the
-  // presentational `FaviconIcon` atom.
+  // presentational `FaviconIcon` atom. In the web preview the browser has no
+  // favicon cache, so seeded demo sites render their bundled favicon in full
+  // color instead; the installed extension keeps using the browser's own
+  // favicon cache and never loads the bundled icons.
 
   interface Props {
     pageUrl: string
@@ -53,10 +56,25 @@
     currentKey = key
     state = { status: 'pending' }
     let stale = false
-    const load = original
-      ? () => loadFavicon(pageUrl)
-      : () => loadConvertedFavicon(pageUrl, tint)
-    load().then(
+    const task = async () => {
+      // Web preview only: the build-time flag removes this branch, the dynamic
+      // import and the bundled favicons from the extension bundles.
+      if (import.meta.env.METROMARK_PREVIEW) {
+        try {
+          const { demoFaviconFor } = await import('$lib/demo-favicons')
+          const demo = demoFaviconFor(pageUrl)
+          if (demo !== undefined)
+            return demo
+        }
+        catch (error) {
+          console.warn('Bundled demo favicon lookup failed; using the default fallback.', error)
+        }
+      }
+      return original
+        ? loadFavicon(pageUrl)
+        : loadConvertedFavicon(pageUrl, tint)
+    }
+    task().then(
       (dataUrl) => {
         if (!stale)
           state = { status: 'ready', dataUrl }
