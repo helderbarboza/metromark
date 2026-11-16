@@ -12,3 +12,4 @@ playwright-report/
 session-ses_*.md
 .env*
 release/
+.eslintcache

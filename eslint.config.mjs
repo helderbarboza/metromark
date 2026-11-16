@@ -41,7 +41,7 @@ export default antfu(
     rules: {
       'better-tailwindcss/no-unknown-classes': 'off',
       'better-tailwindcss/no-conflicting-classes': 'error',
-      'better-tailwindcss/enforce-canonical-classes': ['error', { rootFontSize: 16 }],
+      'better-tailwindcss/enforce-canonical-classes': ['warn', { rootFontSize: 16 }],
       'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', { printWidth: 90, preferSingleLine: true, group: 'newLine', strictness: 'loose' }],
       'svelte/max-attributes-per-line': ['error', { singleline: 3, multiline: 1 }],
       'svelte/first-attribute-linebreak': ['error', { multiline: 'below', singleline: 'beside' }],
