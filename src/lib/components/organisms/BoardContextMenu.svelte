@@ -10,9 +10,11 @@
   import TileSizeGrid from '$lib/components/molecules/TileSizeGrid.svelte'
   import MetroGroup from '$lib/components/organisms/MetroGroup.svelte'
   import * as ContextMenu from '$lib/components/ui/context-menu'
+  import { Scrollbar } from '$lib/components/ui/scroll-area'
   import { gridViewDef, tileSizesForView } from '$lib/layout'
   import { focusFirstMenuItem } from '$lib/menu-focus'
   import { SnapGridGroup } from '@snapgridjs/svelte'
+  import { ScrollArea as ScrollAreaPrimitive } from 'bits-ui'
   import { cn } from 'cn'
   import { tick } from 'svelte'
   import { MediaQuery } from 'svelte/reactivity'
@@ -130,66 +132,79 @@
     {#snippet child({ props })}
       <main
         {...props}
-        id='board'
-        class='
-          relative min-h-0 flex-1 scrollbar-none overflow-auto outline-none
-          [&::-webkit-scrollbar]:hidden
-        '
-        bind:this={scroller}
-        onscroll={smoothScroll.closeMenuOnBoardScroll}
-        onwheel={smoothScroll.wheel}
+        class='contents'
+        tabindex='-1'
         onpointerdown={onBoardPointerDown}
         oncontextmenu={event => onForwardContextMenu(props, event)}
         aria-label={$LL.app.bookmarkBoard()}
-        tabindex='-1'
       >
-        <div
-          class={cn('flex h-full flex-row', def.anchor === 'end' ? 'items-end' : 'items-center')}
-          style:padding-bottom={def.anchor === 'end' ? `${def.inset ?? 0}px` : undefined}
-        >
-          {#if !snapshot}
-            <BoardStatus variant='loading' {loadError} />
-          {:else if normalizedQuery && !visibleGroups.length}
-            <BoardStatus variant='no-results' {query} onclearsearch={onClearSearch} />
-          {:else}
-            <SnapGridGroup>
-              <div
-                bind:this={containerEl}
-                class='
-                  flex h-fit w-max items-end gap-9 px-40
-                  max-lg:gap-7 max-lg:px-9
-                  max-md:px-6
-                '
-              >
-                {#each visibleGroups as group (group.id)}
-                  <MetroGroup
-                    {group}
-                    layout={layoutStager.draftLayouts[group.id] ?? group.layout}
-                    tiles={tiles}
-                    {cell}
-                    {rows}
-                    draggable={!normalizedQuery}
-                    showDomains={snapshot.settings.showDomains}
-                    {preview}
-                    onLayoutChange={layoutStager.stage}
-                    onDragStart={onDragStart}
-                    onDragStop={onDragStop}
-                    onSelect={onSelect}
-                    onActivateFolder={onActivateFolder}
-                    flash={flashGroup === group.id}
-                    onResizeTile={onResizeTile}
-                    menu={groupMenu}
-                    onAdd={onAdd}
-                    onBlocked={onBlocked}
-                  />
-                {/each}
-                {#if !visibleGroups.length && !normalizedQuery}
-                  <BoardStatus variant='no-folders' />
-                {/if}
-              </div>
-            </SnapGridGroup>
-          {/if}
-        </div>
+        <ScrollAreaPrimitive.Root type='scroll' class='relative min-h-0 flex-1 outline-none select-none'>
+          <ScrollAreaPrimitive.Viewport
+            id='board'
+            bind:ref={scroller}
+            tabindex={-1}
+            onscroll={smoothScroll.closeMenuOnBoardScroll}
+            onwheel={smoothScroll.wheel}
+            class='size-full outline-none'
+          >
+
+            <div
+              class={cn('flex h-full flex-row', def.anchor === 'end' ? 'items-end' : 'items-center')}
+              style:padding-bottom={def.anchor === 'end' ? `${def.inset ?? 0}px` : undefined}
+            >
+              {#if !snapshot}
+                <BoardStatus variant='loading' {loadError} />
+              {:else if normalizedQuery && !visibleGroups.length}
+                <BoardStatus variant='no-results' {query} onclearsearch={onClearSearch} />
+              {:else}
+                <SnapGridGroup>
+                  <div
+                    bind:this={containerEl}
+                    class='
+                      flex h-fit w-max items-end gap-9 px-40
+                      max-lg:gap-7 max-lg:px-9
+                      max-md:px-6
+                    '
+                  >
+                    {#each visibleGroups as group (group.id)}
+                      <MetroGroup
+                        {group}
+                        layout={layoutStager.draftLayouts[group.id] ?? group.layout}
+                        tiles={tiles}
+                        {cell}
+                        {rows}
+                        draggable={!normalizedQuery}
+                        showDomains={snapshot.settings.showDomains}
+                        {preview}
+                        onLayoutChange={layoutStager.stage}
+                        onDragStart={onDragStart}
+                        onDragStop={onDragStop}
+                        onSelect={onSelect}
+                        onActivateFolder={onActivateFolder}
+                        flash={flashGroup === group.id}
+                        onResizeTile={onResizeTile}
+                        menu={groupMenu}
+                        onAdd={onAdd}
+                        onBlocked={onBlocked}
+                      />
+                    {/each}
+                    {#if !visibleGroups.length && !normalizedQuery}
+                      <BoardStatus variant='no-folders' />
+                    {/if}
+                  </div>
+                </SnapGridGroup>
+              {/if}
+            </div>
+          </ScrollAreaPrimitive.Viewport>
+          <Scrollbar
+            orientation='horizontal'
+            class='
+              *:data-scroll-area-thumb:rounded-none
+              *:data-scroll-area-thumb:bg-foreground/30
+              *:data-scroll-area-thumb:backdrop-blur-lg
+            '
+          />
+        </ScrollAreaPrimitive.Root>
       </main>
     {/snippet}
   </ContextMenu.Trigger>
