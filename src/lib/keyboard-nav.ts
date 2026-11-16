@@ -16,7 +16,7 @@ export interface KeyboardNavDeps {
 }
 
 /**
- * Canvas-level keyboard shortcuts for the new tab page.
+ * Board-level keyboard shortcuts for the new tab page.
  *
  * Owns the `kbMenu` flag: Shift+F10 and the Menu key produce a contextmenu
  * whose coordinates still point at the last mouse position, so selectTile

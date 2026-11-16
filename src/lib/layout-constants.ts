@@ -44,7 +44,7 @@ export interface GridViewDef {
   readonly id: string
   /** Grid row count of this view. */
   readonly rows: number
-  /** Vertical anchor of the group row inside the canvas. */
+  /** Vertical anchor of the group row inside the board. */
   readonly anchor: 'center' | 'end'
   /** Bottom inset in px for end-anchored views. */
   readonly inset?: number

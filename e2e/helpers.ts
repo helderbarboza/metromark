@@ -84,15 +84,15 @@ export async function rightClick(page: Page, title: string) {
 }
 /**
  * Right-clicks a group header, which opens the group's context menu.
- * Pre-scrolls the canvas so the group is in view: a scroll event dismisses
+ * Pre-scrolls the board so the folder is in view: a scroll event dismisses
  * an open context menu, so scrolling must happen before the menu opens.
  */
 export async function rightClickGroup(page: Page, title: string) {
   const target = group(page, title)
   await target.evaluate((el) => {
-    const canvas = document.querySelector('#canvas')
-    if (canvas && el instanceof HTMLElement)
-      canvas.scrollLeft = Math.max(0, el.offsetLeft - 68)
+    const board = document.querySelector('#board')
+    if (board && el instanceof HTMLElement)
+      board.scrollLeft = Math.max(0, el.offsetLeft - 68)
   })
   await target.locator('[data-testid="group-header"]').click({ button: 'right' })
 }

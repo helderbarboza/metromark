@@ -23,20 +23,20 @@ The live web preview is an isolated **demo workspace**; it cannot access your re
 
 ## What it does
 
-- Keeps all browser bookmark containers separate, with their own named groups.
-- Presents every folder as a flat group. A subfolder header displays its full ancestry, including its browser container.
+- Keeps all browser bookmark containers separate, with their own named folders.
+- Shows every folder flat. A subfolder heading displays its full ancestry, including its browser container.
 - Provides small, medium, wide and large tiles: 1×1, 2×2, 4×2 and 4×4 grid cells.
 - Receives native bookmark changes in open new tabs and writes management changes back to the actual browser tree.
-- Selecting a tile (right-click, the menu key or Shift+F10) opens an app bar with its edit, move, delete and size commands; group and background right-clicks open context menus. Creation, editing, folder management, moving, customization and deletion are available directly on the new-tab page.
+- Selecting a tile (right-click, the menu key or Shift+F10) opens an app bar with its edit, move, delete and size commands; folder and board background right-clicks open context menus. Creation, editing, folder management, moving, customization and deletion are available directly on the new-tab page.
 - Offers **30-second Undo** for deletion, moves, bookmark edits and layout resets. Folder deletion backs up the entire subtree and remaps recreated bookmark IDs on restoration.
 - Provides a confirmed factory reset for MetroMark appearance, settings and theme. It keeps all browser bookmarks.
 - Stores appearance and tile placement separately from the browser's bookmarks.
-- Includes title/URL/path search, browser-container filtering, horizontal group navigation, four themes, two densities, two grid views (Classic 8-row wallpaper or a 2-row bottom-anchored Dock; its tile arrangements are kept separately) and reduced-motion settings. Tiles can show original full-color favicons instead of single-color glyphs, or tinted glyphs cached locally in IndexedDB.
+- Includes title/URL/path search, browser-container filtering, horizontal folder navigation, four themes, two densities, two grid views (Classic 8-row wallpaper or a 2-row bottom-anchored Dock; its tile arrangements are kept separately) and reduced-motion settings. Tiles can show original full-color favicons instead of single-color glyphs, or tinted glyphs cached locally in IndexedDB.
 - Offers a solid color background, an animated shader background, or an image background. Image backgrounds accept a remote http(s) URL or an image you upload (stored in your browser's IndexedDB on this device; PNG, JPEG, WebP, GIF or SVG, up to 25 MB), with cover/contain/fill/none fit, an opacity slider and an adjustable parallax zoom (1–4×).
 
 ### Arrangement rules
 
-Tiles are always movable; no mode has to be turned on first. Within-folder movement changes only local presentation metadata; it does **not** reorder native bookmark siblings. Cross-group pointer dragging moves the real bookmark into the destination folder. On a touch screen a short drag down on a tile reveals the selection check: releasing there selects the tile, while continuing past the drag threshold picks it up to move. Tiles claim the touch gesture, so pan the canvas by dragging its empty background rather than a tile. Keyboard dragging works within a group: Space picks up/drops, arrow keys move, and Escape cancels. Use the Move to folder dialog for keyboard-accessible cross-folder moves.
+Tiles are always movable; no mode has to be turned on first. Within-folder movement changes only local presentation metadata; it does **not** reorder native bookmark siblings. Cross-folder pointer dragging moves the real bookmark into the destination folder. On a touch screen a short drag down on a tile reveals the selection check: releasing there selects the tile, while continuing past the drag threshold picks it up to move. Tiles claim the touch gesture, so pan the board by dragging its empty background rather than a tile. Keyboard dragging works within a folder: Space picks up/drops, arrow keys move, and Escape cancels. Use the Move to folder dialog for keyboard-accessible cross-folder moves.
 
 Managed bookmarks and browser-owned containers are protected. Writable browser containers can receive bookmarks but cannot be renamed or deleted through MetroMark. Firefox separators are not shown as tiles and are preserved when restoring a deleted subtree.
 

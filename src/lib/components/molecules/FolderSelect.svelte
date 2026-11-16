@@ -27,7 +27,7 @@
   </span>
   <select
     aria-labelledby={`${uid}-label`}
-    aria-describedby={`${uid}-hint`}
+    aria-describedby={hint ? `${uid}-hint` : undefined}
     bind:value
     required
     disabled={disabled}
@@ -41,7 +41,9 @@
       <option value={folder.id}>{folder.path.join(' / ') || $LL.app.unnamedGroup()}</option>
     {/each}
   </select>
-  <span class='m-0 text-xs/relaxed text-(--muted-foreground)' id={`${uid}-hint`}>
-    {hint ?? $LL.dialogs.folderHint()}
-  </span>
+  {#if hint}
+    <span class='m-0 text-xs/relaxed text-(--muted-foreground)' id={`${uid}-hint`}>
+      {hint}
+    </span>
+  {/if}
 </label>

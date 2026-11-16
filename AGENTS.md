@@ -140,13 +140,13 @@ throw new Error(getT().errors.noLongerExists())
 
 ## Product invariants
 
-1. Browser containers such as Bookmarks Bar/Toolbar, Other Bookmarks, and Bookmarks Menu stay separate named groups.
-2. Folder groups are visually flat. Subfolder headings show full ancestry, including the browser container. No nested tile panels.
+1. Browser containers such as Bookmarks Bar/Toolbar, Other Bookmarks, and Bookmarks Menu stay separate named folders.
+2. Folders are visually flat. Subfolder headings show full ancestry, including the browser container. No nested tile panels.
 3. Tile presets: small 1x1, medium 2x2, wide 4x2, large 4x4.
 4. Within-folder dragging changes local layout metadata only. It must not reorder native bookmark siblings.
-5. Cross-group pointer dragging moves the actual bookmark into the destination folder. The Move to folder dialog is the keyboard alternative.
+5. Cross-folder pointer dragging moves the actual bookmark into the destination folder. The Move to folder dialog is the keyboard alternative.
 6. Native bookmark manager changes update open new-tab pages; MetroMark management changes update native bookmarks.
-7. Tile right-clicks select the tile and open its app bar commands. Group and canvas right-clicks open real context menus. Group controls manage folders.
+7. Tile right-clicks select the tile and open its app bar commands. Folder and board right-clicks open real context menus. Folder controls manage folders.
 8. Destructive actions offer Undo. Preserve whole-subtree restoration, recreated-ID remapping, missing-destination recovery, and conflict guards.
 9. Protect managed bookmarks and browser-owned containers. Not every folder is writable or removable.
 10. The new-tab page is the manager. Do not add a separate manager view or alter the native bookmark manager UI without authorization.
@@ -158,7 +158,7 @@ throw new Error(getT().errors.noLongerExists())
 - Register background listeners synchronously before asynchronous initialization.
 - Keep Firefox builds explicitly MV3; WXT's default Firefox target may differ.
 - Feature-detect optional bookmark events and platform-specific fields.
-- Coalesce source/destination layout callbacks into one cross-group operation. Source removal during dragging is not bookmark deletion.
+- Coalesce source/destination layout callbacks into one cross-folder operation. Source removal during dragging is not bookmark deletion.
 - Preserve local placement when native titles, URLs, or sibling order change.
 - Keep restart-critical Undo state in extension storage, not only process memory.
 - Undo expires after 30 seconds. Expiry is not a secure-erasure guarantee.

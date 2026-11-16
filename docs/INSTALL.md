@@ -26,15 +26,15 @@ A temporary Firefox add-on is removed when the browser restarts. A permanent ins
 
 - Click a tile to launch its bookmark.
 - Right-click a tile, or press the menu key or Shift+F10 on it, to select it and open the app bar with edit/move/delete and size presets.
-- Right-click the canvas to add bookmarks or folders and open settings.
-- Use a group's three-dot button for folder actions.
-- Tiles are always draggable. Same-group dragging changes only the tile layout; dragging to another group moves the real bookmark.
-- On a touch screen, drag a tile down to reveal the check; releasing there selects the tile, while continuing past the drag threshold picks it up to move. Tiles claim the touch, so pan the canvas by dragging its empty background.
+- Right-click the board to add bookmarks or folders and open settings.
+- Use a folder's three-dot button for folder actions.
+- Tiles are always draggable. Same-folder dragging changes only the tile layout; dragging to another folder moves the real bookmark.
+- On a touch screen, drag a tile down to reveal the check; releasing there selects the tile, while continuing past the drag threshold picks it up to move. Tiles claim the touch, so pan the board by dragging its empty background.
 - Keyboard dragging: Space picks a focused tile up, arrow keys move it, Space/Enter drops it, Escape cancels. Enter opens the bookmark. For cross-folder keyboard moves, use **Move to folder**.
 - Destructive actions offer **Undo for 30 seconds**. Folder deletion restores its whole subtree when undone.
 - Native bookmark-manager edits appear in open new-tab pages, and MetroMark's management actions update native bookmarks.
 
-Browser-owned containers remain separate. Subfolders are flat groups with their ancestry shown in the heading, rather than nested tile panels.
+Browser-owned containers remain separate. Subfolders are flat, with their ancestry shown in the heading, rather than nested tile panels.
 
 ## Demo versus extension
 

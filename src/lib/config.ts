@@ -40,7 +40,7 @@ const ImageBackgroundSchema = v.object({
   url: v.string(),
   fit: v.optional(BackgroundFitSchema),
   opacity: v.optional(v.number()),
-  /** Subtle horizontal offset while the canvas scrolls; forced off by reduced motion */
+  /** Subtle horizontal offset while the board scrolls; forced off by reduced motion */
   parallax: v.optional(v.boolean()),
   /** Layer scale as a multiple of the canvas size, from 1 to 4; bigger means wider layer and more travel */
   parallaxZoom: v.optional(v.number()),

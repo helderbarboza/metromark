@@ -13,7 +13,7 @@
   import MenuItems from '$lib/components/molecules/MenuItems.svelte'
   import UndoToast from '$lib/components/molecules/UndoToast.svelte'
   import WorkspaceFooter from '$lib/components/molecules/WorkspaceFooter.svelte'
-  import CanvasContextMenu from '$lib/components/organisms/CanvasContextMenu.svelte'
+  import BoardContextMenu from '$lib/components/organisms/BoardContextMenu.svelte'
   import Editor from '$lib/components/organisms/Editor.svelte'
   import MetroAppBar from '$lib/components/organisms/MetroAppBar.svelte'
   import PageBackground from '$lib/components/organisms/PageBackground.svelte'
@@ -30,7 +30,7 @@
   import { sweepBackgroundMedia } from '$lib/media-store'
   import {
     buildAppBarMenuItems,
-    buildCanvasMenuItems,
+    buildBoardMenuItems,
     buildGroupMenuItems,
     buildTileMenuItems,
   } from '$lib/menus'
@@ -79,7 +79,7 @@
   let gestureTimer: ReturnType<typeof setTimeout> | undefined
   let dialog = $state<DialogSpec | null>(null)
   let menuTarget = $state<{
-    target: 'tile' | 'canvas'
+    target: 'tile' | 'board'
     id: string
   } | null>(null)
   let menuOpen = $state(false)
@@ -165,7 +165,7 @@
   const originalFavicons = $derived(
     snapshot?.settings.originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
   )
-  // Workspace state for the canvas subtree (tiles read it via context). The getter
+  // Workspace state for the board subtree (tiles read it via context). The getter
   // closure keeps consumers reactive without drilling props.
   setWorkspace(() => ({
     dragging,
@@ -325,7 +325,7 @@
     })
   }
   /**
-   * Folder tiles never launch; they pan the canvas to the folder's own group and
+   * Folder tiles never launch; they pan the board to the folder's own section and
    * outline it briefly (Windows Explorer-style "open" without leaving the page).
    * Filters are reset first so the target group is always rendered.
    */
@@ -334,7 +334,7 @@
       rootFilter = 'all'
     if (query)
       query = ''
-    // Wait for the unfiltered canvas to render before locating the group.
+    // Wait for the unfiltered board to render before locating the group.
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const element = scroller?.querySelector<HTMLElement>(`[data-group-id="${CSS.escape(id)}"]`)
       if (!element || !scroller)
@@ -366,7 +366,7 @@
   }
   /** Right-click, the menu key, or Shift+F10 on a writable tile marks it selected. */
   function selectTile(event: MouseEvent, id: string) {
-    // preventDefault also keeps the canvas context menu closed (bits-ui honors it).
+    // preventDefault also keeps the board context menu closed (bits-ui honors it).
     event.preventDefault()
     const target = event.target instanceof Element ? event.target : null
     selectionOrigin = target?.closest<HTMLElement>('a, button') ?? null
@@ -393,7 +393,7 @@
     }
     event.preventDefault()
   }
-  /** Canvas handler first, then bits-ui's handler (it opens the menu and honors preventDefault). */
+  /** Board handler first, then bits-ui's handler (it opens the menu and honors preventDefault). */
   function forwardContextMenu(props: Record<string, unknown>, event: MouseEvent) {
     // The group header owns its own context menu; swallow the event here.
     if (event.target instanceof Element
@@ -407,12 +407,12 @@
       Reflect.apply(triggerContextMenu, undefined, [event])
   }
   /**
-   * Single contextmenu entry point on the canvas. Writable tiles select instead of
-   * opening a menu; everything else opens the canvas/tile context menu.
+   * Single contextmenu entry point on the board. Writable tiles select instead of
+   * opening a menu; everything else opens the board/tile context menu.
    */
   function handleContextMenu(event: MouseEvent) {
     const target = event.target
-    // The group header owns its own context menu; never let the canvas menu
+    // The group header owns its own context menu; never let the board menu
     // open alongside it (or instead of it, depending on event-ordering).
     if (target instanceof Element && target.closest('[data-testid="group-header"]'))
       return
@@ -440,11 +440,11 @@
     keyboardNav.kbMenu = false
     const grid = target.closest<HTMLElement>('[data-testid="metro-grid"]')
     if (grid) {
-      menuTarget = { target: 'canvas', id: grid.dataset.groupId ?? defaultFolder() }
+      menuTarget = { target: 'board', id: grid.dataset.groupId ?? defaultFolder() }
       menuOrigin = grid
       return
     }
-    menuTarget = { target: 'canvas', id: defaultFolder() }
+    menuTarget = { target: 'board', id: defaultFolder() }
     menuOrigin = scroller
   }
   /** Return focus to the element that was right-clicked (or focused for Shift+F10). */
@@ -472,7 +472,7 @@
       selectionOrigin?.focus({ preventScroll: true })
     selectionOrigin = null
   }
-  function canvasPointerDown(event: PointerEvent) {
+  function boardPointerDown(event: PointerEvent) {
     if (dragging)
       return
     // Activating a tile opens it; pressing anywhere else drops the selection (p. 82).
@@ -516,14 +516,13 @@
     copy,
     execute,
     clearSelection,
-    focusSearch: () => searchInput?.focus(),
   }
   const menuItems = $derived.by(() => {
     // Menu labels are translated at build time, so track the locale.
     void $locale
     return menuTarget?.target === 'tile'
       ? buildTileMenuItems(contextTile, menuCallbacks)
-      : buildCanvasMenuItems({
+      : buildBoardMenuItems({
         groups,
         selectedId,
         contextId: menuTarget?.id ?? '',
@@ -547,8 +546,8 @@
   const menuHeading = $derived.by<MenuHeading>(() => {
     void $locale
     return menuTarget?.target === 'tile'
-      ? { title: contextTile?.title ?? $LL.app.yourCanvas(), subtitle: tileSubtitle(contextTile) }
-      : { title: $LL.app.yourCanvas() }
+      ? { title: contextTile?.title ?? $LL.app.yourBoard(), subtitle: tileSubtitle(contextTile) }
+      : { title: $LL.app.yourBoard() }
   })
   // Commands that stay off the app bar itself live in a menu opened from one of
   // its buttons, so they are not duplicated as bar commands.
@@ -559,12 +558,12 @@
   function resizeTile(id: string, size: TileSize) {
     void execute({ type: 'tile.appearance', id, patch: { size } })
   }
-  function canvasDragStart() {
+  function boardDragStart() {
     dragging = true
     // A tile moving between groups must not keep the app bar.
     selectedId = null
     selectionOrigin = null
-    // An in-flight smooth scroll would fight the drag and keep the canvas
+    // An in-flight smooth scroll would fight the drag and keep the board
     // moving under the pointer, so stop it and hold scrolling still.
     smoothScroll.cancelSmoothScroll()
     if (scroller)
@@ -574,7 +573,7 @@
     clearTimeout(gestureTimer)
     gestureTimer = setTimeout(() => {
       dragging = false
-      // Restore the canvas's own smooth scrolling once the gesture is over.
+      // Restore the board's own smooth scrolling once the gesture is over.
       if (scroller)
         scroller.style.scrollBehavior = ''
     }, 180)
@@ -634,7 +633,7 @@
         />
       {/snippet}
 
-      <CanvasContextMenu
+      <BoardContextMenu
         bind:open={menuOpen}
         bind:scroller
         bind:contentEl={menuContentEl}
@@ -650,7 +649,7 @@
         preview={client.mode === 'preview'}
         {query}
         onClearSearch={() => (query = '')}
-        onDragStart={canvasDragStart}
+        onDragStart={boardDragStart}
         onDragStop={dragStop}
         onSelect={selectByGesture}
         onActivateFolder={activateFolder}
@@ -658,7 +657,7 @@
         {groupMenu}
         onAdd={parentId => edit({ kind: 'bookmark', parentId })}
         onBlocked={message => showNotice({ message, tone: 'error' })}
-        onCanvasPointerDown={canvasPointerDown}
+        onBoardPointerDown={boardPointerDown}
         onForwardContextMenu={forwardContextMenu}
         {menuTarget}
         {contextTile}

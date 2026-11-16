@@ -152,7 +152,7 @@
   <MenuItems
     variant='context'
     items={[
-      { label: 'Add bookmark here', icon: 'addBookmark', action: fn(), disabled: !group.writable },
+      { label: 'Add new bookmark', icon: 'addBookmark', action: fn(), disabled: !group.writable },
       { label: 'Rename folder', icon: 'edit', action: rename, separator: true },
       {
         label: 'Delete folder',

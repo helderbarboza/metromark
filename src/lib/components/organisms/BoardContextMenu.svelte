@@ -5,7 +5,7 @@
   import type { GroupView, Snapshot, TileSize, TileView } from '$lib/types'
   import type { Snippet } from 'svelte'
   import LL from '$i18n/i18n-svelte'
-  import CanvasStatus from '$lib/components/molecules/CanvasStatus.svelte'
+  import BoardStatus from '$lib/components/molecules/BoardStatus.svelte'
   import MenuItems from '$lib/components/molecules/MenuItems.svelte'
   import TileSizeGrid from '$lib/components/molecules/TileSizeGrid.svelte'
   import MetroGroup from '$lib/components/organisms/MetroGroup.svelte'
@@ -20,7 +20,7 @@
   interface Props {
     /** Context menu open state (bindable). */
     open: boolean
-    /** The canvas element (bindable). */
+    /** The board element (bindable). */
     scroller: HTMLElement | null
     /** The context-menu content element (bindable). */
     contentEl: HTMLDivElement | null
@@ -46,10 +46,10 @@
     groupMenu: Snippet<[GroupView]>
     onAdd: (parentId: string) => void
     onBlocked: (message: string) => void
-    onCanvasPointerDown: (event: PointerEvent) => void
+    onBoardPointerDown: (event: PointerEvent) => void
     /** Intercepts the raw contextmenu event before bits-ui opens the menu. */
     onForwardContextMenu: (props: Record<string, unknown>, event: MouseEvent) => void
-    menuTarget: { target: 'tile' | 'canvas', id: string } | null
+    menuTarget: { target: 'tile' | 'board', id: string } | null
     contextTile: TileView | undefined
     menuItems: MenuItem[]
     menuHeading: { title: string, subtitle?: string }
@@ -80,7 +80,7 @@
     groupMenu,
     onAdd,
     onBlocked,
-    onCanvasPointerDown,
+    onBoardPointerDown,
     onForwardContextMenu,
     menuTarget,
     contextTile,
@@ -99,7 +99,7 @@
   let containerEl = $state<HTMLDivElement | null>(null)
   let previousRect: DOMRect | null = null
 
-  // FLIP the canvas container across view-mode switches: remember its position
+  // FLIP the board container across view-mode switches: remember its position
   // before the wrapper classes change, then slide it into the new position.
   $effect.pre(() => {
     // Tracked read: capture the pre-change rect on every mode flip.
@@ -124,23 +124,23 @@
   })
 </script>
 
-<!-- Canvas right-click opens the canvas menu (add bookmark/folder, settings). -->
+<!-- Board right-click opens the board menu (add bookmark/folder, settings). -->
 <ContextMenu.Root bind:open>
   <ContextMenu.Trigger>
     {#snippet child({ props })}
       <main
         {...props}
-        id='canvas'
+        id='board'
         class='
           relative min-h-0 flex-1 scrollbar-none overflow-auto outline-none
           [&::-webkit-scrollbar]:hidden
         '
         bind:this={scroller}
-        onscroll={smoothScroll.closeMenuOnCanvasScroll}
+        onscroll={smoothScroll.closeMenuOnBoardScroll}
         onwheel={smoothScroll.wheel}
-        onpointerdown={onCanvasPointerDown}
+        onpointerdown={onBoardPointerDown}
         oncontextmenu={event => onForwardContextMenu(props, event)}
-        aria-label={$LL.app.bookmarkCanvas()}
+        aria-label={$LL.app.bookmarkBoard()}
         tabindex='-1'
       >
         <div
@@ -148,9 +148,9 @@
           style:padding-bottom={def.anchor === 'end' ? `${def.inset ?? 0}px` : undefined}
         >
           {#if !snapshot}
-            <CanvasStatus variant='loading' {loadError} />
+            <BoardStatus variant='loading' {loadError} />
           {:else if normalizedQuery && !visibleGroups.length}
-            <CanvasStatus variant='no-results' {query} onclearsearch={onClearSearch} />
+            <BoardStatus variant='no-results' {query} onclearsearch={onClearSearch} />
           {:else}
             <SnapGridGroup>
               <div
@@ -184,7 +184,7 @@
                   />
                 {/each}
                 {#if !visibleGroups.length && !normalizedQuery}
-                  <CanvasStatus variant='no-folders' />
+                  <BoardStatus variant='no-folders' />
                 {/if}
               </div>
             </SnapGridGroup>
@@ -198,7 +198,7 @@
     class='w-65'
     aria-label={menuTarget?.target === 'tile'
       ? $LL.app.actionsFor({ title: contextTile?.title ?? $LL.app.tile() })
-      : $LL.app.canvasActions()}
+      : $LL.app.boardActions()}
     onOpenAutoFocus={event => focusFirstMenuItem(event, contentEl)}
     onCloseAutoFocus={onCloseAutoFocus}
   >

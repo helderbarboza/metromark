@@ -22,7 +22,6 @@ export interface MenuCallbacks {
   copy: (id: string) => void
   execute: (command: Command) => Promise<boolean>
   clearSelection: () => void
-  focusSearch: () => void
 }
 
 export interface GroupMenuInput {
@@ -31,10 +30,10 @@ export interface GroupMenuInput {
   callbacks: MenuCallbacks
 }
 
-export interface CanvasMenuInput {
+export interface BoardMenuInput {
   groups: GroupView[]
   selectedId: string | null
-  /** ID of the group whose grid was right-clicked, if any. */
+  /** ID of the folder whose grid was right-clicked, if any. */
   contextId: string
   defaultFolder: string
   shaderActive: boolean
@@ -72,7 +71,7 @@ export function buildGroupMenuItems(input: GroupMenuInput): MenuItem[] {
   ]
 }
 
-export function buildCanvasMenuItems(input: CanvasMenuInput): MenuItem[] {
+export function buildBoardMenuItems(input: BoardMenuInput): MenuItem[] {
   const { groups, selectedId, contextId, defaultFolder, shaderActive, imageActive, callbacks } = input
   const parentId = groups.find(item => item.id === contextId && item.writable)?.id ?? defaultFolder
   const items: MenuItem[] = [
@@ -83,7 +82,6 @@ export function buildCanvasMenuItems(input: CanvasMenuInput): MenuItem[] {
     items.push({ label: t().clearSelection(), icon: 'close', separator: true, action: () => callbacks.clearSelection() })
   }
   items.push(
-    { label: t().searchBookmarks(), icon: 'searchBookmarks', action: () => callbacks.focusSearch() },
     { label: t().appearanceSettings(), icon: 'settings', separator: true, action: () => callbacks.edit({ kind: 'settings' }) },
   )
   if (shaderActive) {

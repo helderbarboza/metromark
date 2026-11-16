@@ -52,7 +52,7 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `molecules/TileShell.svelte` | Shared tile shell. |
 | `molecules/Modal.svelte` | Dialog shell with focus handling. |
 | `molecules/UndoToast.svelte` | Toast with self-dismiss timer. |
-| `molecules/CanvasStatus.svelte` | Status line for the canvas. |
+| `molecules/BoardStatus.svelte` | Status line for the board. |
 | `molecules/WorkspaceFooter.svelte` | Status footer for the workspace. |
 | `molecules/MenuItems.svelte` | Menu item list renderer. |
 | `molecules/SettingsRow.svelte` | Settings line with label and control. |
@@ -74,10 +74,10 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `organisms/BookmarkTile.svelte` | Bookmark tile. |
 | `organisms/FolderTile.svelte` | Folder tile. |
 | `organisms/GridTile.svelte` | Drag-and-drop tile item. |
-| `organisms/MetroGroup.svelte` | One folder group with its tiles. |
+| `organisms/MetroGroup.svelte` | One folder with its tiles. |
 | `organisms/MetroAppBar.svelte` | Selection app bar. |
 | `organisms/RootsSelect.svelte` | Root filter select. |
-| `organisms/CanvasContextMenu.svelte` | Canvas context menu. |
+| `organisms/BoardContextMenu.svelte` | Board context menu. |
 | `organisms/PageBackground.svelte` | Composes the configured background. |
 | `organisms/ColorBackground.svelte` | Color background. |
 | `organisms/ImageBackground.svelte` | Image background. |

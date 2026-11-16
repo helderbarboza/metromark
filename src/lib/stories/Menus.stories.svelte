@@ -53,7 +53,7 @@
     tileSize: undefined,
     onresize: undefined,
     items: [
-      { label: 'Add bookmark here', icon: 'addBookmark', action: fn() },
+      { label: 'Add new bookmark', icon: 'addBookmark', action: fn() },
       { label: 'Rename folder', icon: 'edit', action: fn(), disabled: true },
       { label: 'Delete folder', icon: 'delete', action: fn(), danger: true, disabled: true },
     ],

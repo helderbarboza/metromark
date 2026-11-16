@@ -128,7 +128,7 @@
     layout,
 
     /*
-    Critical: if containerPadding is [0, 0], canvas width must be:
+    Critical: if containerPadding is [0, 0], board width must be:
 
     cols × cell + (cols - 1) × horizontal gap
 
@@ -143,7 +143,7 @@
       containerPadding: [0, 0],
 
       /*
-      Derived from the usable tile canvas height:
+      Derived from the usable tile board height:
       floor((tileWellHeight + GAP) / (cell + GAP))
 
       Do not tie this directly to the device’s raw 768/1080 resolution.
@@ -176,7 +176,7 @@
     },
 
     onDragStart: () => {
-      // Preserve enough canvas columns for the current drag.
+      // Preserve enough board columns for the current drag.
       liveCols = usedCols(layout)
       onDragStart()
     },
@@ -184,7 +184,7 @@
     onDrag: (previewLayout) => {
       /*
       Grow only while dragging. Do not shrink during a drag,
-      because that changes the canvas geometry under the pointer.
+      because that changes the board geometry under the pointer.
     */
       liveCols = Math.max(liveCols, usedCols(previewLayout))
     },

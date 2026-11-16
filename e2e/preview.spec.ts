@@ -28,18 +28,18 @@ test('flat ancestry, separate roots, launcher tiles, and background context-menu
   await expect(group(page, 'Other bookmarks')).toBeVisible()
   await page.getByRole('combobox', { name: 'Bookmark root' }).click()
   await page.getByRole('option', { name: /^All bookmarks/ }).click()
-  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
-  await expect(page.getByRole('menuitem', { name: 'Add bookmark', exact: true })).toBeFocused()
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await expect(page.getByRole('menuitem', { name: 'Add new bookmark', exact: true })).toBeFocused()
   await page.keyboard.press('ArrowDown')
-  await expect(page.getByRole('menuitem', { name: 'Create folder / group', exact: true })).toBeFocused()
+  await expect(page.getByRole('menuitem', { name: 'Add new folder', exact: true })).toBeFocused()
   await page.keyboard.press('Escape')
   await expect(page.getByRole('menu')).toHaveCount(0)
 })
 
 test('create, edit, customize, resize, move, delete and Undo; dialogs close without exceptions', async ({ page }) => {
   await start(page)
-  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
-  await page.getByRole('menuitem', { name: 'Add bookmark', exact: true }).click()
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.getByRole('menuitem', { name: 'Add new bookmark', exact: true }).click()
   let dialog = page.getByRole('dialog')
   await dialog.getByLabel('Title', { exact: true }).fill('QA new favorite')
   await dialog.getByLabel('Website address', { exact: true }).fill('https://example.com/one')
@@ -93,9 +93,9 @@ test('group header opens its context menu from the keyboard; Escape closes and r
   await header.focus()
   await page.keyboard.press('Enter')
   await expect(page.getByRole('menu', { name: 'Actions for Work' })).toBeVisible()
-  await expect(page.getByRole('menuitem', { name: 'Add bookmark here' })).toBeFocused()
+  await expect(page.getByRole('menuitem', { name: 'Add new bookmark' })).toBeFocused()
   await page.keyboard.press('ArrowDown')
-  await expect(page.getByRole('menuitem', { name: 'Create child folder' })).toBeFocused()
+  await expect(page.getByRole('menuitem', { name: 'Add new folder' })).toBeFocused()
   await page.keyboard.press('Escape')
   await expect(page.getByRole('menu')).toHaveCount(0)
   await expect(header).toBeFocused()
@@ -104,16 +104,16 @@ test('group header opens its context menu from the keyboard; Escape closes and r
 test('folder create/rename, flat nested paths, whole-subtree delete and Undo with remapped IDs', async ({ page }) => {
   await start(page)
   await rightClickGroup(page, 'Learning')
-  await page.getByRole('menuitem', { name: 'Create child folder' }).click()
+  await page.getByRole('menuitem', { name: 'Add new folder' }).click()
   await page.getByRole('dialog').getByLabel('Folder name').fill('QA child')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await page.getByRole('button', { name: 'Create folder' }).click()
   await expect(group(page, 'QA child').locator('[data-testid="group-path"]')).toHaveText('Bookmarks bar / Learning /')
   await rightClickGroup(page, 'QA child')
   await page.getByRole('menuitem', { name: 'Rename folder' }).click()
   await page.getByRole('dialog').getByLabel('Folder name').fill('QA renamed child')
   await page.getByRole('button', { name: 'Save changes' }).click()
   await rightClickGroup(page, 'QA renamed child')
-  await page.getByRole('menuitem', { name: 'Add bookmark here' }).click()
+  await page.getByRole('menuitem', { name: 'Add new bookmark' }).click()
   await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('QA nested favorite')
   await page.getByRole('dialog').getByLabel('Website address', { exact: true }).fill('https://example.com/nested')
   await page.getByRole('dialog').getByRole('button', { name: 'Add bookmark', exact: true }).click()
@@ -209,7 +209,7 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('QA across tabs')
   await page.getByRole('dialog').getByRole('button', { name: 'Save changes' }).click()
   await expect(link(second, 'QA across tabs')).toBeVisible()
-  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('radio', { name: 'Dark', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
@@ -228,7 +228,7 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'catppuccin-mocha')
   await page.setViewportSize({ width: 800, height: 600 })
-  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await expect(page.getByRole('complementary', { name: 'Settings' })).toBeVisible()
   await page.keyboard.press('Escape')
@@ -236,7 +236,7 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   expect(secondErrors).toEqual([])
 })
 
-test('right-click and keyboard selection open the app bar; Escape and the canvas clear it', async ({ page }) => {
+test('right-click and keyboard selection open the app bar; Escape and the board clear it', async ({ page }) => {
   await start(page)
   const steam = link(page, 'Steam')
   const bar = appBar(page)
@@ -266,10 +266,10 @@ test('right-click and keyboard selection open the app bar; Escape and the canvas
   await page.keyboard.press('Escape')
   await expect(bar).toHaveCount(0)
   await expect(steam).toBeFocused()
-  // Pressing the canvas drops the selection too.
+  // Pressing the board drops the selection too.
   await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
-  await page.locator('#canvas').click({ position: { x: 25, y: 20 } })
+  await page.locator('#board').click({ position: { x: 25, y: 20 } })
   await expect(bar).toHaveCount(0)
 })
 
@@ -319,7 +319,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch to dark mode (catppuccin-mocha) via Appearance dialog
-  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('radio', { name: 'Dark', exact: true }).click()
   await page.keyboard.press('Escape')
@@ -329,7 +329,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await expect(steam).toHaveCSS('color', 'rgb(0, 0, 0)')
 
   // Switch back to light mode
-  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('radio', { name: 'Light', exact: true }).click()
   await page.keyboard.press('Escape')
@@ -339,7 +339,7 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch theme to one-light (another light theme with different accent colors)
-  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
   await page.getByRole('button', { name: 'One Light', exact: true }).click()
@@ -355,7 +355,7 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
   await page.emulateMedia({ colorScheme: 'light' })
   await page.goto('/')
   await expect(draggable(page, 'steam')).toBeVisible()
-  await page.locator('#canvas').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('tab', { name: 'Tiles', exact: true }).click()
   await page.getByRole('radio', { name: 'Compact', exact: true }).click()
@@ -421,10 +421,10 @@ test('folder tiles render with previews and scroll to their group', async ({ pag
   // The folder's own group keeps its bookmark tiles plus its subfolder tile.
   await expect(group(page, 'Learning').locator('button[data-grid-id="tools"]')).toBeVisible()
   await expect(group(page, 'Tools').locator('a[data-grid-id="storybook"]')).toBeVisible()
-  // Activating the folder tile pans the canvas and flashes its group.
-  const before = await page.locator('#canvas').evaluate(element => element.scrollLeft)
+  // Activating the folder tile pans the board and flashes its folder.
+  const before = await page.locator('#board').evaluate(element => element.scrollLeft)
   await workTile.click()
-  await expect.poll(async () => page.locator('#canvas').evaluate(element => element.scrollLeft)).toBeGreaterThan(before)
+  await expect.poll(async () => page.locator('#board').evaluate(element => element.scrollLeft)).toBeGreaterThan(before)
   await expect(group(page, 'Work')).toHaveClass(/animate-flash/)
   // The flash clears after ~1s.
   await expect(group(page, 'Work')).not.toHaveClass(/animate-flash/, { timeout: 2500 })

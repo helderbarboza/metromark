@@ -39,9 +39,9 @@ type RootTranslation = {
 		 */
 		addressCopied: string
 		/**
-		 * Y​o​u​r​ ​c​a​n​v​a​s
+		 * Y​o​u​r​ ​b​o​a​r​d
 		 */
-		yourCanvas: string
+		yourBoard: string
 		/**
 		 * T​i​l​e
 		 */
@@ -51,9 +51,9 @@ type RootTranslation = {
 		 */
 		folder: string
 		/**
-		 * C​a​n​v​a​s​ ​a​c​t​i​o​n​s
+		 * B​o​a​r​d​ ​a​c​t​i​o​n​s
 		 */
-		canvasActions: string
+		boardActions: string
 		/**
 		 * A​c​t​i​o​n​s​ ​f​o​r​ ​{​t​i​t​l​e​}
 		 * @param {unknown} title
@@ -81,20 +81,20 @@ type RootTranslation = {
 		 */
 		sampleRestored: string
 		/**
-		 * B​o​o​k​m​a​r​k​ ​t​i​l​e​ ​c​a​n​v​a​s
+		 * B​o​o​k​m​a​r​k​ ​t​i​l​e​ ​b​o​a​r​d
 		 */
-		bookmarkCanvas: string
+		bookmarkBoard: string
 		/**
 		 * T​i​l​e​s​ ​i​n​ ​{​p​a​t​h​}
 		 * @param {unknown} path
 		 */
 		tilesIn: RequiredParams<'path'>
 		/**
-		 * U​n​n​a​m​e​d​ ​g​r​o​u​p
+		 * U​n​n​a​m​e​d​ ​f​o​l​d​e​r
 		 */
 		unnamedGroup: string
 		/**
-		 * U​n​g​r​o​u​p​e​d​ ​b​o​o​k​m​a​r​k​s
+		 * B​o​o​k​m​a​r​k​s
 		 */
 		ungroupedBookmarks: string
 		/**
@@ -110,7 +110,7 @@ type RootTranslation = {
 		 */
 		emptyFolderTitle: string
 		/**
-		 * A​d​d​ ​a​ ​b​o​o​k​m​a​r​k​ ​o​r​ ​m​o​v​e​ ​t​i​l​e​s​ ​h​e​r​e​ ​f​r​o​m​ ​a​n​y​ ​o​t​h​e​r​ ​g​r​o​u​p​.
+		 * A​d​d​ ​a​ ​b​o​o​k​m​a​r​k​ ​o​r​ ​m​o​v​e​ ​t​i​l​e​s​ ​h​e​r​e​ ​f​r​o​m​ ​a​n​y​ ​o​t​h​e​r​ ​f​o​l​d​e​r​.
 		 */
 		emptyFolderDescription: string
 		/**
@@ -146,12 +146,12 @@ type RootTranslation = {
 		 */
 		shrinkTile: RequiredParams<'name' | 'noun' | 'size'>
 		/**
-		 * F​o​l​d​e​r​ ​{​t​i​t​l​e​}​.​ ​R​i​g​h​t​-​c​l​i​c​k​ ​t​o​ ​s​e​l​e​c​t​.​ ​S​p​a​c​e​ ​t​o​ ​p​i​c​k​ ​u​p​ ​a​n​d​ ​m​o​v​e​;​ ​a​r​r​o​w​ ​k​e​y​s​ ​t​o​ ​m​o​v​e​;​ ​E​s​c​a​p​e​ ​t​o​ ​c​a​n​c​e​l​.​ ​A​c​t​i​v​a​t​i​n​g​ ​s​c​r​o​l​l​s​ ​t​o​ ​t​h​i​s​ ​f​o​l​d​e​r​’​s​ ​g​r​o​u​p​.
+		 * F​o​l​d​e​r​ ​{​t​i​t​l​e​}​.​ ​R​i​g​h​t​-​c​l​i​c​k​ ​t​o​ ​s​e​l​e​c​t​.​ ​S​p​a​c​e​ ​t​o​ ​p​i​c​k​ ​u​p​ ​a​n​d​ ​m​o​v​e​;​ ​a​r​r​o​w​ ​k​e​y​s​ ​t​o​ ​m​o​v​e​;​ ​E​s​c​a​p​e​ ​t​o​ ​c​a​n​c​e​l​.​ ​A​c​t​i​v​a​t​i​n​g​ ​s​c​r​o​l​l​s​ ​t​o​ ​t​h​i​s​ ​f​o​l​d​e​r​.
 		 * @param {unknown} title
 		 */
 		folderTileLabel: RequiredParams<'title'>
 		/**
-		 * F​o​l​d​e​r​ ​{​t​i​t​l​e​}​.​ ​A​c​t​i​v​a​t​i​n​g​ ​s​c​r​o​l​l​s​ ​t​o​ ​t​h​i​s​ ​f​o​l​d​e​r​’​s​ ​g​r​o​u​p​.
+		 * F​o​l​d​e​r​ ​{​t​i​t​l​e​}​.​ ​A​c​t​i​v​a​t​i​n​g​ ​s​c​r​o​l​l​s​ ​t​o​ ​t​h​i​s​ ​f​o​l​d​e​r​.
 		 * @param {unknown} title
 		 */
 		folderTileSummary: RequiredParams<'title'>
@@ -194,11 +194,11 @@ type RootTranslation = {
 		 */
 		deleteBookmark: string
 		/**
-		 * A​d​d​ ​b​o​o​k​m​a​r​k​ ​h​e​r​e
+		 * A​d​d​ ​n​e​w​ ​b​o​o​k​m​a​r​k
 		 */
 		addBookmarkHere: string
 		/**
-		 * C​r​e​a​t​e​ ​c​h​i​l​d​ ​f​o​l​d​e​r
+		 * A​d​d​ ​n​e​w​ ​f​o​l​d​e​r
 		 */
 		createChildFolder: string
 		/**
@@ -214,21 +214,17 @@ type RootTranslation = {
 		 */
 		deleteFolder: string
 		/**
-		 * A​d​d​ ​b​o​o​k​m​a​r​k
+		 * A​d​d​ ​n​e​w​ ​b​o​o​k​m​a​r​k
 		 */
 		addBookmark: string
 		/**
-		 * C​r​e​a​t​e​ ​f​o​l​d​e​r​ ​/​ ​g​r​o​u​p
+		 * A​d​d​ ​n​e​w​ ​f​o​l​d​e​r
 		 */
 		createFolderGroup: string
 		/**
 		 * C​l​e​a​r​ ​s​e​l​e​c​t​i​o​n
 		 */
 		clearSelection: string
-		/**
-		 * S​e​a​r​c​h​ ​b​o​o​k​m​a​r​k​s
-		 */
-		searchBookmarks: string
 		/**
 		 * A​p​p​e​a​r​a​n​c​e​ ​&​ ​s​e​t​t​i​n​g​s
 		 */
@@ -381,11 +377,11 @@ type RootTranslation = {
 		 */
 		addBookmark: string
 		/**
-		 * O​n​l​y​ ​t​h​i​s​ ​f​o​l​d​e​r​’​s​ ​n​a​m​e​ ​c​h​a​n​g​e​s​.​ ​D​e​s​c​e​n​d​a​n​t​ ​g​r​o​u​p​ ​p​a​t​h​s​ ​u​p​d​a​t​e​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.
+		 * O​n​l​y​ ​t​h​i​s​ ​f​o​l​d​e​r​’​s​ ​n​a​m​e​ ​c​h​a​n​g​e​s​.​ ​D​e​s​c​e​n​d​a​n​t​ ​f​o​l​d​e​r​ ​p​a​t​h​s​ ​u​p​d​a​t​e​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.
 		 */
 		renameIntro: string
 		/**
-		 * A​ ​b​o​o​k​m​a​r​k​ ​f​o​l​d​e​r​ ​b​e​c​o​m​e​s​ ​a​ ​t​i​l​e​ ​g​r​o​u​p​.​ ​N​e​s​t​e​d​ ​f​o​l​d​e​r​s​ ​g​e​t​ ​t​h​e​i​r​ ​o​w​n​ ​g​r​o​u​p​,​ ​t​o​o​.
+		 * A​ ​b​o​o​k​m​a​r​k​ ​f​o​l​d​e​r​ ​g​e​t​s​ ​i​t​s​ ​o​w​n​ ​h​e​a​d​i​n​g​ ​o​n​ ​t​h​e​ ​b​o​a​r​d​.​ ​N​e​s​t​e​d​ ​f​o​l​d​e​r​s​ ​g​e​t​ ​t​h​e​i​r​ ​o​w​n​ ​h​e​a​d​i​n​g​s​,​ ​t​o​o​.
 		 */
 		createGroupIntro: string
 		/**
@@ -401,7 +397,7 @@ type RootTranslation = {
 		 */
 		createInside: string
 		/**
-		 * C​r​e​a​t​e​ ​g​r​o​u​p
+		 * C​r​e​a​t​e​ ​f​o​l​d​e​r
 		 */
 		createGroup: string
 		/**
@@ -493,10 +489,6 @@ type RootTranslation = {
 		 */
 		folderUnavailable: string
 		/**
-		 * B​r​o​w​s​e​r​ ​r​o​o​t​s​ ​a​r​e​ ​k​e​p​t​ ​s​e​p​a​r​a​t​e​.​ ​T​h​e​r​e​ ​a​r​e​ ​n​o​ ​v​i​r​t​u​a​l​ ​g​r​o​u​p​s​.
-		 */
-		folderHint: string
-		/**
 		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​.
 		 */
 		somethingWrong: string
@@ -555,7 +547,7 @@ type RootTranslation = {
 	}
 	search: {
 		/**
-		 * F​i​n​d​ ​a​ ​b​o​o​k​m​a​r​k​…
+		 * S​e​a​r​c​h​…
 		 */
 		placeholder: string
 		/**
@@ -586,7 +578,7 @@ type RootTranslation = {
 		 */
 		searchBookmarks: string
 		/**
-		 * J​u​m​p​ ​t​o​ ​b​o​o​k​m​a​r​k​ ​g​r​o​u​p
+		 * J​u​m​p​ ​t​o​ ​b​o​o​k​m​a​r​k​ ​f​o​l​d​e​r
 		 */
 		jumpToGroup: string
 		/**
@@ -613,11 +605,11 @@ type RootTranslation = {
 		 */
 		demoTitle: string
 		/**
-		 * S​c​r​o​l​l​ ​g​r​o​u​p​s​ ​l​e​f​t
+		 * S​c​r​o​l​l​ ​f​o​l​d​e​r​s​ ​l​e​f​t
 		 */
 		scrollLeft: string
 		/**
-		 * S​c​r​o​l​l​ ​g​r​o​u​p​s​ ​r​i​g​h​t
+		 * S​c​r​o​l​l​ ​f​o​l​d​e​r​s​ ​r​i​g​h​t
 		 */
 		scrollRight: string
 	}
@@ -770,7 +762,7 @@ type RootTranslation = {
 		 */
 		gridView: string
 		/**
-		 * C​l​a​s​s​i​c​ ​s​p​r​e​a​d​s​ ​t​i​l​e​s​ ​a​c​r​o​s​s​ ​t​h​e​ ​c​a​n​v​a​s​;​ ​D​o​c​k​ ​p​a​c​k​s​ ​t​h​e​m​ ​a​l​o​n​g​ ​t​h​e​ ​b​o​t​t​o​m​ ​e​d​g​e
+		 * C​l​a​s​s​i​c​ ​s​p​r​e​a​d​s​ ​t​i​l​e​s​ ​a​c​r​o​s​s​ ​t​h​e​ ​b​o​a​r​d​;​ ​D​o​c​k​ ​p​a​c​k​s​ ​t​h​e​m​ ​a​l​o​n​g​ ​t​h​e​ ​b​o​t​t​o​m​ ​e​d​g​e
 		 */
 		gridViewHelp: string
 		/**
@@ -830,7 +822,7 @@ type RootTranslation = {
 		 */
 		layoutsHelp: string
 		/**
-		 * R​e​s​e​t​ ​t​i​l​e​ ​l​a​y​o​u​t​s​ ​f​o​r​ ​e​v​e​r​y​ ​g​r​o​u​p​?
+		 * R​e​s​e​t​ ​t​i​l​e​ ​l​a​y​o​u​t​s​ ​f​o​r​ ​e​v​e​r​y​ ​f​o​l​d​e​r​?
 		 */
 		confirmResetHelp: string
 		/**
@@ -1306,7 +1298,7 @@ type RootTranslation = {
 		 */
 		bookmarkAdded: string
 		/**
-		 * F​o​l​d​e​r​ ​c​r​e​a​t​e​d​.​ ​Y​o​u​r​ ​n​e​w​ ​g​r​o​u​p​ ​i​s​ ​r​e​a​d​y​.
+		 * F​o​l​d​e​r​ ​c​r​e​a​t​e​d​.
 		 */
 		folderCreated: string
 		/**
@@ -1322,7 +1314,7 @@ type RootTranslation = {
 		 */
 		bookmarkMoved: string
 		/**
-		 * F​o​l​d​e​r​ ​m​o​v​e​d​ ​t​o​ ​i​t​s​ ​n​e​w​ ​g​r​o​u​p​.
+		 * F​o​l​d​e​r​ ​m​o​v​e​d​ ​t​o​ ​i​t​s​ ​n​e​w​ ​l​o​c​a​t​i​o​n​.
 		 */
 		folderMovedNewGroup: string
 		/**
@@ -1408,11 +1400,11 @@ type RootTranslation = {
 		 */
 		hexColor: string
 		/**
-		 * I​n​v​a​l​i​d​ ​g​r​o​u​p​ ​l​a​y​o​u​t​s​.
+		 * I​n​v​a​l​i​d​ ​f​o​l​d​e​r​ ​l​a​y​o​u​t​s​.
 		 */
 		invalidGroupLayouts: string
 		/**
-		 * A​ ​t​i​l​e​ ​g​r​o​u​p​ ​m​u​s​t​ ​b​e​ ​a​ ​f​o​l​d​e​r​.
+		 * A​ ​f​o​l​d​e​r​ ​t​i​l​e​ ​m​u​s​t​ ​b​e​ ​a​ ​f​o​l​d​e​r​.
 		 */
 		groupMustBeFolder: string
 		/**
@@ -1420,11 +1412,11 @@ type RootTranslation = {
 		 */
 		tileChanged: string
 		/**
-		 * A​ ​t​i​l​e​ ​c​a​n​n​o​t​ ​b​e​l​o​n​g​ ​t​o​ ​t​w​o​ ​g​r​o​u​p​s​.
+		 * A​ ​t​i​l​e​ ​c​a​n​n​o​t​ ​b​e​l​o​n​g​ ​t​o​ ​t​w​o​ ​f​o​l​d​e​r​s​.
 		 */
 		tileTwoGroups: string
 		/**
-		 * M​o​v​e​ ​o​n​e​ ​i​t​e​m​ ​a​t​ ​a​ ​t​i​m​e​ ​b​e​t​w​e​e​n​ ​g​r​o​u​p​s​.
+		 * M​o​v​e​ ​o​n​e​ ​i​t​e​m​ ​a​t​ ​a​ ​t​i​m​e​ ​b​e​t​w​e​e​n​ ​f​o​l​d​e​r​s​.
 		 */
 		moveOneAtATime: string
 		/**
@@ -1508,7 +1500,7 @@ type RootTranslation = {
 		 */
 		invalidLayout: string
 		/**
-		 * A​ ​t​i​l​e​ ​c​a​n​n​o​t​ ​a​p​p​e​a​r​ ​t​w​i​c​e​ ​i​n​ ​a​ ​g​r​o​u​p​.
+		 * A​ ​t​i​l​e​ ​c​a​n​n​o​t​ ​a​p​p​e​a​r​ ​t​w​i​c​e​ ​i​n​ ​a​ ​f​o​l​d​e​r​.
 		 */
 		tileAppearsTwice: string
 		/**
@@ -1565,9 +1557,9 @@ export type TranslationFunctions = {
 		 */
 		addressCopied: () => LocalizedString
 		/**
-		 * Your canvas
+		 * Your board
 		 */
-		yourCanvas: () => LocalizedString
+		yourBoard: () => LocalizedString
 		/**
 		 * Tile
 		 */
@@ -1577,9 +1569,9 @@ export type TranslationFunctions = {
 		 */
 		folder: () => LocalizedString
 		/**
-		 * Canvas actions
+		 * Board actions
 		 */
-		canvasActions: () => LocalizedString
+		boardActions: () => LocalizedString
 		/**
 		 * Actions for {title}
 		 */
@@ -1605,19 +1597,19 @@ export type TranslationFunctions = {
 		 */
 		sampleRestored: () => LocalizedString
 		/**
-		 * Bookmark tile canvas
+		 * Bookmark tile board
 		 */
-		bookmarkCanvas: () => LocalizedString
+		bookmarkBoard: () => LocalizedString
 		/**
 		 * Tiles in {path}
 		 */
 		tilesIn: (arg: { path: unknown }) => LocalizedString
 		/**
-		 * Unnamed group
+		 * Unnamed folder
 		 */
 		unnamedGroup: () => LocalizedString
 		/**
-		 * Ungrouped bookmarks
+		 * Bookmarks
 		 */
 		ungroupedBookmarks: () => LocalizedString
 		/**
@@ -1633,7 +1625,7 @@ export type TranslationFunctions = {
 		 */
 		emptyFolderTitle: () => LocalizedString
 		/**
-		 * Add a bookmark or move tiles here from any other group.
+		 * Add a bookmark or move tiles here from any other folder.
 		 */
 		emptyFolderDescription: () => LocalizedString
 		/**
@@ -1661,11 +1653,11 @@ export type TranslationFunctions = {
 		 */
 		shrinkTile: (arg: { name: unknown, noun: unknown, size: unknown }) => LocalizedString
 		/**
-		 * Folder {title}. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel. Activating scrolls to this folder’s group.
+		 * Folder {title}. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel. Activating scrolls to this folder.
 		 */
 		folderTileLabel: (arg: { title: unknown }) => LocalizedString
 		/**
-		 * Folder {title}. Activating scrolls to this folder’s group.
+		 * Folder {title}. Activating scrolls to this folder.
 		 */
 		folderTileSummary: (arg: { title: unknown }) => LocalizedString
 		/**
@@ -1707,11 +1699,11 @@ export type TranslationFunctions = {
 		 */
 		deleteBookmark: () => LocalizedString
 		/**
-		 * Add bookmark here
+		 * Add new bookmark
 		 */
 		addBookmarkHere: () => LocalizedString
 		/**
-		 * Create child folder
+		 * Add new folder
 		 */
 		createChildFolder: () => LocalizedString
 		/**
@@ -1727,21 +1719,17 @@ export type TranslationFunctions = {
 		 */
 		deleteFolder: () => LocalizedString
 		/**
-		 * Add bookmark
+		 * Add new bookmark
 		 */
 		addBookmark: () => LocalizedString
 		/**
-		 * Create folder / group
+		 * Add new folder
 		 */
 		createFolderGroup: () => LocalizedString
 		/**
 		 * Clear selection
 		 */
 		clearSelection: () => LocalizedString
-		/**
-		 * Search bookmarks
-		 */
-		searchBookmarks: () => LocalizedString
 		/**
 		 * Appearance & settings
 		 */
@@ -1893,11 +1881,11 @@ export type TranslationFunctions = {
 		 */
 		addBookmark: () => LocalizedString
 		/**
-		 * Only this folder’s name changes. Descendant group paths update automatically.
+		 * Only this folder’s name changes. Descendant folder paths update automatically.
 		 */
 		renameIntro: () => LocalizedString
 		/**
-		 * A bookmark folder becomes a tile group. Nested folders get their own group, too.
+		 * A bookmark folder gets its own heading on the board. Nested folders get their own headings, too.
 		 */
 		createGroupIntro: () => LocalizedString
 		/**
@@ -1913,7 +1901,7 @@ export type TranslationFunctions = {
 		 */
 		createInside: () => LocalizedString
 		/**
-		 * Create group
+		 * Create folder
 		 */
 		createGroup: () => LocalizedString
 		/**
@@ -2001,10 +1989,6 @@ export type TranslationFunctions = {
 		 */
 		folderUnavailable: () => LocalizedString
 		/**
-		 * Browser roots are kept separate. There are no virtual groups.
-		 */
-		folderHint: () => LocalizedString
-		/**
 		 * Something went wrong.
 		 */
 		somethingWrong: () => LocalizedString
@@ -2061,7 +2045,7 @@ export type TranslationFunctions = {
 	}
 	search: {
 		/**
-		 * Find a bookmark…
+		 * Search…
 		 */
 		placeholder: () => LocalizedString
 		/**
@@ -2091,7 +2075,7 @@ export type TranslationFunctions = {
 		 */
 		searchBookmarks: () => LocalizedString
 		/**
-		 * Jump to bookmark group
+		 * Jump to bookmark folder
 		 */
 		jumpToGroup: () => LocalizedString
 		/**
@@ -2115,11 +2099,11 @@ export type TranslationFunctions = {
 		 */
 		demoTitle: () => LocalizedString
 		/**
-		 * Scroll groups left
+		 * Scroll folders left
 		 */
 		scrollLeft: () => LocalizedString
 		/**
-		 * Scroll groups right
+		 * Scroll folders right
 		 */
 		scrollRight: () => LocalizedString
 	}
@@ -2269,7 +2253,7 @@ export type TranslationFunctions = {
 		 */
 		gridView: () => LocalizedString
 		/**
-		 * Classic spreads tiles across the canvas; Dock packs them along the bottom edge
+		 * Classic spreads tiles across the board; Dock packs them along the bottom edge
 		 */
 		gridViewHelp: () => LocalizedString
 		/**
@@ -2329,7 +2313,7 @@ export type TranslationFunctions = {
 		 */
 		layoutsHelp: () => LocalizedString
 		/**
-		 * Reset tile layouts for every group?
+		 * Reset tile layouts for every folder?
 		 */
 		confirmResetHelp: () => LocalizedString
 		/**
@@ -2793,7 +2777,7 @@ export type TranslationFunctions = {
 		 */
 		bookmarkAdded: () => LocalizedString
 		/**
-		 * Folder created. Your new group is ready.
+		 * Folder created.
 		 */
 		folderCreated: () => LocalizedString
 		/**
@@ -2809,7 +2793,7 @@ export type TranslationFunctions = {
 		 */
 		bookmarkMoved: () => LocalizedString
 		/**
-		 * Folder moved to its new group.
+		 * Folder moved to its new location.
 		 */
 		folderMovedNewGroup: () => LocalizedString
 		/**
@@ -2895,11 +2879,11 @@ export type TranslationFunctions = {
 		 */
 		hexColor: () => LocalizedString
 		/**
-		 * Invalid group layouts.
+		 * Invalid folder layouts.
 		 */
 		invalidGroupLayouts: () => LocalizedString
 		/**
-		 * A tile group must be a folder.
+		 * A folder tile must be a folder.
 		 */
 		groupMustBeFolder: () => LocalizedString
 		/**
@@ -2907,11 +2891,11 @@ export type TranslationFunctions = {
 		 */
 		tileChanged: () => LocalizedString
 		/**
-		 * A tile cannot belong to two groups.
+		 * A tile cannot belong to two folders.
 		 */
 		tileTwoGroups: () => LocalizedString
 		/**
-		 * Move one item at a time between groups.
+		 * Move one item at a time between folders.
 		 */
 		moveOneAtATime: () => LocalizedString
 		/**
@@ -2995,7 +2979,7 @@ export type TranslationFunctions = {
 		 */
 		invalidLayout: () => LocalizedString
 		/**
-		 * A tile cannot appear twice in a group.
+		 * A tile cannot appear twice in a folder.
 		 */
 		tileAppearsTwice: () => LocalizedString
 		/**

@@ -1,5 +1,5 @@
 /**
- * Smooth horizontal canvas scrolling for the Metro tile canvas.
+ * Smooth horizontal board scrolling for the Metro tile board.
  *
  * Owns the wheel-driven easing loop (requestAnimationFrame), the scroll
  * progress/canScroll/activeGroup state read by the footer, and the rule
@@ -63,7 +63,7 @@ export class SmoothScroller {
    * A user scroll (wheel/touchpad) dismisses the context menu. Incidental
    * programmatic scrolls (layout transitions, scrollIntoView) do not.
    */
-  closeMenuOnCanvasScroll = () => {
+  closeMenuOnBoardScroll = () => {
     if (this.#isMenuOpen() && performance.now() - this.#wheelIntentAt < 600)
       this.#closeMenu()
     this.updateScroll()

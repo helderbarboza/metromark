@@ -7,8 +7,8 @@
  * threshold selects; crossing it picks the tile up.
  *
  * The gesture must run perpendicular to the direction the surface pans, and
- * this canvas pans horizontally - so only a mostly-vertical drag selects or
- * moves a tile. A horizontal swipe is left to the canvas to pan.
+ * the board pans horizontally - so only a mostly-vertical drag selects or
+ * moves a tile. A horizontal swipe is left to the board to pan.
  */
 
 /** Distance before a touch drag means anything: reveals the selection check. */
@@ -42,7 +42,7 @@ export function crossSlideState(gesture: Gesture, point: Point): CrossSlideState
   const distance = Math.hypot(dx, dy)
   if (distance < REVEAL_PX)
     return 'idle'
-  // Perpendicular to the pan direction: a horizontal swipe belongs to the canvas.
+  // Perpendicular to the pan direction: a horizontal swipe belongs to the board.
   if (Math.abs(dx) > Math.abs(dy))
     return 'panning'
   return distance >= DRAG_PX ? 'dragging' : 'armed'
@@ -50,7 +50,7 @@ export function crossSlideState(gesture: Gesture, point: Point): CrossSlideState
 
 /**
  * Advances a gesture. Panning and dragging are terminal for this layer: the
- * canvas owns a pan, and the grid owns a drag once it has started.
+ * board owns a pan, and the grid owns a drag once it has started.
  */
 export function advanceGesture(gesture: Gesture, point: Point): Gesture {
   if (gesture.state === 'panning' || gesture.state === 'dragging')
