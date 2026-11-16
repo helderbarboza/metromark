@@ -49,7 +49,9 @@
     },
   }
   const folderLayout: Layout = [
-    ...layout.map(entry => entry.i === 'slack' ? { ...entry, x: 4 as const, y: 4 as const } : entry),
+    ...layout.map(entry => entry.i === 'slack'
+      ? { ...entry, x: 4 as const, y: 4 as const }
+      : entry),
     { i: folderTileId, x: 2, y: 4, w: 2, h: 2 },
   ]
 
@@ -199,7 +201,10 @@
   template={selectionTemplate}
   play={async ({ canvas, canvasElement }) => {
     await expect(await canvas.findByRole('link', { name: /^Open Steam/ })).toBeVisible()
-    await expect(canvasElement.querySelectorAll('.metro-tile.selected')).toHaveLength(1)
+    const selected = canvasElement.querySelectorAll(
+      '[data-testid="bookmark-tile"][data-selected]',
+    )
+    await expect(selected).toHaveLength(1)
   }}
 />
 
@@ -227,7 +232,15 @@
 />
 <Story
   name='With folder tile'
-  args={{ group: { ...group, layout: folderLayout, tiles: folderTiles }, layout: folderLayout, tiles: folderTiles }}
+  args={{
+    group: {
+      ...group,
+      layout: folderLayout,
+      tiles: folderTiles,
+    },
+    layout: folderLayout,
+    tiles: folderTiles,
+  }}
   {template}
   play={async ({ canvas }) => {
     await expect(await canvas.findByRole('button', { name: /^Folder Design system/ })).toBeVisible()

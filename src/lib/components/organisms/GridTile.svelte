@@ -89,6 +89,11 @@
   const bookmarkTile = $derived(tile.kind === 'bookmark' ? tile : undefined)
   // Unsupported addresses stay in the tree but must never be launched (see validateUrl).
   const href = $derived(bookmarkTile ? safeUrl(bookmarkTile.url) : undefined)
+  const bookmarkLabel = $derived(bookmarkTile
+    ? `Open ${bookmarkTile.title}${
+      showDomains && bookmarkTile.size !== 'small' ? ` ${bookmarkTile.domain}` : ''
+    }. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel.`
+    : '')
 
   function pointerdown(event: PointerEvent) {
     swallowClick = false
@@ -224,9 +229,7 @@
     showDomain={showDomains}
     href={href}
     target={preview ? '_blank' : undefined}
-    ariaLabel="Open {bookmarkTile.title}{showDomains && bookmarkTile.size !== 'small'
-      ? ` ${bookmarkTile.domain}`
-      : ''}. Right-click to select. Space to pick up and move; arrow keys to move; Escape to cancel."
+    ariaLabel={bookmarkLabel}
     ariaRoleDescription='draggable bookmark'
     draggable={false}
     class={cn(

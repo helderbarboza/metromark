@@ -58,10 +58,22 @@
 {/snippet}
 <Story
   name='Small'
-  args={{ size: 'small', tile: { id: 'design', kind: 'folder', colorIndex: 5, title: 'Design system', size: 'small', writable: true, preview: fullPreview.slice(0, 4) } }}
+  args={{
+    size: 'small',
+    tile: {
+      id: 'design',
+      kind: 'folder',
+      colorIndex: 5,
+      title: 'Design system',
+      size: 'small',
+      writable: true,
+      preview: fullPreview.slice(0, 4),
+    },
+  }}
   {template}
   play={async ({ canvas }) => {
-    await expect(canvas.getByRole('button', { name: 'Folder Design system' })).toBeVisible()
+    await expect(canvas
+      .getByRole('button', { name: 'Folder Design system' })).toBeVisible()
   }}
 />
 <Story
@@ -70,50 +82,124 @@
 />
 <Story
   name='Wide'
-  args={{ size: 'wide', tile: { id: 'design', kind: 'folder', colorIndex: 5, title: 'Design system', size: 'wide', writable: true, preview: fullPreview.slice(0, 12) } }}
+  args={{
+    size: 'wide',
+    tile: {
+      id: 'design',
+      kind: 'folder',
+      colorIndex: 5,
+      title: 'Design system',
+      size: 'wide',
+      writable: true,
+      preview: fullPreview.slice(0, 12),
+    },
+  }}
   {template}
 />
 <Story
   name='Large'
-  args={{ size: 'large', tile: { id: 'design', kind: 'folder', colorIndex: 5, title: 'Design system', size: 'large', writable: true, preview: fullPreview } }}
+  args={{
+    size: 'large',
+    tile: {
+      id: 'design',
+      kind: 'folder',
+      colorIndex: 5,
+      title: 'Design system',
+      size: 'large',
+      writable: true,
+      preview: fullPreview,
+    },
+  }}
   {template}
 />
 <Story
   name='Empty folder'
-  args={{ tile: { id: 'quiet', kind: 'folder', colorIndex: 5, title: 'Quiet reading list', size: 'medium', writable: true, preview: [] } }}
+  args={{
+    tile: {
+      id: 'quiet',
+      kind: 'folder',
+      colorIndex: 5,
+      title: 'Quiet reading list',
+      size: 'medium',
+      writable: true,
+      preview: [],
+    },
+  }}
   {template}
   play={async ({ canvas }) => {
-    await expect(canvas.getByRole('button', { name: 'Folder Quiet reading list' })).toBeVisible()
+    await expect(canvas
+      .getByRole('button', { name: 'Folder Quiet reading list' })).toBeVisible()
   }}
 />
 <Story
   name='Selected'
-  args={{ selected: true, onresize: fn() }}
+  args={{
+    selected: true,
+    onresize: fn(),
+  }}
   {template}
   play={async ({ canvas }) => {
-    await expect(canvas.getByRole('button', { name: 'Grow Design system folder tile to wide' })).toBeVisible()
+    await expect(canvas
+      .getByRole('button', { name: 'Grow Design system folder tile to wide' })).toBeVisible()
   }}
 />
 <Story
   name='Largest'
-  args={{ selected: true, size: 'large', onresize: fn() }}
+  args={{
+    selected: true,
+    size: 'large',
+    onresize: fn(),
+  }}
   {template}
   play={async ({ canvas }) => {
-    await expect(canvas.getByRole('button', { name: 'Shrink Design system folder tile to small' })).toBeVisible()
+    await expect(canvas
+      .getByRole('button', { name: 'Shrink Design system folder tile to small' })).toBeVisible()
   }}
 />
 <Story
   name='Custom color'
-  args={{ tile: { id: 'design', kind: 'folder', title: 'Design system', size: 'medium', writable: true, colorIndex: 3, color: '#7a4ff3', preview: fullPreview.slice(0, 6) } }}
+  args={{
+    tile: {
+      id: 'design',
+      kind: 'folder',
+      title: 'Design system',
+      size: 'medium',
+      writable: true,
+      colorIndex: 3,
+      color: '#7a4ff3',
+      preview: fullPreview.slice(0, 6),
+    },
+  }}
   {template}
 />
 <Story
   name='Read-only'
-  args={{ tile: { id: 'design', kind: 'folder', colorIndex: 5, title: 'Design system', size: 'medium', writable: false, preview: fullPreview.slice(0, 6) } }}
+  args={{
+    tile: {
+      id: 'design',
+      kind: 'folder',
+      colorIndex: 5,
+      title: 'Design system',
+      size: 'medium',
+      writable: false,
+      preview: fullPreview.slice(0, 6),
+    },
+  }}
   {template}
 />
 <Story
   name='Long title'
-  args={{ tile: { id: 'design', kind: 'folder', colorIndex: 5, title: 'A folder with a very long but completely safe title', size: 'wide', writable: true, preview: fullPreview.slice(0, 12) }, size: 'wide' }}
+  args={{
+    tile: {
+      id: 'design',
+      kind: 'folder',
+      colorIndex: 5,
+      title: 'A folder with a very long but completely safe title',
+      size: 'wide',
+      writable: true,
+      preview: fullPreview.slice(0, 12),
+    },
+    size: 'wide',
+  }}
   {template}
 />
