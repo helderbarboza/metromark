@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { ShaderDefinition } from '$lib/shaders'
   import type { ShaderMetrics } from '$lib/shaders/metrics.svelte'
+  import type { ShaderPipeline } from '$lib/shaders/pipeline'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { FrameHealth } from '$lib/shaders/health'
   import { publishMetrics } from '$lib/shaders/metrics.svelte'
@@ -77,6 +78,35 @@
     animState.enabled = animated
   })
 
+  // Same pattern for the frame budget and render scale. The render loop reads
+  // these every frame; tracking them in the build effect would tear the
+  // pipeline down and recompile the shaders on every adjustment. The live
+  // effect below applies them to the running pipeline instead.
+  const effectiveScale = $derived(
+    renderScale ?? shader.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale,
+  )
+  const limits = {
+    fps: untrack(() => targetFps),
+    scale: untrack(() => effectiveScale),
+  }
+  /** The running pipeline, set by the build effect; used by the live effect. */
+  let livePipeline: ShaderPipeline | null = null
+  // Reset hook into the adaptive-quality state, wired up by the build effect.
+  // A rebuild would start from a fresh state, so an explicit user override
+  // gets the same fresh start.
+  let resetAdaptive: (() => void) | null = null
+  $effect(() => {
+    const fps = targetFps
+    const scale = effectiveScale
+    const scaleChanged = limits.scale !== scale
+    limits.fps = fps
+    limits.scale = scale
+    if (scaleChanged) {
+      livePipeline?.setScale(scale)
+      resetAdaptive?.()
+    }
+  })
+
   let canvas = $state<HTMLCanvasElement | null>(null)
   // Set when the pipeline cannot start; hides the canvas so the base color
   // layer shows instead of an opaque black rectangle.
@@ -85,20 +115,12 @@
   // so snapshot updates that do not change this setting keep the WebGL context
   // and the animation time.
   const motion = $derived(reducedMotion)
-  // Same reason: reading `renderScale` straight from the props inside the effect
-  // subscribes it to the whole snapshot, so every bookmark refresh (including the
-  // focus refresh when returning to the tab) rebuilt the pipeline and restarted
-  // the shader. Resolve the scale once and only rebuild when it really changes.
-  const effectiveScale = $derived(
-    renderScale ?? shader.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale,
-  )
 
   $effect(() => {
     const element = canvas
     // Tracked reads: the context and programs are rebuilt when either changes.
     const paused = motion
     const definition = shader
-    const scale = effectiveScale
     if (!element)
       return
 
@@ -132,18 +154,27 @@
           width: Math.max(1, Math.round(element.clientWidth * pixelRatio * currentScale)),
           height: Math.max(1, Math.round(element.clientHeight * pixelRatio * currentScale)),
         }),
-        initialScale: scale,
+        // Prime the pipeline with the latest setting, not the mount-time one.
+        initialScale: limits.scale,
         paused,
         // Static pages (reduced motion, non-animating background) redraw once
         // after an image texture uploads; animated ones pick it up next frame.
-        redrawOnImage: paused || targetFps < 0,
+        redrawOnImage: paused || limits.fps < 0,
         mouseState,
       })
       cleanups.push(() => pipeline.dispose())
+      livePipeline = pipeline
+      cleanups.push(() => {
+        if (livePipeline === pipeline)
+          livePipeline = null
+        resetAdaptive = null
+      })
 
       const health = new FrameHealth()
-      const scale0 = scale
-      const fps0 = Math.min(targetFps > 0 ? targetFps : 60, 60)
+      // Read through `limits` at the point of use so the live effect's updates
+      // take effect without a rebuild.
+      const scale0 = () => limits.scale
+      const fps0 = () => Math.min(limits.fps > 0 ? limits.fps : 60, 60)
       const preference = quality
       let load = 1
       let frozen = false
@@ -151,6 +182,13 @@
       let healthySince = 0
       let lastPublish = 0
       let contextLosses = 0
+      resetAdaptive = () => {
+        load = 1
+        frozen = false
+        cooldownUntil = 0
+        healthySince = 0
+        health.reset()
+      }
       // --- per-frame state -------------------------------------------------
       let animationFrame = 0
       let elapsed = 0
@@ -176,13 +214,13 @@
         health.push(now, !frozen)
         const verdict = health.verdict()
         if (!frozen && verdict === 'struggling' && now >= cooldownUntil) {
-          const floor = loadFloor(preference, scale0, fps0)
+          const floor = loadFloor(preference, scale0(), fps0())
           load = nextLoad(load, 'decrease', floor)
-          const solution = solveQuality(preference, load, scale0, fps0, health.displayHz() || 60)
+          const solution = solveQuality(preference, load, scale0(), fps0(), health.displayHz() || 60)
           pipeline.setScale(solution.scale)
           cooldownUntil = now + 10000
           healthySince = 0
-          if (isFrozen(load, preference, scale0, fps0)) {
+          if (isFrozen(load, preference, scale0(), fps0())) {
             frozen = true
             onstruggle?.()
           }
@@ -191,9 +229,9 @@
           if (healthySince === 0)
             healthySince = now
           if (now - healthySince >= 10000) {
-            const floor = loadFloor(preference, scale0, fps0)
+            const floor = loadFloor(preference, scale0(), fps0())
             load = nextLoad(load, 'increase', floor)
-            const solution = solveQuality(preference, load, scale0, fps0, health.displayHz() || 60)
+            const solution = solveQuality(preference, load, scale0(), fps0(), health.displayHz() || 60)
             pipeline.setScale(solution.scale)
             healthySince = now
           }
@@ -211,7 +249,7 @@
             scale: pipeline.currentScale(),
             quality: preference,
             level: frozen ? 'frozen' : load < 0.99 ? 'reduced' : 'full',
-            targetFps: fps0,
+            targetFps: fps0(),
           }
           publishMetrics(snapshot)
         }
@@ -227,10 +265,10 @@
         // away when the pipeline is not otherwise producing frames.
         if (appliedMouseEnabled !== mouseState.enabled) {
           appliedMouseEnabled = mouseState.enabled
-          if (targetFps < 0)
+          if (limits.fps < 0)
             pipeline.renderFrame(elapsed)
         }
-        if (targetFps < 0) {
+        if (limits.fps < 0) {
           if (!staticRendered) {
             pipeline.renderFrame(elapsed)
             staticRendered = true
@@ -238,9 +276,10 @@
           return
         }
         staticRendered = false
-        if (targetFps > 0) {
+        const fpsCap = limits.fps
+        if (fpsCap > 0) {
           // Allow a small margin so a 60 FPS cap does not halve the frame rate.
-          if (now - lastRender < 1000 / targetFps - 1)
+          if (now - lastRender < 1000 / fpsCap - 1)
             return
           lastRender = now
         }
