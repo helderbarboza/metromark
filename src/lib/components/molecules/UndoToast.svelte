@@ -25,7 +25,7 @@
     data-testid='toast-icon'
     class='flex {notice.tone === 'error' ? 'text-(--destructive)' : 'text-(--success)'}'
   >
-    <Icon name={notice.tone === 'error' ? 'close' : 'check'} size={16} />
+    <Icon name={notice.tone === 'error' ? 'errorCircle' : 'check'} size={16} />
   </span>
   <span
     data-testid='toast-message'

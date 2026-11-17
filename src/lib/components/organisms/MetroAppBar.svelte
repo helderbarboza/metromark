@@ -86,7 +86,7 @@
         : $LL.appBar.moveSelectedBookmark()}
       onclick={onmove}
     >
-      <Icon name='folder' size={15} />
+      <Icon name='folderArrowRight' size={15} />
     </button>
     {#if ondelete}
       <button

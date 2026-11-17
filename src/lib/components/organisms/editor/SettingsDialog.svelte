@@ -149,7 +149,7 @@
     </SettingsCard>
 
     <SettingsCard
-      icon='globe'
+      icon='translate'
       title={$LL.settings.language()}
       helpText={$LL.settings.languageHelp()}
       controlId='language'
@@ -206,7 +206,7 @@
 
   <Tabs.Content value='tiles' class='mt-4 grid animate-rise-enter gap-1'>
     <SettingsCard
-      icon='customize'
+      icon='layoutCellFour'
       title={$LL.settings.gridView()}
       helpText={$LL.settings.gridViewHelp()}
       controlId='grid-view'
@@ -258,7 +258,7 @@
       </ToggleGroup.Root>
     </SettingsCard>
     <SettingsCard
-      icon='globe'
+      icon='link'
       title={$LL.settings.showAddresses()}
       helpText={$LL.settings.showAddressesHelp()}
       controlId='show-domains'
@@ -283,7 +283,7 @@
       />
     </SettingsCard>
     <SettingsCard
-      icon='color'
+      icon='imageGlobe'
       title={$LL.settings.originalFavicons()}
       helpText={$LL.settings.originalFaviconsHelp()}
       controlId='original-favicons'
@@ -333,7 +333,7 @@
       />
     </SettingsCard>
     <SettingsCard
-      icon='refresh'
+      icon='arrowReset'
       title={$LL.settings.resetLayouts()}
       helpText={layoutsHelp}
       controlId='reset-layouts'
