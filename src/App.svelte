@@ -11,7 +11,6 @@
   import LL, { locale } from '$i18n/i18n-svelte'
   import { isMediaKey } from '$lib/background-image'
   import MenuItems from '$lib/components/molecules/MenuItems.svelte'
-  import UndoToast from '$lib/components/molecules/UndoToast.svelte'
   import WorkspaceFooter from '$lib/components/molecules/WorkspaceFooter.svelte'
   import BoardContextMenu from '$lib/components/organisms/BoardContextMenu.svelte'
   import Editor from '$lib/components/organisms/Editor.svelte'
@@ -20,6 +19,7 @@
   import RootsSelect from '$lib/components/organisms/RootsSelect.svelte'
   import SettingsDrawer from '$lib/components/organisms/SettingsDrawer.svelte'
   import ThemeSync from '$lib/components/ThemeSync.svelte'
+  import { Toaster } from '$lib/components/ui/sonner'
   import * as Tooltip from '$lib/components/ui/tooltip'
   import { BACKGROUND_DEFAULTS, SETTINGS_DEFAULTS } from '$lib/config'
   import { toggleSelection } from '$lib/interaction'
@@ -47,6 +47,7 @@
   import { filterVisibleGroups } from '$lib/visible-groups'
   import { setWorkspace } from '$lib/workspace-context'
   import { onMount } from 'svelte'
+  import { toast } from 'svelte-sonner'
   import { MediaQuery } from 'svelte/reactivity'
   import { fly } from 'svelte/transition'
 
@@ -87,8 +88,6 @@
   let menuContentEl = $state<HTMLDivElement | null>(null)
   /** Element to refocus when the context menu closes. */
   let menuOrigin: HTMLElement | null = null
-  let notice = $state<Notice | null>(null)
-  let noticeUntil = $state(0)
   const smoothScroll = new SmoothScroller({
     getScroller: () => scroller,
     isReducedMotion: () => snapshot?.settings.reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion,
@@ -151,13 +150,6 @@
   const visibleGroups = $derived(
     filterVisibleGroups(groups, rootFilter, normalizedQuery, snapshot?.appearance, gridView),
   )
-  const undo = $derived(
-    notice?.undoId
-      ? snapshot?.undos.find(
-        entry => entry.id === notice?.undoId && entry.expiresAt > now,
-      )
-      : undefined,
-  )
   const settingsOpen = $derived(snapshot !== null && dialog?.kind === 'settings')
   const osReducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)')
   const reducedMotion = $derived(
@@ -204,10 +196,43 @@
       rootFilter = 'all'
     }
   }
-  function showNotice(value: Notice, expiration?: number) {
-    notice = value
-    noticeUntil
-      = expiration ?? Date.now() + (value.tone === 'error' ? 9000 : 4500)
+  /**
+   * Show a toast. `expiration` is the absolute epoch-ms deadline (used for
+   * undo toasts so the action disappears when the restore entry expires).
+   * `onAction` supplies the click handler for notices that carry their own
+   * `actionLabel`; undo notices resolve against the live snapshot instead.
+   */
+  function showNotice(value: Notice, expiration?: number, onAction?: () => void) {
+    const tone = value.tone ?? 'success'
+    const duration
+      = expiration !== undefined
+        ? Math.max(expiration - Date.now(), 0)
+        : tone === 'error'
+        ? 9000
+        : 4500
+    const undoId = value.undoId
+    // An undo action is only offered while its restore entry is still valid.
+    const undoEntry
+      = undoId === undefined
+        ? undefined
+        : snapshot?.undos.find(
+          item => item.id === undoId && item.expiresAt > Date.now(),
+        )
+    const onClick = onAction ?? (undoEntry ? () => performUndo(undoEntry.id) : undefined)
+    const actionLabel
+      = value.actionLabel ?? (undoEntry ? $LL.toast.undo() : undefined)
+    const action = actionLabel === undefined || onClick === undefined
+      ? undefined
+      : { label: actionLabel, onClick }
+    // One toast at a time, like the notice slot this replaced: a new notice
+    // replaces the current toast instead of stacking.
+    const options = { duration, action, id: 'metromark-notice' }
+    if (tone === 'error')
+      toast.error(value.message, options)
+    else if (tone === 'info')
+      toast.info(value.message, options)
+    else
+      toast.success(value.message, options)
   }
   async function runCommand(command: Command): Promise<boolean> {
     busy = true
@@ -319,10 +344,6 @@
       clearTimeout(flashTimer)
       smoothScroll.cancelSmoothScroll()
     }
-  })
-  $effect(() => {
-    if (notice && now >= noticeUntil)
-      notice = null
   })
   $effect(() => {
     // The root filter persists across sessions; every change path funnels here.
@@ -623,14 +644,32 @@
           background={snapshot.settings.background}
           {reducedMotion}
           scrollProgress={smoothScroll.scrollProgress}
-          onstruggle={() => showNotice({
-            message: $LL.app.animatedBackgroundPaused(),
-            actionLabel: $LL.app.turnOff(),
-          })}
-          onerror={() => showNotice({
-            message: $LL.app.backgroundImageFailed(),
-            actionLabel: $LL.app.turnOff(),
-          })}
+          onstruggle={() => showNotice(
+            {
+              message: $LL.app.animatedBackgroundPaused(),
+              actionLabel: $LL.app.turnOff(),
+            },
+            undefined,
+            () => {
+              void execute({
+                type: 'settings.update',
+                patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+              })
+            },
+          )}
+          onerror={() => showNotice(
+            {
+              message: $LL.app.backgroundImageFailed(),
+              actionLabel: $LL.app.turnOff(),
+            },
+            undefined,
+            () => {
+              void execute({
+                type: 'settings.update',
+                patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+              })
+            },
+          )}
         />
       {/if}
 
@@ -742,27 +781,6 @@
           />
         {/key}
       {/if}
-      {#if notice}
-        <div
-          class='fixed bottom-19.5 left-1/2 z-80 -translate-x-1/2'
-          transition:fly={{ y: 16, duration: reducedMotion ? 0 : 180 }}
-        >
-          <UndoToast
-            {notice}
-            onundo={undo
-              ? () => performUndo(undo.id)
-              : notice.actionLabel
-              ? () => {
-                void execute({
-                  type: 'settings.update',
-                  patch: { background: { ...BACKGROUND_DEFAULTS.color } },
-                })
-              }
-              : undefined}
-            onclose={() => (notice = null)}
-          />
-        </div>
-      {/if}
     </div>
     <SettingsDrawer
       open={settingsOpen}
@@ -777,4 +795,5 @@
         : undefined}
     />
   </div>
+  <Toaster position='bottom-center' closeButton offset='5rem' />
 </Tooltip.Provider>

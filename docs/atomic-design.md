@@ -51,7 +51,6 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `molecules/IconButton.svelte` | Button + icon. |
 | `molecules/TileShell.svelte` | Shared tile shell. |
 | `molecules/Modal.svelte` | Dialog shell with focus handling. |
-| `molecules/UndoToast.svelte` | Toast with self-dismiss timer. |
 | `molecules/BoardStatus.svelte` | Status line for the board. |
 | `molecules/WorkspaceFooter.svelte` | Status footer for the workspace. |
 | `molecules/MenuItems.svelte` | Menu item list renderer. |

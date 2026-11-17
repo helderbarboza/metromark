@@ -69,7 +69,6 @@ const es: Translation = {
   },
   toast: {
     undo: 'Deshacer',
-    dismiss: 'Descartar la notificación',
   },
   dialogs: {
     editBookmark: 'Editar marcador',

@@ -69,7 +69,6 @@ const en = {
   },
   toast: {
     undo: 'Undo',
-    dismiss: 'Dismiss notification',
   },
   dialogs: {
     editBookmark: 'Edit bookmark',

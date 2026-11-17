@@ -270,10 +270,6 @@ type RootTranslation = {
 		 * U​n​d​o
 		 */
 		undo: string
-		/**
-		 * D​i​s​m​i​s​s​ ​n​o​t​i​f​i​c​a​t​i​o​n
-		 */
-		dismiss: string
 	}
 	dialogs: {
 		/**
@@ -1777,10 +1773,6 @@ export type TranslationFunctions = {
 		 * Undo
 		 */
 		undo: () => LocalizedString
-		/**
-		 * Dismiss notification
-		 */
-		dismiss: () => LocalizedString
 	}
 	dialogs: {
 		/**

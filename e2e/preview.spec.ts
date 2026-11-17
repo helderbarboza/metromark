@@ -370,7 +370,7 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
   await page.getByRole('button', { name: 'Reset MetroMark', exact: true }).click()
 
   await expect(page.getByRole('complementary', { name: 'Settings' })).toHaveCount(0)
-  await expect(page.locator('[data-testid="toast-message"]')).toContainText('MetroMark reset to factory defaults')
+  await expect(page.locator('[data-sonner-toast]')).toContainText('MetroMark reset to factory defaults')
   await expect(page.getByRole('button', { name: 'Undo', exact: true })).toHaveCount(0)
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'catppuccin-latte')
   await expect(draggable(page, 'steam')).toBeVisible()
