@@ -69,7 +69,7 @@
   <ShaderBackground
     {shader}
     {reducedMotion}
-    animated={!shaderBenchmark.running}
+    animated={!shaderBenchmark.running && shaderBackground.paused !== true}
     color={baseColor}
     speed={shaderBackground.speed ?? BACKGROUND_DEFAULTS.shader.speed}
     targetFps={shaderBackground.targetFps ?? BACKGROUND_DEFAULTS.shader.targetFps}

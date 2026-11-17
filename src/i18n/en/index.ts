@@ -56,7 +56,7 @@ const en = {
     createFolderGroup: 'Add new folder',
     clearSelection: 'Clear selection',
     appearanceSettings: 'Appearance & settings',
-    turnOffAnimatedBackground: 'Turn off animated background',
+    pauseAnimatedBackground: 'Pause animated background',
     turnOffBackgroundImage: 'Turn off background image',
   },
   appBar: {
@@ -258,6 +258,8 @@ const en = {
     maximumRenderScaleHelp: 'Render below display resolution to save GPU',
     mouseInteraction: 'Mouse interaction',
     mouseInteractionHelp: 'Let the shader follow your pointer',
+    pauseAnimatedBackground: 'Pause animated background',
+    pauseAnimatedBackgroundHelp: 'Freeze the animation; the current frame stays on screen',
     noAnimatedBackground: 'No animated background is running.',
     shaderNone: 'None',
     benchmarkUnavailable: 'WebGL is unavailable; the shaders cannot be benchmarked on this device.',

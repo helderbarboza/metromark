@@ -27,26 +27,46 @@
   <ContextMenu.Group>
     {#each items as item (item.label)}
       {#if item.separator}<ContextMenu.Separator />{/if}
-      <ContextMenu.Item
-        disabled={item.disabled}
-        variant={item.danger ? 'destructive' : 'default'}
-        onSelect={item.action}
-      >
-        {@render itemIcon(item)}
-      </ContextMenu.Item>
+      {#if item.checked !== undefined}
+        <ContextMenu.CheckboxItem
+          disabled={item.disabled}
+          checked={item.checked}
+          onCheckedChange={() => item.action()}
+        >
+          {@render itemIcon(item)}
+        </ContextMenu.CheckboxItem>
+      {:else}
+        <ContextMenu.Item
+          disabled={item.disabled}
+          variant={item.danger ? 'destructive' : 'default'}
+          onSelect={item.action}
+        >
+          {@render itemIcon(item)}
+        </ContextMenu.Item>
+      {/if}
     {/each}
   </ContextMenu.Group>
 {:else}
   <DropdownMenu.Group>
     {#each items as item (item.label)}
       {#if item.separator}<DropdownMenu.Separator />{/if}
-      <DropdownMenu.Item
-        disabled={item.disabled}
-        variant={item.danger ? 'destructive' : 'default'}
-        onSelect={item.action}
-      >
-        {@render itemIcon(item)}
-      </DropdownMenu.Item>
+      {#if item.checked !== undefined}
+        <DropdownMenu.CheckboxItem
+          disabled={item.disabled}
+          checked={item.checked}
+          onCheckedChange={() => item.action()}
+        >
+          {@render itemIcon(item)}
+        </DropdownMenu.CheckboxItem>
+      {:else}
+        <DropdownMenu.Item
+          disabled={item.disabled}
+          variant={item.danger ? 'destructive' : 'default'}
+          onSelect={item.action}
+        >
+          {@render itemIcon(item)}
+        </DropdownMenu.Item>
+      {/if}
     {/each}
   </DropdownMenu.Group>
 {/if}

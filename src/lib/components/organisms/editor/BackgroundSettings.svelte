@@ -593,6 +593,31 @@
         {/each}
       </div>
     </div>
+    <SettingsRow
+      title={$LL.settings.pauseAnimatedBackground()}
+      helpText={$LL.settings.pauseAnimatedBackgroundHelp()}
+      controlId='shader-paused'
+      disabled={busy}
+    >
+      <input
+        id='shader-paused'
+        type='checkbox'
+        role='switch'
+        aria-describedby='shader-paused-help'
+        checked={settings.background.type === 'shader' && settings.background.paused === true}
+        disabled={busy}
+        onchange={event => updateShader({ paused: event.currentTarget.checked })}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+      />
+    </SettingsRow>
     <div class='border-t border-(--border) p-4'>
       <div class='flex flex-wrap items-center justify-between gap-2'>
         <p class='text-xs font-semibold'>{$LL.settings.shaderPerformance()}</p>

@@ -1,4 +1,5 @@
 import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
+import type { Settings } from '$lib/config'
 import type { IconName } from '$lib/icons'
 import type { BookmarkNode, Command, FolderTileView, GroupView, TileView } from '$lib/types'
 import { BACKGROUND_DEFAULTS } from '$lib/config'
@@ -14,6 +15,8 @@ export interface MenuItem {
   danger?: boolean
   /** Render a separator before this item. */
   separator?: boolean
+  /** When set, render as a CheckboxItem with this checked state instead of a plain item. */
+  checked?: boolean
 }
 
 export interface MenuCallbacks {
@@ -36,7 +39,8 @@ export interface BoardMenuInput {
   /** ID of the folder whose grid was right-clicked, if any. */
   contextId: string
   defaultFolder: string
-  shaderActive: boolean
+  /** The current shader background, when the background type is 'shader'. */
+  shaderBackground?: Settings['background'] & { type: 'shader' }
   /** Whether an image background with a URL is currently applied. */
   imageActive: boolean
   callbacks: MenuCallbacks
@@ -72,7 +76,7 @@ export function buildGroupMenuItems(input: GroupMenuInput): MenuItem[] {
 }
 
 export function buildBoardMenuItems(input: BoardMenuInput): MenuItem[] {
-  const { groups, selectedId, contextId, defaultFolder, shaderActive, imageActive, callbacks } = input
+  const { groups, selectedId, contextId, defaultFolder, shaderBackground, imageActive, callbacks } = input
   const parentId = groups.find(item => item.id === contextId && item.writable)?.id ?? defaultFolder
   const items: MenuItem[] = [
     { label: t().addBookmark(), icon: 'addBookmark', disabled: parentId.length === 0, action: () => callbacks.edit({ kind: 'bookmark', parentId }) },
@@ -84,12 +88,14 @@ export function buildBoardMenuItems(input: BoardMenuInput): MenuItem[] {
   items.push(
     { label: t().appearanceSettings(), icon: 'settings', separator: true, action: () => callbacks.edit({ kind: 'settings' }) },
   )
-  if (shaderActive) {
+  if (shaderBackground) {
+    const paused = shaderBackground.paused === true
     items.push({
-      label: t().turnOffAnimatedBackground(),
-      icon: 'close',
+      label: t().pauseAnimatedBackground(),
+      icon: 'pause',
       separator: true,
-      action: () => { void callbacks.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: true, color: undefined } } }) },
+      checked: paused,
+      action: () => { void callbacks.execute({ type: 'settings.update', patch: { background: { ...shaderBackground, paused: !paused } } }) },
     })
   }
   if (imageActive) {

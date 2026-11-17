@@ -555,6 +555,8 @@ export class BookmarkCoordinator {
               throw new Error(getT().errors.invalidShaderRenderScale())
             if (background.quality !== undefined && (typeof background.quality !== 'string' || !['motion', 'detail'].includes(background.quality)))
               throw new Error(getT().errors.invalidShaderQuality())
+            if (background.paused !== undefined && typeof background.paused !== 'boolean')
+              throw new Error(getT().errors.invalidShaderSetting())
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
               throw new Error(getT().errors.invalidBackgroundMode())
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))

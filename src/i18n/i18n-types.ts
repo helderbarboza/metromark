@@ -230,9 +230,9 @@ type RootTranslation = {
 		 */
 		appearanceSettings: string
 		/**
-		 * T​u​r​n​ ​o​f​f​ ​a​n​i​m​a​t​e​d​ ​b​a​c​k​g​r​o​u​n​d
+		 * P​a​u​s​e​ ​a​n​i​m​a​t​e​d​ ​b​a​c​k​g​r​o​u​n​d
 		 */
-		turnOffAnimatedBackground: string
+		pauseAnimatedBackground: string
 		/**
 		 * T​u​r​n​ ​o​f​f​ ​b​a​c​k​g​r​o​u​n​d​ ​i​m​a​g​e
 		 */
@@ -988,6 +988,14 @@ type RootTranslation = {
 		 */
 		mouseInteractionHelp: string
 		/**
+		 * P​a​u​s​e​ ​a​n​i​m​a​t​e​d​ ​b​a​c​k​g​r​o​u​n​d
+		 */
+		pauseAnimatedBackground: string
+		/**
+		 * F​r​e​e​z​e​ ​t​h​e​ ​a​n​i​m​a​t​i​o​n​;​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​f​r​a​m​e​ ​s​t​a​y​s​ ​o​n​ ​s​c​r​e​e​n
+		 */
+		pauseAnimatedBackgroundHelp: string
+		/**
 		 * N​o​ ​a​n​i​m​a​t​e​d​ ​b​a​c​k​g​r​o​u​n​d​ ​i​s​ ​r​u​n​n​i​n​g​.
 		 */
 		noAnimatedBackground: string
@@ -1730,9 +1738,9 @@ export type TranslationFunctions = {
 		 */
 		appearanceSettings: () => LocalizedString
 		/**
-		 * Turn off animated background
+		 * Pause animated background
 		 */
-		turnOffAnimatedBackground: () => LocalizedString
+		pauseAnimatedBackground: () => LocalizedString
 		/**
 		 * Turn off background image
 		 */
@@ -2471,6 +2479,14 @@ export type TranslationFunctions = {
 		 * Let the shader follow your pointer
 		 */
 		mouseInteractionHelp: () => LocalizedString
+		/**
+		 * Pause animated background
+		 */
+		pauseAnimatedBackground: () => LocalizedString
+		/**
+		 * Freeze the animation; the current frame stays on screen
+		 */
+		pauseAnimatedBackgroundHelp: () => LocalizedString
 		/**
 		 * No animated background is running.
 		 */

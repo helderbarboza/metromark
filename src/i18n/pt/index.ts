@@ -56,7 +56,7 @@ const pt: Translation = {
     createFolderGroup: 'Adicionar nova pasta',
     clearSelection: 'Limpar seleção',
     appearanceSettings: 'Aparência e configurações',
-    turnOffAnimatedBackground: 'Desativar fundo animado',
+    pauseAnimatedBackground: 'Pausar fundo animado',
     turnOffBackgroundImage: 'Desativar imagem de fundo',
   },
   appBar: {
@@ -258,6 +258,8 @@ const pt: Translation = {
     maximumRenderScaleHelp: 'Renderizar abaixo da resolução da tela para economizar GPU',
     mouseInteraction: 'Interação com o mouse',
     mouseInteractionHelp: 'Deixe o shader seguir o seu ponteiro',
+    pauseAnimatedBackground: 'Pausar fundo animado',
+    pauseAnimatedBackgroundHelp: 'Congela a animação; o fotograma atual permanece na tela',
     noAnimatedBackground: 'Nenhum fundo animado está em execução.',
     shaderNone: 'Nenhum',
     benchmarkUnavailable: 'WebGL não está disponível; os shaders não podem ser testados neste dispositivo.',

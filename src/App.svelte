@@ -545,7 +545,9 @@
         selectedId,
         contextId: menuTarget?.id ?? '',
         defaultFolder: defaultFolder(),
-        shaderActive: snapshot?.settings.background.type === 'shader',
+        shaderBackground: snapshot?.settings.background.type === 'shader'
+          ? snapshot.settings.background
+          : undefined,
         imageActive: snapshot?.settings.background.type === 'image'
           && snapshot.settings.background.url !== '',
         callbacks: menuCallbacks,

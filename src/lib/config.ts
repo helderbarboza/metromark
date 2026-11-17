@@ -28,6 +28,8 @@ const ShaderBackgroundSchema = v.object({
   renderScale: v.optional(v.number()),
   /** Prefer smooth motion or sharp detail when the renderer is under load */
   quality: v.optional(v.picklist(['motion', 'detail'])),
+  /** Freeze the animation frame; the last frame stays on the canvas */
+  paused: v.optional(v.boolean()),
   /** Use the theme background instead of a custom base color */
   auto: v.optional(v.boolean()),
   /** Base color under the shader layer */
