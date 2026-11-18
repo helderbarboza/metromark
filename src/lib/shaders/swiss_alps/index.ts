@@ -78,7 +78,10 @@ export const swissAlps: ShaderDefinition = {
       fragmentShader: pass(BUFFER_A),
       // iChannel1 is Buffer B: its first texel stores the width the terrain pass is
       // rendering at, which is how this pass notices a resize.
-      channels: [{ buffer: 'a' }, { buffer: 'b' }],
+      channels: [
+        { buffer: 'a' },
+        { buffer: 'b' },
+      ],
       // Buffer C samples this with wrapped world-space coordinates.
       wrap: 'repeat',
     },
@@ -89,7 +92,12 @@ export const swissAlps: ShaderDefinition = {
       // iChannel1 is this pass's own previous frame, for the 1-in-16 update.
       channels: [
         {
-          texture: { image: VALUE_NOISE_URL, wrap: 'repeat', flipY: true, noiseFallback: 256 },
+          texture: {
+            image: VALUE_NOISE_URL,
+            wrap: 'repeat',
+            flipY: true,
+            noiseFallback: 256,
+          },
         },
         {
           buffer: 'b',
@@ -109,7 +117,12 @@ export const swissAlps: ShaderDefinition = {
         { buffer: 'c' },
         { buffer: 'a' },
         {
-          texture: { image: BLUE_NOISE_URL, wrap: 'repeat', flipY: false, noiseFallback: 1024 },
+          texture: {
+            image: BLUE_NOISE_URL,
+            wrap: 'repeat',
+            flipY: false,
+            noiseFallback: 1024,
+          },
         },
       ],
       // rgb = scattered cloud light, a = transmittance (1 = clear sky).
@@ -119,7 +132,10 @@ export const swissAlps: ShaderDefinition = {
       id: 'd',
       fragmentShader: pass(BUFFER_D),
       // iChannel0 is Buffer C, iChannel1 is this pass's own TXAA history.
-      channels: [{ buffer: 'c' }, { buffer: 'd' }],
+      channels: [
+        { buffer: 'c' },
+        { buffer: 'd' },
+      ],
       wrap: 'clamp',
     },
     {
@@ -127,7 +143,10 @@ export const swissAlps: ShaderDefinition = {
       fragmentShader: pass(IMAGE),
       // iChannel0 = terrain, iChannel1 = clouds (its alpha feeds the light scatter
       // and the lens flare mask).
-      channels: [{ buffer: 'b' }, { buffer: 'd' }],
+      channels: [
+        { buffer: 'b' },
+        { buffer: 'd' },
+      ],
     },
   ],
 }

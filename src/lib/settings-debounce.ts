@@ -19,7 +19,10 @@ export class SettingsDebouncer {
   ) {}
 
   async enqueue(command: SettingsUpdate): Promise<boolean> {
-    this.pending = { ...this.pending, ...command.patch }
+    this.pending = {
+      ...this.pending,
+      ...command.patch,
+    }
     return new Promise<boolean>((resolve) => {
       this.waiters.push(resolve)
       clearTimeout(this.timer)

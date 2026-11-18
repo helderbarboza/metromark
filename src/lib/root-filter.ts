@@ -3,7 +3,9 @@ const ALL = 'all'
 
 function storage(): Storage | null {
   try {
-    return typeof localStorage === 'undefined' ? null : localStorage
+    return typeof localStorage === 'undefined'
+      ? null
+      : localStorage
   }
   catch {
     // Accessing localStorage can throw (for example, disabled cookies).
@@ -18,7 +20,9 @@ export function loadRootFilter(): string {
     return ALL
   try {
     const saved = store.getItem(STORAGE_KEY)
-    return saved !== null && saved.length > 0 ? saved : ALL
+    return saved !== null && saved.length > 0
+      ? saved
+      : ALL
   }
   catch {
     return ALL

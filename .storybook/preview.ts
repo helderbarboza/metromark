@@ -16,7 +16,9 @@ applyLocale('en', { persist: false })
 const storybookFavicon = new URL(steamFaviconUrl, window.location.href).href
 window.chrome = {
   ...window.chrome,
-  runtime: { getURL: () => storybookFavicon },
+  runtime: {
+    getURL: () => storybookFavicon,
+  },
 }
 
 // Storybook's docs page renders the story inside a white .sbdocs-preview card
@@ -34,7 +36,14 @@ if (typeof document !== 'undefined' && !document.getElementById('storybook-theme
 const preview: Preview = {
   parameters: {
     layout: 'centered',
-    a11y: { test: 'error', config: { rules: [{ id: 'region', enabled: false }] } },
+    a11y: {
+      test: 'error',
+      config: {
+        rules: [
+          { id: 'region', enabled: false },
+        ],
+      },
+    },
   },
   globalTypes: {
     theme: {
@@ -54,27 +63,37 @@ const preview: Preview = {
   // Composes with story-level `globals: { theme: … }` pins (they just win
   // the selector). Every story in this repo is themed through this decorator —
   // there is no per-fixture theme plumbing anymore.
-  decorators: [(StoryFn, context) => {
-    const theme = typeof context.globals.theme === 'string' ? context.globals.theme : DEFAULT_DARK_THEME
-    const entry = getTheme(theme) ?? getTheme(DEFAULT_DARK_THEME)
-    // Seed mode-watcher's persisted selection so any app that reads
-    // theme directly from storage opens in the selected theme. Written here
-    // (not at module scope) so each story gets its own coherent state;
-    // portable stories share one browser and one localStorage.
-    if (entry && typeof window !== 'undefined') {
-      try {
-        window.localStorage.setItem('mode-watcher-mode', entry.mode)
-        window.localStorage.setItem('mode-watcher-theme', entry.name)
-        window.localStorage.setItem(
-          'app-theme-selections',
-          JSON.stringify({ light: DEFAULT_LIGHT_THEME, dark: entry.name }),
-        )
-      }
-      catch {
+  decorators: [
+    (StoryFn, context) => {
+      const theme = typeof context.globals.theme === 'string'
+        ? context.globals.theme
+        : DEFAULT_DARK_THEME
+      const entry = getTheme(theme) ?? getTheme(DEFAULT_DARK_THEME)
+      // Seed mode-watcher's persisted selection so any app that reads
+      // theme directly from storage opens in the selected theme. Written here
+      // (not at module scope) so each story gets its own coherent state;
+      // portable stories share one browser and one localStorage.
+      if (entry && typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem('mode-watcher-mode', entry.mode)
+          window.localStorage.setItem('mode-watcher-theme', entry.name)
+          window.localStorage.setItem(
+            'app-theme-selections',
+            JSON.stringify({ light: DEFAULT_LIGHT_THEME, dark: entry.name }),
+          )
+        }
+        catch {
         // Storage unavailable — the decorator still applies the DOM attributes.
+        }
       }
-    }
-    return { Component: ThemeDecorator, props: { theme, story: StoryFn() } }
-  }],
+      return {
+        Component: ThemeDecorator,
+        props: {
+          theme,
+          story: StoryFn(),
+        },
+      }
+    },
+  ],
 }
 export default preview

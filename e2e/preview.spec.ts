@@ -29,7 +29,10 @@ test('flat ancestry, separate roots, launcher tiles, and background context-menu
   await expect(group(page, 'Other bookmarks')).toBeVisible()
   await page.getByRole('combobox', { name: 'Bookmark root' }).click()
   await page.getByRole('option', { name: /^All bookmarks/ }).click()
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await expect(page.getByRole('menuitem', { name: 'Add new bookmark', exact: true })).toBeFocused()
   await page.keyboard.press('ArrowDown')
   await expect(page.getByRole('menuitem', { name: 'Add new folder', exact: true })).toBeFocused()
@@ -39,7 +42,10 @@ test('flat ancestry, separate roots, launcher tiles, and background context-menu
 
 test('create, edit, customize, resize, move, delete and Undo; dialogs close without exceptions', async ({ page }) => {
   await start(page)
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Add new bookmark', exact: true }).click()
   let dialog = page.getByRole('dialog')
   await dialog.getByLabel('Title', { exact: true }).fill('QA new favorite')
@@ -68,7 +74,12 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   })
   await dialog.getByRole('button', { name: 'Save changes' }).click()
   await expect(link(page, 'QA edited favorite')).toHaveCSS('color', 'rgb(0, 0, 0)')
-  for (const [raw, display] of [['small', 'Small'], ['medium', 'Medium'], ['large', 'Large'], ['wide', 'Wide']] as const) {
+  for (const [raw, display] of [
+    ['small', 'Small'],
+    ['medium', 'Medium'],
+    ['large', 'Large'],
+    ['wide', 'Wide'],
+  ] as const) {
     await rightClick(page, 'QA edited favorite')
     await page.getByRole('button', { name: `Resize selected tile to ${display}`, exact: true }).click()
     // Small tiles intentionally have no visible title; address via the accessible name.
@@ -146,7 +157,9 @@ test('pointer and keyboard moves persist without reordering native siblings; can
   await page.mouse.up()
   await expect.poll(async () => {
     const tile = (await presentation(page)).layouts?.bar?.find(item => item.i === 'github')
-    return tile ? { x: tile.x, y: tile.y } : original
+    return tile
+      ? { x: tile.x, y: tile.y }
+      : original
   }).not.toEqual(original)
   const afterPointer = (await presentation(page)).layouts.bar.find(item => item.i === 'github')!
   // Space picks the tile up for a keyboard move; Enter keeps activating the bookmark.
@@ -210,7 +223,10 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('QA across tabs')
   await page.getByRole('dialog').getByRole('button', { name: 'Save changes' }).click()
   await expect(link(second, 'QA across tabs')).toBeVisible()
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('radio', { name: 'Dark', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
@@ -229,7 +245,10 @@ test('cross-tab updates, search, persistent Paper theme and small-window access'
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'catppuccin-mocha')
   await page.setViewportSize({ width: 800, height: 600 })
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await expect(page.getByRole('complementary', { name: 'Settings' })).toBeVisible()
   await page.keyboard.press('Escape')
@@ -270,7 +289,9 @@ test('right-click and keyboard selection open the app bar; Escape and the board 
   // Pressing the board drops the selection too.
   await steam.click({ button: 'right' })
   await expect(bar).toBeVisible()
-  await page.locator('#board').click({ position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    position: { x: 25, y: 20 },
+  })
   await expect(bar).toHaveCount(0)
 })
 
@@ -285,7 +306,12 @@ test('touch cross-slide selects instead of launching, and picks the tile up past
   const popups: string[] = []
   page.on('popup', popup => popups.push(popup.url()))
   const touch = async (type: 'touchStart' | 'touchMove' | 'touchEnd', point?: { x: number, y: number }) =>
-    client.send('Input.dispatchTouchEvent', { type, touchPoints: point ? [point] : [] })
+    client.send('Input.dispatchTouchEvent', {
+      type,
+      touchPoints: point
+        ? [point]
+        : [],
+    })
   // A short drag down self-reveals the check; releasing there selects without launching.
   await touch('touchStart', { x, y })
   await touch('touchMove', { x, y: y + 14 })
@@ -320,7 +346,10 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch to dark mode (catppuccin-mocha) via Appearance dialog
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('radio', { name: 'Dark', exact: true }).click()
   await page.keyboard.press('Escape')
@@ -330,7 +359,10 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await expect(steam).toHaveCSS('color', 'rgb(0, 0, 0)')
 
   // Switch back to light mode
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('radio', { name: 'Light', exact: true }).click()
   await page.keyboard.press('Escape')
@@ -340,7 +372,10 @@ test('theme accent foreground contrast adapts to mode and theme', async ({ page 
   await expect(steam).toHaveCSS('color', 'rgb(255, 255, 255)')
 
   // Switch theme to one-light (another light theme with different accent colors)
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('button', { name: 'Themes', exact: true }).press('Enter')
   await page.getByRole('button', { name: 'One Light', exact: true }).click()
@@ -356,7 +391,10 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
   await page.emulateMedia({ colorScheme: 'light' })
   await page.goto('/')
   await expect(draggable(page, 'steam')).toBeVisible()
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Appearance & settings', exact: true }).click()
   await page.getByRole('tab', { name: 'Tiles', exact: true }).click()
   await page.getByRole('radio', { name: 'Compact', exact: true }).click()
@@ -510,7 +548,10 @@ test('folder tiles accept custom colors from the shared appearance dialog', asyn
 
 test('create a folder from the board menu, then drop a bookmark onto it', async ({ page }) => {
   await start(page)
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Add new folder', exact: true }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel('Folder name', { exact: true }).fill('QA drop target')
@@ -542,7 +583,10 @@ test('create a folder from the board menu, then drop a bookmark onto it', async 
 
 test('a new folder cannot be moved into itself, but accepts a bookmark drop', async ({ page }) => {
   await start(page)
-  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
   await page.getByRole('menuitem', { name: 'Add new folder', exact: true }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel('Folder name', { exact: true }).fill('QA self move')

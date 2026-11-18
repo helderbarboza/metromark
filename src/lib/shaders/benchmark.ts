@@ -26,7 +26,13 @@ export const GOOD_MAX_MS = 4
 export const MODERATE_MAX_MS = 6
 export const WEAK_MAX_MS = 8.3
 
-export const BENCHMARK_LEVELS = ['excellent', 'good', 'moderate', 'weak', 'poor'] as const
+export const BENCHMARK_LEVELS = [
+  'excellent',
+  'good',
+  'moderate',
+  'weak',
+  'poor',
+] as const
 export type BenchmarkLevel = (typeof BENCHMARK_LEVELS)[number]
 
 export function classifyFrameTime(avgFrameMs: number): BenchmarkLevel {
@@ -51,7 +57,13 @@ export interface ShaderBenchmarkResult {
 }
 
 function failedResult(shaderId: string): ShaderBenchmarkResult {
-  return { shaderId, status: 'failed', avgFrameMs: 0, worstFrameMs: 0, level: null }
+  return {
+    shaderId,
+    status: 'failed',
+    avgFrameMs: 0,
+    worstFrameMs: 0,
+    level: null,
+  }
 }
 
 /** Yield one frame so the page stays responsive and progress can repaint. */

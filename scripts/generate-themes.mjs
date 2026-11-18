@@ -10,17 +10,43 @@ import { DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME, THEMES } from '../src/lib/them
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const check = process.argv.includes('--check')
 
-const BASE_SLOTS = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '0A', '0B', '0C', '0D', '0E', '0F']
+const BASE_SLOTS = [
+  '00',
+  '01',
+  '02',
+  '03',
+  '04',
+  '05',
+  '06',
+  '07',
+  '08',
+  '09',
+  '0A',
+  '0B',
+  '0C',
+  '0D',
+  '0E',
+  '0F',
+]
 
 function luminance(hex) {
-  const [r, g, b] = [hex.slice(1, 3), hex.slice(3, 5), hex.slice(5, 7)]
+  const [r, g, b] = [
+    hex.slice(1, 3),
+    hex.slice(3, 5),
+    hex.slice(5, 7),
+  ]
     .map(v => Number.parseInt(v, 16) / 255)
-    .map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+    .map(v => (v <= 0.03928
+      ? v / 12.92
+      : ((v + 0.055) / 1.055) ** 2.4))
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 
 function contrastRatio(a, b) {
-  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  const [hi, lo] = [
+    luminance(a),
+    luminance(b),
+  ].sort((x, y) => y - x)
   return (hi + 0.05) / (lo + 0.05)
 }
 

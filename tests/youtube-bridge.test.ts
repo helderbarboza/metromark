@@ -7,7 +7,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const ID = 'dQw4w9WgXcQ'
 const PLAYLIST = 'PLabc123XYZ_-0123456789abcdef'
-const PLAYLIST_IDS = ['aaaaaaaaaaa', 'bbbbbbbbbbb', 'ccccccccccc', 'ddddddddddd']
+const PLAYLIST_IDS = [
+  'aaaaaaaaaaa',
+  'bbbbbbbbbbb',
+  'ccccccccccc',
+  'ddddddddddd',
+]
 const playlistInfo = () => ({ playlist: PLAYLIST_IDS, playlistIndex: 0, playlistId: PLAYLIST })
 
 function makeCursor(stored: Record<string, number> = {}) {
@@ -39,8 +44,12 @@ class FakeContentWindow {
         continue
       if (parsed.event !== 'command')
         continue
-      const func = 'func' in parsed && typeof parsed.func === 'string' ? parsed.func : ''
-      const args = 'args' in parsed && Array.isArray(parsed.args) ? parsed.args : []
+      const func = 'func' in parsed && typeof parsed.func === 'string'
+        ? parsed.func
+        : ''
+      const args = 'args' in parsed && Array.isArray(parsed.args)
+        ? parsed.args
+        : []
       out.push({ func, args })
     }
     return out
@@ -57,7 +66,9 @@ class FakeFrame implements BridgeFrame {
   }
 
   getAttribute(name: string) {
-    return name === 'src' ? this.src : null
+    return name === 'src'
+      ? this.src
+      : null
   }
 
   addEventListener(type: 'load', listener: () => void) {
@@ -146,7 +157,14 @@ describe('youtubeBackgroundBridge', () => {
     expect(frame.contentWindow.commands()).toEqual([])
     win.ready(frame)
     const commands = frame.contentWindow.commands()
-    expect(commands.map(command => command.func)).toEqual(['playVideo', 'unMute', 'setVolume', 'setPlaybackRate', 'unloadModule', 'unloadModule'])
+    expect(commands.map(command => command.func)).toEqual([
+      'playVideo',
+      'unMute',
+      'setVolume',
+      'setPlaybackRate',
+      'unloadModule',
+      'unloadModule',
+    ])
     expect(commands[2].args).toEqual([40])
     expect(commands[3].args).toEqual([1])
   })
@@ -158,7 +176,10 @@ describe('youtubeBackgroundBridge', () => {
     let unloads = frame.contentWindow.commands().filter(command => command.func === 'unloadModule')
     expect(unloads.map(command => command.args[0])).toEqual(['captions', 'cc'])
 
-    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 1 },
+    })
     unloads = frame.contentWindow.commands().filter(command => command.func === 'unloadModule')
     expect(unloads.map(command => command.args[0])).toEqual(['captions', 'cc', 'captions', 'cc'])
   })
@@ -244,14 +265,20 @@ describe('youtubeBackgroundBridge', () => {
     const js = makeBridge({ loopMode: 'js' })
     js.bridge.mount()
     js.win.ready(js.frame)
-    js.win.dispatch(js.frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 0 } })
+    js.win.dispatch(js.frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 0 },
+    })
     const jsCommands = js.frame.contentWindow.commands().map(command => command.func)
     expect(jsCommands).toEqual(expect.arrayContaining(['seekTo', 'playVideo']))
 
     const native = makeBridge({ loopMode: 'native' })
     native.bridge.mount()
     native.win.ready(native.frame)
-    native.win.dispatch(native.frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 0 } })
+    native.win.dispatch(native.frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 0 },
+    })
     const nativeCommands = native.frame.contentWindow.commands().map(command => command.func)
     expect(nativeCommands).not.toContain('seekTo')
     expect(nativeCommands).not.toContain('playVideo')
@@ -263,7 +290,12 @@ describe('youtubeBackgroundBridge', () => {
     expect(frame.contentWindow.commands()).toEqual([])
     win.ready(frame)
     const rateCommands = frame.contentWindow.commands().filter(command => command.func === 'setPlaybackRate')
-    expect(rateCommands).toEqual([{ func: 'setPlaybackRate', args: [1.5] }])
+    expect(rateCommands).toEqual([
+      {
+        func: 'setPlaybackRate',
+        args: [1.5],
+      },
+    ])
   })
 
   it('replays a rate set before ready exactly once, after ready', () => {
@@ -273,7 +305,12 @@ describe('youtubeBackgroundBridge', () => {
     expect(frame.contentWindow.commands()).toEqual([])
     win.ready(frame)
     const rateCommands = frame.contentWindow.commands().filter(command => command.func === 'setPlaybackRate')
-    expect(rateCommands).toEqual([{ func: 'setPlaybackRate', args: [0.5] }])
+    expect(rateCommands).toEqual([
+      {
+        func: 'setPlaybackRate',
+        args: [0.5],
+      },
+    ])
   })
 
   it('commands the live player when the rate changes after ready', () => {
@@ -283,7 +320,12 @@ describe('youtubeBackgroundBridge', () => {
     frame.contentWindow.posted.length = 0
     bridge.setPlaybackRate(2)
     const commands = frame.contentWindow.commands()
-    expect(commands).toEqual([{ func: 'setPlaybackRate', args: [2] }])
+    expect(commands).toEqual([
+      {
+        func: 'setPlaybackRate',
+        args: [2],
+      },
+    ])
     expect(bridge.snapshot.playbackRate).toBe(2)
   })
 
@@ -331,9 +373,18 @@ describe('youtubeBackgroundBridge', () => {
   })
 
   it('throws when neither or both IDs are passed', () => {
-    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), { target: new FakeWindow() })).toThrow()
-    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), { target: new FakeWindow(), videoId: ID, playlistId: PLAYLIST })).toThrow()
-    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), { target: new FakeWindow(), playlistId: 'ab' })).toThrow()
+    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), {
+      target: new FakeWindow(),
+    })).toThrow()
+    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), {
+      target: new FakeWindow(),
+      videoId: ID,
+      playlistId: PLAYLIST,
+    })).toThrow()
+    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), {
+      target: new FakeWindow(),
+      playlistId: 'ab',
+    })).toThrow()
   })
 
   it('sets loop on ready and shuffles once when the playlist starts playing', () => {
@@ -344,13 +395,24 @@ describe('youtubeBackgroundBridge', () => {
     expect(commands.map(command => command.func)).toContain('setLoop')
     expect(commands.map(command => command.func)).not.toContain('setShuffle')
 
-    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 1 },
+    })
     commands = frame.contentWindow.commands()
     const shuffles = commands.filter(command => command.func === 'setShuffle')
-    expect(shuffles).toEqual([{ func: 'setShuffle', args: [true] }])
+    expect(shuffles).toEqual([
+      {
+        func: 'setShuffle',
+        args: [true],
+      },
+    ])
 
     // A second PLAYING transition must not reshuffle.
-    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 1 },
+    })
     expect(frame.contentWindow.commands().filter(command => command.func === 'setShuffle')).toHaveLength(1)
   })
 
@@ -360,14 +422,22 @@ describe('youtubeBackgroundBridge', () => {
     win.ready(frame)
     expect(frame.contentWindow.commands().filter(command => command.func === 'setShuffle')).toEqual([])
     vi.advanceTimersByTime(1600)
-    expect(frame.contentWindow.commands().filter(command => command.func === 'setShuffle')).toEqual([{ func: 'setShuffle', args: [true] }])
+    expect(frame.contentWindow.commands().filter(command => command.func === 'setShuffle')).toEqual([
+      {
+        func: 'setShuffle',
+        args: [true],
+      },
+    ])
   })
 
   it('never shuffles a single video', () => {
     const { bridge, frame, win } = makeBridge()
     bridge.mount()
     win.ready(frame)
-    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 1 },
+    })
     vi.advanceTimersByTime(2000)
     const funcs = frame.contentWindow.commands().map(command => command.func)
     expect(funcs).not.toContain('setShuffle')
@@ -382,7 +452,12 @@ describe('youtubeBackgroundBridge', () => {
       win.info(frame, playlistInfo())
       win.ready(frame)
       expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt'))
-        .toEqual([{ func: 'playVideoAt', args: [2] }])
+        .toEqual([
+          {
+            func: 'playVideoAt',
+            args: [2],
+          },
+        ])
       // Repeated deliveries must not re-pick.
       win.info(frame, playlistInfo())
       expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt')).toHaveLength(1)
@@ -394,28 +469,55 @@ describe('youtubeBackgroundBridge', () => {
 
   it('plays the stored cursor position in sequential mode and advances it, wrapping at the end', () => {
     const { cursor, writes } = makeCursor({ [PLAYLIST]: 3 })
-    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST, playlistOrder: 'sequential', playlistCursor: cursor })
+    const { bridge, frame, win } = makeBridge({
+      videoId: undefined,
+      playlistId: PLAYLIST,
+      playlistOrder: 'sequential',
+      playlistCursor: cursor,
+    })
     bridge.mount()
     win.info(frame, playlistInfo())
     win.ready(frame)
     expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt'))
-      .toEqual([{ func: 'playVideoAt', args: [3] }])
-    expect(writes).toEqual([{ playlistId: PLAYLIST, nextIndex: 0 }])
+      .toEqual([
+        {
+          func: 'playVideoAt',
+          args: [3],
+        },
+      ])
+    expect(writes).toEqual([
+      { playlistId: PLAYLIST, nextIndex: 0 },
+    ])
     // Sequential mode never reshuffles.
-    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 1 },
+    })
     vi.advanceTimersByTime(2000)
     expect(frame.contentWindow.commands().map(command => command.func)).not.toContain('setShuffle')
   })
 
   it('sequential mode with a stale cursor normalizes it into range', () => {
     const { cursor, writes } = makeCursor({ [PLAYLIST]: 7 })
-    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST, playlistOrder: 'sequential', playlistCursor: cursor })
+    const { bridge, frame, win } = makeBridge({
+      videoId: undefined,
+      playlistId: PLAYLIST,
+      playlistOrder: 'sequential',
+      playlistCursor: cursor,
+    })
     bridge.mount()
     win.info(frame, playlistInfo())
     win.ready(frame)
     expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt'))
-      .toEqual([{ func: 'playVideoAt', args: [3] }])
-    expect(writes).toEqual([{ playlistId: PLAYLIST, nextIndex: 0 }])
+      .toEqual([
+        {
+          func: 'playVideoAt',
+          args: [3],
+        },
+      ])
+    expect(writes).toEqual([
+      { playlistId: PLAYLIST, nextIndex: 0 },
+    ])
   })
 
   it('sequential mode without a store starts at the top', () => {
@@ -424,7 +526,12 @@ describe('youtubeBackgroundBridge', () => {
     win.info(frame, playlistInfo())
     win.ready(frame)
     expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt'))
-      .toEqual([{ func: 'playVideoAt', args: [0] }])
+      .toEqual([
+        {
+          func: 'playVideoAt',
+          args: [0],
+        },
+      ])
   })
 
   it('reduced motion does not pick a start video nor advance the cursor', () => {
@@ -437,7 +544,13 @@ describe('youtubeBackgroundBridge', () => {
     vi.advanceTimersByTime(2000)
     expect(shuffle.frame.contentWindow.commands().map(command => command.func)).not.toContain('setShuffle')
 
-    const sequential = makeBridge({ videoId: undefined, playlistId: PLAYLIST, autoplay: false, playlistOrder: 'sequential', playlistCursor: cursor })
+    const sequential = makeBridge({
+      videoId: undefined,
+      playlistId: PLAYLIST,
+      autoplay: false,
+      playlistOrder: 'sequential',
+      playlistCursor: cursor,
+    })
     sequential.bridge.mount()
     sequential.win.info(sequential.frame, playlistInfo())
     sequential.win.ready(sequential.frame)
@@ -450,7 +563,10 @@ describe('youtubeBackgroundBridge', () => {
     bridge.mount()
     win.ready(frame)
     expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt')).toEqual([])
-    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 1 },
+    })
     expect(frame.contentWindow.commands().map(command => command.func)).toContain('setShuffle')
   })
 
@@ -459,7 +575,10 @@ describe('youtubeBackgroundBridge', () => {
     bridge.mount()
     win.ready(frame)
     frame.setAttribute('src', 'about:blank') // observe the reload
-    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 0 } })
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', {
+      event: 'onStateChange',
+      info: { playerState: 0 },
+    })
     expect(frame.getAttribute('src')).toContain('/embed/videoseries?')
     expect(frame.contentWindow.commands().map(command => command.func)).not.toContain('playVideo')
   })

@@ -18,23 +18,42 @@ export default defineConfig({
     // extension pages and YouTube refuses to play the embed (error 153).
     permissions: browser === 'firefox'
       ? ['bookmarks', 'storage', 'declarativeNetRequestWithHostAccess']
-      : ['bookmarks', 'storage', 'favicon', 'declarativeNetRequestWithHostAccess'],
+      : [
+          'bookmarks',
+          'storage',
+          'favicon',
+          'declarativeNetRequestWithHostAccess',
+        ],
     host_permissions: ['https://www.youtube-nocookie.com/*'],
-    icons: { 16: 'icons/16.png', 32: 'icons/32.png', 48: 'icons/48.png', 128: 'icons/128.png' },
+    icons: {
+      16: 'icons/16.png',
+      32: 'icons/32.png',
+      48: 'icons/48.png',
+      128: 'icons/128.png',
+    },
     ...(browser === 'firefox'
-      ? { browser_specific_settings: {
-          gecko: {
-            id: 'metromark@local.example',
-            strict_min_version: '140.0',
-            data_collection_permissions: { required: ['none'] },
+      ? {
+          browser_specific_settings: {
+            gecko: {
+              id: 'metromark@local.example',
+              strict_min_version: '140.0',
+              data_collection_permissions: {
+                required: ['none'],
+              },
+            },
           },
-        } }
+        }
       : { minimum_chrome_version: '128' }),
   }),
   vite: () => ({
     build: { sourcemap: true },
     resolve: { alias: libAlias },
-    define: { ...metromarkDefines, 'import.meta.env.METROMARK_PREVIEW': JSON.stringify(false) },
-    plugins: [tailwindcss()],
+    define: {
+      ...metromarkDefines,
+      'import.meta.env.METROMARK_PREVIEW': JSON.stringify(false),
+    },
+    plugins: [
+      tailwindcss(),
+    ],
   }),
 })

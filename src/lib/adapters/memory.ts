@@ -6,7 +6,11 @@ export function normalizeTree(tree: BookmarkNode[]): BookmarkNode[] {
     ...node,
     parentId,
     index,
-    ...(node.children ? { children: walk(node.children, node.id) } : {}),
+    ...(node.children
+      ? {
+          children: walk(node.children, node.id),
+        }
+      : {}),
   }))
   return walk(tree)
 }
@@ -40,7 +44,17 @@ export class MemoryBookmarks implements BookmarkPort {
     const parent = this.node(details.parentId)
     if (!parent.children)
       throw new Error('The destination is not a folder.')
-    const node: BookmarkNode = { id: `new-${Date.now().toString(36)}-${++this.serial}-${crypto.randomUUID().slice(0, 6)}`, title: details.title ?? '', parentId: parent.id, ...(details.url != null ? { url: details.url } : { children: [] }), ...(details.type != null ? { type: details.type } : {}) }
+    const node: BookmarkNode = {
+      id: `new-${Date.now().toString(36)}-${++this.serial}-${crypto.randomUUID().slice(0, 6)}`,
+      title: details.title ?? '',
+      parentId: parent.id,
+      ...(details.url != null
+        ? { url: details.url }
+        : { children: [] }),
+      ...(details.type != null
+        ? { type: details.type }
+        : {}),
+    }
     parent.children.splice(details.index ?? parent.children.length, 0, node)
     this.changed()
     return structuredClone(this.node(node.id))
@@ -85,6 +99,11 @@ export class MemoryBookmarks implements BookmarkPort {
 }
 export class MemoryPersistence implements PersistencePort {
   constructor(public data?: AppData) {}
-  async read() { return this.data ? structuredClone(this.data) : undefined }
+  async read() {
+    return this.data
+      ? structuredClone(this.data)
+      : undefined
+  }
+
   async write(data: AppData) { this.data = structuredClone(data) }
 }

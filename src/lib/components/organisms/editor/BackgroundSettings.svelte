@@ -62,7 +62,9 @@
   )
 
   const autoColor = $derived(
-    settings.background.type === 'color' ? settings.background.auto !== false : true,
+    settings.background.type === 'color'
+      ? settings.background.auto !== false
+      : true,
   )
 
   function isBackgroundType(value: string): value is BackgroundType {
@@ -73,31 +75,50 @@
     if (settings.background.type === type)
       return
     // Replace the whole variant so the object shape matches the new `type`.
-    onchange({ background: { ...BACKGROUND_DEFAULTS[type] } })
+    onchange({
+      background: { ...BACKGROUND_DEFAULTS[type] },
+    })
   }
 
   function setColorMode(auto: boolean, color?: string) {
     if (settings.background.type !== 'color')
       return
-    onchange({ background: { ...settings.background, auto, color } })
+    onchange({
+      background: { ...settings.background, auto, color },
+    })
   }
 
   function updateShader(patch: Partial<ShaderBackgroundSettings>) {
     if (settings.background.type !== 'shader')
       return
-    onchange({ background: { ...settings.background, ...patch } })
+    onchange({
+      background: {
+        ...settings.background,
+        ...patch,
+      },
+    })
   }
 
   function updateImage(patch: Partial<ImageBackgroundSettings>) {
     if (settings.background.type !== 'image')
       return
-    onchange({ background: { ...settings.background, ...patch } })
+    onchange({
+      background: {
+        ...settings.background,
+        ...patch,
+      },
+    })
   }
 
   function updateYoutube(patch: Partial<YoutubeBackgroundSettings>) {
     if (settings.background.type !== 'youtube')
       return
-    onchange({ background: { ...settings.background, ...patch } })
+    onchange({
+      background: {
+        ...settings.background,
+        ...patch,
+      },
+    })
   }
 
   // Draft state keeps the sliders responsive while settings changes round-trip
@@ -105,7 +126,9 @@
   // these mirror what the user sees while dragging. A closure captures the
   // mount-time value on purpose; the effect below keeps them in sync after.
   const initialShader = () =>
-    settings.background.type === 'shader' ? settings.background : undefined
+    settings.background.type === 'shader'
+      ? settings.background
+      : undefined
   let speedDraft = $state(initialShader()?.speed ?? BACKGROUND_DEFAULTS.shader.speed)
   let opacityDraft = $state(initialShader()?.opacity ?? BACKGROUND_DEFAULTS.shader.opacity)
   let renderScaleDraft = $state(
@@ -156,7 +179,12 @@
     trailingTimer = undefined
     lastCommitAt = Date.now()
     pending = { speed: speedDraft, opacity: opacityDraft, renderScale: renderScaleDraft }
-    onchange({ background: { ...bg, ...pending } })
+    onchange({
+      background: {
+        ...bg,
+        ...pending,
+      },
+    })
   }
 
   function scheduleCommit() {
@@ -197,9 +225,13 @@
     return isDataImageUri(url ?? '') || isMediaKey(url ?? '')
   }
   const initialImage = () =>
-    settings.background.type === 'image' ? settings.background : undefined
+    settings.background.type === 'image'
+      ? settings.background
+      : undefined
   let urlDraft = $state(
-    isStoredMedia(initialImage()?.url) ? '' : (initialImage()?.url ?? ''),
+    isStoredMedia(initialImage()?.url)
+      ? ''
+      : (initialImage()?.url ?? ''),
   )
   let urlDirty = $state(false)
   let urlError = $state('')
@@ -216,7 +248,9 @@
   const initialSourceTab = (): ImageSourceTab => {
     const url = initialImage()?.url ?? ''
     // A stored upload belongs to the Upload tab; a remote or data address belongs to From URL.
-    return url !== '' && !isStoredMedia(url) ? 'url' : 'upload'
+    return url !== '' && !isStoredMedia(url)
+      ? 'url'
+      : 'upload'
   }
   let sourceTab = $state<ImageSourceTab>(initialSourceTab())
   let dragOver = $state(false)
@@ -234,8 +268,11 @@
       return
     }
     // Never show a multi-megabyte data URI or an opaque media key in the text field.
-    if (!urlDirty)
-      urlDraft = isStoredMedia(bg.url) ? '' : (bg.url ?? '')
+    if (!urlDirty) {
+      urlDraft = isStoredMedia(bg.url)
+        ? ''
+        : (bg.url ?? '')
+    }
     if (opacityPending !== null) {
       if ((bg.opacity ?? BACKGROUND_DEFAULTS.image.opacity) === opacityPending)
         opacityPending = null
@@ -271,7 +308,9 @@
     opacityTrailingTimer = undefined
     lastOpacityCommitAt = Date.now()
     opacityPending = imageOpacityDraft
-    onchange({ background: { ...bg, opacity: imageOpacityDraft } })
+    onchange({
+      background: { ...bg, opacity: imageOpacityDraft },
+    })
   }
 
   function scheduleImageOpacityCommit() {
@@ -309,7 +348,9 @@
     zoomTrailingTimer = undefined
     lastZoomCommitAt = Date.now()
     zoomPending = zoomDraft
-    onchange({ background: { ...bg, parallaxZoom: zoomDraft } })
+    onchange({
+      background: { ...bg, parallaxZoom: zoomDraft },
+    })
   }
 
   function scheduleZoomCommit() {
@@ -335,7 +376,9 @@
 
   // --- youtube background -----------------------------------------------------
   const initialYoutube = () =>
-    settings.background.type === 'youtube' ? settings.background : undefined
+    settings.background.type === 'youtube'
+      ? settings.background
+      : undefined
   let youtubeUrlDraft = $state(initialYoutube()?.url ?? '')
   let youtubeUrlDirty = $state(false)
   let youtubeUrlError = $state('')
@@ -415,7 +458,9 @@
     youtubeOpacityTrailingTimer = undefined
     lastYoutubeOpacityCommitAt = Date.now()
     youtubeOpacityPending = youtubeOpacityDraft
-    onchange({ background: { ...bg, opacity: youtubeOpacityDraft } })
+    onchange({
+      background: { ...bg, opacity: youtubeOpacityDraft },
+    })
   }
 
   function scheduleYoutubeOpacityCommit() {
@@ -450,7 +495,9 @@
     youtubeZoomTrailingTimer = undefined
     lastYoutubeZoomCommitAt = Date.now()
     youtubeZoomPending = youtubeZoomDraft
-    onchange({ background: { ...bg, parallaxZoom: youtubeZoomDraft } })
+    onchange({
+      background: { ...bg, parallaxZoom: youtubeZoomDraft },
+    })
   }
 
   function scheduleYoutubeZoomCommit() {
@@ -578,7 +625,9 @@
         throw new Error(getT().backgroundErrors.undecodable())
       const blob = await encodeForStorage(file, image)
       const key = await saveBackgroundMedia(blob)
-      onchange({ background: { ...bg, url: key } })
+      onchange({
+        background: { ...bg, url: key },
+      })
       urlDirty = false
     }
     catch (error) {
@@ -667,7 +716,9 @@
       validated = validateBackgroundUrl(urlDraft)
     }
     catch (error) {
-      urlError = error instanceof Error ? error.message : getT().backgroundErrors.addressNotValid()
+      urlError = error instanceof Error
+        ? error.message
+        : getT().backgroundErrors.addressNotValid()
       return
     }
     const current = bg.url ?? ''
@@ -687,7 +738,9 @@
       }
       checking = false
     }
-    onchange({ background: { ...bg, url: validated } })
+    onchange({
+      background: { ...bg, url: validated },
+    })
     urlDirty = false
   }
 
@@ -696,7 +749,9 @@
     if (bg.type !== 'image')
       return
     const current = bg.url ?? ''
-    onchange({ background: { ...BACKGROUND_DEFAULTS.image } })
+    onchange({
+      background: { ...BACKGROUND_DEFAULTS.image },
+    })
     urlDraft = ''
     urlDirty = false
     urlError = ''
@@ -907,14 +962,18 @@
         value={String(
           settings.background.targetFps ?? BACKGROUND_DEFAULTS.shader.targetFps,
         )}
-        onValueChange={v => updateShader({ targetFps: Number(v) })}
+        onValueChange={v => updateShader({
+          targetFps: Number(v),
+        })}
         id='shader-fps'
         aria-labelledby='shader-fps-title'
         aria-describedby='shader-fps-help'
       >
         {#each [15, 30, 60, 120, 0] as value (value)}
           <ToggleGroup.Item value={String(value)} class='grow'>
-            {value === 0 ? $LL.settings.auto() : value}
+            {value === 0
+              ? $LL.settings.auto()
+              : value}
           </ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
@@ -967,19 +1026,41 @@
       >
         <div class='rounded-sm border border-(--border) p-2'>
           <div class='text-[9px] text-(--muted-foreground)'>{$LL.settings.metricFps()}</div>
-          <div class='font-mono tabular-nums {metrics.level === 'frozen' ? 'text-(--destructive)' : levelFps(metrics.fps, metrics.targetFps) === 'danger' ? 'text-(--destructive)' : levelFps(metrics.fps, metrics.targetFps) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
-            {metrics.level === 'frozen' ? '—' : metrics.fps.toFixed(0)}
+          <div
+            class='font-mono tabular-nums {metrics.level === 'frozen'
+              ? 'text-(--destructive)'
+              : levelFps(metrics.fps, metrics.targetFps) === 'danger'
+              ? 'text-(--destructive)'
+              : levelFps(metrics.fps, metrics.targetFps) === 'warn'
+              ? 'text-(--warn)'
+              : 'text-(--foreground)'}'
+          >
+            {metrics.level === 'frozen'
+              ? '—'
+              : metrics.fps.toFixed(0)}
           </div>
         </div>
         <div class='rounded-sm border border-(--border) p-2'>
           <div class='text-[9px] text-(--muted-foreground)'>{$LL.settings.metricFrame()}</div>
-          <div class='font-mono tabular-nums {levelFrame(metrics.frameMs, metrics.nominalMs) === 'danger' ? 'text-(--destructive)' : levelFrame(metrics.frameMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
+          <div
+            class='font-mono tabular-nums {levelFrame(metrics.frameMs, metrics.nominalMs) === 'danger'
+              ? 'text-(--destructive)'
+              : levelFrame(metrics.frameMs, metrics.nominalMs) === 'warn'
+              ? 'text-(--warn)'
+              : 'text-(--foreground)'}'
+          >
             {metrics.frameMs.toFixed(1)} ms
           </div>
         </div>
         <div class='rounded-sm border border-(--border) p-2'>
           <div class='text-[9px] text-(--muted-foreground)'>{$LL.settings.metricWorst()}</div>
-          <div class='font-mono tabular-nums {levelWorst(metrics.worstMs, metrics.nominalMs) === 'danger' ? 'text-(--destructive)' : levelWorst(metrics.worstMs, metrics.nominalMs) === 'warn' ? 'text-(--warn)' : 'text-(--foreground)'}'>
+          <div
+            class='font-mono tabular-nums {levelWorst(metrics.worstMs, metrics.nominalMs) === 'danger'
+              ? 'text-(--destructive)'
+              : levelWorst(metrics.worstMs, metrics.nominalMs) === 'warn'
+              ? 'text-(--warn)'
+              : 'text-(--foreground)'}'
+          >
             {metrics.worstMs.toFixed(1)} ms
           </div>
         </div>
@@ -1082,7 +1163,9 @@
         >
           <Icon name='imageAdd' size={32} class='text-(--muted-foreground)' />
           <span class='text-sm font-semibold'>
-            {uploading ? $LL.settings.reading() : $LL.settings.clickToBrowse()}
+            {uploading
+              ? $LL.settings.reading()
+              : $LL.settings.clickToBrowse()}
           </span>
           <span id='image-upload-help' class='text-xs text-(--muted-foreground)'>
             {$LL.settings.imageUploadHelp()}
@@ -1120,8 +1203,12 @@
             class='min-w-0 flex-1 text-sm'
             value={urlDraft}
             disabled={busy || uploading}
-            aria-invalid={urlError !== '' ? 'true' : undefined}
-            aria-describedby={urlError !== '' ? 'image-url-help image-url-error' : 'image-url-help'}
+            aria-invalid={urlError !== ''
+              ? 'true'
+              : undefined}
+            aria-describedby={urlError !== ''
+              ? 'image-url-help image-url-error'
+              : 'image-url-help'}
             oninput={(event) => {
               urlDraft = event.currentTarget.value
               urlDirty = true
@@ -1141,7 +1228,9 @@
             disabled={busy || uploading || checking}
             onclick={() => void commitUrl()}
           >
-            {checking ? $LL.settings.checking() : $LL.settings.apply()}
+            {checking
+              ? $LL.settings.checking()
+              : $LL.settings.apply()}
           </Button>
         </div>
         <p id='image-url-help' class='mt-2 text-xs text-(--muted-foreground)'>
@@ -1175,7 +1264,11 @@
         }}
       >
         {#each FITS as fit (fit)}
-          <ToggleGroup.Item value={fit} class='grow'>{$LL.settings[fit === 'cover' ? 'fitCover' : fit === 'contain' ? 'fitContain' : 'fitFill']()}</ToggleGroup.Item>
+          <ToggleGroup.Item value={fit} class='grow'>{$LL.settings[fit === 'cover'
+            ? 'fitCover'
+            : fit === 'contain'
+            ? 'fitContain'
+            : 'fitFill']()}</ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
     </SettingsRow>
@@ -1299,7 +1392,9 @@
           class='min-w-0 flex-1 text-sm'
           value={youtubeUrlDraft}
           disabled={busy}
-          aria-invalid={youtubeUrlError !== '' ? 'true' : undefined}
+          aria-invalid={youtubeUrlError !== ''
+            ? 'true'
+            : undefined}
           aria-describedby={youtubeUrlError !== ''
             ? 'youtube-url-help youtube-url-error'
             : 'youtube-url-help'}
@@ -1355,7 +1450,11 @@
         }}
       >
         {#each FITS as fit (fit)}
-          <ToggleGroup.Item value={fit} class='grow'>{$LL.settings[fit === 'cover' ? 'fitCover' : fit === 'contain' ? 'fitContain' : 'fitFill']()}</ToggleGroup.Item>
+          <ToggleGroup.Item value={fit} class='grow'>{$LL.settings[fit === 'cover'
+            ? 'fitCover'
+            : fit === 'contain'
+            ? 'fitContain'
+            : 'fitFill']()}</ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
     </SettingsRow>

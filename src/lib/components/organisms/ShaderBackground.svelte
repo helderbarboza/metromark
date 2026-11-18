@@ -65,7 +65,9 @@
   // the buffer contents that shaders like the multipass ones accumulate.
   // `untrack` seeds it from the current prop value without making the read a
   // dependency of whatever happens to run here.
-  const mouseState = { enabled: untrack(() => mouseInteraction) }
+  const mouseState = {
+    enabled: untrack(() => mouseInteraction),
+  }
   $effect(() => {
     mouseState.enabled = mouseInteraction
   })
@@ -73,7 +75,9 @@
   // Same pattern for `animated`: a plain mirror the render loop reads every frame.
   // Toggling it must not rebuild the pipeline, or every hover on a thumbnail would
   // recompile the shaders.
-  const animState = { enabled: untrack(() => animated) }
+  const animState = {
+    enabled: untrack(() => animated),
+  }
   $effect(() => {
     animState.enabled = animated
   })
@@ -174,7 +178,9 @@
       // Read through `limits` at the point of use so the live effect's updates
       // take effect without a rebuild.
       const scale0 = () => limits.scale
-      const fps0 = () => Math.min(limits.fps > 0 ? limits.fps : 60, 60)
+      const fps0 = () => Math.min(limits.fps > 0
+        ? limits.fps
+        : 60, 60)
       const preference = quality
       let load = 1
       let frozen = false
@@ -199,7 +205,9 @@
 
       const frame = (now: number) => {
         animationFrame = requestAnimationFrame(frame)
-        const delta = lastTime === 0 ? 0 : (now - lastTime) / 1000
+        const delta = lastTime === 0
+          ? 0
+          : (now - lastTime) / 1000
         lastTime = now
         if (!animState.enabled) {
           // Frozen: keep the last presented frame. `lastTime` still tracks the wall
@@ -257,10 +265,16 @@
             fps: stats?.fps ?? 0,
             frameMs: stats?.frameMs ?? 0,
             worstMs: stats?.worstMs ?? 0,
-            nominalMs: health.displayHz() > 0 ? 1000 / health.displayHz() : 16.67,
+            nominalMs: health.displayHz() > 0
+              ? 1000 / health.displayHz()
+              : 16.67,
             scale: pipeline.currentScale(),
             quality: preference,
-            level: frozen ? 'frozen' : load < 0.99 ? 'reduced' : 'full',
+            level: frozen
+              ? 'frozen'
+              : load < 0.99
+              ? 'reduced'
+              : 'full',
             targetFps: fps0(),
           }
           publishMetrics(snapshot)

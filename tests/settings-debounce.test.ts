@@ -3,7 +3,10 @@ import { SettingsDebouncer } from '$lib/settings-debounce'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 function patch(value: number): SettingsUpdate {
-  return { type: 'settings.update', patch: { reducedMotion: value % 2 === 0 } }
+  return {
+    type: 'settings.update',
+    patch: { reducedMotion: value % 2 === 0 },
+  }
 }
 
 describe('settingsDebouncer', () => {
@@ -29,8 +32,14 @@ describe('settingsDebouncer', () => {
   it('merges top-level patch keys, last write wins', async () => {
     const run = vi.fn(async () => true)
     const debouncer = new SettingsDebouncer(200, run)
-    void debouncer.enqueue({ type: 'settings.update', patch: { density: 'compact', showDomains: true } })
-    void debouncer.enqueue({ type: 'settings.update', patch: { density: 'comfortable' } })
+    void debouncer.enqueue({
+      type: 'settings.update',
+      patch: { density: 'compact', showDomains: true },
+    })
+    void debouncer.enqueue({
+      type: 'settings.update',
+      patch: { density: 'comfortable' },
+    })
     await vi.advanceTimersByTimeAsync(200)
     expect(run).toHaveBeenCalledWith({
       type: 'settings.update',

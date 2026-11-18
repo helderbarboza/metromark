@@ -11,10 +11,26 @@ export function validateUrl(value: string): string {
   catch {
     throw new Error(getT().urlErrors.invalid())
   }
-  if (['javascript:', 'data:', 'vbscript:', 'blob:'].includes(parsed.protocol)) {
+  if ([
+    'javascript:',
+    'data:',
+    'vbscript:',
+    'blob:',
+  ].includes(parsed.protocol)) {
     throw new Error(getT().urlErrors.executable())
   }
-  if (!['http:', 'https:', 'file:', 'ftp:', 'mailto:', 'tel:', 'chrome:', 'about:', 'moz-extension:', 'chrome-extension:'].includes(parsed.protocol)) {
+  if (![
+    'http:',
+    'https:',
+    'file:',
+    'ftp:',
+    'mailto:',
+    'tel:',
+    'chrome:',
+    'about:',
+    'moz-extension:',
+    'chrome-extension:',
+  ].includes(parsed.protocol)) {
     throw new Error(getT().urlErrors.unsupportedScheme())
   }
   return url

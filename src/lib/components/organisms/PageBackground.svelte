@@ -36,7 +36,9 @@
   }: Props = $props()
 
   const shaderBackground = $derived(
-    background.type === 'shader' ? background : undefined,
+    background.type === 'shader'
+      ? background
+      : undefined,
   )
   const shader = $derived.by(() => {
     const bg = shaderBackground
@@ -49,7 +51,9 @@
   })
   /** Custom base color, or undefined when the theme background shows through. */
   const baseColor = $derived(
-    background.auto === false ? background.color : undefined,
+    background.auto === false
+      ? background.color
+      : undefined,
   )
 </script>
 

@@ -27,7 +27,14 @@ describe('createPlaylistCursorStore', () => {
   })
 
   it('returns null for corrupt data instead of throwing', () => {
-    for (const corrupt of ['not json', '[]', '42', '{"PL": "three"}', '{"PL": -1}', '{"PL": 1.5}']) {
+    for (const corrupt of [
+      'not json',
+      '[]',
+      '42',
+      '{"PL": "three"}',
+      '{"PL": -1}',
+      '{"PL": 1.5}',
+    ]) {
       const { storage } = fakeStorage({ [KEY]: corrupt })
       const store = createPlaylistCursorStore(storage)
       expect(store.read('PL')).toBeNull()

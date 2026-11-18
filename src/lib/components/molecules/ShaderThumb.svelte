@@ -43,7 +43,10 @@
       icon: presentation.icon,
       class: presentation.class,
       avgFrameTime: time,
-      label: $LL.benchmark.performanceLabel({ level: levelName.toLowerCase(), detail }),
+      label: $LL.benchmark.performanceLabel({
+        level: levelName.toLowerCase(),
+        detail,
+      }),
       title: $LL.benchmark.levelTitle({ level: levelName, time }),
     }
   })

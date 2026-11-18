@@ -104,7 +104,9 @@
       <button
         class:active={size === preset}
         aria-pressed={size === preset}
-        aria-label={$LL.appBar.resizeSelectedTile({ size: $LL.tileSizes[preset]() })}
+        aria-label={$LL.appBar.resizeSelectedTile({
+          size: $LL.tileSizes[preset](),
+        })}
         onclick={() => onresize(preset)}
       >
         {$LL.tileSizes[preset]()}

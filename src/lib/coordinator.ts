@@ -128,7 +128,7 @@ export class BookmarkCoordinator {
 
   private node(id: string): BookmarkNode {
     if (typeof id !== 'string')
-      throw new Error(getT().errors.invalidIdentifier())
+      throw new TypeError(getT().errors.invalidIdentifier())
     const node = indexTree(this.tree).get(id)
     if (!node)
       throw new Error(getT().errors.noLongerExists())
@@ -247,7 +247,13 @@ export class BookmarkCoordinator {
   }
 
   private async prepareUndo(label: string, payload: UndoRecord['payload']) {
-    const undo: UndoRecord = { id: crypto.randomUUID(), label, payload, phase: 'prepared', expiresAt: Date.now() + UNDO_TTL }
+    const undo: UndoRecord = {
+      id: crypto.randomUUID(),
+      label,
+      payload,
+      phase: 'prepared',
+      expiresAt: Date.now() + UNDO_TTL,
+    }
     this.data.undos = this.data.undos.filter(record => record.expiresAt > Date.now()).slice(-19)
     this.data.undos.push(undo)
     // The destructive API call is not allowed to proceed if this write fails.
@@ -269,7 +275,7 @@ export class BookmarkCoordinator {
   async execute(command: Command): Promise<CommandResult> {
     return this.exclusive(async () => {
       if (typeof command?.type !== 'string')
-        throw new Error(getT().errors.invalidCommand())
+        throw new TypeError(getT().errors.invalidCommand())
       // Settings changes never touch the bookmark tree. Skip the tree reads so
       // high-frequency updates (slider drags) stay cheap.
       const settingsOnly = command.type === 'settings.update'
@@ -283,7 +289,10 @@ export class BookmarkCoordinator {
           await this.refresh()
         await this.save()
         this.publish()
-        return { snapshot: this.currentSnapshot(), notice }
+        return {
+          snapshot: this.currentSnapshot(),
+          notice,
+        }
       }
       catch (error) {
         if (!settingsOnly) {
@@ -303,19 +312,33 @@ export class BookmarkCoordinator {
         this.destination(command.parentId)
         if (command.colorIndex !== undefined)
           checkedColorIndex(command.colorIndex)
-        const created = await this.bookmarks.create({ parentId: command.parentId, title: this.title(command.title), url: validateUrl(command.url) })
+        const created = await this.bookmarks.create({
+          parentId: command.parentId,
+          title: this.title(command.title),
+          url: validateUrl(command.url),
+        })
         if (command.colorIndex !== undefined)
           this.data.appearance[created.id] = { ...this.data.appearance[created.id], colorIndex: command.colorIndex }
-        return { message: getT().notices.bookmarkAdded() }
+        return {
+          message: getT().notices.bookmarkAdded(),
+        }
       }
       case 'folder.create': {
         this.destination(command.parentId)
-        await this.bookmarks.create({ parentId: command.parentId, title: this.title(command.title) })
-        return { message: getT().notices.folderCreated() }
+        await this.bookmarks.create({
+          parentId: command.parentId,
+          title: this.title(command.title),
+        })
+        return {
+          message: getT().notices.folderCreated(),
+        }
       }
       case 'node.update': {
         const node = this.editable(command.id)
-        const after = { title: this.title(command.title), url: node.url }
+        const after = {
+          title: this.title(command.title),
+          url: node.url,
+        }
         if (command.url !== undefined) {
           if (!isBookmark(node))
             throw new Error(getT().errors.foldersNoUrl())
@@ -323,10 +346,18 @@ export class BookmarkCoordinator {
         }
         if (after.title === node.title && after.url === node.url)
           return undefined
-        const undo = await this.prepareUndo(getT().undoLabels.changesSaved(), { kind: 'update', nodeId: node.id, before: { title: node.title, url: node.url }, after })
+        const undo = await this.prepareUndo(getT().undoLabels.changesSaved(), {
+          kind: 'update',
+          nodeId: node.id,
+          before: { title: node.title, url: node.url },
+          after,
+        })
         await this.bookmarks.update(node.id, after)
         this.commitUndo(undo)
-        return { message: getT().notices.changesSaved(), undoId: undo.id }
+        return {
+          message: getT().notices.changesSaved(),
+          undoId: undo.id,
+        }
       }
       case 'node.move': {
         const node = this.editable(command.id)
@@ -337,7 +368,16 @@ export class BookmarkCoordinator {
         const source = groups.find(group => group.id === node.parentId)
         const target = groups.find(group => group.id === command.parentId)
         const position = source?.layout.find(item => item.i === node.id)
-        const undo = await this.prepareUndo(isFolder(node) ? getT().undoLabels.folderMoved() : getT().undoLabels.bookmarkMoved(), { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: command.parentId, position })
+        const undo = await this.prepareUndo(isFolder(node)
+          ? getT().undoLabels.folderMoved()
+          : getT().undoLabels.bookmarkMoved(), {
+          kind: 'move',
+          nodeId: node.id,
+          oldParent: node.parentId!,
+          oldIndex: node.index ?? 0,
+          expectedParent: command.parentId,
+          position,
+        })
         await this.bookmarks.move(node.id, { parentId: command.parentId })
         // Folder tiles keep their size and position through a Move-to-folder
         // as part of the same layout sync.
@@ -346,7 +386,10 @@ export class BookmarkCoordinator {
           this.data[key] = {
             ...this.data[key],
             [source.id]: source.layout.filter(item => item.i !== node.id),
-            [target.id]: [...target.layout, freePosition(target.layout, position, this.activeRows())],
+            [target.id]: [
+              ...target.layout,
+              freePosition(target.layout, position, this.activeRows()),
+            ],
           }
           // The other view self-heals on projection: the moved tile drops out
           // of the old group and lands at the next free slot in the new one.
@@ -359,11 +402,19 @@ export class BookmarkCoordinator {
           this.data[other] = {
             ...otherMap,
             [source.id]: otherSource,
-            [target.id]: [...otherDest, freePosition(otherDest, { i: node.id, x: 0, y: 0, w, h }, otherRows)],
+            [target.id]: [
+              ...otherDest,
+              freePosition(otherDest, { i: node.id, x: 0, y: 0, w, h }, otherRows),
+            ],
           }
         }
         this.commitUndo(undo)
-        return { message: isFolder(node) ? getT().notices.folderMoved() : getT().notices.bookmarkMoved(), undoId: undo.id }
+        return {
+          message: isFolder(node)
+            ? getT().notices.folderMoved()
+            : getT().notices.bookmarkMoved(),
+          undoId: undo.id,
+        }
       }
       case 'node.remove': {
         const node = this.editable(command.id)
@@ -426,7 +477,10 @@ export class BookmarkCoordinator {
         }
         const parentId = node.parentId
         const existing = { ...this.data.appearance[node.id] }
-        this.data.appearance[node.id] = { ...existing, ...patch }
+        this.data.appearance[node.id] = {
+          ...existing,
+          ...patch,
+        }
         if (parentId !== undefined) {
           const children = (this.node(parentId).children ?? []).filter(isLayoutable)
           for (const def of this.viewDefs()) {
@@ -474,7 +528,16 @@ export class BookmarkCoordinator {
           const { node, destination } = moves[0]
           const folder = isFolder(node)
           const position = projectGroups(this.currentSnapshot()).find(group => group.id === node.parentId)?.layout.find(item => item.i === node.id)
-          undo = await this.prepareUndo(folder ? getT().undoLabels.folderMoved() : getT().undoLabels.bookmarkMoved(), { kind: 'move', nodeId: node.id, oldParent: node.parentId!, oldIndex: node.index ?? 0, expectedParent: destination, position })
+          undo = await this.prepareUndo(folder
+            ? getT().undoLabels.folderMoved()
+            : getT().undoLabels.bookmarkMoved(), {
+            kind: 'move',
+            nodeId: node.id,
+            oldParent: node.parentId!,
+            oldIndex: node.index ?? 0,
+            expectedParent: destination,
+            position,
+          })
           await this.bookmarks.move(node.id, { parentId: destination })
           this.commitUndo(undo)
         }
@@ -490,11 +553,19 @@ export class BookmarkCoordinator {
             otherMap[groupId] = layout.filter(item => item.i !== node.id)
           const [w, h] = SIZES[effectiveTileSize(this.data.appearance[node.id]?.size ?? APPEARANCE_DEFAULTS.size, otherRows)]
           const dest = otherMap[destination] ?? []
-          otherMap[destination] = [...dest, freePosition(dest, { i: node.id, x: 0, y: 0, w, h }, otherRows)]
+          otherMap[destination] = [
+            ...dest,
+            freePosition(dest, { i: node.id, x: 0, y: 0, w, h }, otherRows),
+          ]
           this.data[other] = otherMap
         }
         return undo
-          ? { message: isFolder(moves[0].node) ? getT().notices.folderMovedNewGroup() : getT().notices.bookmarkMovedNewFolder(), undoId: undo.id }
+          ? {
+              message: isFolder(moves[0].node)
+                ? getT().notices.folderMovedNewGroup()
+                : getT().notices.bookmarkMovedNewFolder(),
+              undoId: undo.id,
+            }
           : undefined
       }
       case 'settings.update': {
@@ -521,12 +592,14 @@ export class BookmarkCoordinator {
           }
           else if (background.type === 'image') {
             if (typeof background.url !== 'string')
-              throw new Error(getT().errors.invalidBackgroundImage())
+              throw new TypeError(getT().errors.invalidBackgroundImage())
             try {
               validateBackgroundUrl(background.url)
             }
             catch (error) {
-              throw new Error(error instanceof Error ? error.message : getT().errors.invalidBackgroundImage())
+              throw new Error(error instanceof Error
+                ? error.message
+                : getT().errors.invalidBackgroundImage())
             }
             if (background.fit !== undefined && !['cover', 'contain', 'fill'].includes(background.fit))
               throw new Error(getT().errors.invalidImageFit())
@@ -543,7 +616,7 @@ export class BookmarkCoordinator {
           }
           else if (background.type === 'youtube') {
             if (typeof background.url !== 'string')
-              throw new Error(getT().errors.invalidYoutubeUrl())
+              throw new TypeError(getT().errors.invalidYoutubeUrl())
             if (background.url.trim() !== '' && parseYouTubeBackgroundTarget(background.url) === null)
               throw new Error(getT().errors.invalidYoutubeUrl())
             if (background.fit !== undefined && !['cover', 'contain', 'fill'].includes(background.fit))
@@ -586,23 +659,41 @@ export class BookmarkCoordinator {
               throw new Error(getT().errors.hexColor())
           }
         }
-        this.data.settings = { ...this.data.settings, ...patch }
+        this.data.settings = {
+          ...this.data.settings,
+          ...patch,
+        }
         if (patch.language !== undefined)
           applyLocale(this.data.settings.language, { persist: false })
         return undefined
       }
       case 'layout.reset': {
-        const undo: UndoRecord = { id: crypto.randomUUID(), label: getT().undoLabels.layoutsReset(), phase: 'committed', expiresAt: Date.now() + UNDO_TTL, payload: { kind: 'layouts', before: structuredClone(this.data.layouts), beforeDock: structuredClone(this.data.dockLayouts) } }
+        const undo: UndoRecord = {
+          id: crypto.randomUUID(),
+          label: getT().undoLabels.layoutsReset(),
+          phase: 'committed',
+          expiresAt: Date.now() + UNDO_TTL,
+          payload: {
+            kind: 'layouts',
+            before: structuredClone(this.data.layouts),
+            beforeDock: structuredClone(this.data.dockLayouts),
+          },
+        }
         this.data.undos.push(undo)
         this.data.layouts = {}
         this.data.dockLayouts = {}
-        return { message: getT().notices.layoutsReset(), undoId: undo.id }
+        return {
+          message: getT().notices.layoutsReset(),
+          undoId: undo.id,
+        }
       }
       case 'factory.reset': {
         // Restore MetroMark presentation data only. Native bookmarks stay untouched.
         this.data = emptyData(this.settings)
         applyLocale(this.data.settings.language, { persist: false })
-        return { message: getT().notices.factoryResetDone() }
+        return {
+          message: getT().notices.factoryResetDone(),
+        }
       }
       case 'undo': return this.undo(command.id, command.parentId)
       default: throw new Error(getT().errors.unknownCommand())
@@ -619,7 +710,9 @@ export class BookmarkCoordinator {
       this.destination(target)
       if (indexTree(this.tree).has(payload.backup.node.id) && !payload.restored) {
         this.data.undos = this.data.undos.filter(record => record.id !== id)
-        return { message: getT().errors.alreadyRestored() }
+        return {
+          message: getT().errors.alreadyRestored(),
+        }
       }
       if (payload.destination != null && payload.destination !== target && Object.keys(payload.restored ?? {}).length) {
         throw new Error(getT().errors.partialRestore())
@@ -631,13 +724,24 @@ export class BookmarkCoordinator {
       let index = children.findIndex(node => node.id === payload.backup.followingId)
       if (index < 0) {
         const preceding = children.findIndex(node => node.id === payload.backup.precedingId)
-        index = preceding >= 0 ? preceding + 1 : Math.min(payload.backup.index, children.length)
+        index = preceding >= 0
+          ? preceding + 1
+          : Math.min(payload.backup.index, children.length)
       }
       const restore = async (old: BookmarkNode, parentId: string, siblingIndex: number) => {
         const known = payload.restored![old.id]
         let newId = known
         if (!known || !indexTree(await this.bookmarks.getTree()).has(known)) {
-          const created = await this.bookmarks.create({ parentId, index: siblingIndex, ...(old.type === 'separator' ? { type: 'separator' as const } : { title: old.title }), ...(old.url !== undefined ? { url: old.url } : {}) })
+          const created = await this.bookmarks.create({
+            parentId,
+            index: siblingIndex,
+            ...(old.type === 'separator'
+              ? { type: 'separator' as const }
+              : { title: old.title }),
+            ...(old.url !== undefined
+              ? { url: old.url }
+              : {}),
+          })
           newId = created.id
           payload.restored![old.id] = newId
           // Persist progress so a partial restore can be retried without duplicating siblings.
@@ -654,7 +758,9 @@ export class BookmarkCoordinator {
       // Remap restored folder ids in both view maps. Legacy records without a
       // Dock map restore as empty; that view re-places tiles on next read.
       for (const def of this.viewDefs()) {
-        const backupMap = def.layoutsKey === 'layouts' ? payload.backup.layouts : payload.backup.dockLayouts
+        const backupMap = def.layoutsKey === 'layouts'
+          ? payload.backup.layouts
+          : payload.backup.dockLayouts
         for (const [oldId, layout] of Object.entries(backupMap ?? {})) {
           if (map[oldId]) {
             this.data[def.layoutsKey][map[oldId]] = layout.filter(item => map[item.i]).map(item => ({ ...item, i: map[item.i] }))
@@ -671,7 +777,13 @@ export class BookmarkCoordinator {
             // A stale-view position may not fit this map; drop it and let
             // reconcileLayout re-place the tile on the next read.
             this.data[key] = fitsRows(payload.backup.position, rows)
-              ? { ...this.data[key], [target]: [...rest, { ...payload.backup.position, i: newId }] }
+              ? {
+                  ...this.data[key],
+                  [target]: [
+                    ...rest,
+                    { ...payload.backup.position, i: newId },
+                  ],
+                }
               : { ...this.data[key], [target]: rest }
           }
         }
@@ -683,7 +795,10 @@ export class BookmarkCoordinator {
         throw new Error(getT().errors.movedAgain())
       this.checkMove(node, payload.oldParent)
       const length = this.node(payload.oldParent).children?.length ?? 0
-      await this.bookmarks.move(node.id, { parentId: payload.oldParent, index: Math.min(payload.oldIndex, length) })
+      await this.bookmarks.move(node.id, {
+        parentId: payload.oldParent,
+        index: Math.min(payload.oldIndex, length),
+      })
       for (const def of this.viewDefs()) {
         const key = def.layoutsKey
         const filtered = { ...this.data[key] }
@@ -696,8 +811,12 @@ export class BookmarkCoordinator {
           const key = def.layoutsKey
           const rows = def.rows
           const rest = this.data[key][payload.oldParent] ?? []
-          if (fitsRows(payload.position, rows))
-            this.data[key] = { ...this.data[key], [payload.oldParent]: [...rest, payload.position] }
+          if (fitsRows(payload.position, rows)) {
+            this.data[key] = {
+              ...this.data[key],
+              [payload.oldParent]: [...rest, payload.position],
+            }
+          }
         }
       }
     }
@@ -714,6 +833,8 @@ export class BookmarkCoordinator {
       this.data.dockLayouts = payload.beforeDock ?? {}
     }
     this.data.undos = this.data.undos.filter(record => record.id !== id)
-    return { message: getT().notices.restored() }
+    return {
+      message: getT().notices.restored(),
+    }
   }
 }

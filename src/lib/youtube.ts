@@ -68,7 +68,9 @@ export function parseYouTubeVideoId(value: string): string | null {
   if (candidate === null)
     return null
   candidate = candidate.trim()
-  return VIDEO_ID.test(candidate) ? candidate : null
+  return VIDEO_ID.test(candidate)
+    ? candidate
+    : null
 }
 
 /**
@@ -84,7 +86,9 @@ export function parseYouTubePlaylistId(value: string): string | null {
   if (candidate === null)
     return null
   const trimmed = candidate.trim()
-  return PLAYLIST_ID.test(trimmed) ? trimmed : null
+  return PLAYLIST_ID.test(trimmed)
+    ? trimmed
+    : null
 }
 
 /**

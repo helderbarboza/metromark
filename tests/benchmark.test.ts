@@ -37,7 +37,13 @@ describe('classifyFrameTime', () => {
 
 describe('bENCHMARK_LEVELS', () => {
   it('lists the five stages, best first', () => {
-    expect(BENCHMARK_LEVELS).toEqual(['excellent', 'good', 'moderate', 'weak', 'poor'])
+    expect(BENCHMARK_LEVELS).toEqual([
+      'excellent',
+      'good',
+      'moderate',
+      'weak',
+      'poor',
+    ])
   })
 
   it('has strictly increasing thresholds', () => {

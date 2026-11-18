@@ -11,7 +11,12 @@
   const gridView = $derived(dock ? 'dock' : 'classic')
   const density = $derived(compact ? 'compact' : 'comfortable')
   const client = $derived(
-    createPreviewClient({ ...SETTINGS_DEFAULTS, density, gridView, reducedMotion: true }),
+    createPreviewClient({
+      ...SETTINGS_DEFAULTS,
+      density,
+      gridView,
+      reducedMotion: true,
+    }),
   )
   let ready = $state(false)
 
@@ -19,7 +24,11 @@
     let cancelled = false
     void client.execute({
       type: 'settings.update',
-      patch: { density: compact ? 'compact' : 'comfortable', gridView, reducedMotion: true },
+      patch: {
+        density: compact ? 'compact' : 'comfortable',
+        gridView,
+        reducedMotion: true,
+      },
     }).then(() => {
       if (!cancelled)
         ready = true

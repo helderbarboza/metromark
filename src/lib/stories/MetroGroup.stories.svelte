@@ -13,12 +13,66 @@
   import { expect, fireEvent, fn, screen, userEvent, waitFor } from 'storybook/test'
 
   const tiles: Record<string, TileView> = {
-    steam: { id: 'steam', title: 'Steam', url: 'https://store.steampowered.com/', domain: 'store.steampowered.com', colorIndex: 0, size: 'medium', writable: true, kind: 'bookmark' },
-    github: { id: 'github', title: 'GitHub', url: 'https://github.com', domain: 'github.com', colorIndex: 1, size: 'medium', writable: true, kind: 'bookmark' },
-    gmail: { id: 'gmail', title: 'Gmail', url: 'https://mail.google.com', domain: 'mail.google.com', colorIndex: 2, size: 'wide', writable: true, kind: 'bookmark' },
-    notion: { id: 'notion', title: 'Notion', url: 'https://notion.so', domain: 'notion.so', colorIndex: 3, size: 'large', writable: true, kind: 'bookmark' },
-    drive: { id: 'drive', title: 'Drive', url: 'https://drive.google.com', domain: 'drive.google.com', colorIndex: 4, size: 'medium', writable: true, kind: 'bookmark' },
-    slack: { id: 'slack', title: 'Slack', url: 'https://slack.com', domain: 'slack.com', colorIndex: 5, size: 'small', writable: true, kind: 'bookmark' },
+    steam: {
+      id: 'steam',
+      title: 'Steam',
+      url: 'https://store.steampowered.com/',
+      domain: 'store.steampowered.com',
+      colorIndex: 0,
+      size: 'medium',
+      writable: true,
+      kind: 'bookmark',
+    },
+    github: {
+      id: 'github',
+      title: 'GitHub',
+      url: 'https://github.com',
+      domain: 'github.com',
+      colorIndex: 1,
+      size: 'medium',
+      writable: true,
+      kind: 'bookmark',
+    },
+    gmail: {
+      id: 'gmail',
+      title: 'Gmail',
+      url: 'https://mail.google.com',
+      domain: 'mail.google.com',
+      colorIndex: 2,
+      size: 'wide',
+      writable: true,
+      kind: 'bookmark',
+    },
+    notion: {
+      id: 'notion',
+      title: 'Notion',
+      url: 'https://notion.so',
+      domain: 'notion.so',
+      colorIndex: 3,
+      size: 'large',
+      writable: true,
+      kind: 'bookmark',
+    },
+    drive: {
+      id: 'drive',
+      title: 'Drive',
+      url: 'https://drive.google.com',
+      domain: 'drive.google.com',
+      colorIndex: 4,
+      size: 'medium',
+      writable: true,
+      kind: 'bookmark',
+    },
+    slack: {
+      id: 'slack',
+      title: 'Slack',
+      url: 'https://slack.com',
+      domain: 'slack.com',
+      colorIndex: 5,
+      size: 'small',
+      writable: true,
+      kind: 'bookmark',
+    },
   }
 
   const layout: Layout = [
@@ -41,10 +95,33 @@
       size: 'medium',
       writable: true,
       preview: [
-        { id: 'mdn', kind: 'bookmark', title: 'MDN', url: 'https://developer.mozilla.org/', colorIndex: 5 },
-        { id: 'svelte', kind: 'bookmark', title: 'Svelte', url: 'https://svelte.dev/', colorIndex: 6 },
-        { id: 'tools', kind: 'folder', colorIndex: 4, title: 'Tools' },
-        { id: 'tailwind', kind: 'bookmark', title: 'Tailwind CSS', url: 'https://tailwindcss.com/', colorIndex: 3 },
+        {
+          id: 'mdn',
+          kind: 'bookmark',
+          title: 'MDN',
+          url: 'https://developer.mozilla.org/',
+          colorIndex: 5,
+        },
+        {
+          id: 'svelte',
+          kind: 'bookmark',
+          title: 'Svelte',
+          url: 'https://svelte.dev/',
+          colorIndex: 6,
+        },
+        {
+          id: 'tools',
+          kind: 'folder',
+          colorIndex: 4,
+          title: 'Tools',
+        },
+        {
+          id: 'tailwind',
+          kind: 'bookmark',
+          title: 'Tailwind CSS',
+          url: 'https://tailwindcss.com/',
+          colorIndex: 3,
+        },
       ],
     },
   }
@@ -52,7 +129,13 @@
     ...layout.map(entry => entry.i === 'slack'
       ? { ...entry, x: 4 as const, y: 4 as const }
       : entry),
-    { i: folderTileId, x: 2, y: 4, w: 2, h: 2 },
+    {
+      i: folderTileId,
+      x: 2,
+      y: 4,
+      w: 2,
+      h: 2,
+    },
   ]
 
   const group: GroupView = {
@@ -105,7 +188,12 @@
   const dockTiles: Record<string, TileView> = Object.fromEntries(
     Object.entries(tiles).map(([id, tile]) => [
       id,
-      { ...tile, size: tile.size === 'large' ? 'wide' : tile.size },
+      {
+        ...tile,
+        size: tile.size === 'large'
+          ? 'wide'
+          : tile.size,
+      },
     ]),
   )
   const dockLayout: Layout = [
@@ -152,8 +240,18 @@
   <MenuItems
     variant='context'
     items={[
-      { label: 'Add new bookmark', icon: 'addBookmark', action: fn(), disabled: !group.writable },
-      { label: 'Rename folder', icon: 'edit', action: rename, separator: true },
+      {
+        label: 'Add new bookmark',
+        icon: 'addBookmark',
+        action: fn(),
+        disabled: !group.writable,
+      },
+      {
+        label: 'Rename folder',
+        icon: 'edit',
+        action: rename,
+        separator: true,
+      },
       {
         label: 'Delete folder',
         icon: 'delete',
@@ -300,7 +398,12 @@
 
 <Story
   name='Dock grid'
-  args={{ group: dockGroup, layout: dockLayout, tiles: dockTiles, rows: 2 }}
+  args={{
+    group: dockGroup,
+    layout: dockLayout,
+    tiles: dockTiles,
+    rows: 2,
+  }}
   {template}
   play={async ({ canvas }) => {
     await expect(await canvas.findByRole('heading', { name: 'Dock view' })).toBeVisible()

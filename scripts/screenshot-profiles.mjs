@@ -21,7 +21,9 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 async function serverResponds() {
   try {
-    const response = await fetch(BASE_URL, { signal: AbortSignal.timeout(2000) })
+    const response = await fetch(BASE_URL, {
+      signal: AbortSignal.timeout(2000),
+    })
     return response.ok
   }
   catch {
@@ -42,7 +44,14 @@ async function waitForServer(timeoutMs) {
 let server = null
 if (!(await serverResponds())) {
   console.log('Starting the preview server on port', PORT)
-  server = spawn('npx', ['vite', '--host', HOST, '--port', String(PORT), '--strictPort'], { stdio: 'ignore' })
+  server = spawn('npx', [
+    'vite',
+    '--host',
+    HOST,
+    '--port',
+    String(PORT),
+    '--strictPort',
+  ], { stdio: 'ignore' })
   process.on('exit', () => {
     server?.kill()
   })

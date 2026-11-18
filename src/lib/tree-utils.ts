@@ -12,5 +12,8 @@ export function website(url: string): { domain: string, colorIndex: number } {
   catch {
     domain = 'bookmark'
   }
-  return { domain, colorIndex: hashColorIndex(domain) }
+  return {
+    domain,
+    colorIndex: hashColorIndex(domain),
+  }
 }

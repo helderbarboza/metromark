@@ -44,7 +44,9 @@ export function foreground(bgColor: string | number[]): number {
   b /= 255
 
   const linearize = (channel: number) =>
-    channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+    channel <= 0.03928
+      ? channel / 12.92
+      : ((channel + 0.055) / 1.055) ** 2.4
 
   const R = linearize(r)
   const G = linearize(g)
@@ -52,5 +54,7 @@ export function foreground(bgColor: string | number[]): number {
 
   const luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B
 
-  return luminance > 0.179 ? 0 : 1
+  return luminance > 0.179
+    ? 0
+    : 1
 }

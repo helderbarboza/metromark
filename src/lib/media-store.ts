@@ -41,7 +41,11 @@ export async function saveBackgroundMedia(blob: Blob): Promise<string> {
   const db = await openDb()
   try {
     const tx = db.transaction(STORE_NAME, 'readwrite')
-    tx.objectStore(STORE_NAME).put({ key, blob, created: Date.now() } satisfies MediaRecord)
+    tx.objectStore(STORE_NAME).put({
+      key,
+      blob,
+      created: Date.now(),
+    } satisfies MediaRecord)
     await transactionDone(tx, 'Unable to store the image.')
   }
   finally {
@@ -111,7 +115,9 @@ export async function sweepBackgroundMedia(referenced: readonly string[]): Promi
     const keys = await new Promise<string[]>((resolve, reject) => {
       keysRequest.onsuccess = () => {
         const result: unknown = keysRequest.result
-        resolve(Array.isArray(result) ? result.filter((key): key is string => typeof key === 'string') : [])
+        resolve(Array.isArray(result)
+          ? result.filter((key): key is string => typeof key === 'string')
+          : [])
       }
       keysRequest.onerror = () => reject(keysRequest.error ?? new Error('Unable to list stored images.'))
     })

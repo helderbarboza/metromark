@@ -44,7 +44,9 @@
     {/if}
     {#if helpText}
       <p
-        id={controlId ? `${controlId}-help` : undefined}
+        id={controlId
+          ? `${controlId}-help`
+          : undefined}
         class='mt-0.5 text-xs/4 text-(--muted-foreground)'
       >
         {helpText}

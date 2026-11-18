@@ -8,12 +8,28 @@ import { hashColorIndex } from '$lib/tree-utils'
 import { validateUrl } from '$lib/url'
 import { describe, expect, it } from 'vitest'
 
-const fixture = (): Snapshot => ({ ...demoData(), tree: normalizeTree(demoTree()), revision: 0, mode: 'preview', undos: [] })
+function fixture(): Snapshot {
+  return {
+    ...demoData(),
+    tree: normalizeTree(demoTree()),
+    revision: 0,
+    mode: 'preview',
+    undos: [],
+  }
+}
 
 describe('bookmark tree projection', () => {
   it('keeps separate browser roots and flattens folders with full paths', () => {
     const groups = projectGroups(fixture())
-    expect(groups.map(group => group.id)).toEqual(['bar', 'work', 'inspiration', 'learning', 'tools', 'other', 'mobile'])
+    expect(groups.map(group => group.id)).toEqual([
+      'bar',
+      'work',
+      'inspiration',
+      'learning',
+      'tools',
+      'other',
+      'mobile',
+    ])
     expect(groups.find(group => group.id === 'tools')?.path).toEqual(['Bookmarks bar', 'Learning', 'Tools'])
     expect(groups.find(group => group.id === 'bar')?.layout).toHaveLength(8)
   })
@@ -37,13 +53,23 @@ describe('bookmark tree projection', () => {
   it('distinguishes duplicate titles and URLs using bookmark IDs', () => {
     const state = fixture()
     const bar = indexTree(state.tree).get('bar')!
-    bar.children!.push({ id: 'duplicate', parentId: 'bar', title: 'Steam', url: 'https://store.steampowered.com/' })
+    bar.children!.push({
+      id: 'duplicate',
+      parentId: 'bar',
+      title: 'Steam',
+      url: 'https://store.steampowered.com/',
+    })
     expect(projectGroups(state)[0].layout).toHaveLength(9)
     expect(Object.keys(projectGroups(state)[0].tiles)).toContain('duplicate')
   })
   it('does not render Firefox separators as bookmarks or groups', () => {
     const state = fixture()
-    indexTree(state.tree).get('bar')!.children!.push({ id: 'separator', title: '', type: 'separator', parentId: 'bar' })
+    indexTree(state.tree).get('bar')!.children!.push({
+      id: 'separator',
+      title: '',
+      type: 'separator',
+      parentId: 'bar',
+    })
     expect(projectGroups(state)[0].layout).toHaveLength(8)
   })
   it('updates every descendant path on an ancestor rename', () => {
@@ -61,7 +87,13 @@ describe('independent layouts', () => {
     bar.children!.reverse()
     // Bookmarks keep their saved positions regardless of sibling order; folder
     // tiles that were never saved may pack afresh around them.
-    const bookmarkIds = new Set(['steam', 'linear', 'github', 'notion', 'gmail'])
+    const bookmarkIds = new Set([
+      'steam',
+      'linear',
+      'github',
+      'notion',
+      'gmail',
+    ])
     expect(projectGroups(state)[0].layout.filter(entry => bookmarkIds.has(entry.i)))
       .toEqual(before.filter(entry => bookmarkIds.has(entry.i)))
   })
@@ -69,7 +101,12 @@ describe('independent layouts', () => {
     const state = fixture()
     const bar = indexTree(state.tree).get('bar')!
     const old = projectGroups(state)[0].layout
-    bar.children!.push({ id: 'fresh', title: 'Fresh', url: 'https://example.com', parentId: 'bar' })
+    bar.children!.push({
+      id: 'fresh',
+      title: 'Fresh',
+      url: 'https://example.com',
+      parentId: 'bar',
+    })
     const next = projectGroups(state)[0].layout
     for (const position of old) expect(next.find(entry => entry.i === position.i)).toEqual(position)
     const newPosition = next.find(entry => entry.i === 'fresh')!
@@ -83,15 +120,28 @@ describe('independent layouts', () => {
     expect(new Set(layout.map(entry => entry.i)).size).toBe(180)
   })
   it('repairs collisions and clamps a large tile to valid rows', () => {
-    const links = [{ id: 'a', title: 'a', url: 'https://a.com' }, { id: 'b', title: 'b', url: 'https://b.com' }]
-    const result = reconcileLayout(links, [{ i: 'a', x: 0, y: 5, w: 4, h: 4 }, { i: 'b', x: 0, y: 4, w: 2, h: 2 }])
+    const links = [
+      { id: 'a', title: 'a', url: 'https://a.com' },
+      { id: 'b', title: 'b', url: 'https://b.com' },
+    ]
+    const result = reconcileLayout(links, [
+      { i: 'a', x: 0, y: 5, w: 4, h: 4 },
+      { i: 'b', x: 0, y: 4, w: 2, h: 2 },
+    ])
     expect(result[0].y + result[0].h).toBeLessThanOrEqual(8)
     expect(overlaps(result[0], result[1])).toBe(false)
   })
   it('rejects unknown sizes, negative coordinates, and repeated IDs', () => {
-    expect(() => validateLayout([{ i: 'a', x: -1, y: 0, w: 2, h: 2 }])).toThrow()
-    expect(() => validateLayout([{ i: 'a', x: 0, y: 0, w: 3, h: 3 }])).toThrow()
-    expect(() => validateLayout([{ i: 'a', x: 0, y: 0, w: 2, h: 2 }, { i: 'a', x: 2, y: 0, w: 2, h: 2 }])).toThrow()
+    expect(() => validateLayout([
+      { i: 'a', x: -1, y: 0, w: 2, h: 2 },
+    ])).toThrow()
+    expect(() => validateLayout([
+      { i: 'a', x: 0, y: 0, w: 3, h: 3 },
+    ])).toThrow()
+    expect(() => validateLayout([
+      { i: 'a', x: 0, y: 0, w: 2, h: 2 },
+      { i: 'a', x: 2, y: 0, w: 2, h: 2 },
+    ])).toThrow()
   })
 })
 
@@ -114,15 +164,29 @@ describe('dock grid view', () => {
     expect(bar.layout.find(entry => entry.i === 'steam')).toMatchObject({ h: 4 })
   })
   it('validates dock commits against 2 rows only', () => {
-    expect(validateLayout([{ i: 'a', x: 0, y: 1, w: 1, h: 1 }], DOCK_ROWS)).toHaveLength(1)
-    expect(() => validateLayout([{ i: 'a', x: 0, y: 1, w: 2, h: 2 }], DOCK_ROWS)).toThrow()
-    expect(() => validateLayout([{ i: 'a', x: 0, y: 0, w: 4, h: 4 }], DOCK_ROWS)).toThrow()
+    expect(validateLayout([
+      { i: 'a', x: 0, y: 1, w: 1, h: 1 },
+    ], DOCK_ROWS)).toHaveLength(1)
+    expect(() => validateLayout([
+      { i: 'a', x: 0, y: 1, w: 2, h: 2 },
+    ], DOCK_ROWS)).toThrow()
+    expect(() => validateLayout([
+      { i: 'a', x: 0, y: 0, w: 4, h: 4 },
+    ], DOCK_ROWS)).toThrow()
     // The same 4x4 item is valid in the classic grid.
-    expect(validateLayout([{ i: 'a', x: 0, y: 4, w: 4, h: 4 }], ROWS)).toHaveLength(1)
+    expect(validateLayout([
+      { i: 'a', x: 0, y: 4, w: 4, h: 4 },
+    ], ROWS)).toHaveLength(1)
   })
   it('remaps a stored classic Large tile instead of overflowing the dock grid', () => {
-    const links = [{ id: 'a', title: 'a', url: 'https://a.com' }]
-    const result = reconcileLayout(links, [{ i: 'a', x: 0, y: 5, w: 4, h: 4 }], { a: { size: 'large' } }, DOCK_ROWS)
+    const links = [
+      { id: 'a', title: 'a', url: 'https://a.com' },
+    ]
+    const result = reconcileLayout(links, [
+      { i: 'a', x: 0, y: 5, w: 4, h: 4 },
+    ], {
+      a: { size: 'large' },
+    }, DOCK_ROWS)
     expect(result[0].h).toBe(2)
     expect(result[0].y + result[0].h).toBeLessThanOrEqual(DOCK_ROWS)
   })
@@ -138,7 +202,14 @@ describe('safe navigation', () => {
     expect(validateUrl(' https://example.com ')).toBe('https://example.com')
     expect(validateUrl('mailto:me@example.com')).toBe('mailto:me@example.com')
   })
-  it.each(['javascript:alert(1)', 'data:text/html,<script>', 'vbscript:msgbox(1)', 'blob:https://example.com/id', 'example.com', ''])('rejects %s', (url) => {
+  it.each([
+    'javascript:alert(1)',
+    'data:text/html,<script>',
+    'vbscript:msgbox(1)',
+    'blob:https://example.com/id',
+    'example.com',
+    '',
+  ])('rejects %s', (url) => {
     expect(() => validateUrl(url)).toThrow()
   })
   it('keeps all sample URLs as actual distinct bookmark entities', () => {
@@ -169,7 +240,15 @@ describe('tile favicons', () => {
     expect(faviconRequestForTile('wide')).toEqual({ requestSize: 64, scaleFactor: 2 })
     expect(faviconRequestForTile('large')).toEqual({ requestSize: 64, scaleFactor: 2 })
   })
-  it.each(['javascript:alert(1)', 'data:text/html,x', 'blob:https://example.com/id', 'mailto:me@example.com', 'ftp://example.com/f', 'not a url', ''])('returns null for %s', (url) => {
+  it.each([
+    'javascript:alert(1)',
+    'data:text/html,x',
+    'blob:https://example.com/id',
+    'mailto:me@example.com',
+    'ftp://example.com/f',
+    'not a url',
+    '',
+  ])('returns null for %s', (url) => {
     expect(buildExtensionFaviconUrl(url, 64, base)).toBeNull()
   })
   it('returns null without an extension runtime base', () => {
@@ -199,13 +278,24 @@ describe('folder tiles', () => {
     expect(bar.tiles.learning?.kind).toBe('folder')
     expect(bar.layout.find(entry => entry.i === 'work')).toBeDefined()
     // Folder tiles and bookmarks share one persisted layout.
-    expect(bar.layout.map(entry => entry.i)).toEqual(expect.arrayContaining(['steam', 'work', 'inspiration', 'learning']))
+    expect(bar.layout.map(entry => entry.i)).toEqual(expect.arrayContaining([
+      'steam',
+      'work',
+      'inspiration',
+      'learning',
+    ]))
   })
   it('previews the folder’s children in layout order with a bookmark/folder split', () => {
     const groups = projectGroups(fixture())
     const preview = folderPreview(groups, 'bar', 'learning')
     expect(preview).toHaveLength(5)
-    expect(preview.map(cell => cell.id)).toEqual(expect.arrayContaining(['mdn', 'svelte', 'typescript', 'tailwind', 'tools']))
+    expect(preview.map(cell => cell.id)).toEqual(expect.arrayContaining([
+      'mdn',
+      'svelte',
+      'typescript',
+      'tailwind',
+      'tools',
+    ]))
     // Preview order is the folder's own layout order, not sibling order.
     const learning = groups.find(group => group.id === 'learning')!
     expect(preview.map(cell => cell.id)).toEqual(learning.layout.map(entry => entry.i))
@@ -232,7 +322,12 @@ describe('folder tiles', () => {
   })
   it('shows an empty mosaic for an empty folder', () => {
     const state = fixture()
-    indexTree(state.tree).get('bar')!.children!.push({ id: 'quiet', parentId: 'bar', title: 'Quiet', children: [] })
+    indexTree(state.tree).get('bar')!.children!.push({
+      id: 'quiet',
+      parentId: 'bar',
+      title: 'Quiet',
+      children: [],
+    })
     const groups = projectGroups(state)
     expect(groups.find(group => group.id === 'bar')?.tiles.quiet?.kind).toBe('folder')
     expect(folderPreview(groups, 'bar', 'quiet')).toEqual([])

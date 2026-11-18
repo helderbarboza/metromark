@@ -42,8 +42,12 @@ function loadSelections(): ThemeSelections {
       return { ...DEFAULTS }
 
     return {
-      light: isOneOf(saved.light, LIGHT_THEMES) ? saved.light : DEFAULTS.light,
-      dark: isOneOf(saved.dark, DARK_THEMES) ? saved.dark : DEFAULTS.dark,
+      light: isOneOf(saved.light, LIGHT_THEMES)
+        ? saved.light
+        : DEFAULTS.light,
+      dark: isOneOf(saved.dark, DARK_THEMES)
+        ? saved.dark
+        : DEFAULTS.dark,
     }
   }
   catch {

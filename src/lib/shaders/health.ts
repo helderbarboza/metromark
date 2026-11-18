@@ -124,7 +124,9 @@ function minDelta(samples: Sample[]): number {
     if (delta > 0 && delta < min)
       min = delta
   }
-  return Number.isFinite(min) ? min : 0
+  return Number.isFinite(min)
+    ? min
+    : 0
 }
 
 function computeStats(samples: Sample[]): HealthStats {
@@ -140,8 +142,15 @@ function computeStats(samples: Sample[]): HealthStats {
   const p50 = percentile(deltas, 0.5)
   const p90 = percentile(deltas, 0.9)
   const span = samples[samples.length - 1].at - samples[0].at
-  const fps = span > 0 ? (rendered / span) * 1000 : 0
-  return { fps, frameMs: p50, worstMs: p90, samples: samples.length }
+  const fps = span > 0
+    ? (rendered / span) * 1000
+    : 0
+  return {
+    fps,
+    frameMs: p50,
+    worstMs: p90,
+    samples: samples.length,
+  }
 }
 
 function percentile(sorted: number[], p: number): number {

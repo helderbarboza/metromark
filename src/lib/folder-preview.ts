@@ -7,9 +7,24 @@ import { website } from '$lib/tree-utils'
  * grid row and spans all columns; the remaining rows render the first children
  * in the folder's own layout order.
  */
-export const FOLDER_COLUMNS: Record<TileSize, number> = { small: 2, medium: 3, wide: 6, large: 6 }
-export const FOLDER_ROWS: Record<TileSize, number> = { small: 2, medium: 3, wide: 3, large: 6 }
-export const FOLDER_PREVIEW: Record<TileSize, number> = { small: 4, medium: 6, wide: 12, large: 30 }
+export const FOLDER_COLUMNS: Record<TileSize, number> = {
+  small: 2,
+  medium: 3,
+  wide: 6,
+  large: 6,
+}
+export const FOLDER_ROWS: Record<TileSize, number> = {
+  small: 2,
+  medium: 3,
+  wide: 3,
+  large: 6,
+}
+export const FOLDER_PREVIEW: Record<TileSize, number> = {
+  small: 4,
+  medium: 6,
+  wide: 12,
+  large: 30,
+}
 
 /** Children that get laid out in a group: bookmarks and folders, never separators. */
 export const isLayoutable = (node: BookmarkNode) => isBookmark(node) || isFolder(node)
@@ -19,7 +34,9 @@ export function orderByLayout(nodes: BookmarkNode[], layout: Layout): BookmarkNo
   const byId = new Map(nodes.map(node => [node.id, node]))
   return layout.flatMap((item) => {
     const node = byId.get(item.i)
-    return node ? [node] : []
+    return node
+      ? [node]
+      : []
   })
 }
 

@@ -119,7 +119,10 @@
       if (reducedMotion || dy === 0)
         return
       el.animate(
-        [{ transform: `translateY(${dy}px)` }, { transform: 'translateY(0)' }],
+        [
+          { transform: `translateY(${dy}px)` },
+          { transform: 'translateY(0)' },
+        ],
         { duration: 150, easing: 'ease-out' },
       )
     })
@@ -149,8 +152,12 @@
           >
 
             <div
-              class={cn('flex h-full flex-row', def.anchor === 'end' ? 'items-end' : 'items-center')}
-              style:padding-bottom={def.anchor === 'end' ? `${def.inset ?? 0}px` : undefined}
+              class={cn('flex h-full flex-row', def.anchor === 'end'
+                ? 'items-end'
+                : 'items-center')}
+              style:padding-bottom={def.anchor === 'end'
+                ? `${def.inset ?? 0}px`
+                : undefined}
             >
               {#if !snapshot}
                 <BoardStatus variant='loading' {loadError} />

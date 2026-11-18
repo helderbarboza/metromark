@@ -83,7 +83,9 @@ export function validateBackgroundUrl(value: string): string {
     return url
   try {
     const parsed = new URL(url)
-    throw new Error(getT().backgroundErrors.backgroundHttpOnly({ scheme: parsed.protocol.slice(0, -1) }))
+    throw new Error(getT().backgroundErrors.backgroundHttpOnly({
+      scheme: parsed.protocol.slice(0, -1),
+    }))
   }
   catch (error) {
     if (error instanceof TypeError)
@@ -109,19 +111,32 @@ export function normalizeImageBackgroundSettings(settings: Settings): Settings {
   if (background.type !== 'image' || background.parallaxZoom === undefined)
     return settings
   const zoom = background.parallaxZoom
-  if (!Number.isFinite(zoom))
-    return { ...settings, background: { ...background, parallaxZoom: BACKGROUND_DEFAULTS.image.parallaxZoom } }
-  const factor = zoom > 4 ? zoom / 100 : zoom
+  if (!Number.isFinite(zoom)) {
+    return {
+      ...settings,
+      background: { ...background, parallaxZoom: BACKGROUND_DEFAULTS.image.parallaxZoom },
+    }
+  }
+  const factor = zoom > 4
+    ? zoom / 100
+    : zoom
   const clamped = Math.min(4, Math.max(1, factor))
   if (clamped === zoom)
     return settings
-  return { ...settings, background: { ...background, parallaxZoom: clamped } }
+  return {
+    ...settings,
+    background: { ...background, parallaxZoom: clamped },
+  }
 }
 
 /** Scale (width, height) down so the longest edge is at most `maxEdge`. Degenerate input clamps to 1x1. */
 export function clampDimensions(width: number, height: number, maxEdge: number = MAX_DIMENSION): ClampedDimensions {
-  const w = Number.isFinite(width) ? Math.max(1, Math.floor(width)) : 1
-  const h = Number.isFinite(height) ? Math.max(1, Math.floor(height)) : 1
+  const w = Number.isFinite(width)
+    ? Math.max(1, Math.floor(width))
+    : 1
+  const h = Number.isFinite(height)
+    ? Math.max(1, Math.floor(height))
+    : 1
   const longest = Math.max(w, h)
   if (longest <= maxEdge)
     return { width: w, height: h, scaled: false }
@@ -139,6 +154,10 @@ export function estimateDataUriBytes(uri: string): number {
   if (!match)
     return 0
   const payload = match[1].replace(/\s/g, '')
-  const padding = payload.endsWith('==') ? 2 : payload.endsWith('=') ? 1 : 0
+  const padding = payload.endsWith('==')
+    ? 2
+    : payload.endsWith('=')
+      ? 1
+      : 0
   return Math.max(0, Math.floor((payload.length * 3) / 4) - padding)
 }

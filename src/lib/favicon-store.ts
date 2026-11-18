@@ -50,7 +50,9 @@ export async function loadCachedGlyph(key: string): Promise<GlyphRecord | undefi
       const tx = db.transaction(STORE_NAME, 'readonly')
       const request = tx.objectStore(STORE_NAME).get(key)
       return await new Promise((resolve, reject) => {
-        request.onsuccess = () => resolve(isGlyphRecord(request.result) ? request.result : undefined)
+        request.onsuccess = () => resolve(isGlyphRecord(request.result)
+          ? request.result
+          : undefined)
         request.onerror = () => reject(request.error ?? new Error('Unable to read the cached icon.'))
       })
     }

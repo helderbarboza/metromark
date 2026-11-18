@@ -8,7 +8,9 @@ export function createDialogCommand(
   const state = $state({ busy: false, error: '' })
 
   function fail(failure: unknown): void {
-    state.error = failure instanceof Error ? failure.message : getT().dialogs.somethingWrong()
+    state.error = failure instanceof Error
+? failure.message
+: getT().dialogs.somethingWrong()
   }
 
   async function run(task: () => Promise<void>): Promise<void> {

@@ -107,7 +107,13 @@
       <div class='p-4'>
         <p class='mb-2.5 text-xs text-(--muted-foreground)'>Recent themes</p>
         <div class='flex flex-wrap gap-2'>
-          {#each ['#2b2b2b', '#1f1f1f', '#3b3b3b', '#0a2a4a', '#4a1f1f'] as color (color)}
+          {#each [
+            '#2b2b2b',
+            '#1f1f1f',
+            '#3b3b3b',
+            '#0a2a4a',
+            '#4a1f1f',
+          ] as color (color)}
             {@render themeCard(color)}
           {/each}
         </div>

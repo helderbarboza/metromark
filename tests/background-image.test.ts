@@ -32,7 +32,10 @@ describe('normalizeImageBackgroundSettings', () => {
   })
 
   it('leaves non-image backgrounds untouched', () => {
-    const color = { ...SETTINGS_DEFAULTS, background: { type: 'color' as const, auto: true } }
+    const color = {
+      ...SETTINGS_DEFAULTS,
+      background: { type: 'color' as const, auto: true },
+    }
     expect(normalizeImageBackgroundSettings(color)).toBe(color)
   })
 })
@@ -86,7 +89,13 @@ describe('isDataImageUri', () => {
 
 describe('validateUploadFile', () => {
   it('accepts the documented image types within the size cap', () => {
-    for (const type of ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml'])
+    for (const type of [
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+      'image/gif',
+      'image/svg+xml',
+    ])
       expect(() => validateUploadFile({ type, size: 5 * 1024 * 1024 })).not.toThrow()
   })
 

@@ -42,7 +42,12 @@ export function solveQuality(
   }
   const raw = fps0 * clampedLoad
   const snapped = snapFps(raw, hz, 'down')
-  return { scale: scale0, fps: snapped < FPS_FLOOR ? snapFps(FPS_FLOOR, hz, 'up') : snapped }
+  return {
+    scale: scale0,
+    fps: snapped < FPS_FLOOR
+      ? snapFps(FPS_FLOOR, hz, 'up')
+      : snapped,
+  }
 }
 
 export function loadFloor(preference: QualityPreference, scale0: number, fps0: number): number {

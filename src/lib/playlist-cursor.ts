@@ -49,7 +49,9 @@ function readMap(storage: PlaylistCursorStorage | undefined): Record<string, num
  */
 export function createPlaylistCursorStore(
   storage: PlaylistCursorStorage | undefined
-    = typeof globalThis.localStorage === 'undefined' ? undefined : globalThis.localStorage,
+    = typeof globalThis.localStorage === 'undefined'
+      ? undefined
+      : globalThis.localStorage,
 ): PlaylistCursorStore {
   return {
     read(playlistId) {

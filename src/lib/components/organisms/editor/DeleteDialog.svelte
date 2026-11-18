@@ -47,7 +47,9 @@
 >
   <Icon name='folder' size={24} />
   <div>
-    <strong class='mb-1.25 block text-xs font-medium'>{$LL.dialogs.bookmarkCount({ count: countBookmarks(node) })}</strong>
+    <strong class='mb-1.25 block text-xs font-medium'>{$LL.dialogs.bookmarkCount({
+      count: countBookmarks(node),
+    })}</strong>
     <span class='text-xs text-(--muted-foreground)'>
       {$LL.dialogs.nestedFolderCount({ count: flatten([node]).filter(isFolder).length - 1 })}
     </span>
@@ -65,6 +67,8 @@
     onclick={remove}
   >
     <Icon name='delete' size={15} />
-    {command.busy ? $LL.dialogs.deleting() : $LL.dialogs.deleteFolder()}
+    {command.busy
+      ? $LL.dialogs.deleting()
+      : $LL.dialogs.deleteFolder()}
   </Button>
 </DialogActions>

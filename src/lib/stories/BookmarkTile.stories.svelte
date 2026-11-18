@@ -12,9 +12,17 @@
     title: 'Organisms/Bookmark tile',
     component: BookmarkTile,
     tags: ['autodocs'],
-    args: { tile: { title: 'Steam', colorIndex: 0, url: 'https://store.steampowered.com/' }, size: 'medium', domain: 'store.steampowered.com', showDomain: true },
+    args: {
+      tile: { title: 'Steam', colorIndex: 0, url: 'https://store.steampowered.com/' },
+      size: 'medium',
+      domain: 'store.steampowered.com',
+      showDomain: true,
+    },
     argTypes: {
-      size: { control: 'radio', options: [...TILE_SIZES] },
+      size: {
+        control: 'radio',
+        options: [...TILE_SIZES],
+      },
       selected: { control: 'boolean' },
       revealed: { control: 'boolean' },
     },
@@ -49,7 +57,11 @@
 />
 <Story
   name='Wide'
-  args={{ size: 'wide', tile: { title: 'Gmail', colorIndex: 3, url: 'https://mail.google.com' }, domain: 'mail.google.com' }}
+  args={{
+    size: 'wide',
+    tile: { title: 'Gmail', colorIndex: 3, url: 'https://mail.google.com' },
+    domain: 'mail.google.com',
+  }}
   {template}
 />
 <Story
@@ -59,7 +71,10 @@
 />
 <Story
   name='Selected'
-  args={{ selected: true, onresize: () => {} }}
+  args={{
+    selected: true,
+    onresize: () => {},
+  }}
   {template}
   play={async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: 'Grow Steam tile to Wide' })).toBeVisible()
@@ -67,7 +82,11 @@
 />
 <Story
   name='Largest'
-  args={{ selected: true, size: 'large', onresize: () => {} }}
+  args={{
+    selected: true,
+    size: 'large',
+    onresize: () => {},
+  }}
   {template}
   play={async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: 'Shrink Steam tile to Small' })).toBeVisible()
@@ -80,11 +99,17 @@
 />
 <Story
   name='Long title'
-  args={{ tile: { title: 'A bookmark with a very long but completely safe title', colorIndex: 2, url: 'https://example.com' }, domain: 'example.com' }}
+  args={{
+    tile: { title: 'A bookmark with a very long but completely safe title', colorIndex: 2, url: 'https://example.com' },
+    domain: 'example.com',
+  }}
   {template}
 />
 <Story
   name='Without icon'
-  args={{ tile: { title: 'A quiet bookmark', colorIndex: 2, url: 'https://example.com' }, domain: 'example.com' }}
+  args={{
+    tile: { title: 'A quiet bookmark', colorIndex: 2, url: 'https://example.com' },
+    domain: 'example.com',
+  }}
   {template}
 />

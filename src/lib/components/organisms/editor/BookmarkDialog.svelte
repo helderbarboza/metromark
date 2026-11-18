@@ -62,7 +62,12 @@
     if (command.busy)
       return
     if (node) {
-      return send({ type: 'node.update', id: node.id, title: name, url })
+      return send({
+        type: 'node.update',
+        id: node.id,
+        title: name,
+        url,
+      })
     }
     command.busy = true
     let colorIndex: number | undefined
@@ -77,7 +82,13 @@
     }
     if (disposed)
       return
-    return send({ type: 'bookmark.create', parentId, title: name, url, colorIndex })
+    return send({
+      type: 'bookmark.create',
+      parentId,
+      title: name,
+      url,
+      colorIndex,
+    })
   }
 
   const currentGroup = $derived(groups.find(group => group.id === node?.parentId))

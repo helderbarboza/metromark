@@ -77,9 +77,15 @@ const ImageBackgroundSchema = v.object({
 /** User-facing settings schema with per-key defaults and docs */
 const SettingsSchema = v.object({
   /** Tile density: 'comfortable' (68px) or 'compact' (54px) */
-  density: v.union([v.literal('comfortable'), v.literal('compact')]),
+  density: v.union([
+    v.literal('comfortable'),
+    v.literal('compact'),
+  ]),
   /** Grid view: 'classic' (8 rows) or 'dock' (2 rows anchored to the bottom) */
-  gridView: v.union([v.literal('classic'), v.literal('dock')]),
+  gridView: v.union([
+    v.literal('classic'),
+    v.literal('dock'),
+  ]),
   /** Show domain names on tiles */
   showDomains: v.boolean(),
   /** Show the site's full-color favicon instead of a single-color Metro glyph */
@@ -125,8 +131,28 @@ export const APPEARANCE_DEFAULTS = {
 
 export const BACKGROUND_DEFAULTS = {
   color: { type: 'color', auto: true, color: undefined },
-  image: { type: 'image', url: '', auto: true, color: undefined, fit: 'cover', opacity: 1, parallax: false, parallaxZoom: 1.5 },
-  youtube: { type: 'youtube', url: '', fit: 'cover', opacity: 1, parallax: false, parallaxZoom: 1.5, playbackRate: 1, playlistOrder: 'shuffle', auto: true, color: undefined },
+  image: {
+    type: 'image',
+    url: '',
+    auto: true,
+    color: undefined,
+    fit: 'cover',
+    opacity: 1,
+    parallax: false,
+    parallaxZoom: 1.5,
+  },
+  youtube: {
+    type: 'youtube',
+    url: '',
+    fit: 'cover',
+    opacity: 1,
+    parallax: false,
+    parallaxZoom: 1.5,
+    playbackRate: 1,
+    playlistOrder: 'shuffle',
+    auto: true,
+    color: undefined,
+  },
   shader: {
     // No shader runs by default: pick one in the background editor. This also
     // keeps a first benchmark run free of contention from a default background.
@@ -205,7 +231,10 @@ export function loadSettings(env: Record<string, string | undefined> = import.me
     fromEnv.background = { type: 'shader', shaderId: shaderIdEnv, quality: 'motion' }
   }
 
-  const merged = { ...SETTINGS_DEFAULTS, ...fromEnv }
+  const merged = {
+    ...SETTINGS_DEFAULTS,
+    ...fromEnv,
+  }
   const result = v.safeParse(SettingsSchema, merged)
   if (!result.success) {
     const issues = v.flatten(result.issues).nested

@@ -41,11 +41,15 @@
       ? tileForFolder(node, snapshot.appearance[node.id])
       : tileFor(node, snapshot.appearance[node.id])
     : undefined)
-  const folder = $derived(node ? isFolder(node) : false)
+  const folder = $derived(node
+    ? isFolder(node)
+    : false)
   const sizeOptions = $derived(tileSizesForView(snapshot.settings.gridView))
   const introParts = $derived.by(() =>
     $LL.dialogs.appearanceIntro({
-      target: folder ? $LL.dialogs.folderTarget() : $LL.dialogs.bookmarkTarget(),
+      target: folder
+        ? $LL.dialogs.folderTarget()
+        : $LL.dialogs.bookmarkTarget(),
     }).split('<>'),
   )
 
@@ -72,7 +76,9 @@
         id: node.id,
         patch: {
           size,
-          colorIndex: colorIndex === -1 ? undefined : colorIndex,
+          colorIndex: colorIndex === -1
+            ? undefined
+            : colorIndex,
           color: customColor,
         },
       })
@@ -107,7 +113,9 @@
   <DialogActions>
     <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button variant='default' type='submit' disabled={command.busy}>
-      {command.busy ? $LL.dialogs.saving() : $LL.dialogs.saveChanges()}
+      {command.busy
+        ? $LL.dialogs.saving()
+        : $LL.dialogs.saveChanges()}
     </Button>
   </DialogActions>
 </form>

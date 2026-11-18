@@ -33,7 +33,9 @@
 <ContextMenu.Group class='flex gap-1 px-1 pb-1.5'>
   {#each sizes as preset (preset)}
     <ContextMenu.Item
-      aria-label={$LL.tileSizeGrid.resizeTo({ size: $LL.tileSizes[preset]() })}
+      aria-label={$LL.tileSizeGrid.resizeTo({
+        size: $LL.tileSizes[preset](),
+      })}
       onSelect={() => onresize(preset)}
       class={cn(
         `

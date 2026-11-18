@@ -103,7 +103,9 @@
   })
 
   /** The URL the <img> actually loads: object URL for media keys, else the source itself. */
-  const displaySrc = $derived(isMediaKey(src) ? mediaUrl : (src || null))
+  const displaySrc = $derived(isMediaKey(src)
+    ? mediaUrl
+    : (src || null))
 
   // object-fit values match the schema one-to-one; `fill` stretches.
   const objectFit = $derived(fit)
@@ -148,7 +150,9 @@
       ]}
       style:object-fit={objectFit}
       style:opacity={opacity}
-      style:transform={parallaxActive ? `translate3d(${shift}%, 0, 0)` : undefined}
+      style:transform={parallaxActive
+        ? `translate3d(${shift}%, 0, 0)`
+        : undefined}
       onerror={() => {
         failed = true
         onerror?.()

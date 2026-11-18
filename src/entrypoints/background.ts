@@ -23,10 +23,16 @@ function youtubeEmbedRefererRule(withInitiator: boolean): Browser.declarativeNet
     priority: 1,
     action: {
       type: 'modifyHeaders',
-      requestHeaders: [{ header: 'referer', operation: 'set', value: browser.runtime.id }],
+      requestHeaders: [
+        { header: 'referer', operation: 'set', value: browser.runtime.id },
+      ],
     },
     condition: {
-      ...(withInitiator ? { initiatorDomains: [browser.runtime.id] } : {}),
+      ...(withInitiator
+        ? {
+            initiatorDomains: [browser.runtime.id],
+          }
+        : {}),
       requestDomains: ['www.youtube-nocookie.com'],
       resourceTypes: ['sub_frame'],
     },
@@ -38,13 +44,23 @@ async function registerYoutubeEmbedRefererRule(): Promise<void> {
   if (typeof dnr?.updateDynamicRules !== 'function')
     return
   try {
-    await dnr.updateDynamicRules({ removeRuleIds: [YOUTUBE_EMBED_RULE_ID], addRules: [youtubeEmbedRefererRule(true)] })
+    await dnr.updateDynamicRules({
+      removeRuleIds: [YOUTUBE_EMBED_RULE_ID],
+      addRules: [
+        youtubeEmbedRefererRule(true),
+      ],
+    })
   }
   catch {
     // Some engines reject the initiator-domain condition for extension
     // requests; fall back to a rule scoped by domain and frame type only.
     try {
-      await dnr.updateDynamicRules({ removeRuleIds: [YOUTUBE_EMBED_RULE_ID], addRules: [youtubeEmbedRefererRule(false)] })
+      await dnr.updateDynamicRules({
+        removeRuleIds: [YOUTUBE_EMBED_RULE_ID],
+        addRules: [
+          youtubeEmbedRefererRule(false),
+        ],
+      })
     }
     catch (error) {
       console.warn('[youtube] Unable to register the embed Referer rule.', error)
@@ -73,7 +89,14 @@ export default defineBackground(() => {
           respond({ ok: true, result: await coordinator.execute(message.command) })
         else respond({ ok: false, error: 'Missing bookmark command.' })
       }
-      catch (error) { respond({ ok: false, error: error instanceof Error ? error.message : 'The bookmark operation failed.' }) }
+      catch (error) {
+        respond({
+          ok: false,
+          error: error instanceof Error
+            ? error.message
+            : 'The bookmark operation failed.',
+        })
+      }
     })()
     return true
   })

@@ -7,24 +7,47 @@ const PRESENTATION_FALLBACK: AppData = {
   appearance: {},
   layouts: {},
   dockLayouts: {},
-  settings: { density: 'comfortable', gridView: 'classic', showDomains: true, originalFavicons: false, reducedMotion: false, language: 'auto', background: { type: 'color', auto: true } },
+  settings: {
+    density: 'comfortable',
+    gridView: 'classic',
+    showDomains: true,
+    originalFavicons: false,
+    reducedMotion: false,
+    language: 'auto',
+    background: { type: 'color', auto: true },
+  },
   undos: [],
 }
 
 export const test = base.extend<{ noPageErrors: void }>({
-  noPageErrors: [async ({ page }, use) => {
-    const errors: string[] = []
-    page.on('pageerror', error => errors.push(error.message))
-    await use()
-    expect(errors, 'No unhandled browser exceptions, including dialog-close regressions').toEqual([])
-  }, { auto: true }],
+  noPageErrors: [
+    async ({ page }, use) => {
+      const errors: string[] = []
+      page.on('pageerror', error => errors.push(error.message))
+      await use()
+      expect(errors, 'No unhandled browser exceptions, including dialog-close regressions').toEqual([])
+    },
+    { auto: true },
+  ],
 })
 export { expect }
-export const group = (page: Page, title: string) => page.locator('[data-testid="metro-group"]').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
+export function group(page: Page, title: string) {
+  return page.locator('[data-testid="metro-group"]').filter({
+    has: page.getByRole('heading', { name: title, exact: true }),
+  })
+}
 /** Tiles are dnd-kit sortables, so they expose role="button" with an "Open …" name. */
-export const link = (page: Page, title: string) => page.getByRole('button', { name: new RegExp(`^Open ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
+export function link(page: Page, title: string) {
+  return page.getByRole('button', {
+    name: new RegExp(`^Open ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`),
+  })
+}
 /** Folder tiles are buttons named "Folder <name>…". */
-export const folderTile = (page: Page, title: string) => page.getByRole('button', { name: new RegExp(`^Folder ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) })
+export function folderTile(page: Page, title: string) {
+  return page.getByRole('button', {
+    name: new RegExp(`^Folder ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`),
+  })
+}
 export const draggable = (page: Page, id: string) => page.locator(`a[data-grid-id="${id}"]`)
 export const appBar = (page: Page) => page.getByRole('toolbar')
 /** Browser context runs outside this module; keep each evaluate body self-contained. */
@@ -56,7 +79,9 @@ export async function presentation(page: Page): Promise<AppData> {
       return null
     }
   })
-  return isAppData(raw) ? raw : PRESENTATION_FALLBACK
+  return isAppData(raw)
+    ? raw
+    : PRESENTATION_FALLBACK
 }
 
 export async function tree(page: Page): Promise<BookmarkNode[]> {
@@ -68,10 +93,15 @@ export async function tree(page: Page): Promise<BookmarkNode[]> {
       return null
     }
   })
-  return Array.isArray(raw) ? raw.filter(isBookmarkNode) : []
+  return Array.isArray(raw)
+    ? raw.filter(isBookmarkNode)
+    : []
 }
 export function flat(nodes: BookmarkNode[]): BookmarkNode[] {
-  return nodes.flatMap(node => [node, ...flat(node.children ?? [])])
+  return nodes.flatMap(node => [
+    node,
+    ...flat(node.children ?? []),
+  ])
 }
 export async function start(page: Page) {
   await page.goto('/')

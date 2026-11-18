@@ -20,7 +20,14 @@
     argTypes: {
       variant: {
         control: 'radio',
-        options: ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+        options: [
+          'default',
+          'secondary',
+          'destructive',
+          'outline',
+          'ghost',
+          'link',
+        ],
       },
       disabled: { control: 'boolean' },
     },

@@ -30,7 +30,9 @@ try {
   await driver.setContext('content')
   const handles = await driver.wait(async () => {
     const value = await driver.getAllWindowHandles()
-    return value.length > before.length ? value : false
+    return value.length > before.length
+      ? value
+      : false
   }, 10000)
   await driver.switchTo().window(handles.find(handle => !before.includes(handle)))
   await driver.wait(until.elementLocated(By.css('[data-testid="metro-group"]')), 20000)
@@ -61,7 +63,9 @@ try {
   await driver.setContext('content')
   const nextHandles = await driver.wait(async () => {
     const value = await driver.getAllWindowHandles()
-    return value.length > oldHandles.length ? value : false
+    return value.length > oldHandles.length
+      ? value
+      : false
   }, 10000)
   await driver.switchTo().window(nextHandles.find(handle => !oldHandles.includes(handle)))
   await driver.wait(until.elementLocated(By.css('a[aria-label^="Open Firefox external edit"]')), 10000)

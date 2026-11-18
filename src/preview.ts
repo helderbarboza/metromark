@@ -34,8 +34,12 @@ function seedProfile() {
     localStorage.setItem(MODE_KEY, profile.mode)
     localStorage.setItem(THEME_KEY, profile.theme)
     localStorage.setItem(THEME_SELECTIONS_KEY, JSON.stringify({
-      light: profile.mode === 'light' ? profile.theme : DEFAULT_LIGHT_THEME,
-      dark: profile.mode === 'dark' ? profile.theme : DEFAULT_DARK_THEME,
+      light: profile.mode === 'light'
+        ? profile.theme
+        : DEFAULT_LIGHT_THEME,
+      dark: profile.mode === 'dark'
+        ? profile.theme
+        : DEFAULT_DARK_THEME,
     }))
     localStorage.setItem(PROFILE_KEY, profile.id)
   }
@@ -49,4 +53,10 @@ seedProfile()
 const settings = loadSettings()
 // Suppress the preview-only "Demo" badge for published captures (`&clean=1`).
 const hideDemoBadge = new URLSearchParams(window.location.search).get('clean') === '1'
-mount(App, { target: document.getElementById('app')!, props: { client: createPreviewClient(settings), hideDemoBadge } })
+mount(App, {
+  target: document.getElementById('app')!,
+  props: {
+    client: createPreviewClient(settings),
+    hideDemoBadge,
+  },
+})

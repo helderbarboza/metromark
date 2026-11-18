@@ -21,14 +21,20 @@ function readJson<T>(key: string, fallback: () => T): T {
       return fallback()
     }
     const parsed: unknown = JSON.parse(value)
-    return isValidJson(parsed, fallback()) ? parsed : fallback()
+    return isValidJson(parsed, fallback())
+      ? parsed
+      : fallback()
   }
   catch {
     return fallback()
   }
 }
 export function createPreviewClient(settings: Settings, persistent = true): Client {
-  const bookmarks = new MemoryBookmarks(persistent ? readJson<BookmarkNode[]>(TREE_KEY, demoTree) : demoTree(), persistent ? tree => localStorage.setItem(TREE_KEY, JSON.stringify(tree)) : undefined)
+  const bookmarks = new MemoryBookmarks(persistent
+    ? readJson<BookmarkNode[]>(TREE_KEY, demoTree)
+    : demoTree(), persistent
+    ? tree => localStorage.setItem(TREE_KEY, JSON.stringify(tree))
+    : undefined)
   const memory = new MemoryPersistence(demoData())
   const persistence = persistent
     ? {
@@ -71,7 +77,9 @@ export function createPreviewClient(settings: Settings, persistent = true): Clie
     },
     async open(url, disposition) {
       const validated = validateUrl(url)
-      window.open(validated, '_blank', disposition === 'window' ? 'noopener,noreferrer,popup' : 'noopener,noreferrer')
+      window.open(validated, '_blank', disposition === 'window'
+        ? 'noopener,noreferrer,popup'
+        : 'noopener,noreferrer')
     },
     async resetPreview() {
       if (persistent) {

@@ -16,8 +16,12 @@ export type ConvertFailureKind = 'cors-taint' | 'load-failure' | 'unsupported-ty
 
 /** Classify a converter failure so the UI can explain it instead of swallowing it. */
 export function classifyConvertError(error: unknown): ConvertFailureKind {
-  const name = error instanceof Error ? error.name : ''
-  const message = error instanceof Error ? error.message : String(error)
+  const name = error instanceof Error
+    ? error.name
+    : ''
+  const message = error instanceof Error
+    ? error.message
+    : String(error)
   if (name === 'SecurityError' || /taint|origin-clean|cross-origin/i.test(message))
     return 'cors-taint'
   if (/unsupported image type/i.test(message))

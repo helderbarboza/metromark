@@ -49,8 +49,12 @@ export async function loadConvertedFavicon(
 
   const task = (async () => {
     const tintArgb = safeTintToArgb(tint)
-    const cacheKey = tintArgb === undefined ? undefined : glyphCacheKey(pageUrl, tintArgb)
-    const cached = cacheKey === undefined ? undefined : await loadCachedGlyph(cacheKey)
+    const cacheKey = tintArgb === undefined
+      ? undefined
+      : glyphCacheKey(pageUrl, tintArgb)
+    const cached = cacheKey === undefined
+      ? undefined
+      : await loadCachedGlyph(cacheKey)
     const now = Date.now()
 
     if (cached && !needsRecheck(cached.lastChecked, now))
@@ -166,8 +170,12 @@ export async function loadFavicon(
     const img = await loadImage(source)
     // Draw 1:1 at intrinsic dimensions, no resize
     const canvas = document.createElement('canvas')
-    canvas.width = img.naturalWidth > 0 ? img.naturalWidth : 64
-    canvas.height = img.naturalHeight > 0 ? img.naturalHeight : 64
+    canvas.width = img.naturalWidth > 0
+      ? img.naturalWidth
+      : 64
+    canvas.height = img.naturalHeight > 0
+      ? img.naturalHeight
+      : 64
     const ctx = canvas.getContext('2d')
     if (!ctx)
       throw new Error('2d canvas context is not available')
@@ -216,8 +224,12 @@ async function loadDominantFaviconColor(pageUrl: string): Promise<Rgb | null> {
   try {
     const img = await loadImageBefore(source, DOMINANT_TIMEOUT)
     const canvas = document.createElement('canvas')
-    canvas.width = img.naturalWidth > 0 ? img.naturalWidth : 64
-    canvas.height = img.naturalHeight > 0 ? img.naturalHeight : 64
+    canvas.width = img.naturalWidth > 0
+      ? img.naturalWidth
+      : 64
+    canvas.height = img.naturalHeight > 0
+      ? img.naturalHeight
+      : 64
     const ctx = canvas.getContext('2d')
     if (!ctx)
       return null
@@ -233,8 +245,12 @@ async function loadDominantFaviconColor(pageUrl: string): Promise<Rgb | null> {
     try {
       const img = await loadImageBefore(source, DOMINANT_TIMEOUT)
       const canvas = document.createElement('canvas')
-      canvas.width = img.naturalWidth > 0 ? img.naturalWidth : 64
-      canvas.height = img.naturalHeight > 0 ? img.naturalHeight : 64
+      canvas.width = img.naturalWidth > 0
+        ? img.naturalWidth
+        : 64
+      canvas.height = img.naturalHeight > 0
+        ? img.naturalHeight
+        : 64
       const ctx = canvas.getContext('2d')
       if (!ctx)
         return null

@@ -82,7 +82,9 @@
   // Tile enter/exit motion. Svelte transitions run on WAAPI, so they do not
   // conflict with the CSS transform transitions for tilt and reveal. Enter
   // keeps opacity 1 (jest-dom treats opacity 0 as not visible); exit may fade.
-  const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const readWorkspace = hasWorkspace()
+    ? getWorkspace()
+    : undefined
   const allowedSizes = $derived(readWorkspace?.().sizes ?? TILE_SIZES)
   const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion)
 
@@ -96,7 +98,9 @@
   // Reactive colors that update when theme/mode changes
   let colors = $derived(resolveTileColors(tile))
   const bg = $derived(colors.bg)
-  const fg = $derived(colors.fg === 1 ? '#ffffff' : '#000000')
+  const fg = $derived(colors.fg === 1
+    ? '#ffffff'
+    : '#000000')
 
   // Update colors when theme/mode changes
   $effect(() => {
@@ -150,11 +154,19 @@
       easing: quadOut,
       duration: reducedMotion ? 0 : 360,
     }}
-    out:scale={{ start: 0.94, opacity: 0, duration: reducedMotion ? 0 : 360 }}
+    out:scale={{
+      start: 0.94,
+      opacity: 0,
+      duration: reducedMotion ? 0 : 360,
+    }}
     style:--tile-bg={bg}
     style:--tile-fg={fg}
-    style:--cell={cell !== undefined ? `${cell}px` : undefined}
-    style:--gap={gap !== undefined ? `${gap}px` : undefined}
+    style:--cell={cell !== undefined
+      ? `${cell}px`
+      : undefined}
+    style:--gap={gap !== undefined
+      ? `${gap}px`
+      : undefined}
   {@attach tilt}
   {@attach attach ?? (() => {})}
     onclick={onclick}
@@ -200,7 +212,9 @@
     >
       <Icon
         class='size-3.5'
-        name={quickResize.direction === 'grow' ? 'arrowDownRight' : 'arrowUpLeft'}
+        name={quickResize.direction === 'grow'
+          ? 'arrowDownRight'
+          : 'arrowUpLeft'}
       />
     </Button>
   {/if}

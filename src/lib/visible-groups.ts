@@ -28,7 +28,9 @@ export function filterVisibleGroups(
         .toLowerCase()
         .includes(normalizedQuery)
       const matching = Object.values(group.tiles).filter((tile) => {
-        const matchesTile = `${tile.title} ${tile.kind === 'bookmark' ? tile.url : ''}`
+        const matchesTile = `${tile.title} ${tile.kind === 'bookmark'
+          ? tile.url
+          : ''}`
           .toLowerCase()
           .includes(normalizedQuery)
         return matchesPath || matchesTile
@@ -45,7 +47,9 @@ export function filterVisibleGroups(
           matching.map(tile => ({
             id: tile.id,
             title: tile.title,
-            url: tile.kind === 'bookmark' ? tile.url : undefined,
+            url: tile.kind === 'bookmark'
+              ? tile.url
+              : undefined,
           })),
           [],
           sizes,

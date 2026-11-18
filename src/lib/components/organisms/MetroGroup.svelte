@@ -82,7 +82,9 @@
 
   // Workspace state flows through context (set by the root component); stories
   // without a provider get inert defaults.
-  const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const readWorkspace = hasWorkspace()
+    ? getWorkspace()
+    : undefined
   const dragging = $derived(readWorkspace?.().dragging ?? false)
   const selectedId = $derived(readWorkspace?.().selectedId ?? null)
 
@@ -109,12 +111,20 @@
   // static tiles (positioned by the flip wrapper below).
   const draggableEntries = $derived(layout.flatMap((entry) => {
     const tile = tiles[entry.i]
-    return movable && tile?.writable ? [{ entry, tile }] : []
+    return movable && tile?.writable
+      ? [
+        { entry, tile },
+      ]
+      : []
   }))
 
   const staticEntries = $derived(layout.flatMap((entry) => {
     const tile = tiles[entry.i]
-    return tile && !(movable && tile.writable) ? [{ entry, tile }] : []
+    return tile && !(movable && tile.writable)
+      ? [
+        { entry, tile },
+      ]
+      : []
   }))
 
   /*
@@ -336,7 +346,9 @@
     )}
     data-testid='metro-grid'
     role='group'
-    aria-label={$LL.app.tilesIn({ path: group.path.join(' / ') })}
+    aria-label={$LL.app.tilesIn({
+      path: group.path.join(' / '),
+    })}
     data-group-id={group.id}
   >
     {#each draggableEntries as { entry, tile } (entry.i)}
@@ -353,8 +365,12 @@
       />
     {/each}
     {#each staticEntries as { entry, tile } (entry.i)}
-      {@const folderTile = tile.kind === 'folder' ? tile : undefined}
-      {@const bookmarkTile = tile.kind === 'bookmark' ? tile : undefined}
+      {@const folderTile = tile.kind === 'folder'
+        ? tile
+        : undefined}
+      {@const bookmarkTile = tile.kind === 'bookmark'
+        ? tile
+        : undefined}
       <div
         class='absolute'
         style={`

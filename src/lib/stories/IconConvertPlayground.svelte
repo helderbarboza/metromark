@@ -54,7 +54,9 @@
       if (current !== runId)
         return
       convertedSrc = undefined
-      errorMessage = error instanceof Error ? error.message : String(error)
+      errorMessage = error instanceof Error
+        ? error.message
+        : String(error)
     }
     finally {
       if (current === runId)

@@ -9,7 +9,9 @@ function memoryStorage(): Storage {
     },
     clear: () => map.clear(),
     getItem: (key: string) => map.get(key) ?? null,
-    key: (index: number) => [...map.keys()][index] ?? null,
+    key: (index: number) => [
+      ...map.keys(),
+    ][index] ?? null,
     removeItem: (key: string) => {
       map.delete(key)
     },

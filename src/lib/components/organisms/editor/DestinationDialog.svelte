@@ -32,7 +32,9 @@
   let parentId = $state('')
 
   const isRestore = $derived(spec.kind === 'restore')
-  const folders = $derived(isRestore ? writableGroups(snapshot) : destinationGroups(snapshot, node))
+  const folders = $derived(isRestore
+    ? writableGroups(snapshot)
+    : destinationGroups(snapshot, node))
 
   onMount(() => {
     parentId = spec.parentId ?? node?.parentId ?? folders[0]?.id ?? ''

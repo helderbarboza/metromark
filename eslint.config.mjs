@@ -41,11 +41,31 @@ export default antfu(
     rules: {
       'better-tailwindcss/no-unknown-classes': 'off',
       'better-tailwindcss/no-conflicting-classes': 'error',
-      'better-tailwindcss/enforce-canonical-classes': ['warn', { rootFontSize: 16 }],
-      'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', { printWidth: 90, preferSingleLine: true, group: 'newLine', strictness: 'loose' }],
-      'svelte/max-attributes-per-line': ['error', { singleline: 3, multiline: 1 }],
-      'svelte/first-attribute-linebreak': ['error', { multiline: 'below', singleline: 'beside' }],
-      'svelte/html-closing-bracket-new-line': ['error', { singleline: 'never', multiline: 'always' }],
+      'better-tailwindcss/enforce-canonical-classes': [
+        'warn',
+        { rootFontSize: 16 },
+      ],
+      'better-tailwindcss/enforce-consistent-line-wrapping': [
+        'warn',
+        {
+          printWidth: 90,
+          preferSingleLine: true,
+          group: 'newLine',
+          strictness: 'loose',
+        },
+      ],
+      'svelte/max-attributes-per-line': [
+        'error',
+        { singleline: 3, multiline: 1 },
+      ],
+      'svelte/first-attribute-linebreak': [
+        'error',
+        { multiline: 'below', singleline: 'beside' },
+      ],
+      'svelte/html-closing-bracket-new-line': [
+        'error',
+        { singleline: 'never', multiline: 'always' },
+      ],
       'style/max-len': [
         'warn',
         {
@@ -61,7 +81,10 @@ export default antfu(
   },
   {
     rules: {
-      '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        { assertionStyle: 'never' },
+      ],
     },
   },
   // Node scripts and the Playwright config use the global `process` intentionally.

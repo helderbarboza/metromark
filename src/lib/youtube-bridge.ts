@@ -59,9 +59,24 @@ const STATE_LABEL: Record<string, YtStateName> = {
  * reload (about 1 s) and only happens if the previous one went silent.
  */
 export const HANDSHAKES = Object.freeze([
-  { id: 'origin', label: 'origin=<page origin>', origin: true, referrer: false },
-  { id: 'referrer', label: 'widget_referrer only', origin: false, referrer: true },
-  { id: 'bare', label: 'no origin hint', origin: false, referrer: false },
+  {
+    id: 'origin',
+    label: 'origin=<page origin>',
+    origin: true,
+    referrer: false,
+  },
+  {
+    id: 'referrer',
+    label: 'widget_referrer only',
+    origin: false,
+    referrer: true,
+  },
+  {
+    id: 'bare',
+    label: 'no origin hint',
+    origin: false,
+    referrer: false,
+  },
 ] as const)
 
 export type LoopMode = 'native' | 'js' | 'off'
@@ -107,7 +122,9 @@ function safeParse(text: string): unknown {
 
 /** Playback rates YouTube honors; anything else is rejected. */
 function parsePlaybackRate(rate: number | undefined): number | null {
-  return typeof rate === 'number' && [0.25, 0.5, 1, 1.5, 2].includes(rate) ? rate : null
+  return typeof rate === 'number' && [0.25, 0.5, 1, 1.5, 2].includes(rate)
+    ? rate
+    : null
 }
 
 function isPlayerResponse(data: unknown): data is PlayerResponse {
@@ -268,7 +285,9 @@ export class YoutubeBackgroundBridge {
     this.#opts = {
       videoId,
       playlistId,
-      playlistOrder: options.playlistOrder === 'sequential' ? 'sequential' : 'shuffle',
+      playlistOrder: options.playlistOrder === 'sequential'
+        ? 'sequential'
+        : 'shuffle',
       playlistCursor: options.playlistCursor ?? null,
       host: options.host ?? 'https://www.youtube-nocookie.com',
       targetOrigin: options.targetOrigin ?? '*',
@@ -339,7 +358,9 @@ export class YoutubeBackgroundBridge {
    * catches up.
    */
   toggle(): void {
-    const playing = this.#intent === null ? this.is('playing') : this.#intent === 'playing'
+    const playing = this.#intent === null
+      ? this.is('playing')
+      : this.#intent === 'playing'
     if (playing)
       this.pause()
     else
@@ -413,14 +434,18 @@ export class YoutubeBackgroundBridge {
   /** Everything the UI needs, in one flat object. */
   get snapshot(): BridgeSnapshot {
     const raw = this.#info.playerState
-    const state = typeof raw === 'number' ? raw : undefined
+    const state = typeof raw === 'number'
+      ? raw
+      : undefined
     const src = this.#frame.getAttribute('src')
     return {
       mounted: this.#mounted,
       apiReady: this.#ready,
       handshake: this.#ready
         ? HANDSHAKES[this.#hsIndex].label
-        : `no answer — tried ${HANDSHAKES[this.#hsIndex].label}${this.#note ? ` (${this.#note})` : ''}`,
+        : `no answer — tried ${HANDSHAKES[this.#hsIndex].label}${this.#note
+          ? ` (${this.#note})`
+          : ''}`,
       attempt: `${this.#hsIndex + 1}/${HANDSHAKES.length}`,
       state: STATE_LABEL[String(state)] ?? 'loading',
       intended: this.#intent,
@@ -431,8 +456,12 @@ export class YoutubeBackgroundBridge {
       muted: Boolean(this.#info.muted ?? this.#opts.muted),
       volume: Number(this.#info.volume ?? this.#opts.volume),
       loopMode: this.#opts.loopMode,
-      messageOrigin: this.#srcOrigin === '' ? '—' : this.#srcOrigin,
-      src: src === null || src === '' ? 'not mounted' : src,
+      messageOrigin: this.#srcOrigin === ''
+        ? '—'
+        : this.#srcOrigin,
+      src: src === null || src === ''
+        ? 'not mounted'
+        : src,
       error: this.#error,
       playbackRate: Number(this.#info.playbackRate ?? this.#opts.playbackRate),
     }
@@ -458,21 +487,33 @@ export class YoutubeBackgroundBridge {
       mute: muted ? '1' : '0',
       // `start` only survives a reload as a whole number; it is how we resume
       // after a handshake retry or a loop-mode change without the API.
-      start: this.#resumeAt > 1 ? String(Math.floor(this.#resumeAt)) : '',
-      loop: loopMode === 'native' ? '1' : '',
+      start: this.#resumeAt > 1
+        ? String(Math.floor(this.#resumeAt))
+        : '',
+      loop: loopMode === 'native'
+        ? '1'
+        : '',
       // Single video: `loop=1` replays it when `playlist` repeats its ID.
       // Playlist: `loop=1` plays the whole playlist and restarts it.
-      playlist: loopMode === 'native' && videoId !== null ? videoId : '',
+      playlist: loopMode === 'native' && videoId !== null
+        ? videoId
+        : '',
       list: playlistId ?? '',
-      origin: handshake.origin ? (location.origin ?? '') : '',
-      widget_referrer: handshake.referrer ? (location.href ?? '') : '',
+      origin: handshake.origin
+        ? (location.origin ?? '')
+        : '',
+      widget_referrer: handshake.referrer
+        ? (location.href ?? '')
+        : '',
     })
     // volume is not an embed parameter, so it is re-applied as a command below.
     if (!muted)
       this.#pending.set('setVolume', ['setVolume', volume])
     const qs = new URLSearchParams(params).toString()
     // videoseries is the canonical playlist embed; it needs no video ID in the path.
-    const path = playlistId === null ? `/embed/${videoId}` : '/embed/videoseries'
+    const path = playlistId === null
+      ? `/embed/${videoId}`
+      : '/embed/videoseries'
     return `${host}${path}?${qs}`
   }
 
@@ -517,8 +558,15 @@ export class YoutubeBackgroundBridge {
     this.#clearTimers()
     // Replay anything the UI asked for while we were still shaking hands.
     const replayedRate = this.#pending.has('setPlaybackRate')
-    for (const [func, args] of this.#pending)
-      this.#post({ event: 'command', func, args: args.slice(1), id: 'ytbg', channel: 'widget' })
+    for (const [func, args] of this.#pending) {
+      this.#post({
+        event: 'command',
+        func,
+        args: args.slice(1),
+        id: 'ytbg',
+        channel: 'widget',
+      })
+    }
     this.#pending.clear()
     // The player starts at 1x after every load; re-apply the configured rate
     // (unless the UI already queued one, which the replay above just posted).
@@ -583,7 +631,9 @@ export class YoutubeBackgroundBridge {
     if (playlistId === null)
       return
     const info: unknown = this.#info.playlist
-    const ids = Array.isArray(info) ? info.filter((value): value is string => typeof value === 'string') : []
+    const ids = Array.isArray(info)
+      ? info.filter((value): value is string => typeof value === 'string')
+      : []
     if (ids.length < 2)
       return // nothing to pick between; the default order plays
     if (this.#opts.playlistOrder === 'sequential') {
@@ -633,7 +683,13 @@ export class YoutubeBackgroundBridge {
       this.#pending.set(func, [func, ...args]) // replayed in #markReady
       return
     }
-    this.#post({ event: 'command', func, args, id: 'ytbg', channel: 'widget' })
+    this.#post({
+      event: 'command',
+      func,
+      args,
+      id: 'ytbg',
+      channel: 'widget',
+    })
   }
 
   #handleMessage(event: BridgeMessageEvent): void {
@@ -645,7 +701,9 @@ export class YoutubeBackgroundBridge {
       this.#emit()
       return
     }
-    const data: unknown = typeof event.data === 'string' ? safeParse(event.data) : event.data
+    const data: unknown = typeof event.data === 'string'
+      ? safeParse(event.data)
+      : event.data
     if (!isPlayerResponse(data))
       return
     const message = data
@@ -673,7 +731,9 @@ export class YoutubeBackgroundBridge {
       }
 
       case 'onError': {
-        const code = typeof message.info === 'number' ? String(message.info) : String(this.#stateOf(message) ?? 'unknown')
+        const code = typeof message.info === 'number'
+          ? String(message.info)
+          : String(this.#stateOf(message) ?? 'unknown')
         this.#error = `widget error ${code}`
         this.#note = this.#error
         this.#emit()
@@ -688,7 +748,9 @@ export class YoutubeBackgroundBridge {
   #stateOf(data: PlayerResponse): number | null {
     const info = data.info
     const candidate = info?.playerState ?? info?.state ?? data.playerState ?? data.state
-    return typeof candidate === 'number' ? candidate : null
+    return typeof candidate === 'number'
+      ? candidate
+      : null
   }
 
   #mergeInfo(info: Record<string, unknown> | undefined): void {

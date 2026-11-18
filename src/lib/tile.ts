@@ -14,7 +14,9 @@ export function tileFor(node: BookmarkNode, appearance: Appearance = {}, tree?: 
     size: appearance.size ?? APPEARANCE_DEFAULTS.size,
     colorIndex: appearance.colorIndex ?? site.colorIndex,
     color: appearance.color,
-    writable: tree ? canModify(node, tree) : true,
+    writable: tree
+      ? canModify(node, tree)
+      : true,
   }
 }
 
@@ -24,7 +26,9 @@ export function tileForFolder(node: BookmarkNode, appearance: Appearance = {}, t
     kind: 'folder',
     title: node.title || 'Untitled folder',
     size: appearance.size ?? APPEARANCE_DEFAULTS.size,
-    writable: tree ? canModify(node, tree) : true,
+    writable: tree
+      ? canModify(node, tree)
+      : true,
     // No domain to hash; the folder id keeps the default accent stable across
     // renames and moves.
     colorIndex: appearance.colorIndex ?? hashColorIndex(node.id),

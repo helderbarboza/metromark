@@ -21,11 +21,21 @@
       src: '/icons/128.png',
     },
     argTypes: {
-      previewSize: { control: { type: 'number', min: 16, max: 128, step: 8 } },
+      previewSize: {
+        control: {
+          type: 'number',
+          min: 16,
+          max: 128,
+          step: 8,
+        },
+      },
       tint: { control: 'color' },
       filled: { control: 'boolean' },
       bg: { control: 'color' },
-      iconShape: { control: 'radio', options: [-1, 0, 1, 2] },
+      iconShape: {
+        control: 'radio',
+        options: [-1, 0, 1, 2],
+      },
       preserveTransparency: { control: 'boolean' },
       clipGlyphToShape: { control: 'boolean' },
       src: { control: 'text' },

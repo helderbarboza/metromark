@@ -29,7 +29,9 @@
 
   const uid = $props.id()
   const titleId = `${uid}-title`
-  const helpId = $derived(helpText ? `${uid}-help` : undefined)
+  const helpId = $derived(helpText
+    ? `${uid}-help`
+    : undefined)
   const contentId = `${uid}-content`
 
   function toggle() {

@@ -40,12 +40,16 @@
     ...rest
   }: Props = $props()
 
-  const readTileGrid = hasTileGrid() ? getTileGridContext() : undefined
+  const readTileGrid = hasTileGrid()
+    ? getTileGridContext()
+    : undefined
   const cell = $derived(readTileGrid?.().cell)
   const gap = $derived(readTileGrid?.().gap ?? GAP)
   const fallbackOpenLabel = $derived(
     $LL.app.openBookmarkName({
-      name: showDomain && domain && size !== 'small' ? `${tile.title} ${domain}` : tile.title,
+      name: showDomain && domain && size !== 'small'
+        ? `${tile.title} ${domain}`
+        : tile.title,
     }),
   )
 
@@ -67,7 +71,9 @@
   gap={gap}
   defaultLabel={fallbackOpenLabel}
   resizeNoun={$LL.app.resizeNounTile()}
-  tooltip={tooltip ?? (tile.url ? `${tile.title} — ${tile.url}` : tile.title)}
+  tooltip={tooltip ?? (tile.url
+    ? `${tile.title} — ${tile.url}`
+    : tile.title)}
 >
   {#snippet content({ fg }: TileContentArgs)}
     {#if children}

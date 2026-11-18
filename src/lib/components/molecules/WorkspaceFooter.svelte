@@ -40,7 +40,9 @@
   const jumpTether = TooltipPrimitive.createTether<string>()
 
   function handleInput(event: Event) {
-    const input = event.currentTarget instanceof HTMLInputElement ? event.currentTarget : null
+    const input = event.currentTarget instanceof HTMLInputElement
+      ? event.currentTarget
+      : null
     if (input)
       query = input.value
     onSearch()
@@ -54,7 +56,9 @@
     max-md:px-6
   '
 >
-  <span role='status' class='sr-only'>{busy ? $LL.footer.savingChanges() : ''}</span>
+  <span role='status' class='sr-only'>{busy
+    ? $LL.footer.savingChanges()
+    : ''}</span>
   <div class='flex shrink-0 items-center'>
     <label
       class='
@@ -120,8 +124,12 @@
               tether={jumpTether}
               payload={group.title}
               class='group/button px-1 py-3'
-              aria-label={$LL.footer.jumpToGroupPath({ path: group.path.join(' / ') })}
-              aria-current={activeGroup === index ? 'true' : undefined}
+              aria-label={$LL.footer.jumpToGroupPath({
+                path: group.path.join(' / '),
+              })}
+              aria-current={activeGroup === index
+                ? 'true'
+                : undefined}
               onclick={() => onJump(index)}
             >
               <span

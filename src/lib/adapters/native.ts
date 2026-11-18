@@ -21,7 +21,15 @@ export function nativeBookmarks(): BookmarkPort {
         await browser.bookmarks.remove(id)
     },
     onChange(listener) {
-      const events = [browser.bookmarks.onCreated, browser.bookmarks.onChanged, browser.bookmarks.onMoved, browser.bookmarks.onRemoved, browser.bookmarks.onChildrenReordered, browser.bookmarks.onImportBegan, browser.bookmarks.onImportEnded].filter(Boolean)
+      const events = [
+        browser.bookmarks.onCreated,
+        browser.bookmarks.onChanged,
+        browser.bookmarks.onMoved,
+        browser.bookmarks.onRemoved,
+        browser.bookmarks.onChildrenReordered,
+        browser.bookmarks.onImportBegan,
+        browser.bookmarks.onImportEnded,
+      ].filter(Boolean)
       for (const event of events) event.addListener(listener)
       return () => {
         for (const event of events) event.removeListener(listener)
@@ -40,7 +48,9 @@ export function nativePersistence() {
       if (result === undefined) {
         return undefined
       }
-      return isAppData(result) ? result : undefined
+      return isAppData(result)
+        ? result
+        : undefined
     },
     async write(data: AppData) { await browser.storage.local.set({ [STORAGE_KEY]: data }) },
   }

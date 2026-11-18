@@ -21,7 +21,12 @@ afterEach(() => {
 describe('commands and synchronization', () => {
   it('edits the browser bookmark and safely undoes the edit', async () => {
     const { coordinator } = fixture()
-    const result = await coordinator.execute({ type: 'node.update', id: 'steam', title: 'Design files', url: 'https://store.steampowered.com/files' })
+    const result = await coordinator.execute({
+      type: 'node.update',
+      id: 'steam',
+      title: 'Design files',
+      url: 'https://store.steampowered.com/files',
+    })
     expect(indexTree(result.snapshot.tree).get('steam')?.title).toBe('Design files')
     const restored = await coordinator.execute({ type: 'undo', id: result.notice!.undoId! })
     expect(indexTree(restored.snapshot.tree).get('steam')?.title).toBe('Steam')
@@ -44,7 +49,10 @@ describe('commands and synchronization', () => {
     const { coordinator, bookmarks } = fixture()
     const before = indexTree(await bookmarks.getTree()).get('bar')!.children!.map(node => node.id)
     const layout = projectGroups(await coordinator.snapshot())[0].layout.map(entry => ({ ...entry, x: entry.x + 5 }))
-    await coordinator.execute({ type: 'layout.commit', layouts: { bar: layout } })
+    await coordinator.execute({
+      type: 'layout.commit',
+      layouts: { bar: layout },
+    })
     expect(indexTree(await bookmarks.getTree()).get('bar')!.children!.map(node => node.id)).toEqual(before)
   })
   it('combines cross-grid callbacks into one native move', async () => {
@@ -54,10 +62,16 @@ describe('commands and synchronization', () => {
     const source = groups[0]
     const destination = groups[1]
     const moving = source.layout.find(entry => entry.i === 'steam')!
-    const result = await coordinator.execute({ type: 'layout.commit', layouts: {
-      bar: source.layout.filter(entry => entry.i !== 'steam'),
-      work: [...destination.layout, { ...moving, x: 4, y: 0 }],
-    } })
+    const result = await coordinator.execute({
+      type: 'layout.commit',
+      layouts: {
+        bar: source.layout.filter(entry => entry.i !== 'steam'),
+        work: [
+          ...destination.layout,
+          { ...moving, x: 4, y: 0 },
+        ],
+      },
+    })
     expect(move).toHaveBeenCalledTimes(1)
     expect(indexTree(result.snapshot.tree).get('steam')?.parentId).toBe('work')
   })
@@ -80,7 +94,11 @@ describe('commands and synchronization', () => {
   it('resizes tiles and persists metadata without modifying the bookmark', async () => {
     const { coordinator, bookmarks } = fixture()
     const update = vi.spyOn(bookmarks, 'update')
-    const result = await coordinator.execute({ type: 'tile.appearance', id: 'steam', patch: { size: 'small', colorIndex: 3, color: '#123456' } })
+    const result = await coordinator.execute({
+      type: 'tile.appearance',
+      id: 'steam',
+      patch: { size: 'small', colorIndex: 3, color: '#123456' },
+    })
     expect(result.snapshot.appearance.steam).toEqual({ size: 'small', colorIndex: 3, color: '#123456' })
     expect(update).not.toHaveBeenCalled()
   })
@@ -89,7 +107,13 @@ describe('commands and synchronization', () => {
 describe('bookmark creation', () => {
   it('stores the suggested swatch index without a custom color', async () => {
     const { coordinator, storage } = fixture()
-    const result = await coordinator.execute({ type: 'bookmark.create', parentId: 'bar', title: 'Example', url: 'https://example.com', colorIndex: 5 })
+    const result = await coordinator.execute({
+      type: 'bookmark.create',
+      parentId: 'bar',
+      title: 'Example',
+      url: 'https://example.com',
+      colorIndex: 5,
+    })
     const created = flatten(result.snapshot.tree).find(node => node.url === 'https://example.com')!
     expect(result.snapshot.appearance[created.id]).toEqual({ colorIndex: 5 })
     expect(result.snapshot.appearance[created.id]?.color).toBeUndefined()
@@ -97,14 +121,25 @@ describe('bookmark creation', () => {
   })
   it('keeps the hashed accent when no swatch is available', async () => {
     const { coordinator } = fixture()
-    const result = await coordinator.execute({ type: 'bookmark.create', parentId: 'bar', title: 'Example', url: 'https://example.com' })
+    const result = await coordinator.execute({
+      type: 'bookmark.create',
+      parentId: 'bar',
+      title: 'Example',
+      url: 'https://example.com',
+    })
     const created = flatten(result.snapshot.tree).find(node => node.url === 'https://example.com')!
     expect(result.snapshot.appearance[created.id]).toBeUndefined()
   })
   it('rejects an invalid color index before creating the bookmark', async () => {
     const { coordinator, bookmarks } = fixture()
     const create = vi.spyOn(bookmarks, 'create')
-    await expect(coordinator.execute({ type: 'bookmark.create', parentId: 'bar', title: 'Example', url: 'https://example.com', colorIndex: 8 })).rejects.toThrow('Color index')
+    await expect(coordinator.execute({
+      type: 'bookmark.create',
+      parentId: 'bar',
+      title: 'Example',
+      url: 'https://example.com',
+      colorIndex: 8,
+    })).rejects.toThrow('Color index')
     expect(create).not.toHaveBeenCalled()
   })
 })
@@ -112,7 +147,11 @@ describe('bookmark creation', () => {
 describe('durable Undo', () => {
   it('immediately deletes and restores a bookmark under a new ID with its appearance', async () => {
     const { coordinator } = fixture()
-    await coordinator.execute({ type: 'tile.appearance', id: 'steam', patch: { colorIndex: 3, color: '#123456' } })
+    await coordinator.execute({
+      type: 'tile.appearance',
+      id: 'steam',
+      patch: { colorIndex: 3, color: '#123456' },
+    })
     const deleted = await coordinator.execute({ type: 'node.remove', id: 'steam' })
     expect(indexTree(deleted.snapshot.tree).has('steam')).toBe(false)
     expect(deleted.snapshot.undos).toHaveLength(1)
@@ -128,7 +167,13 @@ describe('durable Undo', () => {
     expect(indexTree(deleted.snapshot.tree).has('tools')).toBe(false)
     const restored = await coordinator.execute({ type: 'undo', id: deleted.notice!.undoId! })
     const learning = flatten(restored.snapshot.tree).find(node => node.title === 'Learning')!
-    expect(learning.children?.map(node => node.title)).toEqual(['MDN Web Docs', 'Svelte', 'TypeScript', 'Tailwind CSS', 'Tools'])
+    expect(learning.children?.map(node => node.title)).toEqual([
+      'MDN Web Docs',
+      'Svelte',
+      'TypeScript',
+      'Tailwind CSS',
+      'Tools',
+    ])
     expect(flatten([learning]).filter(isBookmark)).toHaveLength(6)
     expect(restored.snapshot.layouts[learning.id]).toHaveLength(4)
     for (const entry of restored.snapshot.layouts[learning.id]) expect(indexTree(restored.snapshot.tree).has(entry.i)).toBe(true)
@@ -186,8 +231,20 @@ describe('durable Undo', () => {
   })
   it('resets presentation data and Undo history without changing bookmarks', async () => {
     const { coordinator, bookmarks, storage } = fixture()
-    await coordinator.execute({ type: 'settings.update', patch: { density: 'compact', showDomains: false, reducedMotion: true, originalFavicons: true } })
-    await coordinator.execute({ type: 'tile.appearance', id: 'steam', patch: { color: '#123456' } })
+    await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        density: 'compact',
+        showDomains: false,
+        reducedMotion: true,
+        originalFavicons: true,
+      },
+    })
+    await coordinator.execute({
+      type: 'tile.appearance',
+      id: 'steam',
+      patch: { color: '#123456' },
+    })
     await coordinator.execute({ type: 'node.update', id: 'linear', title: 'Linear renamed' })
     const bookmarksBefore = await bookmarks.getTree()
     const reset = await coordinator.execute({ type: 'factory.reset' })
@@ -196,34 +253,99 @@ describe('durable Undo', () => {
     expect(reset.snapshot.settings).toEqual(SETTINGS_DEFAULTS)
     expect(reset.snapshot.undos).toEqual([])
     expect(reset.notice?.undoId).toBeUndefined()
-    expect(storage.data).toMatchObject({ appearance: {}, layouts: {}, settings: SETTINGS_DEFAULTS, undos: [] })
+    expect(storage.data).toMatchObject({
+      appearance: {},
+      layouts: {},
+      settings: SETTINGS_DEFAULTS,
+      undos: [],
+    })
     expect(await bookmarks.getTree()).toEqual(bookmarksBefore)
   })
   it('stores the original favicons setting and rejects a non-boolean', async () => {
     const { coordinator } = fixture()
-    const updated = await coordinator.execute({ type: 'settings.update', patch: { originalFavicons: true } })
+    const updated = await coordinator.execute({
+      type: 'settings.update',
+      patch: { originalFavicons: true },
+    })
     expect(updated.snapshot.settings.originalFavicons).toBe(true)
-    const reverted = await coordinator.execute({ type: 'settings.update', patch: { originalFavicons: false } })
+    const reverted = await coordinator.execute({
+      type: 'settings.update',
+      patch: { originalFavicons: false },
+    })
     expect(reverted.snapshot.settings.originalFavicons).toBe(false)
     // The command layer rejects a non-boolean at runtime even though the type forbids it.
     // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { originalFavicons: 1 } } as never)).rejects.toThrow('Invalid favicon setting')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: { originalFavicons: 1 },
+    } as never)).rejects.toThrow('Invalid favicon setting')
   })
   it('stores a custom background color and rejects an invalid hex value', async () => {
     const { coordinator } = fixture()
-    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: false, color: '#123abc' } } })
+    const updated = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'color', auto: false, color: '#123abc' },
+      },
+    })
     expect(updated.snapshot.settings.background).toEqual({ type: 'color', auto: false, color: '#123abc' })
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'color', auto: false, color: 'red' } } })).rejects.toThrow('six-digit hex')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'color', auto: false, color: 'red' },
+      },
+    })).rejects.toThrow('six-digit hex')
   })
   it('stores a shader background config and rejects invalid shader options', async () => {
     const { coordinator } = fixture()
-    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', shaderId: 'flow', speed: 2, targetFps: 30, opacity: 0.5, mouseInteraction: false, renderScale: 0.5, auto: false, color: '#123abc' } } })
-    expect(updated.snapshot.settings.background).toMatchObject({ type: 'shader', shaderId: 'flow', speed: 2, targetFps: 30, opacity: 0.5, mouseInteraction: false, renderScale: 0.5, auto: false, color: '#123abc' })
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', opacity: 2 } } })).rejects.toThrow('Invalid shader opacity')
+    const updated = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: {
+          type: 'shader',
+          shaderId: 'flow',
+          speed: 2,
+          targetFps: 30,
+          opacity: 0.5,
+          mouseInteraction: false,
+          renderScale: 0.5,
+          auto: false,
+          color: '#123abc',
+        },
+      },
+    })
+    expect(updated.snapshot.settings.background).toMatchObject({
+      type: 'shader',
+      shaderId: 'flow',
+      speed: 2,
+      targetFps: 30,
+      opacity: 0.5,
+      mouseInteraction: false,
+      renderScale: 0.5,
+      auto: false,
+      color: '#123abc',
+    })
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'shader', opacity: 2 },
+      },
+    })).rejects.toThrow('Invalid shader opacity')
     // The command layer rejects a non-boolean at runtime even though the type forbids it.
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', mouseInteraction: 1 } } as never })).rejects.toThrow('Invalid shader mouse setting')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'shader', renderScale: 3 } } })).rejects.toThrow('Invalid shader render scale')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'shader', mouseInteraction: 1 },
+      } as never,
+    })).rejects.toThrow('Invalid shader mouse setting')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'shader', renderScale: 3 },
+      },
+    })).rejects.toThrow('Invalid shader render scale')
   })
   it('migrates a legacy whole-percentage parallax zoom to a factor on load', async () => {
     const bookmarks = new MemoryBookmarks(demoTree())
@@ -243,61 +365,256 @@ describe('durable Undo', () => {
   it('stores an image background and rejects invalid values', async () => {
     const { coordinator } = fixture()
     const dataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
-    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: dataUri, fit: 'contain', opacity: 0.5, parallax: true, auto: false, color: '#123abc' } } })
-    expect(updated.snapshot.settings.background).toMatchObject({ type: 'image', url: dataUri, fit: 'contain', opacity: 0.5, parallax: true, auto: false, color: '#123abc' })
-    const remote = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'https://example.com/wallpaper.jpg' } } })
+    const updated = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: {
+          type: 'image',
+          url: dataUri,
+          fit: 'contain',
+          opacity: 0.5,
+          parallax: true,
+          auto: false,
+          color: '#123abc',
+        },
+      },
+    })
+    expect(updated.snapshot.settings.background).toMatchObject({
+      type: 'image',
+      url: dataUri,
+      fit: 'contain',
+      opacity: 0.5,
+      parallax: true,
+      auto: false,
+      color: '#123abc',
+    })
+    const remote = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: 'https://example.com/wallpaper.jpg' },
+      },
+    })
     expect(remote.snapshot.settings.background).toMatchObject({ type: 'image', url: 'https://example.com/wallpaper.jpg' })
-    const idb = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'idb:123e4567-e89b-42d3-a456-426655440000' } } })
+    const idb = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: 'idb:123e4567-e89b-42d3-a456-426655440000' },
+      },
+    })
     expect(idb.snapshot.settings.background).toMatchObject({ type: 'image', url: 'idb:123e4567-e89b-42d3-a456-426655440000' })
-    const zoomed = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallaxZoom: 2.5 } } })
+    const zoomed = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: '', parallaxZoom: 2.5 },
+      },
+    })
     expect(zoomed.snapshot.settings.background).toMatchObject({ parallaxZoom: 2.5 })
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallaxZoom: 175 } } as never })).rejects.toThrow('Invalid parallax zoom')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallaxZoom: 0.5 } } })).rejects.toThrow('Invalid parallax zoom')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'idb:not-a-uuid' } } })).rejects.toThrow('stored image reference')
-    const empty = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '' } } })
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'image', url: '', parallaxZoom: 175 },
+      } as never,
+    })).rejects.toThrow('Invalid parallax zoom')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: '', parallaxZoom: 0.5 },
+      },
+    })).rejects.toThrow('Invalid parallax zoom')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: 'idb:not-a-uuid' },
+      },
+    })).rejects.toThrow('stored image reference')
+    const empty = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: '' },
+      },
+    })
     expect(empty.snapshot.settings.background).toMatchObject({ type: 'image', url: '' })
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'ftp://example.com/a.png' } } })).rejects.toThrow('http(s)')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'javascript:alert(1)' } } })).rejects.toThrow('http(s)')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: 'data:text/html;base64,PHN2Zz4=' } } })).rejects.toThrow('Unsupported image data')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: 'ftp://example.com/a.png' },
+      },
+    })).rejects.toThrow('http(s)')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: 'javascript:alert(1)' },
+      },
+    })).rejects.toThrow('http(s)')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: 'data:text/html;base64,PHN2Zz4=' },
+      },
+    })).rejects.toThrow('Unsupported image data')
     // The command layer rejects invalid enum members even though the type forbids them.
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', fit: 'stretch' } } as never })).rejects.toThrow('Invalid image fit')
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', fit: 'none' } } as never })).rejects.toThrow('Invalid image fit')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', opacity: 2 } } })).rejects.toThrow('Invalid image opacity')
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallax: 1 } } as never })).rejects.toThrow('Invalid parallax setting')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', color: 'red' } } })).rejects.toThrow('six-digit hex')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'image', url: '', fit: 'stretch' },
+      } as never,
+    })).rejects.toThrow('Invalid image fit')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'image', url: '', fit: 'none' },
+      } as never,
+    })).rejects.toThrow('Invalid image fit')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: '', opacity: 2 },
+      },
+    })).rejects.toThrow('Invalid image opacity')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'image', url: '', parallax: 1 },
+      } as never,
+    })).rejects.toThrow('Invalid parallax setting')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'image', url: '', color: 'red' },
+      },
+    })).rejects.toThrow('six-digit hex')
   })
   it('stores a YouTube background and rejects invalid values', async () => {
     const { coordinator } = fixture()
-    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', fit: 'contain' } } })
+    const updated = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', fit: 'contain' },
+      },
+    })
     expect(updated.snapshot.settings.background).toMatchObject({ type: 'youtube', fit: 'contain' })
-    const playlist = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: 'https://www.youtube.com/playlist?list=PLabc123XYZ_-0123456789abcdef' } } })
+    const playlist = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'youtube', url: 'https://www.youtube.com/playlist?list=PLabc123XYZ_-0123456789abcdef' },
+      },
+    })
     expect(playlist.snapshot.settings.background).toMatchObject({ type: 'youtube', url: 'https://www.youtube.com/playlist?list=PLabc123XYZ_-0123456789abcdef' })
-    const watchWithList = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLabc123XYZ_-0123456789abcdef' } } })
+    const watchWithList = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLabc123XYZ_-0123456789abcdef' },
+      },
+    })
     expect(watchWithList.snapshot.settings.background).toMatchObject({ type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLabc123XYZ_-0123456789abcdef' })
-    const ordered = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', playlistOrder: 'sequential' } } })
+    const ordered = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'youtube', url: '', playlistOrder: 'sequential' },
+      },
+    })
     expect(ordered.snapshot.settings.background).toMatchObject({ type: 'youtube', playlistOrder: 'sequential' })
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', playlistOrder: 'spiral' } } as never })).rejects.toThrow('Invalid playlist order')
-    const full = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', fit: 'fill', opacity: 0.5, parallax: true, parallaxZoom: 2, playbackRate: 1.5, auto: false, color: '#123abc' } } })
-    expect(full.snapshot.settings.background).toMatchObject({ type: 'youtube', fit: 'fill', opacity: 0.5, parallax: true, parallaxZoom: 2, playbackRate: 1.5, auto: false, color: '#123abc' })
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'youtube', url: '', playlistOrder: 'spiral' },
+      } as never,
+    })).rejects.toThrow('Invalid playlist order')
+    const full = await coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: {
+          type: 'youtube',
+          url: '',
+          fit: 'fill',
+          opacity: 0.5,
+          parallax: true,
+          parallaxZoom: 2,
+          playbackRate: 1.5,
+          auto: false,
+          color: '#123abc',
+        },
+      },
+    })
+    expect(full.snapshot.settings.background).toMatchObject({
+      type: 'youtube',
+      fit: 'fill',
+      opacity: 0.5,
+      parallax: true,
+      parallaxZoom: 2,
+      playbackRate: 1.5,
+      auto: false,
+      color: '#123abc',
+    })
     // The command layer rejects invalid enum members even though the type forbids them.
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', fit: 'stretch' } } as never })).rejects.toThrow('Invalid YouTube fit')
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', fit: 'none' } } as never })).rejects.toThrow('Invalid YouTube fit')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', opacity: 2 } } })).rejects.toThrow('Invalid YouTube opacity')
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', playbackRate: 1.75 } } as never })).rejects.toThrow('Invalid YouTube playback rate')
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', playbackRate: '2' } } as never })).rejects.toThrow('Invalid YouTube playback rate')
-    // eslint-disable-next-line ts/consistent-type-assertions
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', parallax: 1 } } as never })).rejects.toThrow('Invalid parallax setting')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', parallaxZoom: 0.5 } } })).rejects.toThrow('Invalid parallax zoom')
-    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', color: 'red' } } })).rejects.toThrow('six-digit hex')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'youtube', url: '', fit: 'stretch' },
+      } as never,
+    })).rejects.toThrow('Invalid YouTube fit')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'youtube', url: '', fit: 'none' },
+      } as never,
+    })).rejects.toThrow('Invalid YouTube fit')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'youtube', url: '', opacity: 2 },
+      },
+    })).rejects.toThrow('Invalid YouTube opacity')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'youtube', url: '', playbackRate: 1.75 },
+      } as never,
+    })).rejects.toThrow('Invalid YouTube playback rate')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'youtube', url: '', playbackRate: '2' },
+      } as never,
+    })).rejects.toThrow('Invalid YouTube playback rate')
+
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'youtube', url: '', parallax: 1 },
+      } as never,
+    })).rejects.toThrow('Invalid parallax setting')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'youtube', url: '', parallaxZoom: 0.5 },
+      },
+    })).rejects.toThrow('Invalid parallax zoom')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'youtube', url: '', color: 'red' },
+      },
+    })).rejects.toThrow('six-digit hex')
   })
 })
 
@@ -308,10 +625,16 @@ describe('folder tiles', () => {
     const source = groups.find(group => group.id === 'bar')!
     const destination = groups.find(group => group.id === 'work')!
     const moving = source.layout.find(entry => entry.i === 'learning')!
-    const result = await coordinator.execute({ type: 'layout.commit', layouts: {
-      bar: source.layout.filter(entry => entry.i !== 'learning'),
-      work: [...destination.layout, { ...moving, x: 4, y: 0 }],
-    } })
+    const result = await coordinator.execute({
+      type: 'layout.commit',
+      layouts: {
+        bar: source.layout.filter(entry => entry.i !== 'learning'),
+        work: [
+          ...destination.layout,
+          { ...moving, x: 4, y: 0 },
+        ],
+      },
+    })
     expect(indexTree(result.snapshot.tree).get('learning')?.parentId).toBe('work')
     expect(projectGroups(result.snapshot).find(group => group.id === 'work')?.layout.some(entry => entry.i === 'learning')).toBe(true)
     const undo = await coordinator.execute({ type: 'undo', id: result.notice!.undoId! })
@@ -319,9 +642,20 @@ describe('folder tiles', () => {
   })
   it('rejects moving a folder into its own descendant via a tile drop', async () => {
     const { coordinator } = fixture()
-    await expect(coordinator.execute({ type: 'layout.commit', layouts: {
-      tools: [{ i: 'learning', x: 4, y: 0, w: 2, h: 2 }],
-    } })).rejects.toThrow('A folder cannot be moved into itself or a descendant.')
+    await expect(coordinator.execute({
+      type: 'layout.commit',
+      layouts: {
+        tools: [
+          {
+            i: 'learning',
+            x: 4,
+            y: 0,
+            w: 2,
+            h: 2,
+          },
+        ],
+      },
+    })).rejects.toThrow('A folder cannot be moved into itself or a descendant.')
   })
   it('rejects moving a folder tile into a managed destination', async () => {
     const tree = demoTree()
@@ -333,24 +667,50 @@ describe('folder tiles', () => {
     const source = groups.find(group => group.id === 'bar')!
     const destination = groups.find(group => group.id === 'work')!
     const moving = source.layout.find(entry => entry.i === 'learning')!
-    await expect(coordinator.execute({ type: 'layout.commit', layouts: {
-      bar: source.layout.filter(entry => entry.i !== 'learning'),
-      work: [...destination.layout, { ...moving, x: 4, y: 0 }],
-    } })).rejects.toThrow('Choose a writable bookmark folder, not the protected technical root.')
+    await expect(coordinator.execute({
+      type: 'layout.commit',
+      layouts: {
+        bar: source.layout.filter(entry => entry.i !== 'learning'),
+        work: [
+          ...destination.layout,
+          { ...moving, x: 4, y: 0 },
+        ],
+      },
+    })).rejects.toThrow('Choose a writable bookmark folder, not the protected technical root.')
   })
   it('customizes a folder tile color and size like a bookmark tile', async () => {
     const { coordinator } = fixture()
-    const updated = await coordinator.execute({ type: 'tile.appearance', id: 'tools', patch: { colorIndex: 3, color: '#a1b2c3', size: 'large' } })
+    const updated = await coordinator.execute({
+      type: 'tile.appearance',
+      id: 'tools',
+      patch: { colorIndex: 3, color: '#a1b2c3', size: 'large' },
+    })
     expect(updated.snapshot.appearance.tools).toMatchObject({ colorIndex: 3, color: '#a1b2c3', size: 'large' })
     // Clearing the custom color keeps the chosen accent swatch.
-    const cleared = await coordinator.execute({ type: 'tile.appearance', id: 'tools', patch: { color: '' } })
+    const cleared = await coordinator.execute({
+      type: 'tile.appearance',
+      id: 'tools',
+      patch: { color: '' },
+    })
     expect(cleared.snapshot.appearance.tools).toMatchObject({ colorIndex: 3, color: '' })
-    await expect(coordinator.execute({ type: 'tile.appearance', id: 'tools', patch: { colorIndex: 8 } })).rejects.toThrow('Color index must be 0-7.')
-    await expect(coordinator.execute({ type: 'tile.appearance', id: 'tools', patch: { color: 'nope' } })).rejects.toThrow('Use a six-digit hex color.')
+    await expect(coordinator.execute({
+      type: 'tile.appearance',
+      id: 'tools',
+      patch: { colorIndex: 8 },
+    })).rejects.toThrow('Color index must be 0-7.')
+    await expect(coordinator.execute({
+      type: 'tile.appearance',
+      id: 'tools',
+      patch: { color: 'nope' },
+    })).rejects.toThrow('Use a six-digit hex color.')
   })
   it('keeps folder tiles in the persisted layout through an appearance re-pack', async () => {
     const { coordinator } = fixture()
-    await coordinator.execute({ type: 'tile.appearance', id: 'steam', patch: { size: 'medium' } })
+    await coordinator.execute({
+      type: 'tile.appearance',
+      id: 'steam',
+      patch: { size: 'medium' },
+    })
     const snapshot = await coordinator.snapshot()
     expect(snapshot.layouts.bar?.some(entry => entry.i === 'learning')).toBe(true)
   })
@@ -369,37 +729,68 @@ describe('dock grid view', () => {
   it('switches views without touching the stored classic layout', async () => {
     const { coordinator, storage } = fixture()
     const classic = structuredClone(storage.data!.layouts)
-    const dock = await coordinator.execute({ type: 'settings.update', patch: { gridView: 'dock' } })
+    const dock = await coordinator.execute({
+      type: 'settings.update',
+      patch: { gridView: 'dock' },
+    })
     expect(dock.snapshot.settings.gridView).toBe('dock')
     const dockGroups = projectGroups(dock.snapshot)
     expect(dockGroups.find(group => group.id === 'bar')!.layout.every(entry => entry.y + entry.h <= 2)).toBe(true)
     expect(dockGroups.find(group => group.id === 'bar')!.layout.find(entry => entry.i === 'steam')).toMatchObject({ h: 2 })
     expect(storage.data!.layouts).toEqual(classic)
     expect(storage.data!.dockLayouts).toEqual({})
-    const back = await coordinator.execute({ type: 'settings.update', patch: { gridView: 'classic' } })
+    const back = await coordinator.execute({
+      type: 'settings.update',
+      patch: { gridView: 'classic' },
+    })
     expect(back.snapshot.layouts).toEqual(classic)
   })
   it('rejects the Large size in the dock view and accepts it back in classic', async () => {
     const { coordinator } = fixture()
-    await coordinator.execute({ type: 'settings.update', patch: { gridView: 'dock' } })
-    await expect(coordinator.execute({ type: 'tile.appearance', id: 'linear', patch: { size: 'large' } })).rejects.toThrow('Dock')
-    await coordinator.execute({ type: 'settings.update', patch: { gridView: 'classic' } })
-    const result = await coordinator.execute({ type: 'tile.appearance', id: 'linear', patch: { size: 'large' } })
+    await coordinator.execute({
+      type: 'settings.update',
+      patch: { gridView: 'dock' },
+    })
+    await expect(coordinator.execute({
+      type: 'tile.appearance',
+      id: 'linear',
+      patch: { size: 'large' },
+    })).rejects.toThrow('Dock')
+    await coordinator.execute({
+      type: 'settings.update',
+      patch: { gridView: 'classic' },
+    })
+    const result = await coordinator.execute({
+      type: 'tile.appearance',
+      id: 'linear',
+      patch: { size: 'large' },
+    })
     expect(result.snapshot.appearance.linear.size).toBe('large')
   })
   it('persists dock drags to the dock map and leaves classic positions untouched', async () => {
     const { coordinator, storage } = fixture()
     const classic = structuredClone(storage.data!.layouts)
-    await coordinator.execute({ type: 'settings.update', patch: { gridView: 'dock' } })
+    await coordinator.execute({
+      type: 'settings.update',
+      patch: { gridView: 'dock' },
+    })
     const dock = await coordinator.snapshot()
-    const bar = projectGroups(dock).find(group => group.id === 'bar')!.layout.map(entry => (entry.i === 'steam' ? { ...entry, x: 8 } : entry))
-    await coordinator.execute({ type: 'layout.commit', layouts: { bar } })
+    const bar = projectGroups(dock).find(group => group.id === 'bar')!.layout.map(entry => (entry.i === 'steam'
+      ? { ...entry, x: 8 }
+      : entry))
+    await coordinator.execute({
+      type: 'layout.commit',
+      layouts: { bar },
+    })
     expect(storage.data!.dockLayouts.bar.find(entry => entry.i === 'steam')?.x).toBe(8)
     expect(storage.data!.layouts).toEqual(classic)
   })
   it('moves a tile in the dock view and restores it on undo', async () => {
     const { coordinator, storage } = fixture()
-    await coordinator.execute({ type: 'settings.update', patch: { gridView: 'dock' } })
+    await coordinator.execute({
+      type: 'settings.update',
+      patch: { gridView: 'dock' },
+    })
     const result = await coordinator.execute({ type: 'node.move', id: 'steam', parentId: 'other' })
     expect(storage.data!.dockLayouts.other.map(entry => entry.i)).toContain('steam')
     expect(storage.data!.layouts.other.map(entry => entry.i)).toContain('steam')
@@ -411,7 +802,10 @@ describe('dock grid view', () => {
   })
   it('resets and restores both layout maps together', async () => {
     const { coordinator, storage } = fixture()
-    await coordinator.execute({ type: 'settings.update', patch: { gridView: 'dock' } })
+    await coordinator.execute({
+      type: 'settings.update',
+      patch: { gridView: 'dock' },
+    })
     const reset = await coordinator.execute({ type: 'layout.reset' })
     expect(storage.data!.layouts).toEqual({})
     expect(storage.data!.dockLayouts).toEqual({})

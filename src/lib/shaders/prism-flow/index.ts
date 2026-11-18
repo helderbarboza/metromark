@@ -41,13 +41,17 @@ export const prismFlow: ShaderDefinition = {
         // Upstream binds an R8 128x128 grain texture (embedded as base64 in
         // the preset). MetroMark does not ship it; the pipeline's generated
         // 128x128 RGBA noise is bound instead.
-        { texture: { noise: 128 } },
+        {
+          texture: { noise: 128 },
+        },
       ],
     },
     {
       id: 'lens',
       fragmentShader: LENS,
-      channels: [{ buffer: 'field' }],
+      channels: [
+        { buffer: 'field' },
+      ],
     },
   ],
 }

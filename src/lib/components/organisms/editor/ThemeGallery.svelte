@@ -20,7 +20,10 @@
 
   let { themes: currentThemes = $bindable() }: Props = $props()
 
-  const themeGroupsEntries = [['light', LIGHT_THEMES], ['dark', DARK_THEMES]] as const
+  const themeGroupsEntries = [
+    ['light', LIGHT_THEMES],
+    ['dark', DARK_THEMES],
+  ] as const
 
   function chooseTheme(targetMode: 'light' | 'dark', newTheme: string): void {
     if (targetMode === 'light' && isOneOf(newTheme, LIGHT_THEMES)) {
@@ -39,7 +42,9 @@
   {#each themeGroupsEntries as [mode, modeTheme] (mode)}
     <div>
       <h4 class={cn('mb-2.5 text-xs font-medium tracking-wider text-(--muted-foreground) uppercase')}>
-        {mode === 'light' ? $LL.settings.lightTheme() : $LL.settings.darkTheme()}
+        {mode === 'light'
+          ? $LL.settings.lightTheme()
+          : $LL.settings.darkTheme()}
       </h4>
       <div class='grid grid-cols-3 gap-2'>
         {#each modeTheme as theme (theme)}

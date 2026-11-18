@@ -104,8 +104,11 @@ export function applyLocale(setting: LanguageSetting | string | undefined, optio
     document.documentElement.lang = resolved
   if (options.persist !== false) {
     try {
-      if (typeof localStorage !== 'undefined')
-        localStorage.setItem(STORAGE_KEY, isLanguageSetting(setting) ? setting : 'auto')
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY, isLanguageSetting(setting)
+          ? setting
+          : 'auto')
+      }
     }
     catch {
       /* Storage can be unavailable; the setting itself persists through the coordinator. */

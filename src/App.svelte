@@ -114,13 +114,17 @@
     focusSearch: () => searchInput?.focus(),
   })
 
-  const groups = $derived(snapshot ? projectGroups(snapshot) : [])
+  const groups = $derived(snapshot
+    ? projectGroups(snapshot)
+    : [])
   const allTiles = $derived(
     Object.fromEntries(groups.flatMap(group => Object.entries(group.tiles))),
   )
   const selectedTile = $derived(selectedId ? allTiles[selectedId] : undefined)
   const contextTile = $derived(
-    menuTarget?.target === 'tile' ? allTiles[menuTarget.id] : undefined,
+    menuTarget?.target === 'tile'
+      ? allTiles[menuTarget.id]
+      : undefined,
   )
   const nodes = $derived(indexTree(snapshot?.tree ?? []))
   const roots = $derived(
@@ -135,7 +139,9 @@
     Math.max(
       34,
       Math.min(
-        snapshot?.settings.density === 'compact' ? 54 : 56,
+        snapshot?.settings.density === 'compact'
+          ? 54
+          : 56,
         Math.floor((viewportHeight - 279 - (rows - 1) * GAP) / rows),
       ),
     ),
@@ -212,9 +218,13 @@
         : snapshot?.undos.find(
           item => item.id === undoId && item.expiresAt > Date.now(),
         )
-    const onClick = onAction ?? (undoEntry ? () => performUndo(undoEntry.id) : undefined)
+    const onClick = onAction ?? (undoEntry
+      ? () => performUndo(undoEntry.id)
+      : undefined)
     const actionLabel
-      = value.actionLabel ?? (undoEntry ? $LL.toast.undo() : undefined)
+      = value.actionLabel ?? (undoEntry
+        ? $LL.toast.undo()
+        : undefined)
     const action = actionLabel === undefined || onClick === undefined
       ? undefined
       : { label: actionLabel, onClick }
@@ -268,7 +278,9 @@
     catch (error) {
       showNotice({
         message:
-          error instanceof Error ? error.message : $LL.app.operationFailed(),
+          error instanceof Error
+            ? error.message
+            : $LL.app.operationFailed(),
         tone: 'error',
       })
       try {
@@ -318,7 +330,9 @@
       })
       .catch((error: unknown) => {
         loadError
-          = error instanceof Error ? error.message : $LL.app.unableToLoad()
+          = error instanceof Error
+            ? error.message
+            : $LL.app.unableToLoad()
       })
     const resize = () => {
       viewportHeight = window.innerHeight
@@ -410,7 +424,9 @@
   function selectTile(event: MouseEvent, id: string) {
     // preventDefault also keeps the board context menu closed (bits-ui honors it).
     event.preventDefault()
-    const target = event.target instanceof Element ? event.target : null
+    const target = event.target instanceof Element
+      ? event.target
+      : null
     selectionOrigin = target?.closest<HTMLElement>('a, button') ?? null
     // Right-click always shows the commands for the tile it was pressed on; the
     // cross-slide gesture is what cancels a selection.
@@ -486,7 +502,10 @@
       menuOrigin = grid
       return
     }
-    menuTarget = { target: 'board', id: defaultFolder() }
+    menuTarget = {
+      target: 'board',
+      id: defaultFolder(),
+    }
     menuOrigin = scroller
   }
   /** Return focus to the element that was right-clicked (or focused for Shift+F10). */
@@ -498,7 +517,9 @@
   }
   /** Cross-slide selection from a touch or pen gesture. */
   function selectByGesture(id: string, event: PointerEvent) {
-    const target = event.target instanceof Element ? event.target : null
+    const target = event.target instanceof Element
+      ? event.target
+      : null
     selectionOrigin = target?.closest<HTMLElement>('a, button') ?? null
     selectedId = toggleSelection(selectedId, id)
   }
@@ -518,7 +539,9 @@
     if (dragging)
       return
     // Activating a tile opens it; pressing anywhere else drops the selection (p. 82).
-    const target = event.target instanceof Element ? event.target : null
+    const target = event.target instanceof Element
+      ? event.target
+      : null
     if (target?.closest('[data-grid-id], [data-tile-id]'))
       return
     clearSelection()
@@ -546,7 +569,9 @@
       return
     try {
       await navigator.clipboard.writeText(url)
-      showNotice({ message: $LL.app.addressCopied() })
+      showNotice({
+        message: $LL.app.addressCopied(),
+      })
     }
     catch {
       edit({ kind: 'copy', id })
@@ -588,13 +613,20 @@
   function tileSubtitle(tile: typeof contextTile): string | undefined {
     if (!tile)
       return undefined
-    return tile.kind === 'folder' ? $LL.app.folder() : tile.domain
+    return tile.kind === 'folder'
+      ? $LL.app.folder()
+      : tile.domain
   }
   const menuHeading = $derived.by<MenuHeading>(() => {
     void $locale
     return menuTarget?.target === 'tile'
-      ? { title: contextTile?.title ?? $LL.app.yourBoard(), subtitle: tileSubtitle(contextTile) }
-      : { title: $LL.app.yourBoard() }
+      ? {
+        title: contextTile?.title ?? $LL.app.yourBoard(),
+        subtitle: tileSubtitle(contextTile),
+      }
+      : {
+        title: $LL.app.yourBoard(),
+      }
   })
   // Commands that stay off the app bar itself live in a menu opened from one of
   // its buttons, so they are not duplicated as bar commands.
@@ -603,7 +635,11 @@
     return buildAppBarMenuItems(selectedTile, menuCallbacks)
   })
   function resizeTile(id: string, size: TileSize) {
-    void execute({ type: 'tile.appearance', id, patch: { size } })
+    void execute({
+      type: 'tile.appearance',
+      id,
+      patch: { size },
+    })
   }
   function boardDragStart() {
     dragging = true
@@ -656,7 +692,9 @@
             () => {
               void execute({
                 type: 'settings.update',
-                patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+                patch: {
+                  background: { ...BACKGROUND_DEFAULTS.color },
+                },
               })
             },
           )}
@@ -669,7 +707,9 @@
             () => {
               void execute({
                 type: 'settings.update',
-                patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+                patch: {
+                  background: { ...BACKGROUND_DEFAULTS.color },
+                },
               })
             },
           )}
@@ -682,7 +722,9 @@
             () => {
               void execute({
                 type: 'settings.update',
-                patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+                patch: {
+                  background: { ...BACKGROUND_DEFAULTS.color },
+                },
               })
             },
           )}
@@ -759,7 +801,10 @@
       {#if selectedTile && !dragging}
         <div
           class='fixed inset-x-0 bottom-0 z-50'
-          transition:fly={{ y: 64, duration: reducedMotion ? 0 : 200 }}
+          transition:fly={{
+            y: 64,
+            duration: reducedMotion ? 0 : 200,
+          }}
         >
           <MetroAppBar
             title={selectedTile.title}
@@ -803,7 +848,9 @@
       onresetpreview={client.resetPreview
         ? async () => {
           applySnapshot(await client.resetPreview!())
-          showNotice({ message: $LL.app.sampleRestored() })
+          showNotice({
+            message: $LL.app.sampleRestored(),
+          })
         }
         : undefined}
     />

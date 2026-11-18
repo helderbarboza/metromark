@@ -28,7 +28,9 @@
   const ui = $derived(tileVariants({ size, selected, revealed }))
 
   const cols = $derived(FOLDER_COLUMNS[size])
-  const iconRows = $derived(FOLDER_ROWS[size] - (size === 'small' ? 0 : 1))
+  const iconRows = $derived(FOLDER_ROWS[size] - (size === 'small'
+    ? 0
+    : 1))
   // Icon rows hug the square cell width; the title track absorbs all leftover height.
   const gridRows = $derived(size === 'small'
     ? `repeat(${iconRows}, auto)`
@@ -55,7 +57,9 @@
         kind: 'bookmark',
         cell,
         bg: colors.bg,
-        tint: colors.fg === 1 ? '#ffffff' : '#000000',
+        tint: colors.fg === 1
+          ? '#ffffff'
+          : '#000000',
       } satisfies BookmarkSlot
     })
   })

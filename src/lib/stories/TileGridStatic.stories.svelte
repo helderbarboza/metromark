@@ -19,10 +19,38 @@
   }
 
   const staticTiles: StaticTile[] = [
-    { id: 'slack', title: 'Slack', colorIndex: 0, domain: 'slack.com', href: 'https://slack.com', size: 'small' },
-    { id: 'steam', title: 'Steam', colorIndex: 1, domain: 'store.steampowered.com', href: 'https://store.steampowered.com/', size: 'medium' },
-    { id: 'gmail', title: 'Gmail', colorIndex: 2, domain: 'mail.google.com', href: 'https://mail.google.com', size: 'wide' },
-    { id: 'notion', title: 'Notion', colorIndex: 3, domain: 'notion.so', href: 'https://notion.so', size: 'large' },
+    {
+      id: 'slack',
+      title: 'Slack',
+      colorIndex: 0,
+      domain: 'slack.com',
+      href: 'https://slack.com',
+      size: 'small',
+    },
+    {
+      id: 'steam',
+      title: 'Steam',
+      colorIndex: 1,
+      domain: 'store.steampowered.com',
+      href: 'https://store.steampowered.com/',
+      size: 'medium',
+    },
+    {
+      id: 'gmail',
+      title: 'Gmail',
+      colorIndex: 2,
+      domain: 'mail.google.com',
+      href: 'https://mail.google.com',
+      size: 'wide',
+    },
+    {
+      id: 'notion',
+      title: 'Notion',
+      colorIndex: 3,
+      domain: 'notion.so',
+      href: 'https://notion.so',
+      size: 'large',
+    },
   ]
 
   const { Story } = defineMeta({
@@ -39,7 +67,9 @@
   })
 
   function label(tile: StaticTile, showDomain: boolean): string {
-    return `Open ${tile.title}${showDomain && tile.size !== 'small' ? ` ${tile.domain}` : ''}`
+    return `Open ${tile.title}${showDomain && tile.size !== 'small'
+      ? ` ${tile.domain}`
+      : ''}`
   }
 </script>
 

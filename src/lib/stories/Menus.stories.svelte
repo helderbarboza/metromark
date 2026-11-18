@@ -18,9 +18,19 @@
       headingTitle: 'Steam',
       headingSubtitle: 'store.steampowered.com',
       items: [
-        { label: 'Open in new tab', icon: 'openTab', action: fn() },
+        {
+          label: 'Open in new tab',
+          icon: 'openTab',
+          action: fn(),
+        },
         { label: 'Edit bookmark', icon: 'edit', action: edit },
-        { label: 'Delete bookmark', icon: 'delete', action: fn(), danger: true, separator: true },
+        {
+          label: 'Delete bookmark',
+          icon: 'delete',
+          action: fn(),
+          danger: true,
+          separator: true,
+        },
       ],
     },
   })
@@ -53,9 +63,24 @@
     tileSize: undefined,
     onresize: undefined,
     items: [
-      { label: 'Add new bookmark', icon: 'addBookmark', action: fn() },
-      { label: 'Rename folder', icon: 'edit', action: fn(), disabled: true },
-      { label: 'Delete folder', icon: 'delete', action: fn(), danger: true, disabled: true },
+      {
+        label: 'Add new bookmark',
+        icon: 'addBookmark',
+        action: fn(),
+      },
+      {
+        label: 'Rename folder',
+        icon: 'edit',
+        action: fn(),
+        disabled: true,
+      },
+      {
+        label: 'Delete folder',
+        icon: 'delete',
+        action: fn(),
+        danger: true,
+        disabled: true,
+      },
     ],
   }}
 />
@@ -64,10 +89,27 @@
   args={{
     variant: 'dropdown',
     items: [
-      { label: 'Open in new tab', icon: 'openTab', action: fn() },
-      { label: 'Open in new window', icon: 'openWindow', action: fn() },
-      { label: 'Copy website address', icon: 'copy', action: fn() },
-      { label: 'Customize tile', icon: 'customize', action: edit, separator: true },
+      {
+        label: 'Open in new tab',
+        icon: 'openTab',
+        action: fn(),
+      },
+      {
+        label: 'Open in new window',
+        icon: 'openWindow',
+        action: fn(),
+      },
+      {
+        label: 'Copy website address',
+        icon: 'copy',
+        action: fn(),
+      },
+      {
+        label: 'Customize tile',
+        icon: 'customize',
+        action: edit,
+        separator: true,
+      },
     ],
   }}
   play={async ({ canvas }) => {

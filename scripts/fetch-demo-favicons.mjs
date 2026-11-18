@@ -29,7 +29,10 @@ function hostsFromSource(source) {
 }
 
 async function fetchImage(url) {
-  const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS), redirect: 'follow' })
+  const response = await fetch(url, {
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+    redirect: 'follow',
+  })
   if (!response.ok)
     throw new Error(`HTTP ${response.status}`)
   const contentType = (response.headers.get('content-type') ?? '').split(';')[0].trim()
@@ -77,7 +80,9 @@ for (const host of hosts) {
   }
 }
 
-const entries = [...results.entries()]
+const entries = [
+  ...results.entries(),
+]
   .map(([host, dataUrl]) => `  '${host}': '${dataUrl}',`)
   .join('\n')
 
@@ -117,7 +122,9 @@ export function demoFaviconsAvailable(): boolean {
 `
 
 await writeFile(OUTPUT, output)
-const totalKb = [...results.values()].reduce((sum, url) => sum + url.length, 0) / 1024
+const totalKb = [
+  ...results.values(),
+].reduce((sum, url) => sum + url.length, 0) / 1024
 console.log(`\nWrote ${OUTPUT}`)
 console.log(`${entries.length} favicons, ${Math.round(totalKb)} KB total`)
 if (failures.length > 0)

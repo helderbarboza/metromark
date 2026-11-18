@@ -27,7 +27,9 @@
   </span>
   <select
     aria-labelledby={`${uid}-label`}
-    aria-describedby={hint ? `${uid}-hint` : undefined}
+    aria-describedby={hint
+      ? `${uid}-hint`
+      : undefined}
     bind:value
     required
     disabled={disabled}

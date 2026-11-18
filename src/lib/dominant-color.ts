@@ -114,7 +114,9 @@ export function rgbToOklab([red, green, blue]: Rgb): Rgb {
 
 function srgbToLinear(channel: number): number {
   const value = channel / 255
-  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
+  return value <= 0.04045
+    ? value / 12.92
+    : ((value + 0.055) / 1.055) ** 2.4
 }
 
 function oklabDistance(a: Rgb, b: Rgb): number {

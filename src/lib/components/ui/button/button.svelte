@@ -124,7 +124,9 @@
     href={disabled ? undefined : href}
     aria-disabled={disabled}
     role={disabled ? 'link' : undefined}
-    tabindex={disabled ? -1 : undefined}
+    tabindex={disabled
+      ? -1
+      : undefined}
     {...restProps}
   >
     {@render children?.()}

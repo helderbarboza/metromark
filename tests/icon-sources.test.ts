@@ -24,7 +24,12 @@ describe('classifyConvertError', () => {
     expect(classifyConvertError('boom')).toBe('unknown')
   })
   it('explains every kind', () => {
-    for (const kind of ['cors-taint', 'load-failure', 'unsupported-type', 'unknown'] as const) {
+    for (const kind of [
+      'cors-taint',
+      'load-failure',
+      'unsupported-type',
+      'unknown',
+    ] as const) {
       expect(failureHint(kind).length).toBeGreaterThan(0)
     }
   })

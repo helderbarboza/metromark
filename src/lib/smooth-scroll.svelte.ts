@@ -44,7 +44,9 @@ export class SmoothScroller {
       return
     const max = scroller.scrollWidth - scroller.clientWidth
     this.canScroll = max > 3
-    this.scrollProgress = max > 0 ? scroller.scrollLeft / max : 0
+    this.scrollProgress = max > 0
+? scroller.scrollLeft / max
+: 0
     if (this.#smoothFrame === null) {
       this.#targetScroll = scroller.scrollLeft
       this.#currentScroll = scroller.scrollLeft
@@ -155,7 +157,9 @@ export class SmoothScroller {
     const scroller = this.#getScroller()
     scroller?.scrollBy({
       left: direction * Math.max(250, scroller.clientWidth * 0.65),
-      behavior: this.#isReducedMotion() ? 'instant' : 'smooth',
+      behavior: this.#isReducedMotion()
+? 'instant'
+: 'smooth',
     })
   }
 
@@ -168,7 +172,9 @@ export class SmoothScroller {
     if (element !== undefined && scroller !== null) {
       scroller.scrollTo({
         left: Math.max(0, element.offsetLeft - 68),
-        behavior: this.#isReducedMotion() ? 'instant' : 'smooth',
+        behavior: this.#isReducedMotion()
+? 'instant'
+: 'smooth',
       })
     }
   }

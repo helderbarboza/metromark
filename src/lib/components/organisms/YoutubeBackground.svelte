@@ -65,8 +65,12 @@
   let frame = $state<HTMLIFrameElement | null>(null)
   // A `list` parameter makes the address a playlist; a plain video otherwise.
   const target = $derived(parseYouTubeBackgroundTarget(src))
-  const videoId = $derived(target?.kind === 'video' ? target.videoId : null)
-  const playlistId = $derived(target?.kind === 'playlist' ? target.playlistId : null)
+  const videoId = $derived(target?.kind === 'video'
+    ? target.videoId
+    : null)
+  const playlistId = $derived(target?.kind === 'playlist'
+    ? target.playlistId
+    : null)
   let playing = $state(false)
   let started = $state(false)
   $effect(() => {
@@ -100,12 +104,18 @@
   const boxSize = $derived.by(() => {
     const base = BASE_BOX[resolvedFit ?? 'cover']
     return {
-      width: zoom === 1 ? base.width : `calc(${base.width} * ${zoom})`,
-      height: zoom === 1 ? base.height : `calc(${base.height} * ${zoom})`,
+      width: zoom === 1
+        ? base.width
+        : `calc(${base.width} * ${zoom})`,
+      height: zoom === 1
+        ? base.height
+        : `calc(${base.height} * ${zoom})`,
     }
   })
   const boxTransform = $derived(
-    parallaxActive ? `translate3d(calc(-50% + ${shift}%), -50%, 0)` : 'translate3d(-50%, -50%, 0)',
+    parallaxActive
+      ? `translate3d(calc(-50% + ${shift}%), -50%, 0)`
+      : 'translate3d(-50%, -50%, 0)',
   )
 
   // Kept in a plain variable so the rate effect below can reach the live
@@ -120,7 +130,11 @@
     const list = playlistId
     const el = frame
     const source: { videoId: string } | { playlistId: string } | null
-      = list !== null ? { playlistId: list } : id !== null ? { videoId: id } : null
+      = list !== null
+        ? { playlistId: list }
+        : id !== null
+        ? { videoId: id }
+        : null
     if (!el || source === null) {
       bridge = null
       return

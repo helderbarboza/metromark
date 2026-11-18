@@ -53,8 +53,19 @@ export interface GridViewDef {
 }
 
 const GRID_VIEWS = {
-  classic: { id: 'classic', rows: ROWS, anchor: 'center', layoutsKey: 'layouts' },
-  dock: { id: 'dock', rows: DOCK_ROWS, anchor: 'end', inset: 32, layoutsKey: 'dockLayouts' },
+  classic: {
+    id: 'classic',
+    rows: ROWS,
+    anchor: 'center',
+    layoutsKey: 'layouts',
+  },
+  dock: {
+    id: 'dock',
+    rows: DOCK_ROWS,
+    anchor: 'end',
+    inset: 32,
+    layoutsKey: 'dockLayouts',
+  },
 } as const satisfies Record<string, GridViewDef>
 
 export type GridView = keyof typeof GRID_VIEWS
@@ -73,7 +84,9 @@ export const GRID_VIEW_IDS: GridView[] = Object.keys(GRID_VIEWS).filter(isGridVi
 
 /** The def for a persisted view id; anything unknown falls back to the Classic def. */
 export function gridViewDef(view: string | undefined): GridViewDef {
-  return isGridView(view) ? GRID_VIEWS[view] : GRID_VIEWS[DEFAULT_GRID_VIEW]
+  return isGridView(view)
+    ? GRID_VIEWS[view]
+    : GRID_VIEWS[DEFAULT_GRID_VIEW]
 }
 
 /** Row count for a grid view; anything unknown falls back to the Classic grid. */
@@ -97,7 +110,9 @@ export function allowsLargeSize(rows: number): boolean {
  * keeps its `large` value; nothing is rewritten.
  */
 export function effectiveTileSize(size: TileSize, rows: number = ROWS): TileSize {
-  return SIZES[size][1] <= rows ? size : 'wide'
+  return SIZES[size][1] <= rows
+    ? size
+    : 'wide'
 }
 
 export function sizeOf(item: Pick<LayoutItem, 'w' | 'h'>): TileSize {
@@ -140,7 +155,9 @@ export function reconcileLayout(
       w,
       h,
     }
-    occupied.push(occupied.some(other => overlaps(candidate, other)) ? freePosition(occupied, candidate, rows) : candidate)
+    occupied.push(occupied.some(other => overlaps(candidate, other))
+      ? freePosition(occupied, candidate, rows)
+      : candidate)
     seen.add(item.i)
   }
   for (const node of bookmarks) {
@@ -165,6 +182,12 @@ export function validateLayout(layout: unknown, rows: number = ROWS): Layout {
       throw new Error(getT().errors.invalidTileCoordinates())
     }
     seen.add(item.i)
-    return { i: item.i, x: item.x, y: item.y, w: item.w, h: item.h }
+    return {
+      i: item.i,
+      x: item.x,
+      y: item.y,
+      w: item.w,
+      h: item.h,
+    }
   })
 }

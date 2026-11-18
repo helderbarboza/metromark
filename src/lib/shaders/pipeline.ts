@@ -59,7 +59,9 @@ export function getContext(element: HTMLCanvasElement): GlContext | null {
       return { gl: webgl2, webgl2: true }
   }
   const gl = element.getContext('webgl', CONTEXT_ATTRIBUTES)
-  return gl ? { gl, webgl2: false } : null
+  return gl
+    ? { gl, webgl2: false }
+    : null
 }
 
 /**
@@ -88,7 +90,9 @@ function compileShader(
   if (!compiled) {
     const info = gl.getShaderInfoLog(shader)?.trim() ?? ''
     gl.deleteShader(shader)
-    const detail = info.length > 0 ? info : glDiagnostics(gl)
+    const detail = info.length > 0
+      ? info
+      : glDiagnostics(gl)
     throw new Error(`Unable to compile the ${label} shader: ${detail}`)
   }
   return shader
@@ -143,7 +147,9 @@ function createProgram(
     if (!linked) {
       const info = gl.getProgramInfoLog(program)?.trim() ?? ''
       gl.deleteProgram(program)
-      const detail = info.length > 0 ? info : glDiagnostics(gl)
+      const detail = info.length > 0
+        ? info
+        : glDiagnostics(gl)
       throw new Error(`Unable to link the ${label} shader: ${detail}`)
     }
     return program
@@ -231,7 +237,9 @@ function createTarget(
   wrap: 'clamp' | 'repeat',
   format: 'half' | 'float',
 ): RenderTarget {
-  const wrapMode = wrap === 'repeat' ? gl.REPEAT : gl.CLAMP_TO_EDGE
+  const wrapMode = wrap === 'repeat'
+    ? gl.REPEAT
+    : gl.CLAMP_TO_EDGE
   const texture = gl.createTexture()
   if (texture === null || texture === undefined)
     throw new Error('Unable to create a background buffer texture.')
@@ -305,11 +313,13 @@ interface PassRuntime {
 function resolvePasses(definition: ShaderDefinition): ShaderPass[] {
   if (definition.passes && definition.passes.length > 0)
     return definition.passes.map(pass => ({ ...pass }))
-  return [{
-    id: 'image',
-    fragmentShader: definition.fragmentShader,
-    channels: (definition.channels ?? []).map<PassChannel>(texture => ({ texture })),
-  }]
+  return [
+    {
+      id: 'image',
+      fragmentShader: definition.fragmentShader,
+      channels: (definition.channels ?? []).map<PassChannel>(texture => ({ texture })),
+    },
+  ]
 }
 
 /**
@@ -412,7 +422,9 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
 
     const passDefinitions = resolvePasses(definition)
     const multiPass = passDefinitions.length > 1
-    const format = multiPass ? probeTargetFormat(gl) : null
+    const format = multiPass
+      ? probeTargetFormat(gl)
+      : null
     if (multiPass && !format) {
       throw new Error([
         'Multipass shaders need a filterable float colour attachment; this context ',
@@ -473,7 +485,9 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
     element.height = canvasSize.height
 
     passDefinitions.forEach((passDefinition, index) => {
-      const label = multiPass ? `"${passDefinition.id}" pass` : 'fragment'
+      const label = multiPass
+        ? `"${passDefinition.id}" pass`
+        : 'fragment'
       const program = createProgram(gl, definition, passDefinition.fragmentShader, label)
       disposers.push(() => gl.deleteProgram(program))
 
@@ -570,7 +584,12 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
       if (cached !== undefined)
         return cached
 
-      const entry: ImageEntry = { texture: null, width: 0, height: 0, failed: false }
+      const entry: ImageEntry = {
+        texture: null,
+        width: 0,
+        height: 0,
+        failed: false,
+      }
       imageEntries.set(key, entry)
       const image = new Image()
       image.onload = () => {
@@ -586,7 +605,9 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
           // which is also GL's default.
           gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY)
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-          const wrapMode = wrap === 'repeat' ? gl.REPEAT : gl.CLAMP_TO_EDGE
+          const wrapMode = wrap === 'repeat'
+            ? gl.REPEAT
+            : gl.CLAMP_TO_EDGE
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapMode)
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapMode)
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
@@ -623,11 +644,20 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
     }
 
     const resolveTextureSource = (source: TextureSource): ResolvedChannel => {
-      if (source === 'noise')
-        return { texture: getNoiseTexture(), width: NOISE_SIZE, height: NOISE_SIZE }
+      if (source === 'noise') {
+        return {
+          texture: getNoiseTexture(),
+          width: NOISE_SIZE,
+          height: NOISE_SIZE,
+        }
+      }
       if ('noise' in source) {
         const size = source.noise
-        return { texture: getNoiseTexture(size), width: size, height: size }
+        return {
+          texture: getNoiseTexture(size),
+          width: size,
+          height: size,
+        }
       }
       const entry = loadImage(source.image, source.wrap ?? 'clamp', source.flipY ?? false)
       if (entry.texture)
@@ -635,7 +665,11 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
       // Until the decode lands, hold the fallback at the same texel count so
       // `iChannelResolution` — and any `& mask` in the shader — stays coherent.
       const fallback = source.noiseFallback ?? NOISE_SIZE
-      return { texture: getNoiseTexture(fallback), width: fallback, height: fallback }
+      return {
+        texture: getNoiseTexture(fallback),
+        width: fallback,
+        height: fallback,
+      }
     }
 
     const resolveChannel = (channel: PassChannel | null | undefined): ResolvedChannel => {
@@ -667,7 +701,11 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
     const warnedChannels = new Set<string>()
 
     const drawPass = (pass: PassRuntime, time: number) => {
-      const target = pass.buffer ? pass.buffer.targets[pass.buffer.latest === 0 ? 1 : 0] : null
+      const target = pass.buffer
+        ? pass.buffer.targets[pass.buffer.latest === 0
+          ? 1
+          : 0]
+        : null
       gl.bindFramebuffer(gl.FRAMEBUFFER, target ? target.framebuffer : null)
       const width = target ? target.width : element.width
       const height = target ? target.height : element.height
@@ -730,15 +768,21 @@ export function createPipeline(options: PipelineOptions): ShaderPipeline {
           pass.uniform.mouse,
           live ? pointerX : 0,
           live ? pointerY : 0,
-          live && pointerDown ? pressX : 0,
-          live && pointerDown ? pressY : 0,
+          live && pointerDown
+            ? pressX
+            : 0,
+          live && pointerDown
+            ? pressY
+            : 0,
         )
       }
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 
       if (pass.buffer) {
-        pass.buffer.latest = pass.buffer.latest === 0 ? 1 : 0
+        pass.buffer.latest = pass.buffer.latest === 0
+          ? 1
+          : 0
         pass.dirty = false
       }
     }

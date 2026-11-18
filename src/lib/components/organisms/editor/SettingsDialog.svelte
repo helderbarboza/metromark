@@ -75,16 +75,34 @@
 
   const isPreview = $derived(typeof onresetpreview === 'function')
   const tabs: { value: string, icon: IconName, label: string }[] = $derived([
-    { value: 'appearance', icon: 'paintBrush', label: $LL.settings.tabAppearance() },
-    { value: 'tiles', icon: 'customize', label: $LL.settings.tabTiles() },
-    { value: 'background', icon: 'image', label: $LL.settings.tabBackground() },
-    { value: 'advanced', icon: 'settings', label: $LL.settings.tabAdvanced() },
+    {
+      value: 'appearance',
+      icon: 'paintBrush',
+      label: $LL.settings.tabAppearance(),
+    },
+    {
+      value: 'tiles',
+      icon: 'customize',
+      label: $LL.settings.tabTiles(),
+    },
+    {
+      value: 'background',
+      icon: 'image',
+      label: $LL.settings.tabBackground(),
+    },
+    {
+      value: 'advanced',
+      icon: 'settings',
+      label: $LL.settings.tabAdvanced(),
+    },
   ])
 
   let themes: ThemeSelections = $state(getThemeSelections())
 
   const systemsCaption = $derived(
-    systemPrefersMode.current === 'dark' ? $LL.settings.dark() : $LL.settings.light(),
+    systemPrefersMode.current === 'dark'
+      ? $LL.settings.dark()
+      : $LL.settings.light(),
   )
   const detectedLanguage = $derived(
     LANGUAGE_NATIVE_NAMES[resolveLocale('auto')],
@@ -139,7 +157,9 @@
           {#each modes as mode (mode)}
             <ToggleGroup.Item
               value={mode}
-              class={mode === 'system' ? 'grow' : 'grow capitalize'}
+              class={mode === 'system'
+                ? 'grow'
+                : 'grow capitalize'}
             >
               {mode === 'system'
                 ? $LL.settings.systemMode({ mode: systemsCaption })
@@ -253,7 +273,9 @@
         >
           {#each densities as density (density)}
             <ToggleGroup.Item value={density} class='grow'>
-              {density === 'comfortable' ? $LL.settings.comfortable() : $LL.settings.compact()}
+              {density === 'comfortable'
+                ? $LL.settings.comfortable()
+                : $LL.settings.compact()}
             </ToggleGroup.Item>
           {/each}
         </ToggleGroup.Root>

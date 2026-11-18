@@ -131,7 +131,9 @@ async function loadDrawable(src: IconImageSource): Promise<DrawableImage> {
   }
   // File / Blob / URL string
   const isBlob = src instanceof Blob
-  const url: string = isBlob ? URL.createObjectURL(src) : src
+  const url: string = isBlob
+    ? URL.createObjectURL(src)
+    : src
   return new Promise<DrawableImage>((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous' // needed if loading from remote URLs (CORS)
@@ -398,13 +400,27 @@ export function cssColorToArgb(css: string): number {
   }
   else if (/^[0-9a-f]{4}$/i.test(hex)) {
     const e = expand(hex);
-    [r, g, b, a] = [e.slice(0, 2), e.slice(2, 4), e.slice(4, 6), e.slice(6, 8)]
+    [r, g, b, a] = [
+      e.slice(0, 2),
+      e.slice(2, 4),
+      e.slice(4, 6),
+      e.slice(6, 8),
+    ]
   }
   else if (/^[0-9a-f]{6}$/i.test(hex)) {
-    [r, g, b] = [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)]
+    [r, g, b] = [
+      hex.slice(0, 2),
+      hex.slice(2, 4),
+      hex.slice(4, 6),
+    ]
   }
   else if (/^[0-9a-f]{8}$/i.test(hex)) {
-    [r, g, b, a] = [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6), hex.slice(6, 8)]
+    [r, g, b, a] = [
+      hex.slice(0, 2),
+      hex.slice(2, 4),
+      hex.slice(4, 6),
+      hex.slice(6, 8),
+    ]
   }
   else {
     throw new Error(`Unsupported CSS color "${css}". Use #rgb, #rrggbb, or #rrggbbaa.`)

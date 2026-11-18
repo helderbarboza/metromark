@@ -41,7 +41,10 @@ export interface DemoProfile {
 
 function buildData(layouts: Record<string, Layout>, sizes: Record<string, TileSize>, colors: Record<string, number>, background: Settings['background']): AppData {
   const appearance: AppData['appearance'] = Object.fromEntries(
-    Object.keys(sizes).map(id => [id, { size: sizes[id], colorIndex: colors[id] ?? APPEARANCE_DEFAULTS.colorIndex }]),
+    Object.keys(sizes).map(id => [
+      id,
+      { size: sizes[id], colorIndex: colors[id] ?? APPEARANCE_DEFAULTS.colorIndex },
+    ]),
   )
   return {
     ...emptyData({ ...SETTINGS_DEFAULTS, density: 'compact', background }),
@@ -51,55 +54,57 @@ function buildData(layouts: Record<string, Layout>, sizes: Record<string, TileSi
 }
 
 function gamerTree(): BookmarkNode[] {
-  return [folder('root', '', [
-    folder('bar', 'Bookmarks bar', [
-      link('steam', 'Steam', 'https://store.steampowered.com/'),
-      link('epic', 'Epic Games Store', 'https://store.epicgames.com/'),
-      link('discord', 'Discord', 'https://discord.com/'),
-      link('twitch', 'Twitch', 'https://www.twitch.tv/'),
-      link('youtube', 'YouTube', 'https://www.youtube.com/'),
-      folder('storefronts', 'Storefronts', [
-        link('gog', 'GOG', 'https://www.gog.com/'),
-        link('itch', 'itch.io', 'https://itch.io/'),
-        link('humble', 'Humble Bundle', 'https://www.humblebundle.com/'),
-        link('greenmangaming', 'Green Man Gaming', 'https://www.greenmangaming.com/'),
-        link('fanatical', 'Fanatical', 'https://www.fanatical.com/'),
-        link('gamersgate', 'GamersGate', 'https://www.gamersgate.com/'),
-        link('eaapp', 'EA app', 'https://www.ea.com/ea-app'),
-        link('playstation', 'PlayStation Store', 'https://www.playstation.com/en-us/store/'),
-      ]),
-      folder('community', 'Community', [
-        link('pcgaming', 'r/pcgaming', 'https://www.reddit.com/r/pcgaming/'),
-        link('steamdb', 'SteamDB', 'https://steamdb.info/'),
-        link('protondb', 'ProtonDB', 'https://www.protondb.com/'),
-        link('resetera', 'ResetEra', 'https://www.resetera.com/'),
-        link('rsteam', 'r/Steam', 'https://www.reddit.com/r/Steam/'),
-        link('rps', 'Rock Paper Shotgun', 'https://www.rockpapershotgun.com/'),
-      ]),
-      folder('tools', 'Tools', [
-        link('pcpartpicker', 'PCPartPicker', 'https://pcpartpicker.com/'),
-        link('canyourunit', 'Can You Run It', 'https://www.systemrequirementslab.com/cyri'),
-        link('geforcedrivers', 'GeForce Drivers', 'https://www.nvidia.com/drivers'),
-        link('obs', 'OBS Studio', 'https://obsproject.com/'),
-        link('threedmark', '3DMark', 'https://www.3dmark.com/'),
-        link('userbenchmark', 'UserBenchmark', 'https://www.userbenchmark.com/'),
-      ]),
-    ], 'bookmarks-bar'),
-    folder('other', 'Other bookmarks', [
-      link('howlongtobeat', 'HowLongToBeat', 'https://howlongtobeat.com/'),
-      link('pcgamer', 'PC Gamer', 'https://www.pcgamer.com/'),
-      link('isthereanydeal', 'IsThereAnyDeal', 'https://isthereanydeal.com/'),
-      link('nexusmods', 'Nexus Mods', 'https://www.nexusmods.com/'),
-      link('steamcharts', 'Steam Charts', 'https://steamcharts.com/'),
-      link('backloggd', 'Backloggd', 'https://backloggd.com/'),
-      link('metacritic', 'Metacritic', 'https://www.metacritic.com/game/'),
-      link('gamersnexus', 'Gamers Nexus', 'https://www.gamersnexus.net/'),
-      link('chesscom', 'Chess.com', 'https://www.chess.com/'),
-      link('lichess', 'Lichess', 'https://lichess.org/'),
-      link('osu', 'osu!', 'https://osu.ppy.sh/'),
-    ], 'other'),
-    folder('mobile', 'Mobile bookmarks', [], 'mobile'),
-  ])]
+  return [
+    folder('root', '', [
+      folder('bar', 'Bookmarks bar', [
+        link('steam', 'Steam', 'https://store.steampowered.com/'),
+        link('epic', 'Epic Games Store', 'https://store.epicgames.com/'),
+        link('discord', 'Discord', 'https://discord.com/'),
+        link('twitch', 'Twitch', 'https://www.twitch.tv/'),
+        link('youtube', 'YouTube', 'https://www.youtube.com/'),
+        folder('storefronts', 'Storefronts', [
+          link('gog', 'GOG', 'https://www.gog.com/'),
+          link('itch', 'itch.io', 'https://itch.io/'),
+          link('humble', 'Humble Bundle', 'https://www.humblebundle.com/'),
+          link('greenmangaming', 'Green Man Gaming', 'https://www.greenmangaming.com/'),
+          link('fanatical', 'Fanatical', 'https://www.fanatical.com/'),
+          link('gamersgate', 'GamersGate', 'https://www.gamersgate.com/'),
+          link('eaapp', 'EA app', 'https://www.ea.com/ea-app'),
+          link('playstation', 'PlayStation Store', 'https://www.playstation.com/en-us/store/'),
+        ]),
+        folder('community', 'Community', [
+          link('pcgaming', 'r/pcgaming', 'https://www.reddit.com/r/pcgaming/'),
+          link('steamdb', 'SteamDB', 'https://steamdb.info/'),
+          link('protondb', 'ProtonDB', 'https://www.protondb.com/'),
+          link('resetera', 'ResetEra', 'https://www.resetera.com/'),
+          link('rsteam', 'r/Steam', 'https://www.reddit.com/r/Steam/'),
+          link('rps', 'Rock Paper Shotgun', 'https://www.rockpapershotgun.com/'),
+        ]),
+        folder('tools', 'Tools', [
+          link('pcpartpicker', 'PCPartPicker', 'https://pcpartpicker.com/'),
+          link('canyourunit', 'Can You Run It', 'https://www.systemrequirementslab.com/cyri'),
+          link('geforcedrivers', 'GeForce Drivers', 'https://www.nvidia.com/drivers'),
+          link('obs', 'OBS Studio', 'https://obsproject.com/'),
+          link('threedmark', '3DMark', 'https://www.3dmark.com/'),
+          link('userbenchmark', 'UserBenchmark', 'https://www.userbenchmark.com/'),
+        ]),
+      ], 'bookmarks-bar'),
+      folder('other', 'Other bookmarks', [
+        link('howlongtobeat', 'HowLongToBeat', 'https://howlongtobeat.com/'),
+        link('pcgamer', 'PC Gamer', 'https://www.pcgamer.com/'),
+        link('isthereanydeal', 'IsThereAnyDeal', 'https://isthereanydeal.com/'),
+        link('nexusmods', 'Nexus Mods', 'https://www.nexusmods.com/'),
+        link('steamcharts', 'Steam Charts', 'https://steamcharts.com/'),
+        link('backloggd', 'Backloggd', 'https://backloggd.com/'),
+        link('metacritic', 'Metacritic', 'https://www.metacritic.com/game/'),
+        link('gamersnexus', 'Gamers Nexus', 'https://www.gamersnexus.net/'),
+        link('chesscom', 'Chess.com', 'https://www.chess.com/'),
+        link('lichess', 'Lichess', 'https://lichess.org/'),
+        link('osu', 'osu!', 'https://osu.ppy.sh/'),
+      ], 'other'),
+      folder('mobile', 'Mobile bookmarks', [], 'mobile'),
+    ]),
+  ]
 }
 
 function gamerData(): AppData {
@@ -240,49 +245,51 @@ function gamerData(): AppData {
 }
 
 function travelerTree(): BookmarkNode[] {
-  return [folder('root', '', [
-    folder('bar', 'Bookmarks bar', [
-      link('maps', 'Google Maps', 'https://www.google.com/maps'),
-      link('skyscanner', 'Skyscanner', 'https://www.skyscanner.com/'),
-      link('booking', 'Booking.com', 'https://www.booking.com/'),
-      link('googletravel', 'Google Travel', 'https://www.google.com/travel'),
-      link('wego', 'Wego', 'https://www.wego.com/'),
-      link('translate', 'Google Translate', 'https://translate.google.com/'),
-      link('nomadlist', 'Nomad List', 'https://nomadlist.com/'),
-      folder('plan', 'Plan', [
-        link('gflights', 'Google Flights', 'https://www.google.com/travel/flights'),
-        link('kayak', 'Kayak', 'https://www.kayak.com/'),
-        link('rome2rio', 'Rome2Rio', 'https://www.rome2rio.com/'),
-        link('wanderlog', 'Wanderlog', 'https://wanderlog.com/'),
-        link('tripadvisor', 'Tripadvisor', 'https://www.tripadvisor.com/'),
-        link('kiwi', 'Kiwi.com', 'https://www.kiwi.com/'),
-        link('tripit', 'TripIt', 'https://www.tripit.com/'),
-      ]),
-      folder('stay', 'Stay', [
-        link('airbnb', 'Airbnb', 'https://www.airbnb.com/'),
-        link('hotels', 'Hotels.com', 'https://www.hotels.com/'),
-        link('hostelworld', 'Hostelworld', 'https://www.hostelworld.com/'),
-        link('expedia', 'Expedia', 'https://www.expedia.com/'),
-        link('vrbo', 'Vrbo', 'https://www.vrbo.com/'),
-      ]),
-      folder('inspiration', 'Inspiration', [
-        link('atlasobscura', 'Atlas Obscura', 'https://www.atlasobscura.com/'),
-        link('travelreddit', 'r/travel', 'https://www.reddit.com/r/travel/'),
-        link('pointsguy', 'The Points Guy', 'https://thepointsguy.com/'),
-        link('lonelyplanet', 'Lonely Planet', 'https://www.lonelyplanet.com/'),
-        link('solotravel', 'r/solotravel', 'https://www.reddit.com/r/solotravel/'),
-        link('blondeabroad', 'The Blonde Abroad', 'https://theblondeabroad.com/'),
-      ]),
-    ], 'bookmarks-bar'),
-    folder('other', 'Other bookmarks', [
-      link('xe', 'XE Currency', 'https://www.xe.com/'),
-      link('earth', 'Google Earth', 'https://earth.google.com/'),
-      link('seatguru', 'SeatGuru', 'https://www.seatguru.com/'),
-      link('roadtrippers', 'Roadtrippers', 'https://roadtrippers.com/'),
-      link('traveladvisory', 'Travel Advisory', 'https://travel.state.gov/en/international-travel.html'),
-    ], 'other'),
-    folder('mobile', 'Mobile bookmarks', [], 'mobile'),
-  ])]
+  return [
+    folder('root', '', [
+      folder('bar', 'Bookmarks bar', [
+        link('maps', 'Google Maps', 'https://www.google.com/maps'),
+        link('skyscanner', 'Skyscanner', 'https://www.skyscanner.com/'),
+        link('booking', 'Booking.com', 'https://www.booking.com/'),
+        link('googletravel', 'Google Travel', 'https://www.google.com/travel'),
+        link('wego', 'Wego', 'https://www.wego.com/'),
+        link('translate', 'Google Translate', 'https://translate.google.com/'),
+        link('nomadlist', 'Nomad List', 'https://nomadlist.com/'),
+        folder('plan', 'Plan', [
+          link('gflights', 'Google Flights', 'https://www.google.com/travel/flights'),
+          link('kayak', 'Kayak', 'https://www.kayak.com/'),
+          link('rome2rio', 'Rome2Rio', 'https://www.rome2rio.com/'),
+          link('wanderlog', 'Wanderlog', 'https://wanderlog.com/'),
+          link('tripadvisor', 'Tripadvisor', 'https://www.tripadvisor.com/'),
+          link('kiwi', 'Kiwi.com', 'https://www.kiwi.com/'),
+          link('tripit', 'TripIt', 'https://www.tripit.com/'),
+        ]),
+        folder('stay', 'Stay', [
+          link('airbnb', 'Airbnb', 'https://www.airbnb.com/'),
+          link('hotels', 'Hotels.com', 'https://www.hotels.com/'),
+          link('hostelworld', 'Hostelworld', 'https://www.hostelworld.com/'),
+          link('expedia', 'Expedia', 'https://www.expedia.com/'),
+          link('vrbo', 'Vrbo', 'https://www.vrbo.com/'),
+        ]),
+        folder('inspiration', 'Inspiration', [
+          link('atlasobscura', 'Atlas Obscura', 'https://www.atlasobscura.com/'),
+          link('travelreddit', 'r/travel', 'https://www.reddit.com/r/travel/'),
+          link('pointsguy', 'The Points Guy', 'https://thepointsguy.com/'),
+          link('lonelyplanet', 'Lonely Planet', 'https://www.lonelyplanet.com/'),
+          link('solotravel', 'r/solotravel', 'https://www.reddit.com/r/solotravel/'),
+          link('blondeabroad', 'The Blonde Abroad', 'https://theblondeabroad.com/'),
+        ]),
+      ], 'bookmarks-bar'),
+      folder('other', 'Other bookmarks', [
+        link('xe', 'XE Currency', 'https://www.xe.com/'),
+        link('earth', 'Google Earth', 'https://earth.google.com/'),
+        link('seatguru', 'SeatGuru', 'https://www.seatguru.com/'),
+        link('roadtrippers', 'Roadtrippers', 'https://roadtrippers.com/'),
+        link('traveladvisory', 'Travel Advisory', 'https://travel.state.gov/en/international-travel.html'),
+      ], 'other'),
+      folder('mobile', 'Mobile bookmarks', [], 'mobile'),
+    ]),
+  ]
 }
 
 function travelerData(): AppData {
@@ -405,47 +412,49 @@ function travelerData(): AppData {
 }
 
 function homeCookTree(): BookmarkNode[] {
-  return [folder('root', '', [
-    folder('bar', 'Bookmarks bar', [
-      link('seriouseats', 'Serious Eats', 'https://www.seriouseats.com/'),
-      link('budgetbytes', 'Budget Bytes', 'https://www.budgetbytes.com/'),
-      link('kingarthur', 'King Arthur Baking', 'https://www.kingarthurbaking.com/'),
-      link('foodnetwork', 'Food Network', 'https://www.foodnetwork.com/'),
-      link('epicurious', 'Epicurious', 'https://www.epicurious.com/'),
-      link('paprika', 'Paprika', 'https://www.paprikaapp.com/'),
-      link('plantoeat', 'Plan to Eat', 'https://plantoeat.com/'),
-      folder('recipes', 'Recipes', [
-        link('allrecipes', 'Allrecipes', 'https://www.allrecipes.com/'),
-        link('nytcooking', 'NYT Cooking', 'https://cooking.nytimes.com/'),
-        link('bbcgoodfood', 'BBC Good Food', 'https://www.bbcgoodfood.com/'),
-        link('simplyrecipes', 'Simply Recipes', 'https://www.simplyrecipes.com/'),
-        link('tasteofhome', 'Taste of Home', 'https://www.tasteofhome.com/'),
-      ]),
-      folder('technique', 'Technique', [
-        link('chefsteps', 'ChefSteps', 'https://www.chefsteps.com/'),
-        link('food52', 'Food52', 'https://food52.com/'),
-        link('amtk', 'America’s Test Kitchen', 'https://www.americastestkitchen.com/'),
-        link('foodlab', 'The Food Lab', 'https://www.seriouseats.com/food-lab'),
-        link('sousvide', 'Sous Vide Everything', 'https://www.youtube.com/@sousvideeverything'),
-      ]),
-      folder('community', 'Community', [
-        link('askculinary', 'r/AskCulinary', 'https://www.reddit.com/r/AskCulinary/'),
-        link('bakingreddit', 'r/Baking', 'https://www.reddit.com/r/Baking/'),
-        link('mealprep', 'r/MealPrepSunday', 'https://www.reddit.com/r/MealPrepSunday/'),
-        link('rfood', 'r/Food', 'https://www.reddit.com/r/Food/'),
-        link('rcooking', 'r/Cooking', 'https://www.reddit.com/r/Cooking/'),
-        link('rrecipes', 'r/recipes', 'https://www.reddit.com/r/recipes/'),
-      ]),
-    ], 'bookmarks-bar'),
-    folder('other', 'Other bookmarks', [
-      link('bonappetit', 'Bon Appétit', 'https://www.bonappetit.com/'),
-      link('thekitchn', 'The Kitchn', 'https://www.thekitchn.com/'),
-      link('delish', 'Delish', 'https://www.delish.com/'),
-      link('tasty', 'Tasty', 'https://tasty.co/'),
-      link('saveur', 'Saveur', 'https://www.saveur.com/'),
-    ], 'other'),
-    folder('mobile', 'Mobile bookmarks', [], 'mobile'),
-  ])]
+  return [
+    folder('root', '', [
+      folder('bar', 'Bookmarks bar', [
+        link('seriouseats', 'Serious Eats', 'https://www.seriouseats.com/'),
+        link('budgetbytes', 'Budget Bytes', 'https://www.budgetbytes.com/'),
+        link('kingarthur', 'King Arthur Baking', 'https://www.kingarthurbaking.com/'),
+        link('foodnetwork', 'Food Network', 'https://www.foodnetwork.com/'),
+        link('epicurious', 'Epicurious', 'https://www.epicurious.com/'),
+        link('paprika', 'Paprika', 'https://www.paprikaapp.com/'),
+        link('plantoeat', 'Plan to Eat', 'https://plantoeat.com/'),
+        folder('recipes', 'Recipes', [
+          link('allrecipes', 'Allrecipes', 'https://www.allrecipes.com/'),
+          link('nytcooking', 'NYT Cooking', 'https://cooking.nytimes.com/'),
+          link('bbcgoodfood', 'BBC Good Food', 'https://www.bbcgoodfood.com/'),
+          link('simplyrecipes', 'Simply Recipes', 'https://www.simplyrecipes.com/'),
+          link('tasteofhome', 'Taste of Home', 'https://www.tasteofhome.com/'),
+        ]),
+        folder('technique', 'Technique', [
+          link('chefsteps', 'ChefSteps', 'https://www.chefsteps.com/'),
+          link('food52', 'Food52', 'https://food52.com/'),
+          link('amtk', 'America’s Test Kitchen', 'https://www.americastestkitchen.com/'),
+          link('foodlab', 'The Food Lab', 'https://www.seriouseats.com/food-lab'),
+          link('sousvide', 'Sous Vide Everything', 'https://www.youtube.com/@sousvideeverything'),
+        ]),
+        folder('community', 'Community', [
+          link('askculinary', 'r/AskCulinary', 'https://www.reddit.com/r/AskCulinary/'),
+          link('bakingreddit', 'r/Baking', 'https://www.reddit.com/r/Baking/'),
+          link('mealprep', 'r/MealPrepSunday', 'https://www.reddit.com/r/MealPrepSunday/'),
+          link('rfood', 'r/Food', 'https://www.reddit.com/r/Food/'),
+          link('rcooking', 'r/Cooking', 'https://www.reddit.com/r/Cooking/'),
+          link('rrecipes', 'r/recipes', 'https://www.reddit.com/r/recipes/'),
+        ]),
+      ], 'bookmarks-bar'),
+      folder('other', 'Other bookmarks', [
+        link('bonappetit', 'Bon Appétit', 'https://www.bonappetit.com/'),
+        link('thekitchn', 'The Kitchn', 'https://www.thekitchn.com/'),
+        link('delish', 'Delish', 'https://www.delish.com/'),
+        link('tasty', 'Tasty', 'https://tasty.co/'),
+        link('saveur', 'Saveur', 'https://www.saveur.com/'),
+      ], 'other'),
+      folder('mobile', 'Mobile bookmarks', [], 'mobile'),
+    ]),
+  ]
 }
 
 function homeCookData(): AppData {
@@ -562,9 +571,30 @@ function homeCookData(): AppData {
 }
 
 export const DEMO_PROFILES: Record<DemoProfileId, DemoProfile> = {
-  'gamer': { id: 'gamer', label: 'Gamer', mode: 'dark', theme: 'vice', tree: gamerTree, data: gamerData },
-  'traveler': { id: 'traveler', label: 'Traveler', mode: 'dark', theme: 'tokyo-night-moon', tree: travelerTree, data: travelerData },
-  'home-cook': { id: 'home-cook', label: 'Home cook', mode: 'dark', theme: 'solarized-dark', tree: homeCookTree, data: homeCookData },
+  'gamer': {
+    id: 'gamer',
+    label: 'Gamer',
+    mode: 'dark',
+    theme: 'vice',
+    tree: gamerTree,
+    data: gamerData,
+  },
+  'traveler': {
+    id: 'traveler',
+    label: 'Traveler',
+    mode: 'dark',
+    theme: 'tokyo-night-moon',
+    tree: travelerTree,
+    data: travelerData,
+  },
+  'home-cook': {
+    id: 'home-cook',
+    label: 'Home cook',
+    mode: 'dark',
+    theme: 'solarized-dark',
+    tree: homeCookTree,
+    data: homeCookData,
+  },
 }
 
 const DEMO_PROFILE_ID_LIST: readonly string[] = DEMO_PROFILE_IDS

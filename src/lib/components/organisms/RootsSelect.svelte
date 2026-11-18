@@ -19,7 +19,9 @@
     if (id === 'all')
       return $LL.roots.allBookmarks()
     const root = roots.find(node => node.id === id)
-    return root ? root.title : $LL.roots.allBookmarks()
+    return root
+      ? root.title
+      : $LL.roots.allBookmarks()
   }
 
   const selectedLabel = $derived.by(() => {

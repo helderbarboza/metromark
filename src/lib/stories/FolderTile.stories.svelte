@@ -10,17 +10,78 @@
   import { expect, fn } from 'storybook/test'
 
   const fullPreview: FolderTileView['preview'] = [
-    { id: 'mdn', kind: 'bookmark', title: 'MDN', url: 'https://developer.mozilla.org/', colorIndex: 5, color: undefined },
-    { id: 'svelte', kind: 'bookmark', title: 'Svelte', url: 'https://svelte.dev/', colorIndex: 6 },
-    { id: 'ts', kind: 'bookmark', title: 'TypeScript', url: 'https://www.typescriptlang.org/', colorIndex: 2 },
+    {
+      id: 'mdn',
+      kind: 'bookmark',
+      title: 'MDN',
+      url: 'https://developer.mozilla.org/',
+      colorIndex: 5,
+      color: undefined,
+    },
+    {
+      id: 'svelte',
+      kind: 'bookmark',
+      title: 'Svelte',
+      url: 'https://svelte.dev/',
+      colorIndex: 6,
+    },
+    {
+      id: 'ts',
+      kind: 'bookmark',
+      title: 'TypeScript',
+      url: 'https://www.typescriptlang.org/',
+      colorIndex: 2,
+    },
     { id: 'tools', kind: 'folder', title: 'Tools' },
-    { id: 'tailwind', kind: 'bookmark', title: 'Tailwind CSS', url: 'https://tailwindcss.com/', colorIndex: 3 },
-    { id: 'vite', kind: 'bookmark', title: 'Vite', url: 'https://vite.dev/', colorIndex: 1 },
-    { id: 'storybook', kind: 'bookmark', title: 'Storybook', url: 'https://storybook.js.org/', colorIndex: 0 },
-    { id: 'snapgrid', kind: 'bookmark', title: 'Snapgrid', url: 'https://snapgrid.dev/', colorIndex: 4 },
-    { id: 'figma', kind: 'bookmark', title: 'Figma', url: 'https://figma.com/', colorIndex: 7 },
-    { id: 'arena', kind: 'bookmark', title: 'Are.na', url: 'https://www.are.na/', colorIndex: 5 },
-    { id: 'layers', kind: 'bookmark', title: 'Layers', url: 'https://layers.to/', colorIndex: 1 },
+    {
+      id: 'tailwind',
+      kind: 'bookmark',
+      title: 'Tailwind CSS',
+      url: 'https://tailwindcss.com/',
+      colorIndex: 3,
+    },
+    {
+      id: 'vite',
+      kind: 'bookmark',
+      title: 'Vite',
+      url: 'https://vite.dev/',
+      colorIndex: 1,
+    },
+    {
+      id: 'storybook',
+      kind: 'bookmark',
+      title: 'Storybook',
+      url: 'https://storybook.js.org/',
+      colorIndex: 0,
+    },
+    {
+      id: 'snapgrid',
+      kind: 'bookmark',
+      title: 'Snapgrid',
+      url: 'https://snapgrid.dev/',
+      colorIndex: 4,
+    },
+    {
+      id: 'figma',
+      kind: 'bookmark',
+      title: 'Figma',
+      url: 'https://figma.com/',
+      colorIndex: 7,
+    },
+    {
+      id: 'arena',
+      kind: 'bookmark',
+      title: 'Are.na',
+      url: 'https://www.are.na/',
+      colorIndex: 5,
+    },
+    {
+      id: 'layers',
+      kind: 'bookmark',
+      title: 'Layers',
+      url: 'https://layers.to/',
+      colorIndex: 1,
+    },
   ]
 
   const { Story } = defineMeta({
@@ -40,7 +101,10 @@
       size: 'medium',
     },
     argTypes: {
-      size: { control: 'radio', options: [...TILE_SIZES] },
+      size: {
+        control: 'radio',
+        options: [...TILE_SIZES],
+      },
       selected: { control: 'boolean' },
       revealed: { control: 'boolean' },
     },

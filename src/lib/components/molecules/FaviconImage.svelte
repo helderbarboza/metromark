@@ -38,7 +38,9 @@
   // "Original favicons" comes from the workspace context so deep tile
   // components need no prop drilling. Stories without a provider get the
   // monochrome default.
-  const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const readWorkspace = hasWorkspace()
+    ? getWorkspace()
+    : undefined
   const originalFavicons = $derived(
     readWorkspace?.().originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
   )
@@ -95,6 +97,8 @@
 
 <FaviconIcon
   status={state.status}
-  src={state.status === 'ready' ? state.dataUrl : undefined}
+  src={state.status === 'ready'
+    ? state.dataUrl
+    : undefined}
   class={className}
 />

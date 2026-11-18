@@ -78,7 +78,9 @@
   const item = createGridItem({ id, group })
   // Workspace state flows through context (set by the root component); without a
   // provider (e.g. in stories), consumers get inert defaults.
-  const readWorkspace = hasWorkspace() ? getWorkspace() : undefined
+  const readWorkspace = hasWorkspace()
+    ? getWorkspace()
+    : undefined
   const dragging = $derived(readWorkspace?.().dragging ?? false)
   const selected = $derived((readWorkspace?.().selectedId ?? null) === id)
   const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion)
@@ -87,10 +89,16 @@
   let gesture = $state<Gesture | null>(null)
   let swallowClick = false
   const revealed = $derived(!dragging && gesture?.state === 'armed')
-  const folderTile = $derived(tile.kind === 'folder' ? tile : undefined)
-  const bookmarkTile = $derived(tile.kind === 'bookmark' ? tile : undefined)
+  const folderTile = $derived(tile.kind === 'folder'
+    ? tile
+    : undefined)
+  const bookmarkTile = $derived(tile.kind === 'bookmark'
+    ? tile
+    : undefined)
   // Unsupported addresses stay in the tree but must never be launched (see validateUrl).
-  const href = $derived(bookmarkTile ? safeUrl(bookmarkTile.url) : undefined)
+  const href = $derived(bookmarkTile
+    ? safeUrl(bookmarkTile.url)
+    : undefined)
   const bookmarkLabel = $derived(bookmarkTile
     ? $LL.app.openBookmark({
       name: showDomains && bookmarkTile.size !== 'small'
@@ -191,7 +199,9 @@
   <FolderTile
     {@attach pauseOffscreen()}
     tile={folderTile}
-    size={item.item ? sizeOf(item.item) : tile.size}
+    size={item.item
+      ? sizeOf(item.item)
+      : tile.size}
     {selected}
     {revealed}
     ariaLabel={$LL.app.folderTileLabel({ title: tile.title })}
@@ -225,7 +235,9 @@
   <BookmarkTile
     {@attach pauseOffscreen()}
     tile={bookmarkTile}
-    size={item.item ? sizeOf(item.item) : tile.size}
+    size={item.item
+      ? sizeOf(item.item)
+      : tile.size}
     {selected}
     {revealed}
     domain={bookmarkTile.domain}

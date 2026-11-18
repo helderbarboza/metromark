@@ -22,7 +22,9 @@
   const { spec, snapshot, oncommand, onclose }: Props = $props()
 
   const nodes = $derived(indexTree(snapshot.tree))
-  const node = $derived(spec.id ? nodes.get(spec.id) : undefined)
+  const node = $derived(spec.id
+    ? nodes.get(spec.id)
+    : undefined)
   // Dialog title/eyebrow are translated, so track the locale.
   const title = $derived.by(() => {
     void $locale

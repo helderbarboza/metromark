@@ -27,7 +27,9 @@
         type='checkbox'
         role='switch'
         aria-labelledby={`${controlId}-title`}
-        aria-describedby={helpText ? `${controlId}-help` : undefined}
+        aria-describedby={helpText
+          ? `${controlId}-help`
+          : undefined}
         bind:checked={enabled}
         class='
           h-5.5 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)

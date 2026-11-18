@@ -45,7 +45,9 @@ export function crossSlideState(gesture: Gesture, point: Point): CrossSlideState
   // Perpendicular to the pan direction: a horizontal swipe belongs to the board.
   if (Math.abs(dx) > Math.abs(dy))
     return 'panning'
-  return distance >= DRAG_PX ? 'dragging' : 'armed'
+  return distance >= DRAG_PX
+    ? 'dragging'
+    : 'armed'
 }
 
 /**
@@ -56,7 +58,9 @@ export function advanceGesture(gesture: Gesture, point: Point): Gesture {
   if (gesture.state === 'panning' || gesture.state === 'dragging')
     return gesture
   const state = crossSlideState(gesture, point)
-  return state === gesture.state ? gesture : { ...gesture, state }
+  return state === gesture.state
+    ? gesture
+    : { ...gesture, state }
 }
 
 /** What a pointer release means for the tile the gesture started on. */
@@ -76,5 +80,7 @@ export function releaseOutcome(gesture: Gesture): ReleaseOutcome {
  * `App.svelte`.
  */
 export function toggleSelection(current: string | null, id: string): string | null {
-  return current === id ? null : id
+  return current === id
+    ? null
+    : id
 }

@@ -6,7 +6,10 @@ import { tileFor, tileForFolder } from '$lib/tile'
 export const isBookmark = (node: BookmarkNode) => typeof node.url === 'string' && node.type !== 'separator'
 export const isFolder = (node: BookmarkNode) => !isBookmark(node) && node.type !== 'separator'
 export function flatten(tree: BookmarkNode[]): BookmarkNode[] {
-  return tree.flatMap(node => [node, ...flatten(node.children ?? [])])
+  return tree.flatMap(node => [
+    node,
+    ...flatten(node.children ?? []),
+  ])
 }
 export function indexTree(tree: BookmarkNode[]): Map<string, BookmarkNode> {
   return new Map(flatten(tree).map(node => [node.id, node]))
@@ -18,7 +21,9 @@ function isManaged(node: BookmarkNode, nodes: Map<string, BookmarkNode>): boolea
     if (cursor.unmodifiable != null)
       return true
     seen.add(cursor.id)
-    cursor = cursor.parentId != null ? nodes.get(cursor.parentId) : undefined
+    cursor = cursor.parentId != null
+      ? nodes.get(cursor.parentId)
+      : undefined
   }
   return false
 }
@@ -76,15 +81,21 @@ export function projectGroups(snapshot: Snapshot): GroupView[] {
     if (isFolder(child)) {
       const tile = tileForFolder(child, snapshot.appearance[child.id])
       tile.writable = !isManaged(child, nodes)
-      tile.size = item ? sizeOf(item) : tile.size
+      tile.size = item
+        ? sizeOf(item)
+        : tile.size
       const childDraft = draftsById.get(child.id)
-      const ordered = childDraft ? orderByLayout(childDraft.layoutable, childDraft.layout) : []
+      const ordered = childDraft
+        ? orderByLayout(childDraft.layoutable, childDraft.layout)
+        : []
       tile.preview = ordered.slice(0, FOLDER_PREVIEW[tile.size]).map(node => toPreviewCell(node, snapshot.appearance))
       return [child.id, tile]
     }
     const tile = tileFor(child, snapshot.appearance[child.id])
     tile.writable = !isManaged(child, nodes)
-    tile.size = item ? sizeOf(item) : tile.size
+    tile.size = item
+      ? sizeOf(item)
+      : tile.size
     return [child.id, tile]
   }))
   for (const draft of drafts) {

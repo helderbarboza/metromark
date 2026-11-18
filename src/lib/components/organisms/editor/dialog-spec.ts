@@ -22,7 +22,9 @@ export function dialogTitle(spec: DialogSpec, node?: BookmarkNode): string {
   const t = getT().dialogs
   switch (spec.kind) {
     case 'bookmark':
-      return node ? t.editBookmark() : t.aNewFavorite()
+      return node
+        ? t.editBookmark()
+        : t.aNewFavorite()
     case 'folder':
       return t.makeALittleRoom()
     case 'rename':

@@ -20,8 +20,32 @@ await cp('PRIVACY.md', 'release/PRIVACY.md')
 await cp('NOTICE.md', 'release/NOTICE.md')
 
 const source = {}
-for (const directory of ['src', 'public', '.storybook', 'tests', 'e2e', 'scripts', 'docs']) Object.assign(source, await folderEntries(directory, `metromark/${directory}/`))
-for (const file of ['package.json', 'package-lock.json', '.nvmrc', '.gitignore', 'README.md', 'PRIVACY.md', 'NOTICE.md', 'wxt.config.ts', 'vite.config.ts', 'vitest.config.ts', 'playwright.config.ts', 'tsconfig.json', 'svelte.config.js', 'eslint.config.mjs', 'index.html']) {
+for (const directory of [
+  'src',
+  'public',
+  '.storybook',
+  'tests',
+  'e2e',
+  'scripts',
+  'docs',
+]) Object.assign(source, await folderEntries(directory, `metromark/${directory}/`))
+for (const file of [
+  'package.json',
+  'package-lock.json',
+  '.nvmrc',
+  '.gitignore',
+  'README.md',
+  'PRIVACY.md',
+  'NOTICE.md',
+  'wxt.config.ts',
+  'vite.config.ts',
+  'vitest.config.ts',
+  'playwright.config.ts',
+  'tsconfig.json',
+  'svelte.config.js',
+  'eslint.config.mjs',
+  'index.html',
+]) {
   source[`metromark/${file}`] = new Uint8Array(await readFile(file))
 }
 const sourceName = `metromark-source-${version}.zip`
@@ -30,9 +54,21 @@ const bundle = {
   ...await folderEntries('release/chrome-mv3', 'chrome-mv3/'),
   ...await folderEntries('release/firefox-mv3', 'firefox-mv3/'),
 }
-for (const file of ['INSTALL.md', 'PRIVACY.md', 'NOTICE.md', sourceName, `metromark-firefox-${version}-unsigned.xpi`]) bundle[file] = new Uint8Array(await readFile(`release/${file}`))
+for (const file of [
+  'INSTALL.md',
+  'PRIVACY.md',
+  'NOTICE.md',
+  sourceName,
+  `metromark-firefox-${version}-unsigned.xpi`,
+]) bundle[file] = new Uint8Array(await readFile(`release/${file}`))
 await writeFile(`release/metromark-${version}-bundle.zip`, zipSync(bundle, { level: 6 }))
-const artifacts = [`metromark-${version}-bundle.zip`, `metromark-chrome-${version}.zip`, `metromark-firefox-${version}.zip`, `metromark-firefox-${version}-unsigned.xpi`, sourceName]
+const artifacts = [
+  `metromark-${version}-bundle.zip`,
+  `metromark-chrome-${version}.zip`,
+  `metromark-firefox-${version}.zip`,
+  `metromark-firefox-${version}-unsigned.xpi`,
+  sourceName,
+]
 const hashes = []
 for (const name of artifacts) {
   const bytes = await readFile(`release/${name}`)
