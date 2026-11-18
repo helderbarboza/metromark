@@ -78,19 +78,20 @@
         class='
           w-full min-w-0 bg-transparent p-0 text-xs text-(--foreground) outline-none
           placeholder:text-(--muted-foreground)
+          focus-visible:outline-0!
           [&::-webkit-search-cancel-button]:hidden
         '
       />
       {#if query}
         <button
           aria-label={$LL.search.clearSearch()}
-          class='bg-transparent p-1 text-(--muted-foreground)'
+          class='flex items-center bg-transparent p-1 text-(--muted-foreground)'
           onclick={() => {
             query = ''
             searchInput?.focus()
           }}
         >
-          <Icon name='close' size={13} />
+          <Icon name='close' class='size-4' />
         </button>
       {:else}
         <kbd
