@@ -10,6 +10,7 @@ import {
   presentation,
   rightClick,
   rightClickGroup,
+  scrollBoardToGroup,
   start,
   test,
   tree,
@@ -505,4 +506,78 @@ test('folder tiles accept custom colors from the shared appearance dialog', asyn
   // The folder tile still cannot be deleted from its menus.
   await folderTile(page, 'Work').click({ button: 'right' })
   await expect(page.getByRole('button', { name: 'Delete selected bookmark' })).toHaveCount(0)
+})
+
+test('create a folder from the board menu, then drop a bookmark onto it', async ({ page }) => {
+  await start(page)
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.getByRole('menuitem', { name: 'Add new folder', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByLabel('Folder name', { exact: true }).fill('QA drop target')
+  await dialog.getByLabel('Create inside', { exact: true }).selectOption('other')
+  await dialog.getByRole('button', { name: 'Create folder', exact: true }).click()
+  await expect(dialog).toHaveCount(0)
+  // The tree is the source of truth for the new folder's id; its group is
+  // appended after the groups of its parent.
+  let newId = ''
+  await expect.poll(async () => {
+    newId = flat(await tree(page)).find(node => node.title === 'QA drop target')?.id ?? ''
+    return newId
+  }).not.toBe('')
+  const created = group(page, 'QA drop target')
+  await expect(created).toBeVisible()
+  await expect(group(page, 'Other bookmarks').locator(`button[data-grid-id="${newId}"]`)).toBeVisible()
+  await scrollBoardToGroup(page, 'other')
+  // Drop YouTube (a child of Other bookmarks) onto the new, empty folder.
+  const tile = draggable(page, 'youtube')
+  const source = (await tile.boundingBox())!
+  const target = (await created.locator('[data-testid="metro-grid"]').boundingBox())!
+  await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(target.x + 70, target.y + 60, { steps: 30 })
+  await page.mouse.up()
+  await expect.poll(async () => flat(await tree(page)).find(node => node.id === 'youtube')?.parentId).toBe(newId)
+  await expect(created.locator('a[data-grid-id="youtube"]')).toHaveCount(1)
+})
+
+test('a new folder cannot be moved into itself, but accepts a bookmark drop', async ({ page }) => {
+  await start(page)
+  await page.locator('#board').click({ button: 'right', position: { x: 25, y: 20 } })
+  await page.getByRole('menuitem', { name: 'Add new folder', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByLabel('Folder name', { exact: true }).fill('QA self move')
+  await dialog.getByLabel('Create inside', { exact: true }).selectOption('other')
+  await dialog.getByRole('button', { name: 'Create folder', exact: true }).click()
+  await expect(dialog).toHaveCount(0)
+  let newId = ''
+  await expect.poll(async () => {
+    newId = flat(await tree(page)).find(node => node.title === 'QA self move')?.id ?? ''
+    return newId
+  }).not.toBe('')
+  await scrollBoardToGroup(page, 'other')
+  const created = group(page, 'QA self move')
+  const grid = created.locator('[data-testid="metro-grid"]')
+  // Dropping the folder's own tile onto its own group is rejected with an error toast.
+  const ownTile = group(page, 'Other bookmarks').locator(`button[data-grid-id="${newId}"]`)
+  const source = (await ownTile.boundingBox())!
+  // Keep the drag on the tile's own row: a diagonal gesture escapes the drop feedback.
+  const y = Math.round(source.y + source.height / 2)
+  const gridBox = (await grid.boundingBox())!
+  await page.mouse.move(source.x + source.width / 2, y)
+  await page.mouse.down()
+  await page.mouse.move(gridBox.x + 100, y, { steps: 20 })
+  await page.waitForTimeout(200)
+  await page.mouse.up()
+  await expect(page.locator('[data-sonner-toast]')).toContainText('A folder cannot be moved into itself or a descendant.')
+  await expect(group(page, 'Other bookmarks').locator(`button[data-grid-id="${newId}"]`)).toHaveCount(1)
+  // A bookmark can be dropped into the new folder instead.
+  const tile = draggable(page, 'youtube')
+  const from = (await tile.boundingBox())!
+  const to = (await grid.boundingBox())!
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(to.x + 70, to.y + 60, { steps: 30 })
+  await page.mouse.up()
+  await expect.poll(async () => flat(await tree(page)).find(node => node.id === 'youtube')?.parentId).toBe(newId)
+  await expect(created.locator('a[data-grid-id="youtube"]')).toHaveCount(1)
 })

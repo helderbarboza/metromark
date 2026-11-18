@@ -117,12 +117,16 @@
     return tile && !(movable && tile.writable) ? [{ entry, tile }] : []
   }))
 
+  /*
+   * The container droppable must have a distinct id from the tiles inside it:
+   * dnd-kit's registry holds one entity per id, and a folder's metro-grid and
+   * its folder tile (sortable, id = bookmark id) would otherwise share the
+   * slot. Prefixing the grid id keeps both registered, so newly mounted
+   * groups accept drops (previously they silently lost the slot and could
+   * not receive drops until a reload).
+   */
   const container = createGridContainer(() => ({
-    /*
-    Must be stable and unique for this Start group.
-    This is valid if `group.id` has those properties.
-  */
-    id: group.id,
+    id: `grid:${group.id}`,
 
     // Controlled state: the parent owns and persists this.
     layout,

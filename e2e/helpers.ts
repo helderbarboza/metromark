@@ -83,6 +83,17 @@ export async function rightClick(page: Page, title: string) {
   await expect(appBar(page)).toBeVisible()
 }
 /**
+ * Pre-scrolls the board so the given group is flush against the left edge
+ * and in view: a pointer drop needs its target inside the viewport.
+ */
+export async function scrollBoardToGroup(page: Page, groupId: string) {
+  await page.locator('#board').evaluate((board, id) => {
+    const el = document.querySelector(`[data-testid="metro-group"][data-group-id="${id}"]`)
+    if (board instanceof HTMLElement && el instanceof HTMLElement)
+      board.scrollLeft = Math.max(0, el.offsetLeft - 68)
+  }, groupId)
+}
+/**
  * Right-clicks a group header, which opens the group's context menu.
  * Pre-scrolls the board so the folder is in view: a scroll event dismisses
  * an open context menu, so scrolling must happen before the menu opens.
