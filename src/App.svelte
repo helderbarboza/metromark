@@ -234,8 +234,16 @@
     else
       toast.success(value.message, options)
   }
+  // Settings updates never hold `busy`: the debouncer keeps the flag true for
+  // the whole quiet window plus the round trip, which disabled drag controls
+  // mid-gesture (bits-ui then ignores pointermove/pointerup and the thumb
+  // sticks to the cursor). `settingsPending` tracks the same window for the
+  // footer status line only.
+  let settingsPending = $state(false)
   async function runCommand(command: Command): Promise<boolean> {
-    busy = true
+    const trackBusy = command.type !== 'settings.update'
+    if (trackBusy)
+      busy = true
     try {
       const result = await client.execute(command)
       if (command.type === 'factory.reset') {
@@ -278,7 +286,8 @@
       return false
     }
     finally {
-      busy = false
+      if (trackBusy)
+        busy = false
     }
   }
   // High-frequency settings changes (slider drags, color inputs) coalesce
@@ -286,12 +295,12 @@
   const settingsDebouncer = new SettingsDebouncer(200, runCommand)
   async function execute(command: Command): Promise<boolean> {
     if (command.type === 'settings.update') {
-      busy = true
+      settingsPending = true
       try {
         return await settingsDebouncer.enqueue(command)
       }
       finally {
-        busy = false
+        settingsPending = false
       }
     }
     await settingsDebouncer.flush()
@@ -751,7 +760,7 @@
         canScroll={smoothScroll.canScroll}
         scrollProgress={smoothScroll.scrollProgress}
         preview={client.mode === 'preview' && !hideDemoBadge}
-        {busy}
+        busy={busy || settingsPending}
         onSearch={handleSearch}
         onJump={smoothScroll.jump}
         onScroll={smoothScroll.scroll}

@@ -1234,7 +1234,7 @@
         '
       />
     </SettingsRow>
-    {@const parallaxDisabled = busy || uploading || settings.reducedMotion
+    {@const parallaxDisabled = uploading || settings.reducedMotion
       || !(bg.parallax ?? BACKGROUND_DEFAULTS.image.parallax)}
     <SettingsRow
       title={$LL.settings.parallaxZoom()}
@@ -1414,7 +1414,7 @@
         '
       />
     </SettingsRow>
-    {@const youtubeParallaxDisabled = busy || settings.reducedMotion
+    {@const youtubeParallaxDisabled = settings.reducedMotion
       || !(bg.parallax ?? BACKGROUND_DEFAULTS.youtube.parallax)}
     <SettingsRow
       title={$LL.settings.parallaxZoom()}
