@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte'
   import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
-  import IconButton from '$lib/components/molecules/IconButton.svelte'
+  import { Button } from '$lib/components/ui/button'
   import { onMount } from 'svelte'
 
   interface Props {
@@ -59,9 +59,15 @@
         <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>{eyebrow ?? $LL.dialogs.yourBookmarks()}</div>
         <h2 class='m-0 text-2xl font-normal tracking-tighter'>{title}</h2>
       </div>
-      <IconButton class='-mr-1.75' label={$LL.dialogs.closeDialog()} onclick={onclose}>
+      <Button
+        class='-mr-1.75'
+        title={$LL.dialogs.closeDialog()}
+        onclick={onclose}
+        size='icon'
+        variant='ghost'
+      >
         <Icon name='close' size={18} />
-      </IconButton>
+      </Button>
     </header>
     {@render children()}
   </div>

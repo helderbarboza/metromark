@@ -2,7 +2,7 @@
   import type { GroupView } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
-  import IconButton from '$lib/components/molecules/IconButton.svelte'
+  import { Button } from '$lib/components/ui/button'
   import * as Tooltip from '$lib/components/ui/tooltip'
   import { cn } from '$lib/utils'
   import { Tooltip as TooltipPrimitive } from 'bits-ui'
@@ -176,22 +176,24 @@
       {/if}
     </div>
     <div class='flex items-center gap-0.5'>
-      <IconButton
-        label={$LL.footer.scrollLeft()}
-        class='h-7 w-6 rounded-sm disabled:opacity-25'
+      <Button
+        title={$LL.footer.scrollLeft()}
+        size='icon'
+        variant='ghost'
         disabled={!canScroll || scrollProgress < 0.01}
         onclick={() => onScroll(-1)}
       >
         <Icon name='arrowLeft' size={17} />
-      </IconButton>
-      <IconButton
-        label={$LL.footer.scrollRight()}
-        class='h-7 w-6 rounded-sm disabled:opacity-25'
+      </Button>
+      <Button
+        title={$LL.footer.scrollRight()}
+        size='icon'
+        variant='ghost'
         disabled={!canScroll || scrollProgress > 0.99}
         onclick={() => onScroll(1)}
       >
         <Icon name='arrowRight' size={17} />
-      </IconButton>
+      </Button>
     </div>
   </div>
 </footer>

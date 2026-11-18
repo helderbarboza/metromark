@@ -48,7 +48,6 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | Component | Notes |
 | --- | --- |
 | `molecules/FaviconImage.svelte` | Container. Resolves the browser favicon cache and passes the result to the atom. |
-| `molecules/IconButton.svelte` | Button + icon. |
 | `molecules/TileShell.svelte` | Shared tile shell. |
 | `molecules/Modal.svelte` | Dialog shell with focus handling. |
 | `molecules/BoardStatus.svelte` | Status line for the board. |

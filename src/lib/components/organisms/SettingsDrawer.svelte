@@ -3,8 +3,8 @@
   import type { Command } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
-  import IconButton from '$lib/components/molecules/IconButton.svelte'
   import SettingsDialog from '$lib/components/organisms/editor/SettingsDialog.svelte'
+  import { Button } from '$lib/components/ui/button'
 
   interface Props {
     /** Whether the drawer is expanded. The drawer stays mounted while closed. */
@@ -48,13 +48,15 @@
           {$LL.settings.settings()}
         </h2>
       </div>
-      <IconButton
+      <Button
         class='-mr-1.75'
-        label={$LL.settings.closeSettings()}
+        size='icon'
+        variant='ghost'
+        title={$LL.settings.closeSettings()}
         onclick={onclose}
       >
         <Icon name='close' size={18} />
-      </IconButton>
+      </Button>
     </header>
     <div
       class='
