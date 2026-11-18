@@ -41,8 +41,14 @@
   import { validateYoutubeUrl } from '$lib/youtube'
 
   type BackgroundType = Settings['background']['type']
-  // eslint-disable-next-line style/max-len
-  const BACKGROUND_TYPES = ['color', 'image', 'shader', 'youtube'] as const satisfies readonly BackgroundType[]
+
+  const BACKGROUND_TYPES = [
+    'color',
+    'image',
+    'shader',
+    'youtube',
+  ] as const satisfies readonly BackgroundType[]
+
   const SHADERS = Object.values(shaders)
   const FITS = ['cover', 'contain', 'fill'] as const
 
