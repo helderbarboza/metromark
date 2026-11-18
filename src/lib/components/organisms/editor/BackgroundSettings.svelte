@@ -724,7 +724,7 @@
       }}
     >
       <Select.Trigger
-        class='w-20'
+        class='w-32'
         aria-label={$LL.settings.backgroundType()}
       >
         {$LL.settings[settings.background.type]()}
