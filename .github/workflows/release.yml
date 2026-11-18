@@ -233,15 +233,18 @@ jobs:
         run: |
           set -euo pipefail
           # Submit the exact ZIP that SHA256SUMS.txt covers.
+          # Flags use the equals form: the service account private key
+          # spans multiple lines and starts with dashes, which breaks
+          # space-separated parsing (the CLI prints help and exits 0).
           CHROME_ZIP="artifacts/metromark-chrome-$VERSION.zip"
           test -f "$CHROME_ZIP"
-          args=(--chrome-api-version v2
-                --chrome-zip "$CHROME_ZIP"
-                --chrome-extension-id "$CHROME_EXTENSION_ID"
-                --chrome-publisher-id "$CHROME_PUBLISHER_ID"
-                --chrome-service-account-client-email "$CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL"
-                --chrome-service-account-private-key "$CHROME_SERVICE_ACCOUNT_PRIVATE_KEY"
-                --chrome-publish-type STAGED_PUBLISH)
+          args=(--chrome-api-version=v2
+                --chrome-zip="$CHROME_ZIP"
+                --chrome-extension-id="$CHROME_EXTENSION_ID"
+                --chrome-publisher-id="$CHROME_PUBLISHER_ID"
+                --chrome-service-account-client-email="$CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL"
+                --chrome-service-account-private-key="$CHROME_SERVICE_ACCOUNT_PRIVATE_KEY"
+                --chrome-publish-type=STAGED_PUBLISH)
           if [ "$DRY_RUN" = "true" ]; then
             args+=(--dry-run)
           fi
