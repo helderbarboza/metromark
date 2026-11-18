@@ -2,6 +2,7 @@
   import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import { Button } from '$lib/components/ui/button'
+  import * as Empty from '$lib/components/ui/empty'
 
   interface Props {
     /** Which empty/loading state to render. */
@@ -18,57 +19,54 @@
 </script>
 
 {#if variant === 'loading'}
-  <div
-    class='
-      flex size-full min-h-60 flex-col items-center justify-center text-center
-      text-(--muted-foreground)
-    '
-  >
+  <Empty.Root class='size-full min-h-60'>
+    <Empty.Header>
+      {#if loadError}
+        <Empty.Media variant='icon'>
+          <Icon name='lock' size={22} />
+        </Empty.Media>
+        <Empty.Title role='heading' aria-level={2}>{$LL.status.reconnectingTitle()}</Empty.Title>
+        <Empty.Description>{loadError}</Empty.Description>
+      {:else}
+        <Empty.Media variant='icon'>
+          <span
+            class='
+              size-6 animate-spin rounded-full border border-(--border)
+              border-t-(--primary)
+            '
+          ></span>
+        </Empty.Media>
+        <Empty.Description>{$LL.status.findingFavorites()}</Empty.Description>
+      {/if}
+    </Empty.Header>
     {#if loadError}
-      <Icon name='lock' size={28} />
-      <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
-        {$LL.status.reconnectingTitle()}
-      </h2>
-      <p class='mb-6 px-5 text-xs/relaxed'>{loadError}</p>
-      <button onclick={() => window.location.reload()}>
-        {$LL.status.reloadPage()}
-      </button>
-    {:else}
-      <span
-        class='
-          mb-5 size-6 animate-spin rounded-full border border-(--border)
-          border-t-(--primary)
-        '
-      >
-      </span>
-      <p class='mb-6 px-5 text-xs/relaxed'>
-        {$LL.status.findingFavorites()}
-      </p>
+      <Empty.Content>
+        <Button variant='outline' size='sm' onclick={() => window.location.reload()}>
+          {$LL.status.reloadPage()}
+        </Button>
+      </Empty.Content>
     {/if}
-  </div>
+  </Empty.Root>
 {:else if variant === 'no-results'}
-  <div class='flex size-full min-h-60 flex-col items-center justify-center'>
-    <Icon name='searchBookmarks' size={33} />
-    <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
-      {$LL.search.noFavoritesFound()}
-    </h2>
-    <p class='mb-6 px-5 text-xs/relaxed'>
-      {$LL.search.noFavoritesDetail({ query })}
-    </p>
-    <Button onclick={onclearsearch}>{$LL.search.clearSearch()}</Button>
-  </div>
+  <Empty.Root class='size-full min-h-60'>
+    <Empty.Header>
+      <Empty.Media variant='icon'>
+        <Icon name='searchBookmarks' size={22} />
+      </Empty.Media>
+      <Empty.Title role='heading' aria-level={2}>{$LL.search.noFavoritesFound()}</Empty.Title>
+      <Empty.Description>{$LL.search.noFavoritesDetail({ query })}</Empty.Description>
+    </Empty.Header>
+    <Empty.Content>
+      <Button variant='outline' size='sm' onclick={onclearsearch}>
+        {$LL.search.clearSearch()}
+      </Button>
+    </Empty.Content>
+  </Empty.Root>
 {:else}
-  <div
-    class='
-      flex size-full min-h-60 flex-col items-center justify-center text-center
-      text-(--muted-foreground)
-    '
-  >
-    <h2 class='mt-5 mb-2.5 text-2xl font-normal tracking-tight text-(--foreground)'>
-      {$LL.status.noFoldersTitle()}
-    </h2>
-    <p class='mb-6 px-5 text-xs/relaxed'>
-      {$LL.status.noFoldersDetail()}
-    </p>
-  </div>
+  <Empty.Root class='size-full min-h-60'>
+    <Empty.Header>
+      <Empty.Title role='heading' aria-level={2}>{$LL.status.noFoldersTitle()}</Empty.Title>
+      <Empty.Description>{$LL.status.noFoldersDetail()}</Empty.Description>
+    </Empty.Header>
+  </Empty.Root>
 {/if}
