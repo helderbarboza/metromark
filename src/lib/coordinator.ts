@@ -20,6 +20,7 @@ import { allowsLargeSize, effectiveTileSize, freePosition, GRID_VIEW_IDS, gridVi
 import { applyLocale, getT } from '$lib/locale'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
 import { validateUrl } from '$lib/url.js'
+import { parseYouTubeVideoId } from '$lib/youtube'
 
 export const UNDO_TTL = 30_000
 
@@ -527,7 +528,7 @@ export class BookmarkCoordinator {
             catch (error) {
               throw new Error(error instanceof Error ? error.message : getT().errors.invalidBackgroundImage())
             }
-            if (background.fit !== undefined && !['cover', 'contain', 'fill', 'none'].includes(background.fit))
+            if (background.fit !== undefined && !['cover', 'contain', 'fill'].includes(background.fit))
               throw new Error(getT().errors.invalidImageFit())
             if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
               throw new Error(getT().errors.invalidImageOpacity())
@@ -535,6 +536,26 @@ export class BookmarkCoordinator {
               throw new Error(getT().errors.invalidParallax())
             if (background.parallaxZoom !== undefined && (!Number.isFinite(background.parallaxZoom) || background.parallaxZoom < 1 || background.parallaxZoom > 4))
               throw new Error(getT().errors.invalidParallaxZoom())
+            if (background.auto !== undefined && typeof background.auto !== 'boolean')
+              throw new Error(getT().errors.invalidBackgroundMode())
+            if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))
+              throw new Error(getT().errors.hexColor())
+          }
+          else if (background.type === 'youtube') {
+            if (typeof background.url !== 'string')
+              throw new Error(getT().errors.invalidYoutubeUrl())
+            if (background.url.trim() !== '' && parseYouTubeVideoId(background.url) === null)
+              throw new Error(getT().errors.invalidYoutubeUrl())
+            if (background.fit !== undefined && !['cover', 'contain', 'fill'].includes(background.fit))
+              throw new Error(getT().errors.invalidYoutubeFit())
+            if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
+              throw new Error(getT().errors.invalidYoutubeOpacity())
+            if (background.parallax !== undefined && typeof background.parallax !== 'boolean')
+              throw new Error(getT().errors.invalidParallax())
+            if (background.parallaxZoom !== undefined && (!Number.isFinite(background.parallaxZoom) || background.parallaxZoom < 1 || background.parallaxZoom > 4))
+              throw new Error(getT().errors.invalidParallaxZoom())
+            if (background.playbackRate !== undefined && ![0.25, 0.5, 1, 1.5, 2].includes(background.playbackRate))
+              throw new Error(getT().errors.invalidYoutubePlaybackRate())
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
               throw new Error(getT().errors.invalidBackgroundMode())
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))

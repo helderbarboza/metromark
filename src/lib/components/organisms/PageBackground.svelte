@@ -7,6 +7,7 @@
   import ColorBackground from '$lib/components/organisms/ColorBackground.svelte'
   import ImageBackground from '$lib/components/organisms/ImageBackground.svelte'
   import ShaderBackground from '$lib/components/organisms/ShaderBackground.svelte'
+  import YoutubeBackground from '$lib/components/organisms/YoutubeBackground.svelte'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { getShader, NONE_SHADER_ID } from '$lib/shaders'
   import { shaderBenchmark } from '$lib/shaders/benchmark.svelte'
@@ -21,6 +22,8 @@
     onstruggle?: () => void
     /** Called when the image fails to load. */
     onerror?: () => void
+    /** Called when the YouTube video cannot be played. */
+    onyoutubeerror?: () => void
   }
 
   const {
@@ -29,6 +32,7 @@
     scrollProgress = 0,
     onstruggle,
     onerror,
+    onyoutubeerror,
   }: Props = $props()
 
   const shaderBackground = $derived(
@@ -64,6 +68,19 @@
     {scrollProgress}
     {reducedMotion}
     {onerror}
+  />
+{:else if background.type === 'youtube'}
+  <YoutubeBackground
+    src={background.url}
+    fit={background.fit ?? BACKGROUND_DEFAULTS.youtube.fit}
+    opacity={background.opacity ?? BACKGROUND_DEFAULTS.youtube.opacity}
+    parallax={background.parallax ?? BACKGROUND_DEFAULTS.youtube.parallax}
+    parallaxZoom={background.parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom}
+    playbackRate={background.playbackRate ?? BACKGROUND_DEFAULTS.youtube.playbackRate}
+    color={baseColor}
+    {scrollProgress}
+    {reducedMotion}
+    onerror={onyoutubeerror ?? onerror}
   />
 {:else if shaderBackground && shader}
   <ShaderBackground

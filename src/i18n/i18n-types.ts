@@ -73,6 +73,10 @@ type RootTranslation = {
 		 */
 		backgroundImageFailed: string
 		/**
+		 * T​h​e​ ​Y​o​u​T​u​b​e​ ​b​a​c​k​g​r​o​u​n​d​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​p​l​a​y​e​d​.
+		 */
+		backgroundYoutubeFailed: string
+		/**
 		 * T​u​r​n​ ​o​f​f
 		 */
 		turnOff: string
@@ -873,6 +877,10 @@ type RootTranslation = {
 		 */
 		shader: string
 		/**
+		 * Y​o​u​T​u​b​e
+		 */
+		youtube: string
+		/**
 		 * B​a​c​k​g​r​o​u​n​d​ ​c​o​l​o​r
 		 */
 		backgroundColor: string
@@ -1076,7 +1084,7 @@ type RootTranslation = {
 		 */
 		fit: string
 		/**
-		 * H​o​w​ ​t​h​e​ ​i​m​a​g​e​ ​f​i​l​l​s​ ​t​h​e​ ​p​a​g​e
+		 * H​o​w​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​f​i​l​l​s​ ​t​h​e​ ​p​a​g​e
 		 */
 		fitHelp: string
 		/**
@@ -1091,10 +1099,6 @@ type RootTranslation = {
 		 * F​i​l​l
 		 */
 		fitFill: string
-		/**
-		 * N​o​n​e
-		 */
-		fitNone: string
 		/**
 		 * H​o​w​ ​v​i​s​i​b​l​e​ ​t​h​e​ ​i​m​a​g​e​ ​i​s
 		 */
@@ -1127,6 +1131,30 @@ type RootTranslation = {
 		 * R​e​m​o​v​e​s​ ​t​h​e​ ​i​m​a​g​e​ ​f​r​o​m​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d
 		 */
 		removeImageHelp: string
+		/**
+		 * Y​O​U​T​U​B​E​ ​U​R​L
+		 */
+		youtubeUrl: string
+		/**
+		 * h​t​t​p​s​:​/​/​w​w​w​.​y​o​u​t​u​b​e​.​c​o​m​/​w​a​t​c​h​?​v​=​d​Q​w​4​w​9​W​g​X​c​Q
+		 */
+		youtubeUrlPlaceholder: string
+		/**
+		 * A​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​.​ ​T​h​e​ ​v​i​d​e​o​ ​p​l​a​y​s​ ​m​u​t​e​d
+		 */
+		youtubeAddressHelp: string
+		/**
+		 * H​o​w​ ​v​i​s​i​b​l​e​ ​t​h​e​ ​v​i​d​e​o​ ​i​s
+		 */
+		youtubeOpacityHelp: string
+		/**
+		 * P​l​a​y​b​a​c​k​ ​s​p​e​e​d
+		 */
+		playbackSpeed: string
+		/**
+		 * H​o​w​ ​f​a​s​t​ ​t​h​e​ ​v​i​d​e​o​ ​p​l​a​y​s
+		 */
+		playbackSpeedHelp: string
 	}
 	benchmarkLevels: {
 		/**
@@ -1216,6 +1244,10 @@ type RootTranslation = {
 		 * @param {unknown} scheme
 		 */
 		backgroundHttpOnly: RequiredParams<'scheme'>
+		/**
+		 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​,​ ​s​u​c​h​ ​a​s​ ​h​t​t​p​s​:​/​/​w​w​w​.​y​o​u​t​u​b​e​.​c​o​m​/​w​a​t​c​h​?​v​=​d​Q​w​4​w​9​W​g​X​c​Q​.
+		 */
+		invalidYoutubeAddress: string
 		/**
 		 * T​h​a​t​ ​a​d​d​r​e​s​s​ ​i​s​ ​n​o​t​ ​v​a​l​i​d​.
 		 */
@@ -1459,6 +1491,22 @@ type RootTranslation = {
 		 */
 		invalidParallaxZoom: string
 		/**
+		 * I​n​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​.
+		 */
+		invalidYoutubeUrl: string
+		/**
+		 * I​n​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​f​i​t​.
+		 */
+		invalidYoutubeFit: string
+		/**
+		 * I​n​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​o​p​a​c​i​t​y​.
+		 */
+		invalidYoutubeOpacity: string
+		/**
+		 * I​n​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​p​l​a​y​b​a​c​k​ ​r​a​t​e​.
+		 */
+		invalidYoutubePlaybackRate: string
+		/**
 		 * I​n​v​a​l​i​d​ ​s​h​a​d​e​r​ ​s​e​t​t​i​n​g​.
 		 */
 		invalidShaderSetting: string
@@ -1587,6 +1635,10 @@ export type TranslationFunctions = {
 		 * The background image could not be loaded.
 		 */
 		backgroundImageFailed: () => LocalizedString
+		/**
+		 * The YouTube background could not be played.
+		 */
+		backgroundYoutubeFailed: () => LocalizedString
 		/**
 		 * Turn off
 		 */
@@ -2364,6 +2416,10 @@ export type TranslationFunctions = {
 		 */
 		shader: () => LocalizedString
 		/**
+		 * YouTube
+		 */
+		youtube: () => LocalizedString
+		/**
 		 * Background color
 		 */
 		backgroundColor: () => LocalizedString
@@ -2564,7 +2620,7 @@ export type TranslationFunctions = {
 		 */
 		fit: () => LocalizedString
 		/**
-		 * How the image fills the page
+		 * How the background fills the page
 		 */
 		fitHelp: () => LocalizedString
 		/**
@@ -2579,10 +2635,6 @@ export type TranslationFunctions = {
 		 * Fill
 		 */
 		fitFill: () => LocalizedString
-		/**
-		 * None
-		 */
-		fitNone: () => LocalizedString
 		/**
 		 * How visible the image is
 		 */
@@ -2615,6 +2667,30 @@ export type TranslationFunctions = {
 		 * Removes the image from the background
 		 */
 		removeImageHelp: () => LocalizedString
+		/**
+		 * YOUTUBE URL
+		 */
+		youtubeUrl: () => LocalizedString
+		/**
+		 * https://www.youtube.com/watch?v=dQw4w9WgXcQ
+		 */
+		youtubeUrlPlaceholder: () => LocalizedString
+		/**
+		 * A YouTube address. The video plays muted
+		 */
+		youtubeAddressHelp: () => LocalizedString
+		/**
+		 * How visible the video is
+		 */
+		youtubeOpacityHelp: () => LocalizedString
+		/**
+		 * Playback speed
+		 */
+		playbackSpeed: () => LocalizedString
+		/**
+		 * How fast the video plays
+		 */
+		playbackSpeedHelp: () => LocalizedString
 	}
 	benchmarkLevels: {
 		/**
@@ -2697,6 +2773,10 @@ export type TranslationFunctions = {
 		 * Background addresses must start with http(s); "{scheme}" is not allowed.
 		 */
 		backgroundHttpOnly: (arg: { scheme: unknown }) => LocalizedString
+		/**
+		 * Enter a valid YouTube address, such as https://www.youtube.com/watch?v=dQw4w9WgXcQ.
+		 */
+		invalidYoutubeAddress: () => LocalizedString
 		/**
 		 * That address is not valid.
 		 */
@@ -2937,6 +3017,22 @@ export type TranslationFunctions = {
 		 * Invalid parallax zoom setting.
 		 */
 		invalidParallaxZoom: () => LocalizedString
+		/**
+		 * Invalid YouTube address.
+		 */
+		invalidYoutubeUrl: () => LocalizedString
+		/**
+		 * Invalid YouTube fit.
+		 */
+		invalidYoutubeFit: () => LocalizedString
+		/**
+		 * Invalid YouTube opacity.
+		 */
+		invalidYoutubeOpacity: () => LocalizedString
+		/**
+		 * Invalid YouTube playback rate.
+		 */
+		invalidYoutubePlaybackRate: () => LocalizedString
 		/**
 		 * Invalid shader setting.
 		 */

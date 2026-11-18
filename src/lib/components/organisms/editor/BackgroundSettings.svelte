@@ -1,5 +1,10 @@
 <script lang='ts'>
-  import type { ImageBackgroundSettings, Settings, ShaderBackgroundSettings } from '$lib/config'
+  import type {
+    ImageBackgroundSettings,
+    Settings,
+    ShaderBackgroundSettings,
+    YoutubeBackgroundSettings,
+  } from '$lib/config'
 
   import LL from '$i18n/i18n-svelte'
   import {
@@ -33,11 +38,13 @@
   } from '$lib/shaders/benchmark.svelte'
   import { shaderMetrics } from '$lib/shaders/metrics.svelte'
   import { levelFps, levelFrame, levelWorst } from '$lib/shaders/quality'
+  import { validateYoutubeUrl } from '$lib/youtube'
 
   type BackgroundType = Settings['background']['type']
-  const BACKGROUND_TYPES = ['color', 'image', 'shader'] as const satisfies readonly BackgroundType[]
+  // eslint-disable-next-line style/max-len
+  const BACKGROUND_TYPES = ['color', 'image', 'shader', 'youtube'] as const satisfies readonly BackgroundType[]
   const SHADERS = Object.values(shaders)
-  const IMAGE_FITS = ['cover', 'contain', 'fill', 'none'] as const
+  const FITS = ['cover', 'contain', 'fill'] as const
 
   // The provider (SettingsDialog) owns the values; the closure stays reactive.
   const ctx = getSettingsContext()
@@ -83,6 +90,12 @@
 
   function updateImage(patch: Partial<ImageBackgroundSettings>) {
     if (settings.background.type !== 'image')
+      return
+    onchange({ background: { ...settings.background, ...patch } })
+  }
+
+  function updateYoutube(patch: Partial<YoutubeBackgroundSettings>) {
+    if (settings.background.type !== 'youtube')
       return
     onchange({ background: { ...settings.background, ...patch } })
   }
@@ -318,6 +331,168 @@
   function finishZoomDrag() {
     zoomDragging = false
     commitZoom()
+  }
+
+  // --- youtube background -----------------------------------------------------
+  const initialYoutube = () =>
+    settings.background.type === 'youtube' ? settings.background : undefined
+  let youtubeUrlDraft = $state(initialYoutube()?.url ?? '')
+  let youtubeUrlDirty = $state(false)
+  let youtubeUrlError = $state('')
+
+  $effect(() => {
+    const bg = settings.background
+    if (bg.type !== 'youtube') {
+      youtubeUrlDirty = false
+      youtubeUrlError = ''
+      return
+    }
+    if (!youtubeUrlDirty)
+      youtubeUrlDraft = bg.url ?? ''
+  })
+
+  // Drafts for the opacity and parallax-zoom sliders, mirroring the image tab.
+  const PLAYBACK_RATES = [0.25, 0.5, 1, 1.5, 2] as const
+  let youtubeOpacityDraft = $state(initialYoutube()?.opacity ?? BACKGROUND_DEFAULTS.youtube.opacity)
+  let youtubeOpacityDragging = $state(false)
+  let youtubeOpacityPending = $state<number | null>(null)
+  let youtubeZoomDraft = $state(
+    initialYoutube()?.parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom,
+  )
+  let youtubeZoomDragging = $state(false)
+  let youtubeZoomPending = $state<number | null>(null)
+
+  const COMMIT_YOUTUBE_OPACITY_INTERVAL_MS = 125
+  let lastYoutubeOpacityCommitAt = 0
+  let youtubeOpacityTrailingTimer: ReturnType<typeof setTimeout> | undefined
+  const COMMIT_YOUTUBE_ZOOM_INTERVAL_MS = 125
+  let lastYoutubeZoomCommitAt = 0
+  let youtubeZoomTrailingTimer: ReturnType<typeof setTimeout> | undefined
+
+  $effect(() => {
+    const bg = settings.background
+    if (bg.type !== 'youtube') {
+      youtubeOpacityPending = null
+      youtubeOpacityDragging = false
+      youtubeZoomPending = null
+      youtubeZoomDragging = false
+      return
+    }
+    if (youtubeOpacityPending !== null
+      && (bg.opacity ?? BACKGROUND_DEFAULTS.youtube.opacity) === youtubeOpacityPending) {
+      youtubeOpacityPending = null
+    }
+    if (youtubeZoomPending !== null
+      && (bg.parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom) === youtubeZoomPending) {
+      youtubeZoomPending = null
+    }
+    if (youtubeOpacityDragging || youtubeZoomDragging) {
+      if (!youtubeOpacityDragging && youtubeOpacityPending === null)
+        youtubeOpacityDraft = bg.opacity ?? BACKGROUND_DEFAULTS.youtube.opacity
+      if (!youtubeZoomDragging && youtubeZoomPending === null)
+        youtubeZoomDraft = bg.parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom
+      return
+    }
+    if (youtubeOpacityPending === null)
+      youtubeOpacityDraft = bg.opacity ?? BACKGROUND_DEFAULTS.youtube.opacity
+    if (youtubeZoomPending === null)
+      youtubeZoomDraft = bg.parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom
+  })
+
+  $effect(() => {
+    return () => {
+      clearTimeout(youtubeOpacityTrailingTimer)
+      clearTimeout(youtubeZoomTrailingTimer)
+    }
+  })
+
+  function commitYoutubeOpacity() {
+    const bg = settings.background
+    if (bg.type !== 'youtube')
+      return
+    clearTimeout(youtubeOpacityTrailingTimer)
+    youtubeOpacityTrailingTimer = undefined
+    lastYoutubeOpacityCommitAt = Date.now()
+    youtubeOpacityPending = youtubeOpacityDraft
+    onchange({ background: { ...bg, opacity: youtubeOpacityDraft } })
+  }
+
+  function scheduleYoutubeOpacityCommit() {
+    const elapsed = Date.now() - lastYoutubeOpacityCommitAt
+    if (elapsed >= COMMIT_YOUTUBE_OPACITY_INTERVAL_MS) {
+      commitYoutubeOpacity()
+      return
+    }
+    clearTimeout(youtubeOpacityTrailingTimer)
+    youtubeOpacityTrailingTimer = setTimeout(
+      commitYoutubeOpacity,
+      COMMIT_YOUTUBE_OPACITY_INTERVAL_MS - elapsed,
+    )
+  }
+
+  function dragYoutubeOpacity(value: number) {
+    youtubeOpacityDraft = value
+    youtubeOpacityDragging = true
+    scheduleYoutubeOpacityCommit()
+  }
+
+  function finishYoutubeOpacityDrag() {
+    youtubeOpacityDragging = false
+    commitYoutubeOpacity()
+  }
+
+  function commitYoutubeZoom() {
+    const bg = settings.background
+    if (bg.type !== 'youtube')
+      return
+    clearTimeout(youtubeZoomTrailingTimer)
+    youtubeZoomTrailingTimer = undefined
+    lastYoutubeZoomCommitAt = Date.now()
+    youtubeZoomPending = youtubeZoomDraft
+    onchange({ background: { ...bg, parallaxZoom: youtubeZoomDraft } })
+  }
+
+  function scheduleYoutubeZoomCommit() {
+    const elapsed = Date.now() - lastYoutubeZoomCommitAt
+    if (elapsed >= COMMIT_YOUTUBE_ZOOM_INTERVAL_MS) {
+      commitYoutubeZoom()
+      return
+    }
+    clearTimeout(youtubeZoomTrailingTimer)
+    youtubeZoomTrailingTimer = setTimeout(
+      commitYoutubeZoom,
+      COMMIT_YOUTUBE_ZOOM_INTERVAL_MS - elapsed,
+    )
+  }
+
+  function dragYoutubeZoom(value: number) {
+    youtubeZoomDraft = value
+    youtubeZoomDragging = true
+    scheduleYoutubeZoomCommit()
+  }
+
+  function finishYoutubeZoomDrag() {
+    youtubeZoomDragging = false
+    commitYoutubeZoom()
+  }
+
+  function commitYoutubeUrl() {
+    const bg = settings.background
+    if (bg.type !== 'youtube')
+      return
+    youtubeUrlError = ''
+    let validated: string
+    try {
+      validated = validateYoutubeUrl(youtubeUrlDraft)
+    }
+    catch (error) {
+      youtubeUrlError = error instanceof Error
+        ? error.message
+        : getT().backgroundErrors.addressNotValid()
+      return
+    }
+    updateYoutube({ url: validated })
+    youtubeUrlDirty = false
   }
 
   function loadImageElement(src: string): Promise<HTMLImageElement> {
@@ -993,13 +1168,13 @@
         value={bg.fit ?? 'cover'}
         disabled={busy || uploading}
         onValueChange={(v) => {
-          const fit = IMAGE_FITS.find(candidate => candidate === v)
+          const fit = FITS.find(candidate => candidate === v)
           if (fit)
             updateImage({ fit })
         }}
       >
-        {#each IMAGE_FITS as fit (fit)}
-          <ToggleGroup.Item value={fit} class='grow'>{$LL.settings[fit === 'cover' ? 'fitCover' : fit === 'contain' ? 'fitContain' : fit === 'fill' ? 'fitFill' : 'fitNone']()}</ToggleGroup.Item>
+        {#each FITS as fit (fit)}
+          <ToggleGroup.Item value={fit} class='grow'>{$LL.settings[fit === 'cover' ? 'fitCover' : fit === 'contain' ? 'fitContain' : 'fitFill']()}</ToggleGroup.Item>
         {/each}
       </ToggleGroup.Root>
     </SettingsRow>
@@ -1100,6 +1275,192 @@
         </Button>
       </SettingsRow>
     {/if}
+  {/if}
+
+  {#if settings.background.type === 'youtube'}
+    {@const bg = settings.background}
+    <div class='px-4 py-3'>
+      <label
+        for='youtube-url'
+        class='
+          mt-1 mb-2 block text-[0.5rem] font-semibold tracking-widest
+          text-(--muted-foreground)
+        '
+      >
+        {$LL.settings.youtubeUrl()}
+      </label>
+      <div class='flex items-center gap-2'>
+        <Input
+          id='youtube-url'
+          type='text'
+          inputmode='url'
+          placeholder={$LL.settings.youtubeUrlPlaceholder()}
+          class='min-w-0 flex-1 text-sm'
+          value={youtubeUrlDraft}
+          disabled={busy}
+          aria-invalid={youtubeUrlError !== '' ? 'true' : undefined}
+          aria-describedby={youtubeUrlError !== ''
+            ? 'youtube-url-help youtube-url-error'
+            : 'youtube-url-help'}
+          oninput={(event) => {
+            youtubeUrlDraft = event.currentTarget.value
+            youtubeUrlDirty = true
+            youtubeUrlError = ''
+          }}
+          onkeydown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              commitYoutubeUrl()
+            }
+          }}
+        />
+        <Button
+          variant='default'
+          size='sm'
+          class='h-9 px-4'
+          disabled={busy}
+          onclick={commitYoutubeUrl}
+        >
+          {$LL.settings.apply()}
+        </Button>
+      </div>
+      <p id='youtube-url-help' class='mt-2 text-xs text-(--muted-foreground)'>
+        {$LL.settings.youtubeAddressHelp()}
+      </p>
+    </div>
+
+    {#if youtubeUrlError !== ''}
+      <p id='youtube-url-error' role='alert' class='border-t border-(--border) px-4 py-2 text-xs text-(--destructive)'>
+        {youtubeUrlError}
+      </p>
+    {/if}
+    <SettingsRow
+      title={$LL.settings.fit()}
+      helpText={$LL.settings.fitHelp()}
+      controlId='youtube-fit'
+      disabled={busy}
+    >
+      <ToggleGroup.Root
+        type='single'
+        id='youtube-fit'
+        aria-labelledby='youtube-fit-title'
+        aria-describedby='youtube-fit-help'
+        value={bg.fit ?? 'cover'}
+        disabled={busy}
+        onValueChange={(v) => {
+          const fit = FITS.find(candidate => candidate === v)
+          if (fit)
+            updateYoutube({ fit })
+        }}
+      >
+        {#each FITS as fit (fit)}
+          <ToggleGroup.Item value={fit} class='grow'>{$LL.settings[fit === 'cover' ? 'fitCover' : fit === 'contain' ? 'fitContain' : 'fitFill']()}</ToggleGroup.Item>
+        {/each}
+      </ToggleGroup.Root>
+    </SettingsRow>
+    <BaseColorMode
+      auto={bg.auto ?? BACKGROUND_DEFAULTS.youtube.auto}
+      color={bg.color}
+      {busy}
+      idPrefix='youtube-background'
+      onchange={(auto, color) => updateYoutube({ auto, color })}
+    />
+    <SettingsRow
+      title={$LL.settings.opacity()}
+      helpText={$LL.settings.youtubeOpacityHelp()}
+      controlId='youtube-opacity'
+      disabled={busy}
+    >
+      <span>{Math.round(youtubeOpacityDraft * 100)}%</span>
+      <Slider
+        id='youtube-opacity'
+        aria-labelledby='youtube-opacity-title'
+        aria-describedby='youtube-opacity-help'
+        type='single'
+        value={youtubeOpacityDraft}
+        min={0.0}
+        max={1.0}
+        step={0.1}
+        class='w-32'
+        onValueChange={dragYoutubeOpacity}
+        onValueCommit={finishYoutubeOpacityDrag}
+      />
+    </SettingsRow>
+    <SettingsRow
+      title={$LL.settings.parallax()}
+      helpText={settings.reducedMotion
+        ? $LL.settings.parallaxDisabledHelp()
+        : $LL.settings.parallaxHelp()}
+      controlId='youtube-parallax'
+      disabled={busy || settings.reducedMotion}
+    >
+      <input
+        id='youtube-parallax'
+        type='checkbox'
+        role='switch'
+        aria-describedby='youtube-parallax-help'
+        checked={bg.parallax ?? BACKGROUND_DEFAULTS.youtube.parallax}
+        disabled={busy || settings.reducedMotion}
+        onchange={event => updateYoutube({ parallax: event.currentTarget.checked })}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+      />
+    </SettingsRow>
+    {@const youtubeParallaxDisabled = busy || settings.reducedMotion
+      || !(bg.parallax ?? BACKGROUND_DEFAULTS.youtube.parallax)}
+    <SettingsRow
+      title={$LL.settings.parallaxZoom()}
+      helpText={$LL.settings.parallaxZoomHelp()}
+      controlId='youtube-parallax-zoom'
+      disabled={youtubeParallaxDisabled}
+    >
+      <span>{String(Number(youtubeZoomDraft.toFixed(2)))}x</span>
+      <Slider
+        id='youtube-parallax-zoom'
+        aria-labelledby='youtube-parallax-zoom-title'
+        aria-describedby='youtube-parallax-zoom-help'
+        type='single'
+        value={youtubeZoomDraft}
+        min={1}
+        max={4}
+        step={0.25}
+        class='w-32'
+        disabled={youtubeParallaxDisabled}
+        onValueChange={dragYoutubeZoom}
+        onValueCommit={finishYoutubeZoomDrag}
+      />
+    </SettingsRow>
+    <SettingsRow
+      title={$LL.settings.playbackSpeed()}
+      helpText={$LL.settings.playbackSpeedHelp()}
+      controlId='youtube-speed'
+      disabled={busy}
+    >
+      <ToggleGroup.Root
+        type='single'
+        id='youtube-speed'
+        aria-labelledby='youtube-speed-title'
+        aria-describedby='youtube-speed-help'
+        value={String(bg.playbackRate ?? BACKGROUND_DEFAULTS.youtube.playbackRate)}
+        disabled={busy}
+        onValueChange={(v) => {
+          const rate = PLAYBACK_RATES.find(candidate => String(candidate) === v)
+          if (rate !== undefined)
+            updateYoutube({ playbackRate: rate })
+        }}
+      >
+        {#each PLAYBACK_RATES as rate (rate)}
+          <ToggleGroup.Item value={String(rate)} class='grow'>{rate}×</ToggleGroup.Item>
+        {/each}
+      </ToggleGroup.Root>
+    </SettingsRow>
   {/if}
 
 </CollapsibleSection>

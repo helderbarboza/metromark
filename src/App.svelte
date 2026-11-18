@@ -657,6 +657,19 @@
               })
             },
           )}
+          onyoutubeerror={() => showNotice(
+            {
+              message: $LL.app.backgroundYoutubeFailed(),
+              actionLabel: $LL.app.turnOff(),
+            },
+            undefined,
+            () => {
+              void execute({
+                type: 'settings.update',
+                patch: { background: { ...BACKGROUND_DEFAULTS.color } },
+              })
+            },
+          )}
           onerror={() => showNotice(
             {
               message: $LL.app.backgroundImageFailed(),

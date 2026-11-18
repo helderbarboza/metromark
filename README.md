@@ -32,7 +32,7 @@ The live web preview is an isolated **demo workspace**; it cannot access your re
 - Provides a confirmed factory reset for MetroMark appearance, settings and theme. It keeps all browser bookmarks.
 - Stores appearance and tile placement separately from the browser's bookmarks.
 - Includes title/URL/path search, browser-container filtering, horizontal folder navigation, four themes, two densities, two grid views (Classic 8-row wallpaper or a 2-row bottom-anchored Dock; its tile arrangements are kept separately) and reduced-motion settings. Tiles can show original full-color favicons instead of single-color glyphs, or tinted glyphs cached locally in IndexedDB.
-- Offers a solid color background, an animated shader background, or an image background. Image backgrounds accept a remote http(s) URL or an image you upload (stored in your browser's IndexedDB on this device; PNG, JPEG, WebP, GIF or SVG, up to 25 MB), with cover/contain/fill/none fit, an opacity slider and an adjustable parallax zoom (1–4×).
+- Offers a solid color background, an animated shader background, an image background, or a looping muted YouTube background (no player controls). Image and YouTube backgrounds support cover/contain/fill fit, an opacity slider and an adjustable parallax zoom (1–4×); image backgrounds additionally accept a remote http(s) URL or an image you upload (stored in your browser's IndexedDB on this device; PNG, JPEG, WebP, GIF or SVG, up to 25 MB); YouTube backgrounds additionally offer adjustable playback speed (0.25–2×).
 
 ### Arrangement rules
 
@@ -79,7 +79,7 @@ For v0.3.0 (solid theme-color default background; seeded preview demo profiles; 
 
 ## Privacy, limitations and release notes
 
-Only `bookmarks` and `storage` permissions are requested, plus the Chrome-only `favicon` permission for tile icons (local favicon cache only). There are no host permissions, accounts, analytics, remote favicon requests or external font requests. See [PRIVACY.md](PRIVACY.md).
+Only `bookmarks` and `storage` permissions are requested, plus the Chrome-only `favicon` permission for tile icons (local favicon cache only). One host permission is requested: `www.youtube-nocookie.com`, used solely to set the `Referer` header on the YouTube embed request (Chrome never sends a Referer from extension pages, so without it YouTube refuses the embed with error 153). There are no accounts, analytics, remote favicon requests or external font requests. See [PRIVACY.md](PRIVACY.md).
 
 Presentation metadata is local to the extension/profile and is not synced through `storage.sync`. Native bookmark syncing remains controlled by the browser. Removing the extension does not undo edits made to real bookmarks; it may remove local appearance and Undo metadata. Undo expires after 30 seconds and refuses to overwrite conflicting external edits. Back up important bookmarks before testing management operations.
 

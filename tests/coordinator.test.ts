@@ -263,10 +263,33 @@ describe('durable Undo', () => {
     // The command layer rejects invalid enum members even though the type forbids them.
     // eslint-disable-next-line ts/consistent-type-assertions
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', fit: 'stretch' } } as never })).rejects.toThrow('Invalid image fit')
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', fit: 'none' } } as never })).rejects.toThrow('Invalid image fit')
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', opacity: 2 } } })).rejects.toThrow('Invalid image opacity')
     // eslint-disable-next-line ts/consistent-type-assertions
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', parallax: 1 } } as never })).rejects.toThrow('Invalid parallax setting')
     await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'image', url: '', color: 'red' } } })).rejects.toThrow('six-digit hex')
+  })
+  it('stores a YouTube background and rejects invalid values', async () => {
+    const { coordinator } = fixture()
+    const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', fit: 'contain' } } })
+    expect(updated.snapshot.settings.background).toMatchObject({ type: 'youtube', fit: 'contain' })
+    const full = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', fit: 'fill', opacity: 0.5, parallax: true, parallaxZoom: 2, playbackRate: 1.5, auto: false, color: '#123abc' } } })
+    expect(full.snapshot.settings.background).toMatchObject({ type: 'youtube', fit: 'fill', opacity: 0.5, parallax: true, parallaxZoom: 2, playbackRate: 1.5, auto: false, color: '#123abc' })
+    // The command layer rejects invalid enum members even though the type forbids them.
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', fit: 'stretch' } } as never })).rejects.toThrow('Invalid YouTube fit')
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', fit: 'none' } } as never })).rejects.toThrow('Invalid YouTube fit')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', opacity: 2 } } })).rejects.toThrow('Invalid YouTube opacity')
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', playbackRate: 1.75 } } as never })).rejects.toThrow('Invalid YouTube playback rate')
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', playbackRate: '2' } } as never })).rejects.toThrow('Invalid YouTube playback rate')
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', parallax: 1 } } as never })).rejects.toThrow('Invalid parallax setting')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', parallaxZoom: 0.5 } } })).rejects.toThrow('Invalid parallax zoom')
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', color: 'red' } } })).rejects.toThrow('six-digit hex')
   })
 })
 

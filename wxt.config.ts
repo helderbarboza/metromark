@@ -12,7 +12,14 @@ export default defineConfig({
     description: 'Make your new tab your own: Metro-style tiles, themes and backgrounds, with your bookmarks arranged your way.',
     // Chrome-only `favicon` permission for the local favicon-cache tier.
     // Firefox has no equivalent scheme, so it stays permission-free there.
-    permissions: browser === 'firefox' ? ['bookmarks', 'storage'] : ['bookmarks', 'storage', 'favicon'],
+    // `declarativeNetRequestWithHostAccess` + the youtube-nocookie host
+    // permission let the extension set the Referer header on the YouTube
+    // embed request; without it, current Chromium sends no Referer from
+    // extension pages and YouTube refuses to play the embed (error 153).
+    permissions: browser === 'firefox'
+      ? ['bookmarks', 'storage', 'declarativeNetRequestWithHostAccess']
+      : ['bookmarks', 'storage', 'favicon', 'declarativeNetRequestWithHostAccess'],
+    host_permissions: ['https://www.youtube-nocookie.com/*'],
     icons: { 16: 'icons/16.png', 32: 'icons/32.png', 48: 'icons/48.png', 128: 'icons/128.png' },
     ...(browser === 'firefox'
       ? { browser_specific_settings: {

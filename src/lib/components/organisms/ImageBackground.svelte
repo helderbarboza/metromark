@@ -21,7 +21,7 @@
     /** Base color under the image layer */
     color?: string
     /** How the image fills the canvas */
-    fit?: 'cover' | 'contain' | 'fill' | 'none'
+    fit?: 'cover' | 'contain' | 'fill'
     /** Layer opacity over the base color */
     opacity?: number
     /** 0..1 progress through the horizontal scroll; drives the subtle parallax */

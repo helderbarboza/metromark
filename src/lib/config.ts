@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-const BackgroundFitSchema = v.picklist(['cover', 'contain', 'fill', 'none'])
+const BackgroundFitSchema = v.picklist(['cover', 'contain', 'fill'])
 const LANGUAGE_SETTING_VALUES = ['auto', 'en', 'de', 'fr', 'es', 'pt'] as const
 
 // Keep in sync with the locales under src/i18n (base locale first). 'auto' infers the UI language from the browser.
@@ -33,6 +33,26 @@ const ShaderBackgroundSchema = v.object({
   /** Use the theme background instead of a custom base color */
   auto: v.optional(v.boolean()),
   /** Base color under the shader layer */
+  color: v.optional(v.string()),
+})
+
+const YoutubeBackgroundSchema = v.object({
+  type: v.literal('youtube'),
+  /** YouTube address the user entered; the embed URL is derived at render time */
+  url: v.string(),
+  /** How the video fills the page; the embed keeps its 16:9 aspect */
+  fit: v.optional(BackgroundFitSchema),
+  /** Layer opacity over the base color */
+  opacity: v.optional(v.number()),
+  /** Subtle horizontal offset while the board scrolls; forced off by reduced motion */
+  parallax: v.optional(v.boolean()),
+  /** Layer scale as a multiple of the canvas size, from 1 to 4; bigger means wider layer and more travel */
+  parallaxZoom: v.optional(v.number()),
+  /** Playback speed; YouTube only honors 0.25, 0.5, 1, 1.5 and 2 */
+  playbackRate: v.optional(v.picklist([0.25, 0.5, 1, 1.5, 2])),
+  /** Use the theme background instead of a custom base color */
+  auto: v.optional(v.boolean()),
+  /** Base color under the YouTube layer */
   color: v.optional(v.string()),
 })
 
@@ -71,6 +91,7 @@ export const SettingsSchema = v.object({
     ShaderBackgroundSchema,
     ImageBackgroundSchema,
     ColorBackgroundSchema,
+    YoutubeBackgroundSchema,
   ]),
 })
 
@@ -79,6 +100,7 @@ export type Settings = v.InferOutput<typeof SettingsSchema>
 export type ColorBackgroundSettings = Extract<Settings['background'], { type: 'color' }>
 export type ShaderBackgroundSettings = Extract<Settings['background'], { type: 'shader' }>
 export type ImageBackgroundSettings = Extract<Settings['background'], { type: 'image' }>
+export type YoutubeBackgroundSettings = Extract<Settings['background'], { type: 'youtube' }>
 
 /** Default values (used when config sources omit a key) */
 export const SETTINGS_DEFAULTS: Settings = {
@@ -103,6 +125,7 @@ export const APPEARANCE_DEFAULTS = {
 export const BACKGROUND_DEFAULTS = {
   color: { type: 'color', auto: true, color: undefined },
   image: { type: 'image', url: '', auto: true, color: undefined, fit: 'cover', opacity: 1, parallax: false, parallaxZoom: 1.5 },
+  youtube: { type: 'youtube', url: '', fit: 'cover', opacity: 1, parallax: false, parallaxZoom: 1.5, playbackRate: 1, auto: true, color: undefined },
   shader: {
     // No shader runs by default: pick one in the background editor. This also
     // keeps a first benchmark run free of contention from a default background.
