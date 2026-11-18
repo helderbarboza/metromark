@@ -2,7 +2,13 @@
 
 All notable changes to this project are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.1] - 2026-11-18
+
+### Other
+
+- 0.4.1
+
+## [0.4.0] - 2026-11-18
 
 ### Bug Fixes
 
@@ -10,6 +16,7 @@ All notable changes to this project are documented here. The format is based on 
 - Fix swiss alps rendering
 - Fix lint issue
 - Fix slider drag getting stuck when disabled mid-gesture
+- Sync lockfile with npm ci (add @emnapi/core and @emnapi/runtime 1.11.3)
 
 
 ### Features
@@ -24,6 +31,7 @@ All notable changes to this project are documented here. The format is based on 
 - Add Sonner
 - Add youtube backgrounds
 - Add support to playlists
+- Automate Chrome Web Store submission and changelog generation
 
 
 ### Other
@@ -45,6 +53,7 @@ All notable changes to this project are documented here. The format is based on 
 - Setup knip; code cleanup
 - Adjust search input styling
 - Use empty-state components on BoardStatus
+- 0.4.0
 
 ## [0.3.0] - 2026-11-16
 
@@ -218,6 +227,8 @@ keep text selection.
 - Split components into atoms, molecules and organisms
 - Split FaviconIcon into presentational atom and cache container
 
+[0.4.1]: https://github.com/helderbarboza/metromark/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/helderbarboza/metromark/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/helderbarboza/metromark/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/helderbarboza/metromark/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/helderbarboza/metromark/releases/tag/v0.2.0
