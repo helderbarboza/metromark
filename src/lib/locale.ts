@@ -20,7 +20,7 @@ export const LANGUAGE_NATIVE_NAMES: Record<AppLocale, string> = {
 
 const STORAGE_KEY = 'metromark-language'
 
-function isLanguageSetting(value: unknown): value is LanguageSetting {
+export function isLanguageSetting(value: unknown): value is LanguageSetting {
   return typeof value === 'string'
     && LANGUAGE_SETTING_VALUES.includes(value)
 }

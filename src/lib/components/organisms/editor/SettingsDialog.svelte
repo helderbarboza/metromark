@@ -16,7 +16,7 @@
   import * as Tabs from '$lib/components/ui/tabs'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { GRID_VIEW_IDS, isGridView } from '$lib/layout'
-  import { APP_LOCALES, LANGUAGE_NATIVE_NAMES, resolveLocale } from '$lib/locale'
+  import { APP_LOCALES, isLanguageSetting, LANGUAGE_NATIVE_NAMES, resolveLocale } from '$lib/locale'
   import { setSettingsContext } from '$lib/settings-context'
   import { getThemeSelections } from '$lib/theme-picker'
   import { getTheme } from '$lib/themes.js'
@@ -160,7 +160,7 @@
           value={settings.language}
           disabled={command.busy}
           onValueChange={(v) => {
-            if (v === 'auto' || v === 'en' || v === 'de' || v === 'fr' || v === 'es' || v === 'pt') {
+            if (isLanguageSetting(v)) {
               const language: LanguageSetting = v
               setting({ language })
             }
