@@ -78,7 +78,7 @@
     "playwright": "^1.56.0",
     "selenium-webdriver": "4.51.0",
     "shadcn-svelte": "^1.7.2",
-    "storybook": "10.6.1",
+    "storybook": "10.6.7",
     "svelte-check": "^4.3.0",
     "svelte-sonner": "^1.2.3",
     "tailwindcss": "4.3.3",
