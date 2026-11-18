@@ -81,12 +81,12 @@
   // viewport, `contain` the largest that fits inside it. The video fills a
   // 16:9 iframe exactly, so these need no measurement. `fill` is the raw
   // viewport stretch (the historical behavior).
-  const ASPECT_W = 'calc(100vh * 16 / 9)'
-  const ASPECT_H = 'calc(100vw * 9 / 16)'
+  const ASPECT_W = 'calc(100dvh * 16 / 9)'
+  const ASPECT_H = 'calc(100cqw * 9 / 16)'
   const BASE_BOX = {
-    cover: { width: `max(100vw, ${ASPECT_W})`, height: `max(100vh, ${ASPECT_H})` },
-    contain: { width: `min(100vw, ${ASPECT_W})`, height: `min(100vh, ${ASPECT_H})` },
-    fill: { width: '100vw', height: '100vh' },
+    cover: { width: `max(100cqw, ${ASPECT_W})`, height: `max(100dvh, ${ASPECT_H})` },
+    contain: { width: `min(100cqw, ${ASPECT_W})`, height: `min(100dvh, ${ASPECT_H})` },
+    fill: { width: '100cqw', height: '100dvh' },
   } as const
   const resolvedZoom = $derived(parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom)
   const parallaxActive = $derived(parallax === true && !reducedMotion && target !== null)
@@ -172,7 +172,8 @@
   data-playing='true'
   data-crop='true'
   class='
-    group/bg pointer-events-none fixed inset-0 isolate z-0 overflow-hidden bg-background
+    group/bg @container pointer-events-none absolute inset-0 -z-1 overflow-hidden
+    bg-background
     **:pointer-events-none!
   '
   style:background={color}
