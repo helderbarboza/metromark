@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [0.4.1] - 2026-11-18
 
+### Bug Fixes
+
+- Pass Chrome Web Store flags in equals form to support multiline secrets
+
+
+### Documentation
+
+- V0.4.1 [skip ci]
+
+
 ### Other
 
 - 0.4.1
