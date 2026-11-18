@@ -26,3 +26,12 @@ jobs:
 
       - name: Unit tests
         run: npm test
+
+      - name: Install Playwright chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Storybook tests
+        run: npm run test:stories
+
+      - name: Build
+        run: npm run build
