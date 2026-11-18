@@ -6,7 +6,6 @@
   interface Props {
     roots: BookmarkNode[]
     rootFilter: string
-    bookmarkCount: number
     onSelect: (id: string) => void
   }
 

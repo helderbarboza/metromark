@@ -155,8 +155,6 @@ const es: Translation = {
     searchBookmarks: 'Buscar marcadores',
     jumpToGroup: 'Ir a la carpeta de marcadores',
     jumpToGroupPath: 'Ir a {path}',
-    bookmarkCount: '{count} {{marcador|marcadores}}',
-    folderCount: '{count} {{carpeta|carpetas}}',
     demo: 'Demo',
     demoTitle: 'guardados localmente, no tus marcadores reales',
     scrollLeft: 'Desplazar carpetas a la izquierda',

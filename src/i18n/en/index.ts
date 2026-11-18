@@ -155,8 +155,6 @@ const en = {
     searchBookmarks: 'Search bookmarks',
     jumpToGroup: 'Jump to bookmark folder',
     jumpToGroupPath: 'Jump to {path}',
-    bookmarkCount: '{count} {{bookmark|bookmarks}}',
-    folderCount: '{count} {{folder|folders}}',
     demo: 'Demo',
     demoTitle: 'saved locally, not your real bookmarks',
     scrollLeft: 'Scroll folders left',

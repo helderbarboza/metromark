@@ -155,8 +155,6 @@ const pt: Translation = {
     searchBookmarks: 'Pesquisar favoritos',
     jumpToGroup: 'Ir para a pasta de favoritos',
     jumpToGroupPath: 'Ir para {path}',
-    bookmarkCount: '{count} {{favorito|favoritos}}',
-    folderCount: '{count} {{pasta|pastas}}',
     demo: 'Demo',
     demoTitle: 'salvos localmente, não são os seus favoritos de verdade',
     scrollLeft: 'Rolar as pastas para a esquerda',

@@ -128,12 +128,6 @@
       .flatMap(root => root.children ?? [])
       .filter(node => !isBookmark(node) && node.type !== 'separator'),
   )
-  const bookmarkCount = $derived(
-    flatten(snapshot?.tree ?? []).filter(isBookmark).length,
-  )
-  const folderCount = $derived(
-    groups.filter(group => !group.isSystem).length,
-  )
   const gridView = $derived(snapshot?.settings.gridView ?? SETTINGS_DEFAULTS.gridView)
   const sizes = $derived(tileSizesForView(gridView))
   const rows = $derived(rowsForGridView(gridView))
@@ -700,7 +694,6 @@
           <RootsSelect
             {roots}
             {rootFilter}
-            {bookmarkCount}
             onSelect={selectRoot}
           />
         </div>
@@ -753,8 +746,6 @@
       <WorkspaceFooter
         bind:query
         bind:searchInput
-        {bookmarkCount}
-        {folderCount}
         {visibleGroups}
         activeGroup={smoothScroll.activeGroup}
         canScroll={smoothScroll.canScroll}

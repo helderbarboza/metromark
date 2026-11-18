@@ -587,16 +587,6 @@ type RootTranslation = {
 		 */
 		jumpToGroupPath: RequiredParams<'path'>
 		/**
-		 * {​c​o​u​n​t​}​ ​{​{​b​o​o​k​m​a​r​k​|​b​o​o​k​m​a​r​k​s​}​}
-		 * @param {string | number | boolean} count
-		 */
-		bookmarkCount: RequiredParams<'count'>
-		/**
-		 * {​c​o​u​n​t​}​ ​{​{​f​o​l​d​e​r​|​f​o​l​d​e​r​s​}​}
-		 * @param {string | number | boolean} count
-		 */
-		folderCount: RequiredParams<'count'>
-		/**
 		 * D​e​m​o
 		 */
 		demo: string
@@ -2149,14 +2139,6 @@ export type TranslationFunctions = {
 		 * Jump to {path}
 		 */
 		jumpToGroupPath: (arg: { path: unknown }) => LocalizedString
-		/**
-		 * {count} {{bookmark|bookmarks}}
-		 */
-		bookmarkCount: (arg: { count: string | number | boolean }) => LocalizedString
-		/**
-		 * {count} {{folder|folders}}
-		 */
-		folderCount: (arg: { count: string | number | boolean }) => LocalizedString
 		/**
 		 * Demo
 		 */

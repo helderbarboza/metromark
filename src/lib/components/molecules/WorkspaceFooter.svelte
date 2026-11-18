@@ -10,8 +10,6 @@
   interface Props {
     query?: string
     searchInput?: HTMLInputElement | null
-    bookmarkCount: number
-    folderCount: number
     visibleGroups: GroupView[]
     activeGroup: number
     canScroll: boolean
@@ -26,8 +24,6 @@
   let {
     query = $bindable(''),
     searchInput = $bindable<HTMLInputElement | null>(null),
-    bookmarkCount,
-    folderCount,
     visibleGroups,
     activeGroup,
     canScroll,
@@ -157,14 +153,6 @@
         flex items-center gap-1.5 text-xs whitespace-nowrap text-(--muted-foreground)
       `)}
     >
-      <span class='max-sm:hidden'>
-        <span>{$LL.footer.bookmarkCount({ count: bookmarkCount })}</span>
-        <span>{$LL.footer.folderCount({ count: folderCount })}</span>
-      </span>
-      <span class='inline-flex gap-2 sm:hidden'>
-        <span class='inline-flex gap-0.5'><Icon name='bookmark' size={16} /><span>{bookmarkCount}</span></span>
-        <span class='inline-flex gap-0.5'><Icon name='folder' size={16} /><span>{folderCount}</span></span>
-      </span>
       {#if preview}
         <span
           class='
