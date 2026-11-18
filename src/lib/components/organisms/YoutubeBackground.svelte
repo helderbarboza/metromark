@@ -12,16 +12,19 @@
   // the video's aspect, so `cover` and `contain` assume 16:9 (the YouTube norm
   // for uploads). `fill` stretches the frame and lets the player letterbox
   // inside it. Parallax mirrors the image background as well: the wrapper is
-  // scaled by `parallaxZoom` and shifts with the horizontal scroll.
+  // scaled by `parallaxZoom` and shifts with the horizontal scroll. A playlist
+  // address embeds the whole playlist and plays it in random order, once per
+  // mount, via the widget protocol (see YoutubeBackgroundBridge).
 
   import type { YoutubeBackgroundSettings } from '$lib/config'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
-  import { parseYouTubeVideoId } from '$lib/youtube'
+  import { createPlaylistCursorStore } from '$lib/playlist-cursor'
+  import { parseYouTubeBackgroundTarget } from '$lib/youtube'
   import { YoutubeBackgroundBridge } from '$lib/youtube-bridge'
   import { untrack } from 'svelte'
 
   interface Props {
-    /** The YouTube address the user entered. Empty renders nothing. */
+    /** The YouTube address the user entered — a video or a playlist. Empty renders nothing. */
     src?: string
     /** How the embed fills the page */
     fit?: YoutubeBackgroundSettings['fit']
@@ -35,6 +38,8 @@
     parallaxZoom?: YoutubeBackgroundSettings['parallaxZoom']
     /** Playback speed; YouTube honors 0.25, 0.5, 1, 1.5 and 2 */
     playbackRate?: YoutubeBackgroundSettings['playbackRate']
+    /** How the playlist picks its starting video; only applies to playlist addresses */
+    playlistOrder?: YoutubeBackgroundSettings['playlistOrder']
     /** Base color under the YouTube layer */
     color?: string
     /** When reduced motion is on, the embed renders paused instead of autoplaying */
@@ -51,13 +56,17 @@
     parallax = BACKGROUND_DEFAULTS.youtube.parallax,
     parallaxZoom = BACKGROUND_DEFAULTS.youtube.parallaxZoom,
     playbackRate = BACKGROUND_DEFAULTS.youtube.playbackRate,
+    playlistOrder = BACKGROUND_DEFAULTS.youtube.playlistOrder,
     color,
     reducedMotion = false,
     onerror,
   }: Props = $props()
 
   let frame = $state<HTMLIFrameElement | null>(null)
-  const videoId = $derived(parseYouTubeVideoId(src))
+  // A `list` parameter makes the address a playlist; a plain video otherwise.
+  const target = $derived(parseYouTubeBackgroundTarget(src))
+  const videoId = $derived(target?.kind === 'video' ? target.videoId : null)
+  const playlistId = $derived(target?.kind === 'playlist' ? target.playlistId : null)
   let playing = $state(false)
   let started = $state(false)
   $effect(() => {
@@ -67,6 +76,7 @@
   const resolvedFit = $derived(fit ?? BACKGROUND_DEFAULTS.youtube.fit)
   const resolvedOpacity = $derived(opacity ?? BACKGROUND_DEFAULTS.youtube.opacity)
   const resolvedRate = $derived(playbackRate ?? BACKGROUND_DEFAULTS.youtube.playbackRate)
+  const resolvedOrder = $derived(playlistOrder ?? BACKGROUND_DEFAULTS.youtube.playlistOrder)
   // Box sizes for the embed: `cover` is the smallest 16:9 box that covers the
   // viewport, `contain` the largest that fits inside it. The video fills a
   // 16:9 iframe exactly, so these need no measurement. `fill` is the raw
@@ -79,7 +89,7 @@
     fill: { width: '100vw', height: '100vh' },
   } as const
   const resolvedZoom = $derived(parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom)
-  const parallaxActive = $derived(parallax === true && !reducedMotion && videoId !== null)
+  const parallaxActive = $derived(parallax === true && !reducedMotion && target !== null)
   const zoom = $derived(parallaxActive ? resolvedZoom : 1)
   /**
    * Offset as a percentage of the layer's own width: `translateX` percentages
@@ -101,21 +111,31 @@
   // Kept in a plain variable so the rate effect below can reach the live
   // player without making the bridge a reactive dependency of the frame effect.
   let bridge: YoutubeBackgroundBridge | null = null
+  // One store per component; reads/writes are synchronous and local.
+  const playlistCursor = createPlaylistCursorStore()
 
   $effect(() => {
     // Rebuild the bridge whenever the source or the motion preference changes.
     const id = videoId
+    const list = playlistId
     const el = frame
-    if (!el || !id) {
+    const source: { videoId: string } | { playlistId: string } | null
+      = list !== null ? { playlistId: list } : id !== null ? { videoId: id } : null
+    if (!el || source === null) {
       bridge = null
       return
     }
     let errorReported = false
     const current = new YoutubeBackgroundBridge(el, {
-      videoId: id,
+      ...source,
       // Looping is implicit: there is no user-facing setting for it.
+      // Playlists loop as a whole and play in a random order.
       loopMode: 'native',
       autoplay: !reducedMotion,
+      // Read untracked: changing how the playlist picks its start applies on
+      // the next new tab, and must not rebuild the iframe under the user.
+      playlistOrder: untrack(() => resolvedOrder),
+      playlistCursor,
       // Read untracked: changing the rate must not rebuild the iframe.
       playbackRate: untrack(() => resolvedRate),
       onEvent: (snapshot) => {
@@ -157,7 +177,7 @@
   '
   style:background={color}
 >
-  {#if videoId}
+  {#if target}
     <div
       class='absolute top-1/2 left-1/2 overflow-hidden transition-opacity duration-150'
       style:width={boxSize.width}

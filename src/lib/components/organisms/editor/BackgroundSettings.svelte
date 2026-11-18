@@ -353,6 +353,7 @@
 
   // Drafts for the opacity and parallax-zoom sliders, mirroring the image tab.
   const PLAYBACK_RATES = [0.25, 0.5, 1, 1.5, 2] as const
+  const PLAYLIST_ORDERS = ['shuffle', 'sequential'] as const
   let youtubeOpacityDraft = $state(initialYoutube()?.opacity ?? BACKGROUND_DEFAULTS.youtube.opacity)
   let youtubeOpacityDragging = $state(false)
   let youtubeOpacityPending = $state<number | null>(null)
@@ -1459,6 +1460,29 @@
         {#each PLAYBACK_RATES as rate (rate)}
           <ToggleGroup.Item value={String(rate)} class='grow'>{rate}×</ToggleGroup.Item>
         {/each}
+      </ToggleGroup.Root>
+    </SettingsRow>
+    <SettingsRow
+      title={$LL.settings.playlistOrder()}
+      helpText={$LL.settings.playlistOrderHelp()}
+      controlId='youtube-playlist-order'
+      disabled={busy}
+    >
+      <ToggleGroup.Root
+        type='single'
+        id='youtube-playlist-order'
+        aria-labelledby='youtube-playlist-order-title'
+        aria-describedby='youtube-playlist-order-help'
+        value={bg.playlistOrder ?? BACKGROUND_DEFAULTS.youtube.playlistOrder}
+        disabled={busy}
+        onValueChange={(v) => {
+          const order = PLAYLIST_ORDERS.find(candidate => candidate === v)
+          if (order)
+            updateYoutube({ playlistOrder: order })
+        }}
+      >
+        <ToggleGroup.Item value='shuffle' class='grow'>{$LL.settings.playlistOrderShuffle()}</ToggleGroup.Item>
+        <ToggleGroup.Item value='sequential' class='grow'>{$LL.settings.playlistOrderInOrder()}</ToggleGroup.Item>
       </ToggleGroup.Root>
     </SettingsRow>
   {/if}

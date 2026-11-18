@@ -20,7 +20,7 @@ import { allowsLargeSize, effectiveTileSize, freePosition, GRID_VIEW_IDS, gridVi
 import { applyLocale, getT } from '$lib/locale'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
 import { validateUrl } from '$lib/url.js'
-import { parseYouTubeVideoId } from '$lib/youtube'
+import { parseYouTubeBackgroundTarget } from '$lib/youtube'
 
 export const UNDO_TTL = 30_000
 
@@ -544,7 +544,7 @@ export class BookmarkCoordinator {
           else if (background.type === 'youtube') {
             if (typeof background.url !== 'string')
               throw new Error(getT().errors.invalidYoutubeUrl())
-            if (background.url.trim() !== '' && parseYouTubeVideoId(background.url) === null)
+            if (background.url.trim() !== '' && parseYouTubeBackgroundTarget(background.url) === null)
               throw new Error(getT().errors.invalidYoutubeUrl())
             if (background.fit !== undefined && !['cover', 'contain', 'fill'].includes(background.fit))
               throw new Error(getT().errors.invalidYoutubeFit())
@@ -556,6 +556,8 @@ export class BookmarkCoordinator {
               throw new Error(getT().errors.invalidParallaxZoom())
             if (background.playbackRate !== undefined && ![0.25, 0.5, 1, 1.5, 2].includes(background.playbackRate))
               throw new Error(getT().errors.invalidYoutubePlaybackRate())
+            if (background.playlistOrder !== undefined && !['shuffle', 'sequential'].includes(background.playlistOrder))
+              throw new Error(getT().errors.invalidPlaylistOrder())
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
               throw new Error(getT().errors.invalidBackgroundMode())
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))

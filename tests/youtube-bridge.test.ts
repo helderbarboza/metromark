@@ -6,6 +6,24 @@ import { YoutubeBackgroundBridge } from '$lib/youtube-bridge'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const ID = 'dQw4w9WgXcQ'
+const PLAYLIST = 'PLabc123XYZ_-0123456789abcdef'
+const PLAYLIST_IDS = ['aaaaaaaaaaa', 'bbbbbbbbbbb', 'ccccccccccc', 'ddddddddddd']
+const playlistInfo = () => ({ playlist: PLAYLIST_IDS, playlistIndex: 0, playlistId: PLAYLIST })
+
+function makeCursor(stored: Record<string, number> = {}) {
+  const map = new Map(Object.entries(stored))
+  const writes: Array<{ playlistId: string, nextIndex: number }> = []
+  return {
+    writes,
+    cursor: {
+      read: (playlistId: string) => map.get(playlistId) ?? null,
+      write: (playlistId: string, nextIndex: number) => {
+        map.set(playlistId, nextIndex)
+        writes.push({ playlistId, nextIndex })
+      },
+    },
+  }
+}
 
 class FakeContentWindow {
   posted: Array<{ message: string, targetOrigin: string }> = []
@@ -296,5 +314,153 @@ describe('youtubeBackgroundBridge', () => {
     vi.advanceTimersByTime(4000)
     expect(bridge.snapshot.attempt).toBe('2/3')
     expect(bridge.snapshot.apiReady).toBe(false)
+  })
+
+  it('builds a videoseries embed URL for a playlist', () => {
+    const { bridge, frame } = makeBridge({ videoId: undefined, playlistId: PLAYLIST })
+    bridge.mount()
+    const src = frame.getAttribute('src') ?? ''
+    expect(src.startsWith('https://www.youtube-nocookie.com/embed/videoseries?')).toBe(true)
+    expect(src).toContain(`list=${PLAYLIST}`)
+    expect(src).toContain('loop=1')
+    expect(src).not.toContain('playlist=')
+    expect(src).not.toContain(`/embed/${ID}`)
+    expect(src).toContain('enablejsapi=1')
+    expect(src).toContain('autoplay=1')
+    expect(src).toContain('mute=1')
+  })
+
+  it('throws when neither or both IDs are passed', () => {
+    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), { target: new FakeWindow() })).toThrow()
+    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), { target: new FakeWindow(), videoId: ID, playlistId: PLAYLIST })).toThrow()
+    expect(() => new YoutubeBackgroundBridge(new FakeFrame(), { target: new FakeWindow(), playlistId: 'ab' })).toThrow()
+  })
+
+  it('sets loop on ready and shuffles once when the playlist starts playing', () => {
+    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST })
+    bridge.mount()
+    win.ready(frame)
+    let commands = frame.contentWindow.commands()
+    expect(commands.map(command => command.func)).toContain('setLoop')
+    expect(commands.map(command => command.func)).not.toContain('setShuffle')
+
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    commands = frame.contentWindow.commands()
+    const shuffles = commands.filter(command => command.func === 'setShuffle')
+    expect(shuffles).toEqual([{ func: 'setShuffle', args: [true] }])
+
+    // A second PLAYING transition must not reshuffle.
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    expect(frame.contentWindow.commands().filter(command => command.func === 'setShuffle')).toHaveLength(1)
+  })
+
+  it('falls back to a timer when no PLAYING state is reported', () => {
+    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST })
+    bridge.mount()
+    win.ready(frame)
+    expect(frame.contentWindow.commands().filter(command => command.func === 'setShuffle')).toEqual([])
+    vi.advanceTimersByTime(1600)
+    expect(frame.contentWindow.commands().filter(command => command.func === 'setShuffle')).toEqual([{ func: 'setShuffle', args: [true] }])
+  })
+
+  it('never shuffles a single video', () => {
+    const { bridge, frame, win } = makeBridge()
+    bridge.mount()
+    win.ready(frame)
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    vi.advanceTimersByTime(2000)
+    const funcs = frame.contentWindow.commands().map(command => command.func)
+    expect(funcs).not.toContain('setShuffle')
+    expect(funcs).not.toContain('setLoop')
+  })
+
+  it('picks a random starting video from the playlist on each mount', () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0.5) // floor(0.5 * 4) = 2
+    try {
+      const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST })
+      bridge.mount()
+      win.info(frame, playlistInfo())
+      win.ready(frame)
+      expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt'))
+        .toEqual([{ func: 'playVideoAt', args: [2] }])
+      // Repeated deliveries must not re-pick.
+      win.info(frame, playlistInfo())
+      expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt')).toHaveLength(1)
+    }
+    finally {
+      random.mockRestore()
+    }
+  })
+
+  it('plays the stored cursor position in sequential mode and advances it, wrapping at the end', () => {
+    const { cursor, writes } = makeCursor({ [PLAYLIST]: 3 })
+    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST, playlistOrder: 'sequential', playlistCursor: cursor })
+    bridge.mount()
+    win.info(frame, playlistInfo())
+    win.ready(frame)
+    expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt'))
+      .toEqual([{ func: 'playVideoAt', args: [3] }])
+    expect(writes).toEqual([{ playlistId: PLAYLIST, nextIndex: 0 }])
+    // Sequential mode never reshuffles.
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    vi.advanceTimersByTime(2000)
+    expect(frame.contentWindow.commands().map(command => command.func)).not.toContain('setShuffle')
+  })
+
+  it('sequential mode with a stale cursor normalizes it into range', () => {
+    const { cursor, writes } = makeCursor({ [PLAYLIST]: 7 })
+    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST, playlistOrder: 'sequential', playlistCursor: cursor })
+    bridge.mount()
+    win.info(frame, playlistInfo())
+    win.ready(frame)
+    expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt'))
+      .toEqual([{ func: 'playVideoAt', args: [3] }])
+    expect(writes).toEqual([{ playlistId: PLAYLIST, nextIndex: 0 }])
+  })
+
+  it('sequential mode without a store starts at the top', () => {
+    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST, playlistOrder: 'sequential' })
+    bridge.mount()
+    win.info(frame, playlistInfo())
+    win.ready(frame)
+    expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt'))
+      .toEqual([{ func: 'playVideoAt', args: [0] }])
+  })
+
+  it('reduced motion does not pick a start video nor advance the cursor', () => {
+    const { cursor, writes } = makeCursor({ [PLAYLIST]: 2 })
+    const shuffle = makeBridge({ videoId: undefined, playlistId: PLAYLIST, autoplay: false })
+    shuffle.bridge.mount()
+    shuffle.win.info(shuffle.frame, playlistInfo())
+    shuffle.win.ready(shuffle.frame)
+    expect(shuffle.frame.contentWindow.commands().map(command => command.func)).not.toContain('playVideoAt')
+    vi.advanceTimersByTime(2000)
+    expect(shuffle.frame.contentWindow.commands().map(command => command.func)).not.toContain('setShuffle')
+
+    const sequential = makeBridge({ videoId: undefined, playlistId: PLAYLIST, autoplay: false, playlistOrder: 'sequential', playlistCursor: cursor })
+    sequential.bridge.mount()
+    sequential.win.info(sequential.frame, playlistInfo())
+    sequential.win.ready(sequential.frame)
+    expect(sequential.frame.contentWindow.commands().map(command => command.func)).not.toContain('playVideoAt')
+    expect(writes).toEqual([])
+  })
+
+  it('does not pick a start video when the playlist payload is missing', () => {
+    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST })
+    bridge.mount()
+    win.ready(frame)
+    expect(frame.contentWindow.commands().filter(command => command.func === 'playVideoAt')).toEqual([])
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 1 } })
+    expect(frame.contentWindow.commands().map(command => command.func)).toContain('setShuffle')
+  })
+
+  it('reloads the playlist from the top on ENDED in js loop mode', () => {
+    const { bridge, frame, win } = makeBridge({ videoId: undefined, playlistId: PLAYLIST, loopMode: 'js' })
+    bridge.mount()
+    win.ready(frame)
+    frame.setAttribute('src', 'about:blank') // observe the reload
+    win.dispatch(frame.contentWindow, 'https://www.youtube-nocookie.com', { event: 'onStateChange', info: { playerState: 0 } })
+    expect(frame.getAttribute('src')).toContain('/embed/videoseries?')
+    expect(frame.contentWindow.commands().map(command => command.func)).not.toContain('playVideo')
   })
 })

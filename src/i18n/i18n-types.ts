@@ -1140,7 +1140,7 @@ type RootTranslation = {
 		 */
 		youtubeUrlPlaceholder: string
 		/**
-		 * A​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​.​ ​T​h​e​ ​v​i​d​e​o​ ​p​l​a​y​s​ ​m​u​t​e​d
+		 * A​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​,​ ​a​ ​v​i​d​e​o​ ​o​r​ ​a​ ​p​l​a​y​l​i​s​t​.​ ​I​t​ ​p​l​a​y​s​ ​m​u​t​e​d
 		 */
 		youtubeAddressHelp: string
 		/**
@@ -1155,6 +1155,22 @@ type RootTranslation = {
 		 * H​o​w​ ​f​a​s​t​ ​t​h​e​ ​v​i​d​e​o​ ​p​l​a​y​s
 		 */
 		playbackSpeedHelp: string
+		/**
+		 * P​l​a​y​l​i​s​t​ ​o​r​d​e​r
+		 */
+		playlistOrder: string
+		/**
+		 * H​o​w​ ​t​h​e​ ​p​l​a​y​l​i​s​t​ ​p​i​c​k​s​ ​a​ ​v​i​d​e​o​ ​w​h​e​n​ ​a​ ​n​e​w​ ​t​a​b​ ​o​p​e​n​s​.​ ​S​h​u​f​f​l​e​ ​p​i​c​k​s​ ​a​t​ ​r​a​n​d​o​m​;​ ​i​n​ ​o​r​d​e​r​ ​p​l​a​y​s​ ​e​a​c​h​ ​v​i​d​e​o​ ​i​n​ ​t​u​r​n​,​ ​t​h​e​n​ ​s​t​a​r​t​s​ ​o​v​e​r​.​ ​A​p​p​l​i​e​s​ ​t​o​ ​p​l​a​y​l​i​s​t​ ​a​d​d​r​e​s​s​e​s
+		 */
+		playlistOrderHelp: string
+		/**
+		 * S​h​u​f​f​l​e
+		 */
+		playlistOrderShuffle: string
+		/**
+		 * I​n​ ​o​r​d​e​r
+		 */
+		playlistOrderInOrder: string
 	}
 	benchmarkLevels: {
 		/**
@@ -1245,7 +1261,7 @@ type RootTranslation = {
 		 */
 		backgroundHttpOnly: RequiredParams<'scheme'>
 		/**
-		 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​,​ ​s​u​c​h​ ​a​s​ ​h​t​t​p​s​:​/​/​w​w​w​.​y​o​u​t​u​b​e​.​c​o​m​/​w​a​t​c​h​?​v​=​d​Q​w​4​w​9​W​g​X​c​Q​.
+		 * E​n​t​e​r​ ​a​ ​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​v​i​d​e​o​ ​o​r​ ​p​l​a​y​l​i​s​t​ ​a​d​d​r​e​s​s​.
 		 */
 		invalidYoutubeAddress: string
 		/**
@@ -1506,6 +1522,10 @@ type RootTranslation = {
 		 * I​n​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​p​l​a​y​b​a​c​k​ ​r​a​t​e​.
 		 */
 		invalidYoutubePlaybackRate: string
+		/**
+		 * I​n​v​a​l​i​d​ ​p​l​a​y​l​i​s​t​ ​o​r​d​e​r​.
+		 */
+		invalidPlaylistOrder: string
 		/**
 		 * I​n​v​a​l​i​d​ ​s​h​a​d​e​r​ ​s​e​t​t​i​n​g​.
 		 */
@@ -2676,7 +2696,7 @@ export type TranslationFunctions = {
 		 */
 		youtubeUrlPlaceholder: () => LocalizedString
 		/**
-		 * A YouTube address. The video plays muted
+		 * A YouTube address, a video or a playlist. It plays muted
 		 */
 		youtubeAddressHelp: () => LocalizedString
 		/**
@@ -2691,6 +2711,22 @@ export type TranslationFunctions = {
 		 * How fast the video plays
 		 */
 		playbackSpeedHelp: () => LocalizedString
+		/**
+		 * Playlist order
+		 */
+		playlistOrder: () => LocalizedString
+		/**
+		 * How the playlist picks a video when a new tab opens. Shuffle picks at random; in order plays each video in turn, then starts over. Applies to playlist addresses
+		 */
+		playlistOrderHelp: () => LocalizedString
+		/**
+		 * Shuffle
+		 */
+		playlistOrderShuffle: () => LocalizedString
+		/**
+		 * In order
+		 */
+		playlistOrderInOrder: () => LocalizedString
 	}
 	benchmarkLevels: {
 		/**
@@ -2774,7 +2810,7 @@ export type TranslationFunctions = {
 		 */
 		backgroundHttpOnly: (arg: { scheme: unknown }) => LocalizedString
 		/**
-		 * Enter a valid YouTube address, such as https://www.youtube.com/watch?v=dQw4w9WgXcQ.
+		 * Enter a valid YouTube video or playlist address.
 		 */
 		invalidYoutubeAddress: () => LocalizedString
 		/**
@@ -3033,6 +3069,10 @@ export type TranslationFunctions = {
 		 * Invalid YouTube playback rate.
 		 */
 		invalidYoutubePlaybackRate: () => LocalizedString
+		/**
+		 * Invalid playlist order.
+		 */
+		invalidPlaylistOrder: () => LocalizedString
 		/**
 		 * Invalid shader setting.
 		 */

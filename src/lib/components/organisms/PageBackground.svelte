@@ -77,6 +77,7 @@
     parallax={background.parallax ?? BACKGROUND_DEFAULTS.youtube.parallax}
     parallaxZoom={background.parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom}
     playbackRate={background.playbackRate ?? BACKGROUND_DEFAULTS.youtube.playbackRate}
+    playlistOrder={background.playlistOrder ?? BACKGROUND_DEFAULTS.youtube.playlistOrder}
     color={baseColor}
     {scrollProgress}
     {reducedMotion}

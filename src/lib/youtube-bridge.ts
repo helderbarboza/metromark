@@ -25,6 +25,11 @@
 //     if (event.source !== this.#frame.contentWindow) return;
 // Any window can postMessage to the page; only the frame we created can be .source.
 
+import type { PlaylistCursorStore } from '$lib/playlist-cursor'
+
+/** How a playlist picks its starting video when a page loads. */
+export type PlaylistOrder = 'shuffle' | 'sequential'
+
 export const YT_STATE = Object.freeze({
   UNSTARTED: -1,
   ENDED: 0,
@@ -147,7 +152,17 @@ export interface BridgeSnapshot {
 }
 
 export interface BridgeOptions {
-  videoId: string
+  /** The video to play. Required for a video embed; pass playlistId for a playlist embed instead. */
+  videoId?: string
+  /** The playlist to play. Mutually exclusive with videoId. */
+  playlistId?: string
+  /** How the playlist picks its starting video; defaults to 'shuffle'. */
+  playlistOrder?: PlaylistOrder
+  /**
+   * Persists the sequential cursor (which playlist video comes next) across
+   * mounts, keyed by playlist ID. Without it, sequential mode restarts at 0.
+   */
+  playlistCursor?: PlaylistCursorStore
   /** Embed host; -nocookie keeps YouTube cookies out. */
   host?: string
   /** 'native' = YouTube loops; 'js' = we rewind on ENDED; 'off' = stop at the end. */
@@ -201,7 +216,10 @@ interface PlayerResponse {
 export class YoutubeBackgroundBridge {
   #frame: BridgeFrame
   #opts: {
-    videoId: string
+    videoId: string | null
+    playlistId: string | null
+    playlistOrder: PlaylistOrder
+    playlistCursor: PlaylistCursorStore | null
     host: string
     targetOrigin: string
     readyTimeout: number
@@ -222,6 +240,9 @@ export class YoutubeBackgroundBridge {
   #info: Record<string, unknown> = {}
   #pings: ReturnType<typeof setTimeout>[] = []
   #deadline: ReturnType<typeof setTimeout> | null = null
+  /** Playlist bridges shuffle exactly once per mount; armed in #markReady. */
+  #shuffleTimer: ReturnType<typeof setTimeout> | null = null
+  #shufflePending = false
   #pending = new Map<string, [string, ...unknown[]]>()
   #resumeAt = 0
   #intent: 'playing' | 'paused' | null = null
@@ -229,12 +250,26 @@ export class YoutubeBackgroundBridge {
   #note = ''
   #error: string | null = null
 
+  /** How long after ready the shuffle falls back to a timer if no PLAYING state is reported. */
+  static readonly SHUFFLE_FALLBACK_MS = 1500
+
   constructor(frame: BridgeFrame, options: BridgeOptions) {
-    if (!/^[\w\-]{11}$/.test(options.videoId))
+    const videoId = options.videoId ?? null
+    const playlistId = options.playlistId ?? null
+    if (videoId === null && playlistId === null)
+      throw new Error('Pass either a videoId or a playlistId.')
+    if (videoId !== null && playlistId !== null)
+      throw new Error('Pass a videoId or a playlistId, not both.')
+    if (videoId !== null && !/^[\w\-]{11}$/.test(videoId))
       throw new Error('Invalid YouTube video ID.')
+    if (playlistId !== null && !/^[\w-]{6,64}$/.test(playlistId))
+      throw new Error('Invalid YouTube playlist ID.')
     this.#frame = frame
     this.#opts = {
-      videoId: options.videoId,
+      videoId,
+      playlistId,
+      playlistOrder: options.playlistOrder === 'sequential' ? 'sequential' : 'shuffle',
+      playlistCursor: options.playlistCursor ?? null,
       host: options.host ?? 'https://www.youtube-nocookie.com',
       targetOrigin: options.targetOrigin ?? '*',
       readyTimeout: options.readyTimeout ?? 4000,
@@ -266,6 +301,7 @@ export class YoutubeBackgroundBridge {
     this.#hsIndex = 0
     this.#note = ''
     this.#error = null
+    this.#shufflePending = false
     this.#target.addEventListener('message', this.#onMessageBound)
     this.#frame.addEventListener('load', this.#onLoadBound)
     this.#navigate()
@@ -414,7 +450,7 @@ export class YoutubeBackgroundBridge {
   /* ---------------------------- URL construction ---------------------------- */
 
   #buildSrc(handshake: (typeof HANDSHAKES)[number]): string {
-    const { videoId, host, loopMode, muted, volume, autoplay } = this.#opts
+    const { videoId, playlistId, host, loopMode, muted, volume, autoplay } = this.#opts
     const location = this.#pageOrigin()
     const params = clean({
       ...BASE_PARAMS,
@@ -424,7 +460,10 @@ export class YoutubeBackgroundBridge {
       // after a handshake retry or a loop-mode change without the API.
       start: this.#resumeAt > 1 ? String(Math.floor(this.#resumeAt)) : '',
       loop: loopMode === 'native' ? '1' : '',
-      playlist: loopMode === 'native' ? videoId : '',
+      // Single video: `loop=1` replays it when `playlist` repeats its ID.
+      // Playlist: `loop=1` plays the whole playlist and restarts it.
+      playlist: loopMode === 'native' && videoId !== null ? videoId : '',
+      list: playlistId ?? '',
       origin: handshake.origin ? (location.origin ?? '') : '',
       widget_referrer: handshake.referrer ? (location.href ?? '') : '',
     })
@@ -432,7 +471,9 @@ export class YoutubeBackgroundBridge {
     if (!muted)
       this.#pending.set('setVolume', ['setVolume', volume])
     const qs = new URLSearchParams(params).toString()
-    return `${host}/embed/${videoId}?${qs}`
+    // videoseries is the canonical playlist embed; it needs no video ID in the path.
+    const path = playlistId === null ? `/embed/${videoId}` : '/embed/videoseries'
+    return `${host}${path}?${qs}`
   }
 
   #navigate(): void {
@@ -483,8 +524,76 @@ export class YoutubeBackgroundBridge {
     // (unless the UI already queued one, which the replay above just posted).
     if (!replayedRate)
       this.#cmd('setPlaybackRate', this.#opts.playbackRate)
+    if (this.#opts.playlistId !== null) {
+      // Playlist embeds do not carry a shuffle parameter; the order exists
+      // only over the widget protocol. setLoop keeps the whole playlist
+      // cycling when loopMode is native; the URL already asks for it, this
+      // covers the handshake path too. setShuffle must wait until the
+      // playlist has actually started — see #armShuffle.
+      this.#cmd('setLoop', true)
+      if (this.#opts.autoplay) {
+        // Reduced motion: the player stays paused on its poster, and picking
+        // a video would start it — the cursor and the order are left alone.
+        this.#pickPlaylistStart()
+        if (this.#opts.playlistOrder === 'shuffle')
+          this.#armShuffle()
+      }
+    }
     this.#unloadCaptionModules()
     this.#emit()
+  }
+
+  /**
+   * Shuffle a playlist exactly once per mount. Reports from the field show
+   * setShuffle sent straight from onReady is ignored — the playlist is not
+   * loaded yet — while sending it on the first PLAYING state works. A timer
+   * covers widgets that never report the transition.
+   */
+  #armShuffle(): void {
+    this.#shufflePending = true
+    if (this.#shuffleTimer !== null)
+      clearTimeout(this.#shuffleTimer)
+    this.#shuffleTimer = setTimeout(() => this.#doShuffle(), YoutubeBackgroundBridge.SHUFFLE_FALLBACK_MS)
+  }
+
+  #doShuffle(): void {
+    if (this.#shuffleTimer !== null) {
+      clearTimeout(this.#shuffleTimer)
+      this.#shuffleTimer = null
+    }
+    if (!this.#shufflePending)
+      return
+    this.#shufflePending = false
+    this.#cmd('setShuffle', true)
+  }
+
+  /**
+   * Pick which video of the playlist a new tab plays. The widget delivers the
+   * full playlist in initialDelivery, so the length is known by the time the
+   * player is ready. playVideoAt is sent before any setShuffle, so the index
+   * refers to the original playlist order.
+   *
+   * Shuffle:    a random index on every mount.
+   * Sequential: the next index after the one stored in the persistent
+   *             cursor, wrapping at the end. Without a store the cursor reads
+   *             as 0 — the playlist starts from the top.
+   */
+  #pickPlaylistStart(): void {
+    const playlistId = this.#opts.playlistId
+    if (playlistId === null)
+      return
+    const info: unknown = this.#info.playlist
+    const ids = Array.isArray(info) ? info.filter((value): value is string => typeof value === 'string') : []
+    if (ids.length < 2)
+      return // nothing to pick between; the default order plays
+    if (this.#opts.playlistOrder === 'sequential') {
+      const stored = this.#opts.playlistCursor?.read(playlistId) ?? 0
+      const index = ((Math.trunc(stored) % ids.length) + ids.length) % ids.length
+      this.#cmd('playVideoAt', index)
+      this.#opts.playlistCursor?.write(playlistId, (index + 1) % ids.length)
+      return
+    }
+    this.#cmd('playVideoAt', Math.floor(Math.random() * ids.length))
   }
 
   /**
@@ -599,9 +708,15 @@ export class YoutubeBackgroundBridge {
     if (next === YT_STATE.PLAYING) {
       // The caption module loads lazily once playback starts; unload it again.
       this.#unloadCaptionModules()
+      // The playlist is live now: safe to shuffle (once per mount).
+      this.#doShuffle()
     }
     if (next === YT_STATE.ENDED && this.#opts.loopMode === 'js') {
       // Native loop is off, so we are the loop.
+      if (this.#opts.playlistId !== null) {
+        this.#navigate() // a reload restarts the playlist from the top
+        return
+      }
       if (this.#ready) {
         this.seekTo(0)
         this.play()
@@ -621,6 +736,10 @@ export class YoutubeBackgroundBridge {
     if (this.#deadline) {
       clearTimeout(this.#deadline)
       this.#deadline = null
+    }
+    if (this.#shuffleTimer !== null) {
+      clearTimeout(this.#shuffleTimer)
+      this.#shuffleTimer = null
     }
   }
 

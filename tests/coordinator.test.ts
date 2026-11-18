@@ -274,6 +274,14 @@ describe('durable Undo', () => {
     const { coordinator } = fixture()
     const updated = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', fit: 'contain' } } })
     expect(updated.snapshot.settings.background).toMatchObject({ type: 'youtube', fit: 'contain' })
+    const playlist = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: 'https://www.youtube.com/playlist?list=PLabc123XYZ_-0123456789abcdef' } } })
+    expect(playlist.snapshot.settings.background).toMatchObject({ type: 'youtube', url: 'https://www.youtube.com/playlist?list=PLabc123XYZ_-0123456789abcdef' })
+    const watchWithList = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLabc123XYZ_-0123456789abcdef' } } })
+    expect(watchWithList.snapshot.settings.background).toMatchObject({ type: 'youtube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLabc123XYZ_-0123456789abcdef' })
+    const ordered = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', playlistOrder: 'sequential' } } })
+    expect(ordered.snapshot.settings.background).toMatchObject({ type: 'youtube', playlistOrder: 'sequential' })
+    // eslint-disable-next-line ts/consistent-type-assertions
+    await expect(coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', playlistOrder: 'spiral' } } as never })).rejects.toThrow('Invalid playlist order')
     const full = await coordinator.execute({ type: 'settings.update', patch: { background: { type: 'youtube', url: '', fit: 'fill', opacity: 0.5, parallax: true, parallaxZoom: 2, playbackRate: 1.5, auto: false, color: '#123abc' } } })
     expect(full.snapshot.settings.background).toMatchObject({ type: 'youtube', fit: 'fill', opacity: 0.5, parallax: true, parallaxZoom: 2, playbackRate: 1.5, auto: false, color: '#123abc' })
     // The command layer rejects invalid enum members even though the type forbids them.

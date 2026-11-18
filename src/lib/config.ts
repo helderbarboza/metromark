@@ -50,6 +50,8 @@ const YoutubeBackgroundSchema = v.object({
   parallaxZoom: v.optional(v.number()),
   /** Playback speed; YouTube only honors 0.25, 0.5, 1, 1.5 and 2 */
   playbackRate: v.optional(v.picklist([0.25, 0.5, 1, 1.5, 2])),
+  /** How the playlist picks a video when a new tab opens; 'shuffle' picks at random, 'sequential' plays the next one in playlist order and wraps at the end */
+  playlistOrder: v.optional(v.picklist(['shuffle', 'sequential'])),
   /** Use the theme background instead of a custom base color */
   auto: v.optional(v.boolean()),
   /** Base color under the YouTube layer */
@@ -125,7 +127,7 @@ export const APPEARANCE_DEFAULTS = {
 export const BACKGROUND_DEFAULTS = {
   color: { type: 'color', auto: true, color: undefined },
   image: { type: 'image', url: '', auto: true, color: undefined, fit: 'cover', opacity: 1, parallax: false, parallaxZoom: 1.5 },
-  youtube: { type: 'youtube', url: '', fit: 'cover', opacity: 1, parallax: false, parallaxZoom: 1.5, playbackRate: 1, auto: true, color: undefined },
+  youtube: { type: 'youtube', url: '', fit: 'cover', opacity: 1, parallax: false, parallaxZoom: 1.5, playbackRate: 1, playlistOrder: 'shuffle', auto: true, color: undefined },
   shader: {
     // No shader runs by default: pick one in the background editor. This also
     // keeps a first benchmark run free of contention from a default background.
