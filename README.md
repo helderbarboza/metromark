@@ -69,7 +69,7 @@ Managed bookmarks and browser-owned containers are protected. Writable browser c
 
 ## Development
 
-Use **Node.js 24 or newer**.
+Use **Node.js 26 or newer**.
 
 ```sh
 npm ci

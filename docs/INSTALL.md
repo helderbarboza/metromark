@@ -46,6 +46,6 @@ Removing or disabling MetroMark restores the browser's normal new-tab behavior. 
 
 ## Source
 
-The bundle includes `metromark-source-0.3.0.zip`. Extract it, install Node.js 24+, and run `npm ci`. The source includes Svelte 5 runes, TypeScript, ESLint, Tailwind, Snapgrid and Storybook; Prettier is not used.
+The bundle includes `metromark-source-0.3.0.zip`. Extract it, install Node.js 26+, and run `npm ci`. The source includes Svelte 5 runes, TypeScript, ESLint, Tailwind, Snapgrid and Storybook; Prettier is not used.
 
 Further test runs were stopped on request. The source README records the checks completed earlier; no final complete verification run is claimed.

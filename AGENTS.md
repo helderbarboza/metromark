@@ -4,7 +4,7 @@ Scope: this repo and subdirectories. Make only requested changes. Do not run tes
 
 ## Project
 
-Chrome/Firefox MV3 extension that replaces the new tab with a MetroMark bookmark launcher/manager. Browser bookmarks are the source of truth. The web preview (`npm run dev`) uses isolated sample data, not real bookmarks. Node.js 24 or newer (`.nvmrc`, `engines.node`).
+Chrome/Firefox MV3 extension that replaces the new tab with a MetroMark bookmark launcher/manager. Browser bookmarks are the source of truth. The web preview (`npm run dev`) uses isolated sample data, not real bookmarks. Node.js 26 or newer (`.nvmrc`, `engines.node`).
 
 ## Stack
 
