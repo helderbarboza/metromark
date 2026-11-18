@@ -94,14 +94,6 @@ export function setThemeForMode(targetMode: ThemeMode, theme: ThemeChoice): void
     setTheme(theme)
 }
 
-export function setLightTheme(theme: LightTheme): void {
-  setThemeForMode('light', theme)
-}
-
-export function setDarkTheme(theme: DarkTheme): void {
-  setThemeForMode('dark', theme)
-}
-
 /** Apply the saved theme for the currently resolved mode (light or dark). */
 export function applyThemeForMode(resolvedMode: ThemeMode | undefined = mode.current): void {
   if (resolvedMode) {

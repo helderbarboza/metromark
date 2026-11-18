@@ -30,7 +30,7 @@ import type { PlaylistCursorStore } from '$lib/playlist-cursor'
 /** How a playlist picks its starting video when a page loads. */
 export type PlaylistOrder = 'shuffle' | 'sequential'
 
-export const YT_STATE = Object.freeze({
+const YT_STATE = Object.freeze({
   UNSTARTED: -1,
   ENDED: 0,
   PLAYING: 1,

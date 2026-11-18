@@ -6,14 +6,14 @@ import { getT } from '$lib/locale'
 // so it can be unit tested in node; canvas encoding happens in the settings UI.
 
 /** Upload size cap. Backed by IndexedDB, so this is a sanity bound, not a quota squeeze. */
-export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024
 /** Stored size cap for a legacy inline data URI, in characters (~2.6 MB decoded). Only for pre-existing inline uploads; new uploads use IndexedDB. */
 export const MAX_STORED_CHARACTERS = 3_500_000
 /** Longest edge an uploaded image keeps; larger images are downscaled before storing. */
-export const MAX_DIMENSION = 2560
+const MAX_DIMENSION = 2560
 
 /** IndexedDB media reference produced by the upload flow: `idb:<uuid>`. */
-export const MEDIA_KEY = /^idb:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const MEDIA_KEY = /^idb:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 const ALLOWED_UPLOAD_TYPES: readonly string[] = [
   'image/png',
@@ -35,7 +35,7 @@ export function isMediaKey(value: string): boolean {
   return MEDIA_KEY.test(value)
 }
 
-export function isHttpImageUrl(value: string): boolean {
+function isHttpImageUrl(value: string): boolean {
   try {
     const parsed = new URL(value)
     return parsed.protocol === 'http:' || parsed.protocol === 'https:'

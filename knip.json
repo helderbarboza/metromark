@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/entrypoints/background.ts",
+    "src/entrypoints/newtab/main.ts",
+    "public/init-mode.js",
+    "scripts/test-firefox.mjs",
+    "scripts/fetch-demo-favicons.mjs"
+  ],
+  "ignore": [
+    "src/i18n/i18n-*.ts",
+    "src/lib/components/ui/**"
+  ]
+}

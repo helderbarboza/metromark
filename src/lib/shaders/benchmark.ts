@@ -13,9 +13,9 @@
 import type { ShaderDefinition } from './types'
 import { createPipeline, getContext } from './pipeline'
 
-export const BENCHMARK_SIZE = { width: 480, height: 270 } as const
-export const WARMUP_FRAMES = 20
-export const MEASURE_FRAMES = 50
+const BENCHMARK_SIZE = { width: 480, height: 270 } as const
+const WARMUP_FRAMES = 20
+const MEASURE_FRAMES = 50
 
 /** How long to wait for image channels to decode before measuring. */
 const IMAGES_TIMEOUT_MS = 3000

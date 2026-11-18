@@ -2,8 +2,8 @@
   import type { IconName } from '$lib/icons'
   import type { ComponentProps } from 'svelte'
   import { getIcon } from '$lib/icons'
+  import { cn } from '$lib/utils.js'
   import Iconify from '@iconify/svelte/dist/OfflineIcon.svelte'
-  import { cn } from 'cn'
 
   interface Props extends Omit<ComponentProps<Iconify>, 'icon'> {
     name: IconName

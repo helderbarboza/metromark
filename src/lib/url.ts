@@ -28,13 +28,3 @@ export function safeUrl(url: string): string {
     return '#'
   }
 }
-
-export function isFaviconEligible(pageUrl: string): boolean {
-  try {
-    const parsed = new URL(pageUrl.trim())
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:'
-  }
-  catch {
-    return false
-  }
-}

@@ -44,7 +44,7 @@
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
   import { sizeOf } from '$lib/layout'
   import { safeUrl, validateUrl } from '$lib/url'
-  import { cn } from '$lib/utils'
+  import { cn } from '$lib/utils.js'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import { createGridItem } from '@snapgridjs/svelte'
 

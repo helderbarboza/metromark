@@ -75,7 +75,7 @@ const ImageBackgroundSchema = v.object({
 })
 
 /** User-facing settings schema with per-key defaults and docs */
-export const SettingsSchema = v.object({
+const SettingsSchema = v.object({
   /** Tile density: 'comfortable' (68px) or 'compact' (54px) */
   density: v.union([v.literal('comfortable'), v.literal('compact')]),
   /** Grid view: 'classic' (8 rows) or 'dock' (2 rows anchored to the bottom) */
@@ -99,7 +99,6 @@ export const SettingsSchema = v.object({
 
 export type Settings = v.InferOutput<typeof SettingsSchema>
 
-export type ColorBackgroundSettings = Extract<Settings['background'], { type: 'color' }>
 export type ShaderBackgroundSettings = Extract<Settings['background'], { type: 'shader' }>
 export type ImageBackgroundSettings = Extract<Settings['background'], { type: 'image' }>
 export type YoutubeBackgroundSettings = Extract<Settings['background'], { type: 'youtube' }>

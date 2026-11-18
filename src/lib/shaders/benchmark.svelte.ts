@@ -13,7 +13,7 @@ import { SvelteMap } from 'svelte/reactivity'
 import { benchmarkShader } from './benchmark'
 import { shaders } from './index'
 
-export type { BenchmarkLevel, ShaderBenchmarkResult } from './benchmark'
+export type { ShaderBenchmarkResult } from './benchmark'
 
 /** Registry order matches the picker grid. */
 const BENCHMARK_SHADERS = Object.values(shaders)

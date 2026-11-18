@@ -12,7 +12,7 @@
 
   } from '$lib/theme-picker'
   import { getTheme } from '$lib/themes.js'
-  import { cn } from '$lib/utils'
+  import { cn } from '$lib/utils.js'
 
   interface Props {
     themes: ThemeSelections

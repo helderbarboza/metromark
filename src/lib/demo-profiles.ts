@@ -26,7 +26,7 @@ function shader(shaderId: string): Settings['background'] {
   }
 }
 
-export const DEMO_PROFILE_IDS = ['gamer', 'traveler', 'home-cook'] as const
+const DEMO_PROFILE_IDS = ['gamer', 'traveler', 'home-cook'] as const
 export type DemoProfileId = (typeof DEMO_PROFILE_IDS)[number]
 
 export interface DemoProfile {

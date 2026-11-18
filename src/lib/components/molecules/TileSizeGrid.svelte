@@ -3,7 +3,7 @@
   import LL from '$i18n/i18n-svelte'
   import * as ContextMenu from '$lib/components/ui/context-menu'
   import { TILE_SIZES } from '$lib/layout'
-  import { cn } from '$lib/utils'
+  import { cn } from '$lib/utils.js'
 
   /**
    * TILE SIZE preset row shown inside the tile context menu. Kept as a menu

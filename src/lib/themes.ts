@@ -69,7 +69,3 @@ export const DEFAULT_DARK_THEME: DarkTheme = 'catppuccin-mocha'
 export function getTheme(name: ThemeName | string): (typeof THEMES)[number] | undefined {
   return THEMES.find(theme => theme.name === name)
 }
-
-export function themeBase00(name: ThemeName | string): string | undefined {
-  return getTheme(name)?.base00
-}

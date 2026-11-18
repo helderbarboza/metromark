@@ -1,8 +1,8 @@
 <script lang='ts'>
   import type { HTMLImgAttributes } from 'svelte/elements'
   import { icons } from '$lib/icons'
+  import { cn } from '$lib/utils.js'
   import OfflineIcon from '@iconify/svelte/dist/OfflineIcon.svelte'
-  import { cn } from 'tailwind-variants'
   // Tile icon: the browser's local favicon cache, resolved by the
   // `FaviconImage` container. By default it is converted to a Metro-tint
   // silhouette; with the "Original favicons" setting it keeps the site's

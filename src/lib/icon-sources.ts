@@ -142,7 +142,7 @@ export function buildChromeFaviconUrl(pageUrl: string, size = 64): string {
   return `chrome://favicon2/size/${clamped}@1x/${parsed.href}`
 }
 
-export const UPLOAD_ALLOWLIST = [
+const UPLOAD_ALLOWLIST = [
   'image/png',
   'image/jpeg',
   'image/webp',
@@ -150,7 +150,7 @@ export const UPLOAD_ALLOWLIST = [
   'image/vnd.microsoft.icon',
   'image/svg+xml',
 ]
-export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024
+const MAX_UPLOAD_BYTES = 2 * 1024 * 1024
 
 /** Structural file shape so this stays DOM-free and unit testable. */
 export function validateUploadFile(file: { type: string, size: number }): void {

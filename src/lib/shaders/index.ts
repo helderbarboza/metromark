@@ -6,7 +6,7 @@ import { monterey } from './monterey'
 import { prismFlow } from './prism-flow'
 import { swissAlps } from './swiss_alps'
 
-export type { PassChannel, ShaderDefinition, ShaderPass, TextureSource } from './types'
+export type { ShaderDefinition } from './types'
 export const shaders = {
   clouds,
   flow,
@@ -15,7 +15,7 @@ export const shaders = {
   'prism-flow': prismFlow,
   'swiss-alps': swissAlps,
 } as const satisfies Record<string, ShaderDefinition>
-export type ShaderId = keyof typeof shaders
+
 const list: readonly ShaderDefinition[] = Object.values(shaders)
 /**
  * Lookup by each definition's own `id`, not by the property name above. The two

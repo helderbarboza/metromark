@@ -30,7 +30,7 @@ export function cellsToPx(n: number, cell: number, gap = GAP): number {
 
 export const TILE_SIZES: readonly TileSize[] = ['small', 'medium', 'wide', 'large']
 
-export function tileSizesForRows(rows: number): TileSize[] {
+function tileSizesForRows(rows: number): TileSize[] {
   return TILE_SIZES.filter(size => SIZES[size][1] <= rows)
 }
 
@@ -52,7 +52,7 @@ export interface GridViewDef {
   readonly layoutsKey: 'layouts' | 'dockLayouts'
 }
 
-export const GRID_VIEWS = {
+const GRID_VIEWS = {
   classic: { id: 'classic', rows: ROWS, anchor: 'center', layoutsKey: 'layouts' },
   dock: { id: 'dock', rows: DOCK_ROWS, anchor: 'end', inset: 32, layoutsKey: 'dockLayouts' },
 } as const satisfies Record<string, GridViewDef>
@@ -60,7 +60,7 @@ export const GRID_VIEWS = {
 export type GridView = keyof typeof GRID_VIEWS
 
 /** The Classic view, matching SETTINGS_DEFAULTS.gridView. */
-export const DEFAULT_GRID_VIEW: GridView = SETTINGS_DEFAULTS.gridView
+const DEFAULT_GRID_VIEW: GridView = SETTINGS_DEFAULTS.gridView
 
 /** Whether a value is one of the known grid view ids. */
 export function isGridView(value: unknown): value is GridView {

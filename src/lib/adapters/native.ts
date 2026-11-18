@@ -4,7 +4,7 @@ import { validateUrl } from '$lib/url.js'
 import { browser } from 'wxt/browser'
 
 export const MESSAGE_SCOPE = 'metromark/v1'
-export const STORAGE_KEY = 'metromark.presentation.v1'
+const STORAGE_KEY = 'metromark.presentation.v1'
 export function nativeBookmarks(): BookmarkPort {
   return {
     async getTree() { return normalizeTree(await browser.bookmarks.getTree()) },

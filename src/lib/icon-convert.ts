@@ -21,7 +21,7 @@ export type IconImageSource
     | HTMLCanvasElement
     | ImageBitmap
 
-export type IconOutputKind = 'canvas' | 'dataURL' | 'blob'
+type IconOutputKind = 'canvas' | 'dataURL' | 'blob'
 
 export interface ProcessIconOptions {
   /** 0xAARRGGBB tint color. */
@@ -42,7 +42,7 @@ export interface ProcessIconOptions {
   output?: IconOutputKind
 }
 
-export type DrawableImage
+type DrawableImage
   = | HTMLImageElement
     | HTMLCanvasElement
     | ImageBitmap
@@ -182,9 +182,9 @@ function getDrawableSize(drawable: DrawableImage): { width: number, height: numb
 }
 
 // ---------------------------------------------------------------------------
-// renderType3LuminanceSilhouette — public entry point
+// renderType3LuminanceSilhouette — internal entry point for the type-3 pipeline
 // ---------------------------------------------------------------------------
-export function renderType3LuminanceSilhouette(
+function renderType3LuminanceSilhouette(
   src: HTMLCanvasElement,
   tintArgb: number,
   bgArgb: number,
@@ -213,7 +213,7 @@ export function renderType3LuminanceSilhouette(
 //   Reads from the source canvas but only writes to a new canvas, so the
 //   input is never mutated. Output preserves the source dimensions.
 // ---------------------------------------------------------------------------
-export function renderLuminanceSilhouette(
+function renderLuminanceSilhouette(
   srcCanvas: HTMLCanvasElement,
   tintArgb: number,
   preserveTransparency = false,
@@ -288,7 +288,7 @@ export function renderLuminanceSilhouette(
   return out
 }
 
-export function clipCanvasToIconShape(
+function clipCanvasToIconShape(
   canvas: HTMLCanvasElement,
   iconShapeId: IconShape,
 ): HTMLCanvasElement {
@@ -313,7 +313,7 @@ export function clipCanvasToIconShape(
 //   bg-colored) glyph silhouette into the center, finally clips to shape.
 //   Output preserves the source dimensions.
 // ---------------------------------------------------------------------------
-export function invertToFilledTile(
+function invertToFilledTile(
   silhouetteCanvas: HTMLCanvasElement,
   tintArgb: number,
   bgArgb: number,
@@ -456,7 +456,7 @@ export function colorToCss(argbInt: number): string {
 //   scaling the result alpha by both the mask color's alpha and the
 //   source pixel's own alpha (matches SRC_IN semantics).
 // ---------------------------------------------------------------------------
-export function applyColorSrcIn(
+function applyColorSrcIn(
   canvas: HTMLCanvasElement,
   colorArgb: number,
 ): HTMLCanvasElement {

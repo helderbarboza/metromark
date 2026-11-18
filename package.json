@@ -27,7 +27,8 @@
     "postinstall": "wxt prepare",
     "generate:themes": "node scripts/generate-themes.mjs",
     "i18n": "typesafe-i18n --no-watch",
-    "i18n:watch": "typesafe-i18n"
+    "i18n:watch": "typesafe-i18n",
+    "knip": "knip"
   },
   "dependencies": {
     "@dnd-kit/dom": "0.4.0",
@@ -67,6 +68,7 @@
     "eslint-plugin-svelte": "3.23.1",
     "fflate": "0.8.3",
     "geckodriver": "8.0.0",
+    "knip": "^6.45.1",
     "playwright": "^1.56.0",
     "selenium-webdriver": "4.51.0",
     "shadcn-svelte": "^1.7.2",

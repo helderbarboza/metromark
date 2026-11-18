@@ -25,7 +25,7 @@
   import { focusFirstMenuItem } from '$lib/menu-focus'
   import { setTileGrid } from '$lib/tile-grid-context'
   import { safeUrl, validateUrl } from '$lib/url'
-  import { cn } from '$lib/utils'
+  import { cn } from '$lib/utils.js'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import {
     createGridContainer,

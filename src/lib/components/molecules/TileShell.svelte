@@ -12,11 +12,11 @@
   import { TILE_SIZES } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
   import { safeUrl } from '$lib/url'
+  import { cn } from '$lib/utils.js'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import { mode, theme } from 'mode-watcher'
   import { quadOut } from 'svelte/easing'
   import { scale } from 'svelte/transition'
-  import { cn } from 'tailwind-variants'
 
   /** Subset of the tile view the shell needs: label text and accent colors. */
   interface ShellTile {

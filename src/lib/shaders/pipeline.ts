@@ -348,7 +348,7 @@ export interface PipelineOptions {
   mouseState: { enabled: boolean }
 }
 
-export interface ShaderPipelinePointer {
+interface ShaderPipelinePointer {
   /** Recompute the pointer position in framebuffer pixels from a pointer event. */
   update: (event: PointerEvent) => void
   /** Update position and track button state / press origin. */

@@ -10,7 +10,7 @@
   import { FOLDER_COLUMNS, FOLDER_PREVIEW, FOLDER_ROWS } from '$lib/folder-preview'
   import { resolveTileColors } from '$lib/theme-colors'
   import { mode, theme } from 'mode-watcher'
-  import { cn } from 'tailwind-variants'
+  import { cn } from '$lib/utils.js'
 
   interface Props extends CommonTileProps {
     tile: FolderTileView

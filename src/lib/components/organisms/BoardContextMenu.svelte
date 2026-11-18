@@ -15,7 +15,7 @@
   import { focusFirstMenuItem } from '$lib/menu-focus'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { ScrollArea as ScrollAreaPrimitive } from 'bits-ui'
-  import { cn } from 'cn'
+  import { cn } from '$lib/utils.js'
   import { tick } from 'svelte'
   import { MediaQuery } from 'svelte/reactivity'
 

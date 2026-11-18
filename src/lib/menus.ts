@@ -110,7 +110,7 @@ export function buildBoardMenuItems(input: BoardMenuInput): MenuItem[] {
 }
 
 /** Folder tiles are never deleted; they resize, recolor, move, and rename. */
-export function buildFolderTileMenuItems(tile: FolderTileView | undefined, callbacks: MenuCallbacks): MenuItem[] {
+function buildFolderTileMenuItems(tile: FolderTileView | undefined, callbacks: MenuCallbacks): MenuItem[] {
   if (!tile)
     return []
   return [

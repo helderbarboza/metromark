@@ -9,7 +9,7 @@
   import { tileVariants } from '$lib/components/tile-variants'
   import { GAP } from '$lib/layout'
   import { getTileGrid as getTileGridContext, hasTileGrid } from '$lib/tile-grid-context'
-  import { cn } from 'tailwind-variants'
+  import { cn } from '$lib/utils.js'
 
   interface Props extends CommonTileProps {
     tile: BookmarkTileDef

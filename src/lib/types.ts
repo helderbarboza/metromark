@@ -1,10 +1,10 @@
 import type { Settings } from '$lib/config'
 import type { Layout, LayoutItem } from '@snapgridjs/core'
 
-export type { Compactor, Layout, LayoutItem } from '@snapgridjs/core'
+export type { Layout, LayoutItem } from '@snapgridjs/core'
 
 export type TileSize = 'small' | 'medium' | 'wide' | 'large'
-export type TileKind = 'bookmark' | 'folder'
+type TileKind = 'bookmark' | 'folder'
 export interface BookmarkTileDef {
   title: string
   colorIndex: number

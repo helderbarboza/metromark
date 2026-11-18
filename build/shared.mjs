@@ -2,10 +2,10 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 /** Absolute path of `src/lib`, shared by every build that aliases `$lib`. */
-export const libDir = fileURLToPath(new URL('../src/lib', import.meta.url))
+const libDir = fileURLToPath(new URL('../src/lib', import.meta.url))
 
 /** Absolute path of `src/i18n`, shared by every build that aliases `$i18n`. */
-export const i18nDir = fileURLToPath(new URL('../src/i18n', import.meta.url))
+const i18nDir = fileURLToPath(new URL('../src/i18n', import.meta.url))
 
 /** `resolve.alias` entries shared by vite, vitest and the wxt extension build. */
 export const libAlias = { $lib: libDir, $i18n: i18nDir }

@@ -4,7 +4,7 @@
   import Icon from '$lib/components/atoms/Icon.svelte'
   import { Button } from '$lib/components/ui/button'
   import * as Tooltip from '$lib/components/ui/tooltip'
-  import { cn } from '$lib/utils'
+  import { cn } from '$lib/utils.js'
   import { Tooltip as TooltipPrimitive } from 'bits-ui'
 
   interface Props {

@@ -11,21 +11,7 @@ export function flatten(tree: BookmarkNode[]): BookmarkNode[] {
 export function indexTree(tree: BookmarkNode[]): Map<string, BookmarkNode> {
   return new Map(flatten(tree).map(node => [node.id, node]))
 }
-export function pathFor(id: string, nodes: Map<string, BookmarkNode>): string[] {
-  const path: string[] = []
-  const seen = new Set<string>()
-  let node = nodes.get(id)
-  while (node && node.parentId != null && !seen.has(node.id)) {
-    seen.add(node.id)
-    path.unshift(node.title || 'Untitled folder')
-    node = nodes.get(node.parentId)
-  }
-  return path
-}
-export function formatGroupPath(path: string[]): string {
-  return path.length > 1 ? `${path.slice(0, -1).join(' / ')} /` : 'BROWSER ROOT'
-}
-export function isManaged(node: BookmarkNode, nodes: Map<string, BookmarkNode>): boolean {
+function isManaged(node: BookmarkNode, nodes: Map<string, BookmarkNode>): boolean {
   const seen = new Set<string>()
   let cursor: BookmarkNode | undefined = node
   while (cursor && !seen.has(cursor.id)) {
@@ -36,7 +22,7 @@ export function isManaged(node: BookmarkNode, nodes: Map<string, BookmarkNode>):
   }
   return false
 }
-export function isContainer(node: BookmarkNode, tree: BookmarkNode[]): boolean {
+function isContainer(node: BookmarkNode, tree: BookmarkNode[]): boolean {
   return Boolean(node.folderType) || tree.some(root => root.id === node.parentId)
 }
 export function canModify(node: BookmarkNode, tree: BookmarkNode[]): boolean {

@@ -8,7 +8,7 @@ export const APP_LOCALES = ['en', 'de', 'fr', 'es', 'pt'] as const satisfies rea
 export type AppLocale = Locales
 /** The `language` setting: an explicit locale, or `auto` to infer from the environment. */
 export type LanguageSetting = 'auto' | AppLocale
-export const LANGUAGE_SETTING_VALUES: readonly string[] = ['auto', ...APP_LOCALES]
+const LANGUAGE_SETTING_VALUES: readonly string[] = ['auto', ...APP_LOCALES]
 
 export const LANGUAGE_NATIVE_NAMES: Record<AppLocale, string> = {
   en: 'English',
@@ -82,11 +82,6 @@ export function provisionalLanguageSetting(): LanguageSetting {
 }
 
 let activeLocale: AppLocale | null = null
-
-/** The locale currently applied to the app (or the background worker). */
-export function getActiveLocale(): AppLocale {
-  return activeLocale ?? 'en'
-}
 
 interface ApplyOptions {
   /** Persist the setting for pre-snapshot rendering; defaults to true. */

@@ -11,7 +11,7 @@ export const CACHE_VERSION = 1
 export const MAX_ENTRIES = 500
 
 /** How long a fingerprint check stays valid. Favicons are re-verified afterwards. */
-export const RECHECK_MS = 24 * 60 * 60 * 1000
+const RECHECK_MS = 24 * 60 * 60 * 1000
 
 /** One stored glyph. `created` drives LRU eviction; `lastChecked` drives revalidation. */
 export interface GlyphRecord {
