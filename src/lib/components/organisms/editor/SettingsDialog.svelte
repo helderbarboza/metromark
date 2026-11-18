@@ -116,278 +116,280 @@
     {/each}
   </Tabs.List>
 
-  <Tabs.Content value='appearance' class='mt-4 grid animate-rise-enter gap-1'>
-    <SettingsCard
-      icon='darkTheme'
-      title={$LL.settings.mode()}
-      helpText={$LL.settings.modeHelp()}
-      controlId='app-mode'
-    >
-      <ToggleGroup.Root
-        type='single'
-        value={userPrefersMode.current}
-        onValueChange={(v) => {
-          // bits-ui passes a bare string; mode-watcher only accepts known modes.
-          if (v === 'light' || v === 'dark' || v === 'system')
-            setMode(v)
-        }}
-        id='app-mode'
-        aria-labelledby='app-mode-title'
-        aria-describedby='app-mode-help'
+  <div class='contents *:mt-4 *:grid *:animate-rise-enter *:gap-1'>
+    <Tabs.Content value='appearance'>
+      <SettingsCard
+        icon='darkTheme'
+        title={$LL.settings.mode()}
+        helpText={$LL.settings.modeHelp()}
+        controlId='app-mode'
       >
-        {#each modes as mode (mode)}
-          <ToggleGroup.Item
-            value={mode}
-            class={mode === 'system' ? 'grow' : 'grow capitalize'}
+        <ToggleGroup.Root
+          type='single'
+          value={userPrefersMode.current}
+          onValueChange={(v) => {
+            // bits-ui passes a bare string; mode-watcher only accepts known modes.
+            if (v === 'light' || v === 'dark' || v === 'system')
+              setMode(v)
+          }}
+          id='app-mode'
+          aria-labelledby='app-mode-title'
+          aria-describedby='app-mode-help'
+        >
+          {#each modes as mode (mode)}
+            <ToggleGroup.Item
+              value={mode}
+              class={mode === 'system' ? 'grow' : 'grow capitalize'}
+            >
+              {mode === 'system'
+                ? $LL.settings.systemMode({ mode: systemsCaption })
+                : $LL.settings[mode]()}
+            </ToggleGroup.Item>
+          {/each}
+        </ToggleGroup.Root>
+      </SettingsCard>
+
+      <SettingsCard
+        icon='translate'
+        title={$LL.settings.language()}
+        helpText={$LL.settings.languageHelp()}
+        controlId='language'
+      >
+        <Select.Root
+          type='single'
+          value={settings.language}
+          disabled={command.busy}
+          onValueChange={(v) => {
+            if (v === 'auto' || v === 'en' || v === 'de' || v === 'fr' || v === 'es' || v === 'pt') {
+              const language: LanguageSetting = v
+              setting({ language })
+            }
+          }}
+        >
+          <Select.Trigger
+            id='language'
+            class='w-44'
+            aria-labelledby='language-title'
+            aria-describedby='language-help'
           >
-            {mode === 'system'
-              ? $LL.settings.systemMode({ mode: systemsCaption })
-              : $LL.settings[mode]()}
-          </ToggleGroup.Item>
-        {/each}
-      </ToggleGroup.Root>
-    </SettingsCard>
+            {languageLabel}
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Group>
+              <Select.Item value='auto'>
+                {$LL.settings.systemLanguage({ language: detectedLanguage })}
+              </Select.Item>
+              {#each APP_LOCALES as lang (lang)}
+                <Select.Item value={lang}>{LANGUAGE_NATIVE_NAMES[lang]}</Select.Item>
+              {/each}
+            </Select.Group>
+          </Select.Content>
+        </Select.Root>
+      </SettingsCard>
 
-    <SettingsCard
-      icon='translate'
-      title={$LL.settings.language()}
-      helpText={$LL.settings.languageHelp()}
-      controlId='language'
-    >
-      <Select.Root
-        type='single'
-        value={settings.language}
-        disabled={command.busy}
-        onValueChange={(v) => {
-          if (v === 'auto' || v === 'en' || v === 'de' || v === 'fr' || v === 'es' || v === 'pt') {
-            const language: LanguageSetting = v
-            setting({ language })
-          }
-        }}
+      <CollapsibleSection
+        icon='color'
+        title={$LL.settings.themes()}
+        helpText={$LL.settings.themesHelp()}
       >
-        <Select.Trigger
-          id='language'
-          class='w-44'
-          aria-labelledby='language-title'
-          aria-describedby='language-help'
-        >
-          {languageLabel}
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Group>
-            <Select.Item value='auto'>
-              {$LL.settings.systemLanguage({ language: detectedLanguage })}
-            </Select.Item>
-            {#each APP_LOCALES as lang (lang)}
-              <Select.Item value={lang}>{LANGUAGE_NATIVE_NAMES[lang]}</Select.Item>
-            {/each}
-          </Select.Group>
-        </Select.Content>
-      </Select.Root>
-    </SettingsCard>
-
-    <CollapsibleSection
-      icon='color'
-      title={$LL.settings.themes()}
-      helpText={$LL.settings.themesHelp()}
-    >
-      {#snippet control()}
-        <div class='inline-flex items-center gap-2 text-sm'>
-          <span>{getTheme(themes.light)?.label ?? themes.light}</span>
-          <span aria-hidden='true' class='text-(--muted-foreground)'>·</span>
-          <span>{getTheme(themes.dark)?.label ?? themes.dark}</span>
+        {#snippet control()}
+          <div class='inline-flex items-center gap-2 text-sm'>
+            <span>{getTheme(themes.light)?.label ?? themes.light}</span>
+            <span aria-hidden='true' class='text-(--muted-foreground)'>·</span>
+            <span>{getTheme(themes.dark)?.label ?? themes.dark}</span>
+          </div>
+        {/snippet}
+        <div class='p-4'>
+          <ThemeGallery bind:themes />
         </div>
-      {/snippet}
-      <div class='p-4'>
-        <ThemeGallery bind:themes />
-      </div>
-    </CollapsibleSection>
-  </Tabs.Content>
+      </CollapsibleSection>
+    </Tabs.Content>
 
-  <Tabs.Content value='tiles' class='mt-4 grid animate-rise-enter gap-1'>
-    <SettingsCard
-      icon='layoutCellFour'
-      title={$LL.settings.gridView()}
-      helpText={$LL.settings.gridViewHelp()}
-      controlId='grid-view'
-    >
-      <ToggleGroup.Root
-        type='single'
-        id='grid-view'
-        aria-labelledby='grid-view-title'
-        aria-describedby='grid-view-help'
-        value={settings.gridView}
-        disabled={command.busy}
-        onValueChange={(v) => {
-          if (!isGridView(v))
-            return
-          setting({ gridView: v })
-        }}
+    <Tabs.Content value='tiles'>
+      <SettingsCard
+        icon='layoutCellFour'
+        title={$LL.settings.gridView()}
+        helpText={$LL.settings.gridViewHelp()}
+        controlId='grid-view'
       >
-        {#each gridViews as view (view)}
-          <ToggleGroup.Item value={view} class='grow'>
-            {gridViewLabels[view]()}
-          </ToggleGroup.Item>
-        {/each}
-      </ToggleGroup.Root>
-    </SettingsCard>
-    <SettingsCard
-      icon='density'
-      title={$LL.settings.tileDensity()}
-      helpText={$LL.settings.tileDensityHelp()}
-      controlId='tile-density'
-    >
-      <ToggleGroup.Root
-        type='single'
-        id='tile-density'
-        aria-labelledby='tile-density-title'
-        aria-describedby='tile-density-help'
-        value={settings.density}
-        disabled={command.busy}
-        onValueChange={(v) => {
-          if (v !== 'comfortable' && v !== 'compact')
-            return
-          setting({ density: v })
-        }}
+        <ToggleGroup.Root
+          type='single'
+          id='grid-view'
+          aria-labelledby='grid-view-title'
+          aria-describedby='grid-view-help'
+          value={settings.gridView}
+          disabled={command.busy}
+          onValueChange={(v) => {
+            if (!isGridView(v))
+              return
+            setting({ gridView: v })
+          }}
+        >
+          {#each gridViews as view (view)}
+            <ToggleGroup.Item value={view} class='grow'>
+              {gridViewLabels[view]()}
+            </ToggleGroup.Item>
+          {/each}
+        </ToggleGroup.Root>
+      </SettingsCard>
+      <SettingsCard
+        icon='density'
+        title={$LL.settings.tileDensity()}
+        helpText={$LL.settings.tileDensityHelp()}
+        controlId='tile-density'
       >
-        {#each densities as density (density)}
-          <ToggleGroup.Item value={density} class='grow'>
-            {density === 'comfortable' ? $LL.settings.comfortable() : $LL.settings.compact()}
-          </ToggleGroup.Item>
-        {/each}
-      </ToggleGroup.Root>
-    </SettingsCard>
-    <SettingsCard
-      icon='link'
-      title={$LL.settings.showAddresses()}
-      helpText={$LL.settings.showAddressesHelp()}
-      controlId='show-domains'
-    >
-      <input
-        id='show-domains'
-        type='checkbox'
-        role='switch'
-        aria-describedby='show-domains-help'
-        checked={settings.showDomains}
-        disabled={command.busy}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
-        onchange={event => setting({ showDomains: event.currentTarget.checked })}
-      />
-    </SettingsCard>
-    <SettingsCard
-      icon='imageGlobe'
-      title={$LL.settings.originalFavicons()}
-      helpText={$LL.settings.originalFaviconsHelp()}
-      controlId='original-favicons'
-    >
-      <input
-        id='original-favicons'
-        type='checkbox'
-        role='switch'
-        aria-describedby='original-favicons-help'
-        checked={settings.originalFavicons}
-        disabled={command.busy}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
-        onchange={event => setting({ originalFavicons: event.currentTarget.checked })}
-      />
-    </SettingsCard>
-    <SettingsCard
-      icon='pause'
-      title={$LL.settings.reduceMotion()}
-      helpText={$LL.settings.reduceMotionHelp()}
-      controlId='reduce-motion'
-    >
-      <input
-        id='reduce-motion'
-        type='checkbox'
-        role='switch'
-        aria-describedby='reduce-motion-help'
-        checked={settings.reducedMotion}
-        disabled={command.busy}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
-        onchange={event => setting({ reducedMotion: event.currentTarget.checked })}
-      />
-    </SettingsCard>
-    <SettingsCard
-      icon='arrowReset'
-      title={$LL.settings.resetLayouts()}
-      helpText={layoutsHelp}
-      controlId='reset-layouts'
-    >
-      {#if confirmReset}
-        <Button onclick={() => (confirmReset = false)}>{$LL.dialogs.cancel()}</Button>
-        <Button
-          variant='default'
+        <ToggleGroup.Root
+          type='single'
+          id='tile-density'
+          aria-labelledby='tile-density-title'
+          aria-describedby='tile-density-help'
+          value={settings.density}
           disabled={command.busy}
-          aria-describedby='reset-layouts-help'
-          onclick={() => send({ type: 'layout.reset' })}
+          onValueChange={(v) => {
+            if (v !== 'comfortable' && v !== 'compact')
+              return
+            setting({ density: v })
+          }}
         >
-          {$LL.settings.resetWithUndo()}
-        </Button>
-      {:else}
-        <Button id='reset-layouts' onclick={() => (confirmReset = true)}>
-          {$LL.settings.resetLayouts()}
-        </Button>
-      {/if}
-    </SettingsCard>
-  </Tabs.Content>
-  <Tabs.Content value='background' class='mt-4 grid animate-rise-enter gap-1'>
-    <BackgroundSettings />
-  </Tabs.Content>
-  <Tabs.Content value='advanced' class='mt-4 grid animate-rise-enter gap-1'>
-    <SettingsCard
-      icon='buildingFactory'
-      title={$LL.settings.factoryReset()}
-      helpText={factoryHelp}
-      controlId='factory-reset'
-    >
-      {#if confirmFactory}
-        <Button disabled={command.busy} onclick={() => (confirmFactory = false)}>
-          {$LL.dialogs.cancel()}
-        </Button>
-        <Button
-          variant='destructive'
+          {#each densities as density (density)}
+            <ToggleGroup.Item value={density} class='grow'>
+              {density === 'comfortable' ? $LL.settings.comfortable() : $LL.settings.compact()}
+            </ToggleGroup.Item>
+          {/each}
+        </ToggleGroup.Root>
+      </SettingsCard>
+      <SettingsCard
+        icon='link'
+        title={$LL.settings.showAddresses()}
+        helpText={$LL.settings.showAddressesHelp()}
+        controlId='show-domains'
+      >
+        <input
+          id='show-domains'
+          type='checkbox'
+          role='switch'
+          aria-describedby='show-domains-help'
+          checked={settings.showDomains}
           disabled={command.busy}
-          aria-describedby='factory-reset-help'
-          onclick={() => send({ type: 'factory.reset' })}
-        >
-          {$LL.settings.resetMetroMark()}
-        </Button>
-      {:else}
-        <Button
-          id='factory-reset'
+          class='
+            h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full
+            bg-(--border) p-0.75
+            before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+            before:transition-transform before:duration-130
+            checked:bg-(--primary)
+            checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+            disabled:cursor-not-allowed disabled:opacity-50
+          '
+          onchange={event => setting({ showDomains: event.currentTarget.checked })}
+        />
+      </SettingsCard>
+      <SettingsCard
+        icon='imageGlobe'
+        title={$LL.settings.originalFavicons()}
+        helpText={$LL.settings.originalFaviconsHelp()}
+        controlId='original-favicons'
+      >
+        <input
+          id='original-favicons'
+          type='checkbox'
+          role='switch'
+          aria-describedby='original-favicons-help'
+          checked={settings.originalFavicons}
           disabled={command.busy}
-          onclick={() => (confirmFactory = true)}
-        >
-          {$LL.settings.factoryReset()}
-        </Button>
-      {/if}
-    </SettingsCard>
-  </Tabs.Content>
+          class='
+            h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full
+            bg-(--border) p-0.75
+            before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+            before:transition-transform before:duration-130
+            checked:bg-(--primary)
+            checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+            disabled:cursor-not-allowed disabled:opacity-50
+          '
+          onchange={event => setting({ originalFavicons: event.currentTarget.checked })}
+        />
+      </SettingsCard>
+      <SettingsCard
+        icon='pause'
+        title={$LL.settings.reduceMotion()}
+        helpText={$LL.settings.reduceMotionHelp()}
+        controlId='reduce-motion'
+      >
+        <input
+          id='reduce-motion'
+          type='checkbox'
+          role='switch'
+          aria-describedby='reduce-motion-help'
+          checked={settings.reducedMotion}
+          disabled={command.busy}
+          class='
+            h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full
+            bg-(--border) p-0.75
+            before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+            before:transition-transform before:duration-130
+            checked:bg-(--primary)
+            checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+            disabled:cursor-not-allowed disabled:opacity-50
+          '
+          onchange={event => setting({ reducedMotion: event.currentTarget.checked })}
+        />
+      </SettingsCard>
+      <SettingsCard
+        icon='arrowReset'
+        title={$LL.settings.resetLayouts()}
+        helpText={layoutsHelp}
+        controlId='reset-layouts'
+      >
+        {#if confirmReset}
+          <Button onclick={() => (confirmReset = false)}>{$LL.dialogs.cancel()}</Button>
+          <Button
+            variant='default'
+            disabled={command.busy}
+            aria-describedby='reset-layouts-help'
+            onclick={() => send({ type: 'layout.reset' })}
+          >
+            {$LL.settings.resetWithUndo()}
+          </Button>
+        {:else}
+          <Button id='reset-layouts' onclick={() => (confirmReset = true)}>
+            {$LL.settings.resetLayouts()}
+          </Button>
+        {/if}
+      </SettingsCard>
+    </Tabs.Content>
+    <Tabs.Content value='background'>
+      <BackgroundSettings />
+    </Tabs.Content>
+    <Tabs.Content value='advanced'>
+      <SettingsCard
+        icon='buildingFactory'
+        title={$LL.settings.factoryReset()}
+        helpText={factoryHelp}
+        controlId='factory-reset'
+      >
+        {#if confirmFactory}
+          <Button disabled={command.busy} onclick={() => (confirmFactory = false)}>
+            {$LL.dialogs.cancel()}
+          </Button>
+          <Button
+            variant='destructive'
+            disabled={command.busy}
+            aria-describedby='factory-reset-help'
+            onclick={() => send({ type: 'factory.reset' })}
+          >
+            {$LL.settings.resetMetroMark()}
+          </Button>
+        {:else}
+          <Button
+            id='factory-reset'
+            disabled={command.busy}
+            onclick={() => (confirmFactory = true)}
+          >
+            {$LL.settings.factoryReset()}
+          </Button>
+        {/if}
+      </SettingsCard>
+    </Tabs.Content>
+  </div>
 </Tabs.Root>
 
 <DialogError error={command.error} />
