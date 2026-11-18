@@ -13,9 +13,9 @@
   import { Scrollbar } from '$lib/components/ui/scroll-area'
   import { gridViewDef, tileSizesForView } from '$lib/layout'
   import { focusFirstMenuItem } from '$lib/menu-focus'
+  import { cn } from '$lib/utils.js'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { ScrollArea as ScrollAreaPrimitive } from 'bits-ui'
-  import { cn } from '$lib/utils.js'
   import { tick } from 'svelte'
   import { MediaQuery } from 'svelte/reactivity'
 

@@ -9,8 +9,8 @@
   import { APPEARANCE_DEFAULTS } from '$lib/config'
   import { FOLDER_COLUMNS, FOLDER_PREVIEW, FOLDER_ROWS } from '$lib/folder-preview'
   import { resolveTileColors } from '$lib/theme-colors'
-  import { mode, theme } from 'mode-watcher'
   import { cn } from '$lib/utils.js'
+  import { mode, theme } from 'mode-watcher'
 
   interface Props extends CommonTileProps {
     tile: FolderTileView
