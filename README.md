@@ -4,7 +4,7 @@ A Metro-inspired new-tab launcher and bookmark manager for Chrome and Firefox. B
 
 ## Deliverables
 
-Download the current artifacts from [GitHub Releases](https://github.com/helderbarboza/metromark/releases), or from the **Artifacts** of the latest successful run of the release workflow. The bundles are built by CI (`.github/workflows/release.yml`, manual dispatch) and are **not committed** to this repository; `release/` is local scratch output.
+Download the current artifacts from [GitHub Releases](https://github.com/helderbarboza/metromark/releases), or from the **Artifacts** of the latest successful run of the release workflow. The bundles are built by CI (`.github/workflows/release.yml`, triggered by version tags or manual dispatch) and are **not committed** to this repository; `release/` is local scratch output.
 
 Each release carries:
 
@@ -17,7 +17,28 @@ Each release carries:
 
 See the [installation guide](docs/INSTALL.md).
 
-These are **development builds**, not store-published extensions, and they are **not signed**. Firefox's unsigned build is for temporary installation; a permanent standard Firefox install needs Mozilla signing. Chrome loads through **Load unpacked**. Manifest minimum versions are Chrome 128 and Firefox 140.
+The Chrome ZIP is submitted to the Chrome Web Store by the release workflow as a **staged publish**. The update goes live only when you publish it in the Developer Dashboard after review passes. Firefox's unsigned build is for temporary installation; a permanent standard Firefox install needs Mozilla signing. Manifest minimum versions are Chrome 128 and Firefox 140.
+
+### Releasing
+
+1. Make sure `package.json` carries the new version. Use `npm version <patch|minor|major>` to bump it and create the tag.
+2. Push the tag (`git push --follow-tags`). The release workflow starts on any `v*` tag.
+3. The workflow runs the gate, builds, packages and verifies the checksums.
+4. The `release` job creates or updates the GitHub Release for the tag.
+5. The `publish-chrome` job asks for approval in the `chrome-web-store` environment, then submits the Chrome ZIP to the Chrome Web Store as a staged publish.
+6. Publish the staged version in the Developer Dashboard after review passes.
+
+The `chrome-web-store` environment must exist in the repository settings and carry a required reviewer. Store its secrets there, not at repository level. You need: `CHROME_EXTENSION_ID`, `CHROME_PUBLISHER_ID`, `CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL` and `CHROME_SERVICE_ACCOUNT_PRIVATE_KEY`. Create a service account in Google Cloud, enable the Chrome Web Store API, and grant access in the Developer Dashboard. See the [WXT publishing docs](https://wxt.dev/guide/essentials/publishing).
+
+To test the store credentials without uploading, run the workflow with **manual dispatch** and set `dry_run` to `true`. The dispatch path can also skip the GitHub Release with `publish_release` set to `false`.
+
+### Changelog
+
+`CHANGELOG.md` is generated with [git-cliff](https://git-cliff.org) from conventional commits. The `changelog` job regenerates it on every `v*` tag push and commits it back to `master`. The GitHub Release notes for the tag come from the same source.
+
+Commit messages follow the [Conventional Commits](https://www.conventionalcommits.org) spec. A local `commit-msg` hook checks them with commitlint (installed by `npm install` via the `prepare` script). Preview the changelog with `npm run changelog`.
+
+For a release where the tag's tree should contain its own changelog entry, run `npm run changelog` before `npm version <patch|minor|major>` and commit the result instead of using the tag-push automation.
 
 The live web preview is an isolated **demo workspace**; it cannot access your real bookmarks. Installed extension builds use the actual browser bookmark APIs. The preview also ships three seeded demo profiles at `/?profile=gamer`, `/?profile=traveler` and `/?profile=home-cook`; `npm run screenshots` captures them into `release/screenshots/`.
 
@@ -65,7 +86,7 @@ npm run package           # Persistent release packages and editable source
 
 Available optional verification commands are `npm run check`, `npm run lint`, `npm test`, `npm run test:stories` and `npm run test:e2e`. Browser tooling needs Playwright browsers installed. `scripts/test-firefox.mjs` exercises the Firefox extension in a disposable profile after a Firefox build. No command uses your personal browser profile.
 
-For v0.3.0 (solid theme-color default background; seeded preview demo profiles; the extension bundle excludes the preview-only bundled favicons), the checks run are: `npm run check` (0 errors, 0 warnings), `npm run lint` (0 errors, 3 pre-existing warnings), `npm test` (204 passed), `npm run test:stories` (81 passed), `npm run test:e2e` (16 passed), and `node scripts/test-firefox.mjs` (4 native Firefox checks passed in a disposable profile at v0.3.0; see [docs/verification/2026-11-16-firefox.txt](docs/verification/2026-11-16-firefox.txt)). The release itself is produced by the release workflow, which re-runs the same gate. **Chrome native verification, store review and signing are not covered.**
+For v0.3.0 (solid theme-color default background; seeded preview demo profiles; the extension bundle excludes the preview-only bundled favicons), the checks run are: `npm run check` (0 errors, 0 warnings), `npm run lint` (0 errors, 3 pre-existing warnings), `npm test` (204 passed), `npm run test:stories` (81 passed), `npm run test:e2e` (16 passed), and `node scripts/test-firefox.mjs` (4 native Firefox checks passed in a disposable profile at v0.3.0; see [docs/verification/2026-11-16-firefox.txt](docs/verification/2026-11-16-firefox.txt)). The release itself is produced by the release workflow, which re-runs the same gate and submits the Chrome build to the Chrome Web Store as a staged publish. **Chrome native verification, store review and signing are not covered.**
 
 ## Architecture
 

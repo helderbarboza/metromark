@@ -28,7 +28,9 @@
     "generate:themes": "node scripts/generate-themes.mjs",
     "i18n": "typesafe-i18n --no-watch",
     "i18n:watch": "typesafe-i18n",
-    "knip": "knip"
+    "knip": "knip",
+    "changelog": "git cliff --config cliff.toml --output CHANGELOG.md",
+    "prepare": "husky"
   },
   "dependencies": {
     "@dnd-kit/dom": "0.4.0",
@@ -46,6 +48,8 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.5.1",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@internationalized/date": "^3.12.4",
     "@lucide/svelte": "^1.74.0",
     "@playwright/test": "^1.56.0",
@@ -68,6 +72,8 @@
     "eslint-plugin-svelte": "3.23.1",
     "fflate": "0.8.3",
     "geckodriver": "8.0.0",
+    "git-cliff": "^2.14.2",
+    "husky": "^9.1.7",
     "knip": "^6.45.1",
     "playwright": "^1.56.0",
     "selenium-webdriver": "4.51.0",
