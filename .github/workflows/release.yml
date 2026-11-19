@@ -106,7 +106,6 @@ jobs:
             release/*.zip
             release/*.xpi
             release/SHA256SUMS.txt
-            release/INSTALL.md
             release/PRIVACY.md
             release/NOTICE.md
           retention-days: 30
@@ -142,7 +141,7 @@ jobs:
         run: |
           set -euo pipefail
           node_modules/.bin/git-cliff --config cliff.toml --latest --strip all > release-notes.md
-          printf '\nFirefox XPI is unsigned; permanent standard Firefox installs need Mozilla signing. The Chrome build is submitted as a staged publish; publish it in the Developer Dashboard after review passes. See docs/INSTALL.md, PRIVACY.md and NOTICE.md in the repository.\n' >> release-notes.md
+          printf '\nFirefox XPI is unsigned; permanent standard Firefox installs need Mozilla signing. The Chrome build is submitted as a staged publish; publish it in the Developer Dashboard after review passes. See PRIVACY.md and NOTICE.md in the repository.\n' >> release-notes.md
 
       - name: Create or update the GitHub Release
         env:
@@ -201,7 +200,7 @@ jobs:
     runs-on: ubuntu-latest
     # The chrome-web-store environment holds the store API secrets and
     # requires a reviewer. Create it in the repository settings first.
-    # See the release section of README.md.
+    # The release workflow submits the Chrome ZIP as a staged publish.
     environment: chrome-web-store
     permissions:
       contents: read

@@ -15,7 +15,6 @@ for (const browser of ['chrome', 'firefox']) {
   await writeFile(`release/metromark-${browser}-${version}.zip`, await archiveFolder(directory))
 }
 await cp(`release/metromark-firefox-${version}.zip`, `release/metromark-firefox-${version}-unsigned.xpi`)
-await cp('docs/INSTALL.md', 'release/INSTALL.md')
 await cp('PRIVACY.md', 'release/PRIVACY.md')
 await cp('NOTICE.md', 'release/NOTICE.md')
 
@@ -34,7 +33,6 @@ for (const file of [
   'package-lock.json',
   '.nvmrc',
   '.gitignore',
-  'README.md',
   'PRIVACY.md',
   'NOTICE.md',
   'wxt.config.ts',
@@ -55,7 +53,6 @@ const bundle = {
   ...await folderEntries('release/firefox-mv3', 'firefox-mv3/'),
 }
 for (const file of [
-  'INSTALL.md',
   'PRIVACY.md',
   'NOTICE.md',
   sourceName,
@@ -76,4 +73,4 @@ for (const name of artifacts) {
   console.log(`${name}: ${(bytes.length / 1024).toFixed(1)} KiB`)
 }
 await writeFile('release/SHA256SUMS.txt', `${hashes.join('\n')}\n`)
-console.log('Unpacked builds, browser packages, editable source, installation guide, and checksums saved in release/.')
+console.log('Unpacked builds, browser packages, editable source, and checksums saved in release/.')
