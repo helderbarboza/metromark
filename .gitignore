@@ -13,3 +13,4 @@ session-ses_*.md
 .env*
 release/
 .eslintcache
+docs/verification/
