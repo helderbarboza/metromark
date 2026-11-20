@@ -36,13 +36,13 @@
 <script lang='ts'>
 
   import type { Gesture } from '$lib/interaction'
-  import type { TileSize, TileView } from '$lib/types'
+  import type { LayoutItem, TileSize, TileView } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
   import FolderTile from '$lib/components/organisms/FolderTile.svelte'
   import { SETTINGS_DEFAULTS } from '$lib/config'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
-  import { sizeOf } from '$lib/layout'
+  import { layoutItemStyle, sizeOf } from '$lib/layout'
   import { safeUrl, validateUrl } from '$lib/url'
   import { cn } from '$lib/utils.js'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
@@ -51,6 +51,10 @@
   interface Props {
     id: string
     group: string
+    /** Committed layout entry, used before Snapgrid republishes a moved tile. */
+    entry: LayoutItem
+    /** Tile-grid cell size in px. Sets the fallback pixel geometry. */
+    cell: number
     tile: TileView
     showDomains: boolean
     preview: boolean
@@ -65,6 +69,8 @@
   const {
     id,
     group,
+    entry,
+    cell,
     tile,
     showDomains,
     preview,
@@ -76,6 +82,16 @@
   // Snapgrid instances are keyed by immutable browser bookmark IDs.
   // svelte-ignore state_referenced_locally
   const item = createGridItem({ id, group })
+  // The projected size stays valid while Snapgrid has no item for a moved tile.
+  const size = $derived(item.item
+    ? sizeOf(item.item)
+    : tile.size)
+  // Snapgrid returns a style without width/height until it knows the item.
+  // Keep the tile at its exact cell for that frame instead of letting
+  // size-full stretch it across the destination board.
+  const style = $derived(item.item
+    ? item.style
+    : `position: absolute; touch-action: none; ${layoutItemStyle(entry, cell)}`)
   // Workspace state flows through context (set by the root component); without a
   // provider (e.g. in stories), consumers get inert defaults.
   const readWorkspace = hasWorkspace()
@@ -199,9 +215,7 @@
   <FolderTile
     {@attach pauseOffscreen()}
     tile={folderTile}
-    size={item.item
-      ? sizeOf(item.item)
-      : tile.size}
+    size={size}
     {selected}
     {revealed}
     ariaLabel={$LL.app.folderTileLabel({ title: tile.title })}
@@ -219,7 +233,7 @@
       dragging && item.isDragging && '[&>button]:opacity-95',
       dragging && item.isDragging && '[&>button]:shadow-[0_10px_30px_color-mix(in_srgb,black_47%,transparent)]',
     )}
-    style={item.style}
+    style={style}
     dataTestId='folder-tile'
     dataGridId={id}
     dataDragging={item.isDragging}
@@ -235,9 +249,7 @@
   <BookmarkTile
     {@attach pauseOffscreen()}
     tile={bookmarkTile}
-    size={item.item
-      ? sizeOf(item.item)
-      : tile.size}
+    size={size}
     {selected}
     {revealed}
     domain={bookmarkTile.domain}
@@ -266,7 +278,7 @@
       dragging && item.isDragging && '[&>a]:opacity-95',
       dragging && item.isDragging && '[&>a]:shadow-[0_10px_30px_color-mix(in_srgb,black_47%,transparent)]',
     )}
-    style={item.style}
+    style={style}
     dataTestId='bookmark-tile'
     dataGridId={id}
     dataDragging={item.isDragging}

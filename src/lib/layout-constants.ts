@@ -28,6 +28,22 @@ export function cellsToPx(n: number, cell: number, gap = GAP): number {
   return Math.max(0, n * cell + (n - 1) * gap)
 }
 
+/**
+ * Pixel geometry for one layout item. Matches Snapgrid: with zero container
+ * padding, left/top are `x/y * (cell + gap)` and width/height use cellsToPx.
+ * Use this when the grid engine has no item yet, so a tile never falls back to
+ * `size-full` and fills its whole folder board.
+ */
+export function layoutItemStyle(
+  item: Pick<LayoutItem, 'x' | 'y' | 'w' | 'h'>,
+  cell: number,
+  gap = GAP,
+): string {
+  const left = item.x * (cell + gap)
+  const top = item.y * (cell + gap)
+  return `left: ${left}px; top: ${top}px; width: ${cellsToPx(item.w, cell, gap)}px; height: ${cellsToPx(item.h, cell, gap)}px;`
+}
+
 export const TILE_SIZES: readonly TileSize[] = ['small', 'medium', 'wide', 'large']
 
 function tileSizesForRows(rows: number): TileSize[] {

@@ -10,6 +10,7 @@ export {
   GRID_VIEW_IDS,
   gridViewDef,
   isGridView,
+  layoutItemStyle,
   MAX_TILE_COLS,
   MIN_ENGINE_COLS,
   MIN_GROUP_COLS,

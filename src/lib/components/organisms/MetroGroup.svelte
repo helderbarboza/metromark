@@ -15,6 +15,7 @@
     EMPTY_GROUP_COLS,
     ENGINE_COL_HEADROOM,
     GAP,
+    layoutItemStyle,
     MAX_TILE_COLS,
     MIN_ENGINE_COLS,
     MIN_GROUP_COLS,
@@ -355,6 +356,8 @@
       <GridTile
         id={entry.i}
         group={container.group}
+        {entry}
+        {cell}
         {tile}
         {showDomains}
         {preview}
@@ -373,12 +376,7 @@
         : undefined}
       <div
         class='absolute'
-        style={`
-          left: ${entry.x * (cell + GAP)}px;
-          top: ${entry.y * (cell + GAP)}px;
-          width: ${cellsToPx(entry.w, cell)}px;
-          height: ${cellsToPx(entry.h, cell)}px;
-        `}
+        style={layoutItemStyle(entry, cell)}
       >
         {#if folderTile}
           <FolderTile
