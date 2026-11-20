@@ -12,7 +12,7 @@ MetroMark reads and manages bookmarks in the browser profile where it is install
 - Tile icons come from your browser's local favicon cache only (Chrome). By default they are converted locally into Metro-style glyphs, and the glyphs are cached locally in IndexedDB (with a decoded-pixels fingerprint to detect favicon changes); with the "Original favicons" setting they are shown in their original colors. No icon requests leave the browser.
 - There are no accounts, telemetry, analytics, advertising requests or remote favicon/font services in the installed extension.
 - Clicking a bookmark intentionally navigates to its website, which has its own privacy practices. The browser's own bookmark synchronization is separate and remains under browser settings.
-- The standalone demo stores sample bookmarks and presentation data in that demo origin's local storage. It has no access to native bookmarks.
+- The standalone demo stores sample bookmarks and presentation data in that demo origin's local storage. It has no access to native bookmarks. The demo renders bundled favicons for the seeded sites; for any other address in the demo it fetches the favicon from Google's favicon cache at runtime (Google sees the host, never the page path). The installed extension never makes icon requests and never uses this lookup.
 
 Uninstalling may remove local presentation and Undo information. It does not reverse changes already made to native bookmarks. MetroMark is not a bookmark backup service; keep a separate backup for important data.
 

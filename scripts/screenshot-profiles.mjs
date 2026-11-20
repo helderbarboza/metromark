@@ -2,12 +2,13 @@
 // Output names mirror the profile ids. The directory is gitignored scratch output.
 // The script reuses a server on 127.0.0.1:5173 when one responds.
 // Otherwise it starts `vite` on that port and stops it on exit.
-// Keep DEMO_PROFILE_IDS in sync with src/lib/demo-profiles.ts.
+// Profile ids come from the same spec the preview uses; nothing to keep in sync.
 import { spawn } from 'node:child_process'
 import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { chromium } from 'playwright'
+import { DEMO_PROFILE_SPECS } from '../src/lib/demo-spec.ts'
 
 const HOST = '127.0.0.1'
 const PORT = 5173
@@ -15,7 +16,7 @@ const BASE_URL = process.env.SCREENSHOT_BASE_URL ?? `http://${HOST}:${PORT}`
 const OUTPUT_DIR = path.resolve('release/screenshots')
 const VIEWPORT = { width: 1280, height: 800 }
 const SETTLE_MS = 2500
-const DEMO_PROFILE_IDS = ['gamer', 'traveler', 'home-cook']
+const DEMO_PROFILE_IDS = DEMO_PROFILE_SPECS.map(spec => spec.id)
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 

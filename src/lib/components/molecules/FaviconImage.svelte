@@ -2,6 +2,7 @@
   import FaviconIcon from '$lib/components/atoms/FaviconIcon.svelte'
   import { SETTINGS_DEFAULTS } from '$lib/config'
   import { loadConvertedFavicon, loadFavicon } from '$lib/favicon-cache'
+  import { isFaviconEligible } from '$lib/icon-sources'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   // Container for the tile favicon: resolves the browser's favicon cache
   // (a Metro-tint silhouette by default, the site's full colors with the
@@ -73,6 +74,18 @@
         }
         catch (error) {
           console.warn('Bundled demo favicon lookup failed; using the default fallback.', error)
+        }
+        // Host not in the bundle: resolve it live so edited demo bookmarks
+        // get their icon without re-running the favicon generator. The
+        // s2 endpoint always serves an image; Google sees only the host.
+        if (isFaviconEligible(pageUrl)) {
+          try {
+            const host = new URL(pageUrl.trim()).hostname
+            return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`
+          }
+          catch {
+          // Fall through to the default fallback.
+          }
         }
       }
       return original
