@@ -38,6 +38,8 @@
     parallaxZoom?: YoutubeBackgroundSettings['parallaxZoom']
     /** Playback speed; YouTube honors 0.25, 0.5, 1, 1.5 and 2 */
     playbackRate?: YoutubeBackgroundSettings['playbackRate']
+    /** Hold the video on the current frame instead of playing it */
+    paused?: YoutubeBackgroundSettings['paused']
     /** How the playlist picks its starting video; only applies to playlist addresses */
     playlistOrder?: YoutubeBackgroundSettings['playlistOrder']
     /** Base color under the YouTube layer */
@@ -56,6 +58,7 @@
     parallax = BACKGROUND_DEFAULTS.youtube.parallax,
     parallaxZoom = BACKGROUND_DEFAULTS.youtube.parallaxZoom,
     playbackRate = BACKGROUND_DEFAULTS.youtube.playbackRate,
+    paused = BACKGROUND_DEFAULTS.youtube.paused,
     playlistOrder = BACKGROUND_DEFAULTS.youtube.playlistOrder,
     color,
     reducedMotion = false,
@@ -80,6 +83,9 @@
   const resolvedFit = $derived(fit ?? BACKGROUND_DEFAULTS.youtube.fit)
   const resolvedOpacity = $derived(opacity ?? BACKGROUND_DEFAULTS.youtube.opacity)
   const resolvedRate = $derived(playbackRate ?? BACKGROUND_DEFAULTS.youtube.playbackRate)
+  const resolvedPaused = $derived(paused ?? BACKGROUND_DEFAULTS.youtube.paused)
+  // Reduced motion already holds the video on its poster; treat both as paused.
+  const effectivePaused = $derived(resolvedPaused || reducedMotion)
   const resolvedOrder = $derived(playlistOrder ?? BACKGROUND_DEFAULTS.youtube.playlistOrder)
   // Box sizes for the embed: `cover` is the smallest 16:9 box that covers the
   // viewport, `contain` the largest that fits inside it. The video fills a
@@ -118,8 +124,8 @@
       : 'translate3d(-50%, -50%, 0)',
   )
 
-  // Kept in a plain variable so the rate effect below can reach the live
-  // player without making the bridge a reactive dependency of the frame effect.
+  // Kept in a plain variable so the effects below can reach the live player
+  // without making the bridge a reactive dependency of the frame effect.
   let bridge: YoutubeBackgroundBridge | null = null
   // One store per component; reads/writes are synchronous and local.
   const playlistCursor = createPlaylistCursorStore()
@@ -145,7 +151,9 @@
       // Looping is implicit: there is no user-facing setting for it.
       // Playlists loop as a whole and play in a random order.
       loopMode: 'native',
-      autoplay: !reducedMotion,
+      // Read reducedMotion here so a preference change rebuilds the embed.
+      // Read paused untracked so a runtime toggle stays a player command.
+      autoplay: !reducedMotion && !untrack(() => resolvedPaused),
       // Read untracked: changing how the playlist picks its start applies on
       // the next new tab, and must not rebuild the iframe under the user.
       playlistOrder: untrack(() => resolvedOrder),
@@ -154,10 +162,16 @@
       playbackRate: untrack(() => resolvedRate),
       onEvent: (snapshot) => {
         playing = snapshot.state === 'playing'
+        // A player loaded without autoplay reports cued or paused, not playing.
+        // Show its frame as soon as the widget knows the video is ready.
+        if (snapshot.state === 'cued' || snapshot.state === 'paused')
+          started = true
         // Widget-reported error, or all three handshake attempts went silent
         // (the params-only fallback): either way the video is not visibly playing.
+        // An intentional pause must not raise a false error.
         const handshakeExhausted = !snapshot.apiReady && snapshot.attempt === '3/3'
-        if ((snapshot.error !== null || handshakeExhausted) && !errorReported) {
+        const cannotPlay = snapshot.error !== null || (handshakeExhausted && !effectivePaused)
+        if (cannotPlay && !errorReported) {
           errorReported = true
           onerror?.()
         }
@@ -176,6 +190,15 @@
   // can take as a URL parameter; rebuilding the iframe to change it would stutter.
   $effect(() => {
     bridge?.setPlaybackRate(resolvedRate)
+  })
+
+  // Pause is a command too. The mount-time value comes from the embed's
+  // autoplay parameter; this effect handles later changes of the setting.
+  $effect(() => {
+    if (effectivePaused)
+      bridge?.pause()
+    else
+      bridge?.play()
   })
 
 </script>

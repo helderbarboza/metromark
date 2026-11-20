@@ -986,7 +986,7 @@ type RootTranslation = {
 		 */
 		pauseAnimatedBackground: string
 		/**
-		 * F​r​e​e​z​e​ ​t​h​e​ ​a​n​i​m​a​t​i​o​n​;​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​f​r​a​m​e​ ​s​t​a​y​s​ ​o​n​ ​s​c​r​e​e​n
+		 * F​r​e​e​z​e​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​o​n​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​f​r​a​m​e
 		 */
 		pauseAnimatedBackgroundHelp: string
 		/**
@@ -1517,9 +1517,9 @@ type RootTranslation = {
 		 */
 		invalidPlaylistOrder: string
 		/**
-		 * I​n​v​a​l​i​d​ ​s​h​a​d​e​r​ ​s​e​t​t​i​n​g​.
+		 * I​n​v​a​l​i​d​ ​b​a​c​k​g​r​o​u​n​d​ ​s​e​t​t​i​n​g​.
 		 */
-		invalidShaderSetting: string
+		invalidBackgroundSetting: string
 		/**
 		 * I​n​v​a​l​i​d​ ​s​h​a​d​e​r​ ​s​p​e​e​d​.
 		 */
@@ -2534,7 +2534,7 @@ export type TranslationFunctions = {
 		 */
 		pauseAnimatedBackground: () => LocalizedString
 		/**
-		 * Freeze the animation; the current frame stays on screen
+		 * Freeze the background on the current frame
 		 */
 		pauseAnimatedBackgroundHelp: () => LocalizedString
 		/**
@@ -3056,9 +3056,9 @@ export type TranslationFunctions = {
 		 */
 		invalidPlaylistOrder: () => LocalizedString
 		/**
-		 * Invalid shader setting.
+		 * Invalid background setting.
 		 */
-		invalidShaderSetting: () => LocalizedString
+		invalidBackgroundSetting: () => LocalizedString
 		/**
 		 * Invalid shader speed.
 		 */

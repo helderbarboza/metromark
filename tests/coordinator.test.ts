@@ -541,6 +541,7 @@ describe('durable Undo', () => {
           parallax: true,
           parallaxZoom: 2,
           playbackRate: 1.5,
+          paused: true,
           auto: false,
           color: '#123abc',
         },
@@ -553,6 +554,7 @@ describe('durable Undo', () => {
       parallax: true,
       parallaxZoom: 2,
       playbackRate: 1.5,
+      paused: true,
       auto: false,
       color: '#123abc',
     })
@@ -603,6 +605,14 @@ describe('durable Undo', () => {
         background: { type: 'youtube', url: '', parallax: 1 },
       } as never,
     })).rejects.toThrow('Invalid parallax setting')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'youtube', url: '', paused: 'yes' },
+      } as never,
+    })).rejects.toThrow('Invalid background setting')
+
     await expect(coordinator.execute({
       type: 'settings.update',
       patch: {

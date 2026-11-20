@@ -631,6 +631,8 @@ export class BookmarkCoordinator {
               throw new Error(getT().errors.invalidYoutubePlaybackRate())
             if (background.playlistOrder !== undefined && !['shuffle', 'sequential'].includes(background.playlistOrder))
               throw new Error(getT().errors.invalidPlaylistOrder())
+            if (background.paused !== undefined && typeof background.paused !== 'boolean')
+              throw new Error(getT().errors.invalidBackgroundSetting())
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
               throw new Error(getT().errors.invalidBackgroundMode())
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))
@@ -638,7 +640,7 @@ export class BookmarkCoordinator {
           }
           else if (background.type === 'shader') {
             if (background.shaderId !== undefined && typeof background.shaderId !== 'string')
-              throw new Error(getT().errors.invalidShaderSetting())
+              throw new Error(getT().errors.invalidBackgroundSetting())
             if (background.speed !== undefined && (typeof background.speed !== 'number' || !Number.isFinite(background.speed) || background.speed < 0))
               throw new Error(getT().errors.invalidShaderSpeed())
             if (background.targetFps !== undefined && (typeof background.targetFps !== 'number' || !Number.isFinite(background.targetFps)))
@@ -652,7 +654,7 @@ export class BookmarkCoordinator {
             if (background.quality !== undefined && (typeof background.quality !== 'string' || !['motion', 'detail'].includes(background.quality)))
               throw new Error(getT().errors.invalidShaderQuality())
             if (background.paused !== undefined && typeof background.paused !== 'boolean')
-              throw new Error(getT().errors.invalidShaderSetting())
+              throw new Error(getT().errors.invalidBackgroundSetting())
             if (background.auto !== undefined && typeof background.auto !== 'boolean')
               throw new Error(getT().errors.invalidBackgroundMode())
             if (background.color !== undefined && background.color !== '' && !/^#[0-9a-f]{6}$/i.test(background.color))

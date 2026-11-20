@@ -50,6 +50,8 @@ const YoutubeBackgroundSchema = v.object({
   parallaxZoom: v.optional(v.number()),
   /** Playback speed; YouTube only honors 0.25, 0.5, 1, 1.5 and 2 */
   playbackRate: v.optional(v.picklist([0.25, 0.5, 1, 1.5, 2])),
+  /** Hold the video on the current frame instead of playing it */
+  paused: v.optional(v.boolean()),
   /** How the playlist picks a video when a new tab opens; 'shuffle' picks at random, 'sequential' plays the next one in playlist order and wraps at the end */
   playlistOrder: v.optional(v.picklist(['shuffle', 'sequential'])),
   /** Use the theme background instead of a custom base color */
@@ -149,6 +151,7 @@ export const BACKGROUND_DEFAULTS = {
     parallax: false,
     parallaxZoom: 1.5,
     playbackRate: 1,
+    paused: false,
     playlistOrder: 'shuffle',
     auto: true,
     color: undefined,

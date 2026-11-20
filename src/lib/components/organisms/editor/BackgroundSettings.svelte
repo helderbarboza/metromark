@@ -1544,6 +1544,31 @@
       />
     </SettingsRow>
     <SettingsRow
+      title={$LL.settings.pauseAnimatedBackground()}
+      helpText={$LL.settings.pauseAnimatedBackgroundHelp()}
+      controlId='youtube-paused'
+      disabled={busy}
+    >
+      <input
+        id='youtube-paused'
+        type='checkbox'
+        role='switch'
+        aria-describedby='youtube-paused-help'
+        checked={bg.paused ?? BACKGROUND_DEFAULTS.youtube.paused}
+        disabled={busy}
+        onchange={event => updateYoutube({ paused: event.currentTarget.checked })}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+      />
+    </SettingsRow>
+    <SettingsRow
       title={$LL.settings.playbackSpeed()}
       helpText={$LL.settings.playbackSpeedHelp()}
       controlId='youtube-speed'

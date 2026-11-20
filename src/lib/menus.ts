@@ -41,6 +41,8 @@ export interface BoardMenuInput {
   defaultFolder: string
   /** The current shader background, when the background type is 'shader'. */
   shaderBackground?: Settings['background'] & { type: 'shader' }
+  /** The current YouTube background, when one with a URL is applied. */
+  youtubeBackground?: Settings['background'] & { type: 'youtube' }
   /** Whether an image background with a URL is currently applied. */
   imageActive: boolean
   callbacks: MenuCallbacks
@@ -138,7 +140,16 @@ export function buildGroupMenuItems(input: GroupMenuInput): MenuItem[] {
 }
 
 export function buildBoardMenuItems(input: BoardMenuInput): MenuItem[] {
-  const { groups, selectedId, contextId, defaultFolder, shaderBackground, imageActive, callbacks } = input
+  const {
+    groups,
+    selectedId,
+    contextId,
+    defaultFolder,
+    shaderBackground,
+    youtubeBackground,
+    imageActive,
+    callbacks,
+  } = input
   const parentId = groups.find(item => item.id === contextId && item.writable)?.id ?? defaultFolder
   const items: MenuItem[] = [
     {
@@ -170,8 +181,9 @@ export function buildBoardMenuItems(input: BoardMenuInput): MenuItem[] {
       action: () => callbacks.edit({ kind: 'settings' }),
     },
   )
-  if (shaderBackground) {
-    const paused = shaderBackground.paused === true
+  const animatedBackground = shaderBackground ?? youtubeBackground
+  if (animatedBackground) {
+    const paused = animatedBackground.paused === true
     items.push({
       label: t().pauseAnimatedBackground(),
       icon: 'pause',
@@ -181,7 +193,7 @@ export function buildBoardMenuItems(input: BoardMenuInput): MenuItem[] {
         void callbacks.execute({
           type: 'settings.update',
           patch: {
-            background: { ...shaderBackground, paused: !paused },
+            background: { ...animatedBackground, paused: !paused },
           },
         })
       },

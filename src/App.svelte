@@ -597,6 +597,10 @@
         shaderBackground: snapshot?.settings.background.type === 'shader'
           ? snapshot.settings.background
           : undefined,
+        youtubeBackground: snapshot?.settings.background.type === 'youtube'
+          && snapshot.settings.background.url.trim() !== ''
+          ? snapshot.settings.background
+          : undefined,
         imageActive: snapshot?.settings.background.type === 'image'
           && snapshot.settings.background.url !== '',
         callbacks: menuCallbacks,
