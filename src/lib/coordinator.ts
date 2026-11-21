@@ -47,6 +47,13 @@ function checkedColorIndex(value: number): number {
   return value
 }
 
+/** Validate a custom hex color. An empty string clears the custom color. */
+function checkedColor(value: string): string {
+  if (value !== '' && !/^#[0-9a-f]{6}$/i.test(value))
+    throw new Error(getT().errors.hexColor())
+  return value
+}
+
 /** A single writer for bookmark commands and extension metadata. No UI or DOM dependency. */
 export class BookmarkCoordinator {
   private data: AppData
@@ -310,25 +317,35 @@ export class BookmarkCoordinator {
     switch (command.type) {
       case 'bookmark.create': {
         this.destination(command.parentId)
+        const appearance: Appearance = {}
         if (command.colorIndex !== undefined)
-          checkedColorIndex(command.colorIndex)
+          appearance.colorIndex = checkedColorIndex(command.colorIndex)
+        if (command.color !== undefined)
+          appearance.color = checkedColor(command.color)
         const created = await this.bookmarks.create({
           parentId: command.parentId,
           title: this.title(command.title),
           url: validateUrl(command.url),
         })
-        if (command.colorIndex !== undefined)
-          this.data.appearance[created.id] = { ...this.data.appearance[created.id], colorIndex: command.colorIndex }
+        if (Object.keys(appearance).length > 0)
+          this.data.appearance[created.id] = { ...this.data.appearance[created.id], ...appearance }
         return {
           message: getT().notices.bookmarkAdded(),
         }
       }
       case 'folder.create': {
         this.destination(command.parentId)
-        await this.bookmarks.create({
+        const appearance: Appearance = {}
+        if (command.colorIndex !== undefined)
+          appearance.colorIndex = checkedColorIndex(command.colorIndex)
+        if (command.color !== undefined)
+          appearance.color = checkedColor(command.color)
+        const created = await this.bookmarks.create({
           parentId: command.parentId,
           title: this.title(command.title),
         })
+        if (Object.keys(appearance).length > 0)
+          this.data.appearance[created.id] = { ...this.data.appearance[created.id], ...appearance }
         return {
           message: getT().notices.folderCreated(),
         }
@@ -471,9 +488,7 @@ export class BookmarkCoordinator {
           patch.colorIndex = checkedColorIndex(command.patch.colorIndex)
         }
         if (command.patch.color !== undefined) {
-          if (command.patch.color !== '' && !/^#[0-9a-f]{6}$/i.test(command.patch.color))
-            throw new Error(getT().errors.hexColor())
-          patch.color = command.patch.color
+          patch.color = checkedColor(command.patch.color)
         }
         const parentId = node.parentId
         const existing = { ...this.data.appearance[node.id] }

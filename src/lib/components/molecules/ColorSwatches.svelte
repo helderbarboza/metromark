@@ -6,10 +6,12 @@
     colors,
     colorIndex = $bindable(0),
     customColor = $bindable(''),
+    onpick,
   }: {
     colors: string[]
     colorIndex?: number
     customColor?: string
+    onpick?: () => void
   } = $props()
 
   const uid = $props.id()
@@ -38,6 +40,7 @@
         onclick={() => {
           customColor = ''
           colorIndex = i
+          onpick?.()
         }}
       >
         {#if !customColor && colorIndex === i}
@@ -59,6 +62,7 @@
         if (!customColor) {
           customColor = '#000000'
           colorIndex = -1
+          onpick?.()
         }
       }}
     >

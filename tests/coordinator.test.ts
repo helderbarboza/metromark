@@ -142,6 +142,78 @@ describe('bookmark creation', () => {
     })).rejects.toThrow('Color index')
     expect(create).not.toHaveBeenCalled()
   })
+  it('stores a custom color without a swatch index', async () => {
+    const { coordinator, storage } = fixture()
+    const result = await coordinator.execute({
+      type: 'bookmark.create',
+      parentId: 'bar',
+      title: 'Example',
+      url: 'https://example.com',
+      color: '#abcdef',
+    })
+    const created = flatten(result.snapshot.tree).find(node => node.url === 'https://example.com')!
+    expect(result.snapshot.appearance[created.id]).toEqual({ color: '#abcdef' })
+    expect(storage.data?.appearance[created.id]).toEqual({ color: '#abcdef' })
+  })
+  it('rejects an invalid custom color before creating the bookmark', async () => {
+    const { coordinator, bookmarks } = fixture()
+    const create = vi.spyOn(bookmarks, 'create')
+    await expect(coordinator.execute({
+      type: 'bookmark.create',
+      parentId: 'bar',
+      title: 'Example',
+      url: 'https://example.com',
+      color: 'red',
+    })).rejects.toThrow('hex color')
+    expect(create).not.toHaveBeenCalled()
+  })
+})
+
+describe('folder creation', () => {
+  it('stores a chosen swatch index on the new folder', async () => {
+    const { coordinator, storage } = fixture()
+    const result = await coordinator.execute({
+      type: 'folder.create',
+      parentId: 'bar',
+      title: 'Example folder',
+      colorIndex: 3,
+    })
+    const created = flatten(result.snapshot.tree).find(node => node.title === 'Example folder')!
+    expect(result.snapshot.appearance[created.id]).toEqual({ colorIndex: 3 })
+    expect(storage.data?.appearance[created.id]).toEqual({ colorIndex: 3 })
+  })
+  it('stores a custom color on the new folder', async () => {
+    const { coordinator } = fixture()
+    const result = await coordinator.execute({
+      type: 'folder.create',
+      parentId: 'bar',
+      title: 'Example folder',
+      color: '#123456',
+    })
+    const created = flatten(result.snapshot.tree).find(node => node.title === 'Example folder')!
+    expect(result.snapshot.appearance[created.id]).toEqual({ color: '#123456' })
+  })
+  it('keeps the hashed accent when no color is chosen', async () => {
+    const { coordinator } = fixture()
+    const result = await coordinator.execute({
+      type: 'folder.create',
+      parentId: 'bar',
+      title: 'Example folder',
+    })
+    const created = flatten(result.snapshot.tree).find(node => node.title === 'Example folder')!
+    expect(result.snapshot.appearance[created.id]).toBeUndefined()
+  })
+  it('rejects an invalid color before creating the folder', async () => {
+    const { coordinator, bookmarks } = fixture()
+    const create = vi.spyOn(bookmarks, 'create')
+    await expect(coordinator.execute({
+      type: 'folder.create',
+      parentId: 'bar',
+      title: 'Example folder',
+      color: '#abcd',
+    })).rejects.toThrow('hex color')
+    expect(create).not.toHaveBeenCalled()
+  })
 })
 
 describe('durable Undo', () => {

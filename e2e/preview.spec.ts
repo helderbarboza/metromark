@@ -546,6 +546,48 @@ test('folder tiles accept custom colors from the shared appearance dialog', asyn
   await expect(page.getByRole('button', { name: 'Delete selected bookmark' })).toHaveCount(0)
 })
 
+test('add dialogs save the color set during creation', async ({ page }) => {
+  await start(page)
+
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
+  await page.getByRole('menuitem', { name: 'Add new bookmark', exact: true }).click()
+  let dialog = page.getByRole('dialog')
+  await dialog.getByLabel('Title', { exact: true }).fill('QA colored bookmark')
+  await dialog.getByLabel('Website address', { exact: true }).fill('https://example.com/colored')
+  await dialog.getByRole('button', { name: 'Custom color', exact: true }).click()
+  await dialog.getByLabel('Custom tile color').evaluate((input: HTMLInputElement) => {
+    input.value = '#f7f7f7'
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+  await dialog.getByRole('button', { name: 'Add bookmark', exact: true }).click()
+  await expect(dialog).toHaveCount(0)
+  let newId = ''
+  await expect.poll(async () => {
+    newId = flat(await tree(page)).find(node => node.title === 'QA colored bookmark')?.id ?? ''
+    return newId
+  }).not.toBe('')
+  expect((await presentation(page)).appearance[newId]?.color).toBe('#f7f7f7')
+
+  await page.locator('#board').click({
+    button: 'right',
+    position: { x: 25, y: 20 },
+  })
+  await page.getByRole('menuitem', { name: 'Add new folder', exact: true }).click()
+  dialog = page.getByRole('dialog')
+  await dialog.getByLabel('Folder name', { exact: true }).fill('QA colored folder')
+  await dialog.getByRole('button', { name: 'Use theme color 3', exact: true }).click()
+  await dialog.getByRole('button', { name: 'Create folder', exact: true }).click()
+  await expect(dialog).toHaveCount(0)
+  await expect.poll(async () => {
+    newId = flat(await tree(page)).find(node => node.title === 'QA colored folder')?.id ?? ''
+    return newId
+  }).not.toBe('')
+  expect((await presentation(page)).appearance[newId]).toEqual({ colorIndex: 2 })
+})
+
 test('create a folder from the board menu, then drop a bookmark onto it', async ({ page }) => {
   await start(page)
   await page.locator('#board').click({

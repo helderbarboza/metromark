@@ -3,6 +3,7 @@
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
+  import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
   import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import FolderSelect from '$lib/components/molecules/FolderSelect.svelte'
@@ -37,6 +38,9 @@
   let name = $state('')
   let url = $state('')
   let parentId = $state('')
+  let colorIndex = $state(-1)
+  let customColor = $state('')
+  let colorPicked = $state(false)
   let disposed = false
 
   onDestroy(() => {
@@ -69,25 +73,36 @@
         url,
       })
     }
-    command.busy = true
-    let colorIndex: number | undefined
-    try {
-      colorIndex = await suggestAccentIndex(url, themeColors)
+    const color: { colorIndex?: number, color?: string } = {}
+    if (colorPicked) {
+      if (customColor)
+        color.color = customColor
+      else
+        color.colorIndex = colorIndex
     }
-    catch {
-      colorIndex = undefined
+    else {
+      command.busy = true
+      let suggested: number | undefined
+      try {
+        suggested = await suggestAccentIndex(url, themeColors)
+      }
+      catch {
+        suggested = undefined
+      }
+      finally {
+        command.busy = false
+      }
+      if (disposed)
+        return
+      if (suggested !== undefined)
+        color.colorIndex = suggested
     }
-    finally {
-      command.busy = false
-    }
-    if (disposed)
-      return
     return send({
       type: 'bookmark.create',
       parentId,
       title: name,
       url,
-      colorIndex,
+      ...color,
     })
   }
 
@@ -133,6 +148,12 @@
   </label>
   {#if !node}
     <FolderSelect folders={folders} bind:value={parentId} label={$LL.dialogs.folder()} />
+    <ColorSwatches
+      colors={themeColors}
+      bind:colorIndex
+      bind:customColor
+      onpick={() => (colorPicked = true)}
+    />
   {/if}
   {#if node}
     <div

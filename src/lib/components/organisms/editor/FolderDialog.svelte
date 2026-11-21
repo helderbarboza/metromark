@@ -2,12 +2,15 @@
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
+  import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
   import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import FolderSelect from '$lib/components/molecules/FolderSelect.svelte'
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
+  import { getThemeAccentColors } from '$lib/theme-colors'
+  import { theme } from 'mode-watcher'
   import { onMount } from 'svelte'
 
   const {
@@ -31,8 +34,15 @@
 
   let name = $state('')
   let parentId = $state('')
+  let colorIndex = $state(-1)
+  let customColor = $state('')
+  let colorPicked = $state(false)
 
   const folders = $derived(writableGroups(snapshot))
+  const themeColors = $derived.by(() => {
+    void theme.current
+    return getThemeAccentColors()
+  })
 
   onMount(() => {
     name = node?.title ?? ''
@@ -48,7 +58,14 @@
         return send({ type: 'node.update', id: node.id, title: name })
       return
     }
-    return send({ type: 'folder.create', parentId, title: name })
+    const color: { colorIndex?: number, color?: string } = {}
+    if (colorPicked) {
+      if (customColor)
+        color.color = customColor
+      else
+        color.colorIndex = colorIndex
+    }
+    return send({ type: 'folder.create', parentId, title: name, ...color })
   }
 
   const isRename = $derived(spec.kind === 'rename')
@@ -78,6 +95,12 @@
   </label>
   {#if !isRename}
     <FolderSelect folders={folders} bind:value={parentId} label={$LL.dialogs.createInside()} />
+    <ColorSwatches
+      colors={themeColors}
+      bind:colorIndex
+      bind:customColor
+      onpick={() => (colorPicked = true)}
+    />
   {/if}
   <DialogError error={command.error} />
   <DialogActions>
