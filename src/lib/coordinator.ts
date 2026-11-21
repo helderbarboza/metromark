@@ -19,7 +19,6 @@ import { isLayoutable } from '$lib/folder-preview'
 import { allowsLargeSize, effectiveTileSize, freePosition, GRID_VIEW_IDS, gridViewDef, isGridView, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
 import { applyLocale, getT } from '$lib/locale'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
-import { validateUrl } from '$lib/url.js'
 import { parseYouTubeBackgroundTarget } from '$lib/youtube'
 
 export const UNDO_TTL = 30_000
@@ -325,7 +324,7 @@ export class BookmarkCoordinator {
         const created = await this.bookmarks.create({
           parentId: command.parentId,
           title: this.title(command.title),
-          url: validateUrl(command.url),
+          url: command.url.trim(),
         })
         if (Object.keys(appearance).length > 0)
           this.data.appearance[created.id] = { ...this.data.appearance[created.id], ...appearance }
@@ -359,7 +358,7 @@ export class BookmarkCoordinator {
         if (command.url !== undefined) {
           if (!isBookmark(node))
             throw new Error(getT().errors.foldersNoUrl())
-          after.url = validateUrl(command.url)
+          after.url = command.url.trim()
         }
         if (after.title === node.title && after.url === node.url)
           return undefined

@@ -8,7 +8,6 @@ const fr: Translation = {
     operationFailed: 'L’opération a échoué.',
     unableToLoad: 'Impossible de charger les favoris.',
     unableToOpen: 'Impossible d’ouvrir cette adresse.',
-    unableToOpenBookmark: 'Impossible d’ouvrir ce favori.',
     addressCopied: 'Adresse du site copiée.',
     yourBoard: 'Ton tableau',
     tile: 'Tuile',
@@ -333,10 +332,7 @@ const fr: Translation = {
     imageCouldNotBeUsed: 'Cette image n’a pas pu être utilisée.',
   },
   urlErrors: {
-    empty: 'Saisis une adresse de site.',
     invalid: 'Utilise une adresse complète, comme https://example.com.',
-    executable: 'Les adresses exécutables et les data-URL ne peuvent pas être lancées depuis cette page d’extension privilégiée.',
-    unsupportedScheme: 'Cette adresse utilise un schéma d’URL non pris en charge.',
     iconAddressNotValid: 'Saisis une adresse d’image.',
     iconAddressInvalid: 'Utilise une adresse complète, comme https://example.com/icon.png.',
     iconHttpOnly: 'Les adresses d’icônes doivent commencer par http(s).',

@@ -8,7 +8,6 @@ const en = {
     operationFailed: 'The operation failed.',
     unableToLoad: 'Unable to load bookmarks.',
     unableToOpen: 'Unable to open this address.',
-    unableToOpenBookmark: 'Unable to open this bookmark.',
     addressCopied: 'Website address copied.',
     yourBoard: 'Your board',
     tile: 'Tile',
@@ -333,10 +332,7 @@ const en = {
     imageCouldNotBeUsed: 'That image could not be used.',
   },
   urlErrors: {
-    empty: 'Enter a website address.',
     invalid: 'Use a complete address, such as https://example.com.',
-    executable: 'Executable and data URLs cannot be launched from this privileged extension page.',
-    unsupportedScheme: 'This address uses an unsupported URL scheme.',
     iconAddressNotValid: 'Enter an image address.',
     iconAddressInvalid: 'Use a complete address, such as https://example.com/icon.png.',
     iconHttpOnly: 'Icon addresses must start with http(s).',

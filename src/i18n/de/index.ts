@@ -8,7 +8,6 @@ const de: Translation = {
     operationFailed: 'Der Vorgang ist fehlgeschlagen.',
     unableToLoad: 'Lesezeichen konnten nicht geladen werden.',
     unableToOpen: 'Diese Adresse kann nicht geöffnet werden.',
-    unableToOpenBookmark: 'Dieses Lesezeichen kann nicht geöffnet werden.',
     addressCopied: 'Website-Adresse kopiert.',
     yourBoard: 'Dein Board',
     tile: 'Kachel',
@@ -333,10 +332,7 @@ const de: Translation = {
     imageCouldNotBeUsed: 'Dieses Bild konnte nicht verwendet werden.',
   },
   urlErrors: {
-    empty: 'Gib eine Website-Adresse ein.',
     invalid: 'Verwende eine vollständige Adresse, z. B. https://example.com.',
-    executable: 'Ausführbare und data-URLs können von dieser privilegierten Erweiterungsseite nicht gestartet werden.',
-    unsupportedScheme: 'Diese Adresse verwendet ein nicht unterstütztes URL-Schema.',
     iconAddressNotValid: 'Gib eine Icon-Adresse ein.',
     iconAddressInvalid: 'Verwende eine vollständige Icon-Adresse, z. B. https://example.com/icon.png.',
     iconHttpOnly: 'Icon-Adressen müssen mit http(s) beginnen.',

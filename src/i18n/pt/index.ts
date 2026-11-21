@@ -8,7 +8,6 @@ const pt: Translation = {
     operationFailed: 'A operação falhou.',
     unableToLoad: 'Não foi possível carregar os favoritos.',
     unableToOpen: 'Não foi possível abrir este endereço.',
-    unableToOpenBookmark: 'Não foi possível abrir este favorito.',
     addressCopied: 'Endereço do site copiado.',
     yourBoard: 'Seu quadro',
     tile: 'Bloco',
@@ -333,10 +332,7 @@ const pt: Translation = {
     imageCouldNotBeUsed: 'Não foi possível usar essa imagem.',
   },
   urlErrors: {
-    empty: 'Digite um endereço de site.',
     invalid: 'Use um endereço completo, como https://example.com.',
-    executable: 'URLs executáveis e de dados não podem ser abertas a partir desta página privilegiada da extensão.',
-    unsupportedScheme: 'Este endereço usa um esquema de URL não suportado.',
     iconAddressNotValid: 'Digite um endereço de imagem.',
     iconAddressInvalid: 'Use um endereço completo, como https://example.com/icon.png.',
     iconHttpOnly: 'Os endereços de ícone devem começar com http(s).',

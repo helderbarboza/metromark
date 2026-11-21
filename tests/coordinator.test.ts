@@ -31,6 +31,17 @@ describe('commands and synchronization', () => {
     const restored = await coordinator.execute({ type: 'undo', id: result.notice!.undoId! })
     expect(indexTree(restored.snapshot.tree).get('steam')?.title).toBe('Steam')
   })
+  it('stores an unusual URL scheme without validating it on edit', async () => {
+    const { coordinator, bookmarks } = fixture()
+    const update = vi.spyOn(bookmarks, 'update')
+    await coordinator.execute({
+      type: 'node.update',
+      id: 'steam',
+      title: 'Steam',
+      url: 'data:text/plain,hello',
+    })
+    expect(update).toHaveBeenCalledWith('steam', expect.objectContaining({ url: 'data:text/plain,hello' }))
+  })
   it('observes external bookmark manager changes without writing them back', async () => {
     const { bookmarks, coordinator } = fixture()
     await coordinator.ready
@@ -166,6 +177,29 @@ describe('bookmark creation', () => {
       color: 'red',
     })).rejects.toThrow('hex color')
     expect(create).not.toHaveBeenCalled()
+  })
+  it('stores an unusual URL scheme without validating it', async () => {
+    const { coordinator, bookmarks } = fixture()
+    const create = vi.spyOn(bookmarks, 'create')
+    const result = await coordinator.execute({
+      type: 'bookmark.create',
+      parentId: 'bar',
+      title: 'Odd address',
+      url: 'javascript:alert(1)',
+    })
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ url: 'javascript:alert(1)' }))
+    expect(flatten(result.snapshot.tree).some(node => node.url === 'javascript:alert(1)')).toBe(true)
+  })
+  it('trims the URL before creating the bookmark', async () => {
+    const { coordinator, bookmarks } = fixture()
+    const create = vi.spyOn(bookmarks, 'create')
+    await coordinator.execute({
+      type: 'bookmark.create',
+      parentId: 'bar',
+      title: 'Spaced address',
+      url: '  https://example.com  ',
+    })
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ url: 'https://example.com' }))
   })
 })
 

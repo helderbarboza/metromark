@@ -779,7 +779,6 @@
         onResizeTile={resizeTile}
         {groupMenu}
         onAdd={parentId => edit({ kind: 'bookmark', parentId })}
-        onBlocked={message => showNotice({ message, tone: 'error' })}
         onBoardPointerDown={boardPointerDown}
         onForwardContextMenu={forwardContextMenu}
         {menuTarget}

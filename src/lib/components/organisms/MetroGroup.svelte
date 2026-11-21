@@ -25,7 +25,6 @@
   } from '$lib/layout'
   import { focusFirstMenuItem } from '$lib/menu-focus'
   import { setTileGrid } from '$lib/tile-grid-context'
-  import { safeUrl, validateUrl } from '$lib/url'
   import { cn } from '$lib/utils.js'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import {
@@ -57,7 +56,6 @@
     /** Content of the per-group context menu, rendered in the header's trigger. */
     menu?: Snippet<[GroupView]>
     onAdd: (folderId: string) => void
-    onBlocked: (message: string) => void
   }
 
   const {
@@ -78,7 +76,6 @@
     flash = false,
     menu,
     onAdd,
-    onBlocked,
   }: Props = $props()
 
   // Workspace state flows through context (set by the root component); stories
@@ -211,25 +208,9 @@
   }))
 
   const placeholder = createGridPlaceholder(container.group)
-  function href(tile: Extract<TileView, { kind: 'bookmark' }>) {
-    return safeUrl(tile.url)
-  }
-  function launch(event: MouseEvent, tile: Extract<TileView, { kind: 'bookmark' }>) {
-    if (dragging) {
+  function launch(event: MouseEvent) {
+    if (dragging)
       event.preventDefault()
-      return
-    }
-    try {
-      validateUrl(tile.url)
-    }
-    catch (error) {
-      event.preventDefault()
-      onBlocked(
-        error instanceof Error
-          ? error.message
-          : $LL.app.unableToOpenBookmark(),
-      )
-    }
   }
   /**
    * Keyboard activation for the header trigger: dispatches a contextmenu at the
@@ -362,7 +343,6 @@
         {showDomains}
         {preview}
         onselect={onSelect}
-        onblocked={onBlocked}
         onactivate={onActivateFolder}
         onresize={onResizeTile && (size => onResizeTile(entry.i, size))}
       />
@@ -399,14 +379,14 @@
             selected={selectedId === entry.i}
             domain={bookmarkTile.domain}
             showDomain={showDomains}
-            href={href(bookmarkTile)}
+            href={bookmarkTile.url}
             target={preview ? '_blank' : undefined}
             ariaLabel={$LL.app.openBookmarkName({
               name: showDomains && sizeOf(entry) !== 'small'
                 ? `${bookmarkTile.title} ${bookmarkTile.domain}`
                 : bookmarkTile.title,
             })}
-            onclick={event => launch(event, bookmarkTile)}
+            onclick={launch}
             class='block size-full'
             dataTestId='tile-slot'
             dataTileId={entry.i}

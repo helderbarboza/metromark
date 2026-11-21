@@ -31,10 +31,6 @@ type RootTranslation = {
 		 */
 		unableToOpen: string
 		/**
-		 * U​n​a​b​l​e​ ​t​o​ ​o​p​e​n​ ​t​h​i​s​ ​b​o​o​k​m​a​r​k​.
-		 */
-		unableToOpenBookmark: string
-		/**
 		 * W​e​b​s​i​t​e​ ​a​d​d​r​e​s​s​ ​c​o​p​i​e​d​.
 		 */
 		addressCopied: string
@@ -1269,21 +1265,9 @@ type RootTranslation = {
 	}
 	urlErrors: {
 		/**
-		 * E​n​t​e​r​ ​a​ ​w​e​b​s​i​t​e​ ​a​d​d​r​e​s​s​.
-		 */
-		empty: string
-		/**
 		 * U​s​e​ ​a​ ​c​o​m​p​l​e​t​e​ ​a​d​d​r​e​s​s​,​ ​s​u​c​h​ ​a​s​ ​h​t​t​p​s​:​/​/​e​x​a​m​p​l​e​.​c​o​m​.
 		 */
 		invalid: string
-		/**
-		 * E​x​e​c​u​t​a​b​l​e​ ​a​n​d​ ​d​a​t​a​ ​U​R​L​s​ ​c​a​n​n​o​t​ ​b​e​ ​l​a​u​n​c​h​e​d​ ​f​r​o​m​ ​t​h​i​s​ ​p​r​i​v​i​l​e​g​e​d​ ​e​x​t​e​n​s​i​o​n​ ​p​a​g​e​.
-		 */
-		executable: string
-		/**
-		 * T​h​i​s​ ​a​d​d​r​e​s​s​ ​u​s​e​s​ ​a​n​ ​u​n​s​u​p​p​o​r​t​e​d​ ​U​R​L​ ​s​c​h​e​m​e​.
-		 */
-		unsupportedScheme: string
 		/**
 		 * E​n​t​e​r​ ​a​n​ ​i​m​a​g​e​ ​a​d​d​r​e​s​s​.
 		 */
@@ -1605,10 +1589,6 @@ export type TranslationFunctions = {
 		 * Unable to open this address.
 		 */
 		unableToOpen: () => LocalizedString
-		/**
-		 * Unable to open this bookmark.
-		 */
-		unableToOpenBookmark: () => LocalizedString
 		/**
 		 * Website address copied.
 		 */
@@ -2810,21 +2790,9 @@ export type TranslationFunctions = {
 	}
 	urlErrors: {
 		/**
-		 * Enter a website address.
-		 */
-		empty: () => LocalizedString
-		/**
 		 * Use a complete address, such as https://example.com.
 		 */
 		invalid: () => LocalizedString
-		/**
-		 * Executable and data URLs cannot be launched from this privileged extension page.
-		 */
-		executable: () => LocalizedString
-		/**
-		 * This address uses an unsupported URL scheme.
-		 */
-		unsupportedScheme: () => LocalizedString
 		/**
 		 * Enter an image address.
 		 */

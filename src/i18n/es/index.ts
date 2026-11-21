@@ -8,7 +8,6 @@ const es: Translation = {
     operationFailed: 'La operación falló.',
     unableToLoad: 'No se pudieron cargar los marcadores.',
     unableToOpen: 'No se puede abrir esta dirección.',
-    unableToOpenBookmark: 'No se puede abrir este marcador.',
     addressCopied: 'Dirección del sitio copiada.',
     yourBoard: 'Tu tablero',
     tile: 'Mosaico',
@@ -333,10 +332,7 @@ const es: Translation = {
     imageCouldNotBeUsed: 'No se pudo usar esa imagen.',
   },
   urlErrors: {
-    empty: 'Escribe una dirección de sitio.',
     invalid: 'Usa una dirección completa, como https://example.com.',
-    executable: 'Las URLs ejecutables y de datos no se pueden abrir desde esta página privilegiada de la extensión.',
-    unsupportedScheme: 'Esta dirección usa un esquema de URL no admitido.',
     iconAddressNotValid: 'Escribe una dirección de imagen.',
     iconAddressInvalid: 'Usa una dirección completa, como https://example.com/icon.png.',
     iconHttpOnly: 'Las direcciones de iconos deben empezar con http(s).',

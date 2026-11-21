@@ -43,7 +43,6 @@
   import { SETTINGS_DEFAULTS } from '$lib/config'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
   import { layoutItemStyle, sizeOf } from '$lib/layout'
-  import { safeUrl, validateUrl } from '$lib/url'
   import { cn } from '$lib/utils.js'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import { createGridItem } from '@snapgridjs/svelte'
@@ -59,7 +58,6 @@
     showDomains: boolean
     preview: boolean
     onselect: (id: string, event: PointerEvent) => void
-    onblocked: (message: string) => void
     /** Folder tiles activate by scrolling to their group instead of launching. */
     onactivate?: (id: string) => void
     /** Omit to hide the quick grow/shrink button (read-only tiles). */
@@ -75,7 +73,6 @@
     showDomains,
     preview,
     onselect,
-    onblocked,
     onactivate,
     onresize,
   }: Props = $props()
@@ -111,10 +108,7 @@
   const bookmarkTile = $derived(tile.kind === 'bookmark'
     ? tile
     : undefined)
-  // Unsupported addresses stay in the tree but must never be launched (see validateUrl).
-  const href = $derived(bookmarkTile
-    ? safeUrl(bookmarkTile.url)
-    : undefined)
+  const href = $derived(bookmarkTile?.url)
   const bookmarkLabel = $derived(bookmarkTile
     ? $LL.app.openBookmark({
       name: showDomains && bookmarkTile.size !== 'small'
@@ -164,23 +158,6 @@
       // Folder tiles never launch; they scroll to the folder's group.
       event.preventDefault()
       onactivate?.(id)
-      return
-    }
-    launch(event)
-  }
-  function launch(event: MouseEvent) {
-    if (!bookmarkTile)
-      return
-    try {
-      validateUrl(bookmarkTile.url)
-    }
-    catch (error) {
-      event.preventDefault()
-      onblocked(
-        error instanceof Error
-          ? error.message
-          : $LL.app.unableToOpenBookmark(),
-      )
     }
   }
   /**

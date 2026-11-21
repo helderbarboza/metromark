@@ -47,7 +47,6 @@
     /** Per-group context menu content, rendered by each MetroGroup header. */
     groupMenu: Snippet<[GroupView]>
     onAdd: (parentId: string) => void
-    onBlocked: (message: string) => void
     onBoardPointerDown: (event: PointerEvent) => void
     /** Intercepts the raw contextmenu event before bits-ui opens the menu. */
     onForwardContextMenu: (props: Record<string, unknown>, event: MouseEvent) => void
@@ -81,7 +80,6 @@
     onResizeTile,
     groupMenu,
     onAdd,
-    onBlocked,
     onBoardPointerDown,
     onForwardContextMenu,
     menuTarget,
@@ -192,7 +190,6 @@
                         onResizeTile={onResizeTile}
                         menu={groupMenu}
                         onAdd={onAdd}
-                        onBlocked={onBlocked}
                       />
                     {/each}
                     {#if !visibleGroups.length && !normalizedQuery}

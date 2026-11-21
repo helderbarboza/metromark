@@ -231,7 +231,6 @@
       onDragStop: fn(),
       onSelect: fn(),
       onAdd: fn(),
-      onBlocked: fn(),
     },
   })
 </script>

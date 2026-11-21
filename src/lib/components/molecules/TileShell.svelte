@@ -11,7 +11,6 @@
   import { SETTINGS_DEFAULTS } from '$lib/config'
   import { TILE_SIZES } from '$lib/layout'
   import { resolveTileColors } from '$lib/theme-colors'
-  import { safeUrl } from '$lib/url'
   import { cn } from '$lib/utils.js'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
   import { mode, theme } from 'mode-watcher'
@@ -89,7 +88,7 @@
   const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion)
 
   const isLink = $derived(as === 'a')
-  const launchHref = $derived(href ?? safeUrl(tile.url ?? ''))
+  const launchHref = $derived(href ?? tile.url ?? '')
   const elementProps = $derived(isLink
     ? { href: launchHref, target, rel }
     : { type: 'button' as const })

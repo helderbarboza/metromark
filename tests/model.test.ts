@@ -5,7 +5,6 @@ import { buildExtensionFaviconUrl, clampFaviconSize, faviconRequestForTile, isFa
 import { DOCK_ROWS, effectiveTileSize, overlaps, reconcileLayout, ROWS, usedCols, validateLayout } from '$lib/layout'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, projectGroups } from '$lib/tree'
 import { hashColorIndex } from '$lib/tree-utils'
-import { validateUrl } from '$lib/url'
 import { describe, expect, it } from 'vitest'
 
 function fixture(): Snapshot {
@@ -197,21 +196,7 @@ describe('dock grid view', () => {
   })
 })
 
-describe('safe navigation', () => {
-  it('accepts valid web and mail addresses', () => {
-    expect(validateUrl(' https://example.com ')).toBe('https://example.com')
-    expect(validateUrl('mailto:me@example.com')).toBe('mailto:me@example.com')
-  })
-  it.each([
-    'javascript:alert(1)',
-    'data:text/html,<script>',
-    'vbscript:msgbox(1)',
-    'blob:https://example.com/id',
-    'example.com',
-    '',
-  ])('rejects %s', (url) => {
-    expect(() => validateUrl(url)).toThrow()
-  })
+describe('bookmark data', () => {
   it('keeps all sample URLs as actual distinct bookmark entities', () => {
     expect(flatten(fixture().tree).filter(isBookmark)).toHaveLength(24)
   })

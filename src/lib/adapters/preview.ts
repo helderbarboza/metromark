@@ -2,7 +2,6 @@ import type { AppData, BookmarkNode, Client, Settings } from '$lib/types'
 import { MemoryBookmarks, MemoryPersistence } from '$lib/adapters/memory'
 import { BookmarkCoordinator } from '$lib/coordinator'
 import { demoData, demoTree } from '$lib/demo'
-import { validateUrl } from '$lib/url.js'
 
 const TREE_KEY = 'metromark.preview.bookmarks.v1'
 const DATA_KEY = 'metromark.preview.presentation.v1'
@@ -76,8 +75,7 @@ export function createPreviewClient(settings: Settings, persistent = true): Clie
       }
     },
     async open(url, disposition) {
-      const validated = validateUrl(url)
-      window.open(validated, '_blank', disposition === 'window'
+      window.open(url, '_blank', disposition === 'window'
         ? 'noopener,noreferrer,popup'
         : 'noopener,noreferrer')
     },
