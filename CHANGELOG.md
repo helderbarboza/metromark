@@ -2,6 +2,41 @@
 
 All notable changes to this project are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2026-11-21
+
+### Other
+
+- 0.7.1
+
+## [0.7.0] - 2026-11-21
+
+### Bug Fixes
+
+- Prevent oversized first frame on cross-folder tile move
+
+
+### Documentation
+
+- V0.6.0 [skip ci]
+
+
+### Features
+
+- Allow toggling pause on youtube backgrounds
+- Add color swatches to the new bookmark/folder dialog
+
+
+### Other
+
+- 0.7.0
+
+
+### Refactoring
+
+- Remove URL validations
+- Add Dialog, replace update Modal
+- Use standard input components
+
 ## [0.6.0] - 2026-11-19
 
 ### Other
@@ -469,6 +504,8 @@ keep text selection.
 - Split components into atoms, molecules and organisms
 - Split FaviconIcon into presentational atom and cache container
 
+[0.7.1]: https://github.com/helderbarboza/metromark/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/helderbarboza/metromark/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/helderbarboza/metromark/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/helderbarboza/metromark/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/helderbarboza/metromark/compare/v0.4.1...v0.4.2
