@@ -7,8 +7,9 @@
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { Button } from '$lib/components/ui/button'
   import * as Dialog from '$lib/components/ui/dialog'
+  import * as Select from '$lib/components/ui/select'
   import { APPEARANCE_DEFAULTS } from '$lib/config'
-  import { tileSizesForView } from '$lib/layout'
+  import { TILE_SIZES, tileSizesForView } from '$lib/layout'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { tileFor, tileForFolder } from '$lib/tile'
   import { isFolder } from '$lib/tree'
@@ -84,6 +85,10 @@
       })
     }
   }
+
+  function isTileSize(value: string): value is TileSize {
+    return TILE_SIZES.some(size => size === value)
+  }
 </script>
 
 <form onsubmit={submit}>
@@ -91,22 +96,32 @@
     <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
       {introParts[0]}<strong class='text-(--foreground)'>{tile.title}</strong>{introParts[1]}
     </p>
-    <label class='mb-5.25 flex flex-col gap-2.25'>
-      <span class='text-xs font-medium text-(--foreground)' id='tile-size-label'>{$LL.dialogs.tileSize()}</span>
-      <select
-        aria-labelledby='tile-size-label'
-        bind:value={size}
-        data-initial-focus
-        class='
-          h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-          pr-7 text-xs text-(--foreground) outline-offset-1
-        '
+    <div class='mb-5.25 flex flex-col gap-2.25'>
+      <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.tileSize()}</span>
+      <Select.Root
+        type='single'
+        value={size}
+        onValueChange={(value) => {
+          if (isTileSize(value))
+            size = value
+        }}
       >
-        {#each sizeOptions as preset (preset)}
-          <option value={preset}>{$LL.tileSizes[preset]()}</option>
-        {/each}
-      </select>
-    </label>
+        <Select.Trigger
+          aria-label={$LL.dialogs.tileSize()}
+          class='w-full'
+          data-initial-focus
+        >
+          {$LL.tileSizes[size]()}
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Group>
+            {#each sizeOptions as preset (preset)}
+              <Select.Item value={preset}>{$LL.tileSizes[preset]()}</Select.Item>
+            {/each}
+          </Select.Group>
+        </Select.Content>
+      </Select.Root>
+    </div>
     <ColorSwatches colors={themeColors} bind:colorIndex bind:customColor />
   {/if}
   <DialogError error={command.error} />

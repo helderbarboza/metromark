@@ -66,7 +66,8 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   await moreActions(page, 'QA edited favorite')
   await page.getByRole('menuitem', { name: 'Customize tile' }).click()
   dialog = page.getByRole('dialog')
-  await dialog.getByLabel('Tile size', { exact: true }).selectOption('wide')
+  await dialog.getByRole('combobox', { name: 'Tile size', exact: true }).click()
+  await page.getByRole('option', { name: 'Wide', exact: true }).click()
   await dialog.getByRole('button', { name: 'Custom color', exact: true }).click()
   await dialog.getByLabel('Custom tile color').evaluate((input: HTMLInputElement) => {
     input.value = '#f7f7f7'

@@ -9,6 +9,7 @@
   import { writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
   import * as Dialog from '$lib/components/ui/dialog'
+  import { Input } from '$lib/components/ui/input'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { theme } from 'mode-watcher'
   import { onMount } from 'svelte'
@@ -84,18 +85,13 @@
   </p>
   <label class='mb-5.25 flex flex-col gap-2.25'>
     <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.folderName()}</span>
-    <input
+    <Input
       data-initial-focus
       bind:value={name}
       required
-      maxlength='2048'
+      maxlength={2048}
       placeholder={$LL.dialogs.folderNamePlaceholder()}
       autocomplete='off'
-      class='
-        h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-        text-xs text-(--foreground) outline-offset-1
-        placeholder:text-(--muted-foreground) placeholder:opacity-60
-      '
     />
   </label>
   {#if !isRename}

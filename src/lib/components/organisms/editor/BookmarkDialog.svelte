@@ -10,6 +10,7 @@
   import { writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
   import * as Dialog from '$lib/components/ui/dialog'
+  import { Input } from '$lib/components/ui/input'
   import { suggestAccentIndex } from '$lib/favicon-cache'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { projectGroups } from '$lib/tree'
@@ -117,33 +118,23 @@
   </p>
   <label class='mb-5.25 flex flex-col gap-2.25'>
     <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.title()}</span>
-    <input
+    <Input
       data-initial-focus
       bind:value={name}
       required
-      maxlength='2048'
+      maxlength={2048}
       placeholder={$LL.dialogs.titlePlaceholder()}
       autocomplete='off'
-      class='
-        h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-        text-xs text-(--foreground) outline-offset-1
-        placeholder:text-(--muted-foreground) placeholder:opacity-60
-      '
     />
   </label>
   <label class='mb-5.25 flex flex-col gap-2.25'>
     <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.websiteAddress()}</span>
-    <input
+    <Input
       bind:value={url}
       required
       placeholder={$LL.dialogs.urlPlaceholder()}
       autocomplete='url'
       spellcheck='false'
-      class='
-        h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25
-        text-xs text-(--foreground) outline-offset-1
-        placeholder:text-(--muted-foreground) placeholder:opacity-60
-      '
     />
   </label>
   {#if !node}

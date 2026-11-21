@@ -2,6 +2,7 @@
   import LL from '$i18n/i18n-svelte'
   import { Button } from '$lib/components/ui/button'
   import * as Dialog from '$lib/components/ui/dialog'
+  import { Input } from '$lib/components/ui/input'
 
   const { url, onclose }: { url: string, onclose: () => void } = $props()
 </script>
@@ -9,11 +10,7 @@
 <p class='mb-6.5 text-xs/relaxed text-(--muted-foreground)'>
   {$LL.dialogs.copyIntro()}
 </p>
-<input
-  class='
-    h-11.25 w-full rounded-sm border border-(--border) bg-(--background) px-3.25 text-xs
-    text-(--foreground) outline-offset-1
-  '
+<Input
   data-initial-focus
   readonly
   value={url}
