@@ -39,10 +39,11 @@
           dark:hover:bg-muted/50
         `,
         destructive: `
-          bg-destructive/10 text-destructive
+          bg-destructive/10 text-[color-mix(in_oklch,var(--destructive),black_30%)]
           hover:bg-destructive/20
           focus-visible:border-destructive/40 focus-visible:ring-destructive/20
           dark:bg-destructive/20
+          dark:text-[color-mix(in_oklch,var(--destructive),white_45%)]
           dark:hover:bg-destructive/30
           dark:focus-visible:ring-destructive/40
         `,

@@ -63,7 +63,7 @@
   args={{ variant: 'destructive' }}
   play={async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Delete folder' })
-    await expect(button).toHaveClass('bg-destructive')
+    await expect(button).toHaveClass('bg-destructive/10')
     await expect(button.querySelector('svg')).toBeInTheDocument()
   }}
 >
