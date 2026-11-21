@@ -4,12 +4,12 @@
   import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
-  import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import FolderSelect from '$lib/components/molecules/FolderSelect.svelte'
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
+  import * as Dialog from '$lib/components/ui/dialog'
   import { suggestAccentIndex } from '$lib/favicon-cache'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { projectGroups } from '$lib/tree'
@@ -167,7 +167,7 @@
     </div>
   {/if}
   <DialogError error={command.error} />
-  <DialogActions>
+  <Dialog.Footer>
     <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button
       variant='default'
@@ -180,5 +180,5 @@
         ? $LL.dialogs.addBookmark()
         : $LL.dialogs.saveChanges()}
     </Button>
-  </DialogActions>
+  </Dialog.Footer>
 </form>

@@ -2,10 +2,10 @@
   import type { BookmarkNode, Command } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
-  import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { Button } from '$lib/components/ui/button'
+  import * as Dialog from '$lib/components/ui/dialog'
   import { countBookmarks, flatten, isFolder } from '$lib/tree'
 
   const {
@@ -59,7 +59,7 @@
   {$LL.dialogs.undoHint()}
 </p>
 <DialogError error={command.error} />
-<DialogActions>
+<Dialog.Footer>
   <Button type='button' onclick={onclose}>{$LL.dialogs.keepFolder()}</Button>
   <Button
     variant='destructive'
@@ -71,4 +71,4 @@
       ? $LL.dialogs.deleting()
       : $LL.dialogs.deleteFolder()}
   </Button>
-</DialogActions>
+</Dialog.Footer>

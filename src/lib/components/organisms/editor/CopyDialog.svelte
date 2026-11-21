@@ -1,7 +1,7 @@
 <script lang='ts'>
   import LL from '$i18n/i18n-svelte'
-  import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import { Button } from '$lib/components/ui/button'
+  import * as Dialog from '$lib/components/ui/dialog'
 
   const { url, onclose }: { url: string, onclose: () => void } = $props()
 </script>
@@ -20,6 +20,6 @@
   aria-label={$LL.dialogs.websiteAddressToCopy()}
   onfocus={event => event.currentTarget.select()}
 />
-<DialogActions>
+<Dialog.Footer>
   <Button variant='default' onclick={onclose}>{$LL.dialogs.done()}</Button>
-</DialogActions>
+</Dialog.Footer>

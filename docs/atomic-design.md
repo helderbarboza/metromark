@@ -56,7 +56,6 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `molecules/SettingsRow.svelte` | Settings line with label and control. |
 | `molecules/SettingsCard.svelte` | Settings card container. |
 | `molecules/CollapsibleSection.svelte` | Collapsible settings section. |
-| `molecules/DialogActions.svelte` | Dialog action row. |
 | `molecules/DialogError.svelte` | Dialog error message. |
 | `molecules/TileSizeGrid.svelte` | Tile size picker. |
 | `molecules/ColorSwatches.svelte` | Color swatch picker. |

@@ -2,12 +2,12 @@
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
-  import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import FolderSelect from '$lib/components/molecules/FolderSelect.svelte'
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { destinationGroups, writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
+  import * as Dialog from '$lib/components/ui/dialog'
   import { onMount } from 'svelte'
 
   const {
@@ -70,7 +70,7 @@
     initialFocus={true}
   />
   <DialogError error={command.error} />
-  <DialogActions>
+  <Dialog.Footer>
     <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button
       variant='default'
@@ -83,5 +83,5 @@
         ? $LL.dialogs.restoreHere()
         : $LL.dialogs.moveHere()}
     </Button>
-  </DialogActions>
+  </Dialog.Footer>
 </form>

@@ -1,9 +1,7 @@
 <script lang='ts'>
   import type { Snippet } from 'svelte'
   import LL from '$i18n/i18n-svelte'
-  import Icon from '$lib/components/atoms/Icon.svelte'
-  import { Button } from '$lib/components/ui/button'
-  import { onMount } from 'svelte'
+  import * as Dialog from '$lib/components/ui/dialog'
 
   interface Props {
     title: string
@@ -11,64 +9,40 @@
     eyebrow?: string
     children: Snippet
     onclose: () => void
-    drawer?: boolean
   }
 
-  const { title, eyebrow, children, onclose, drawer = false }: Props = $props()
+  const { title, eyebrow, children, onclose }: Props = $props()
 
-  let element: HTMLDialogElement
-  onMount(() => {
-    element.showModal()
-    const field = element.querySelector<HTMLElement>('[data-initial-focus]')
-    field?.focus()
-    return () => element.close()
-  })
-  function backdrop(event: PointerEvent) {
-    const rect = element.getBoundingClientRect()
-    if (
-      event.target === element
-      && (event.clientX < rect.left
-        || event.clientX > rect.right
-        || event.clientY < rect.top
-        || event.clientY > rect.bottom)
-    ) {
+  let open = $state(true)
+  let content = $state<HTMLElement | null>(null)
+
+  function handleOpenChange(value: boolean): void {
+    if (!value) {
+      open = false
       onclose()
     }
   }
-  function cancel(event: Event) {
-    event.preventDefault()
-    onclose()
+
+  function handleOpenAutoFocus(event: Event): void {
+    // Preserve the old behavior: land focus on `[data-initial-focus]` when the
+    // dialog has one (e.g. the title field in the bookmark dialog).
+    const field = content?.querySelector<HTMLElement>('[data-initial-focus]')
+    if (field) {
+      event.preventDefault()
+      field.focus({ preventScroll: true })
+    }
   }
 </script>
 
-<dialog
-  bind:this={element}
-  class={[
-    `animate-pop-enter p-0 border border-(--border) bg-(--card) text-(--foreground) shadow-(--shadow) overflow-auto backdrop:bg-black/40 backdrop:backdrop-blur-[1px]`,
-    drawer && 'fixed top-3 right-3 bottom-3 left-auto m-0',
-    drawer && 'w-[min(410px,calc(100vw-24px))] h-[calc(100vh-24px)] max-h-none rounded-md',
-    !drawer && 'w-[min(480px,calc(100vw-32px))] max-h-[calc(100vh-48px)] m-auto rounded-lg',
-  ].filter(Boolean).join(' ')}
-  aria-label={title}
-  oncancel={cancel}
-  onpointerdown={backdrop}
->
-  <div class='px-7.5 pt-7.25 pb-7.5 max-[480px]:p-6'>
-    <header class='mb-6.5 flex items-center justify-between gap-2.5'>
-      <div>
-        <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>{eyebrow ?? $LL.dialogs.yourBookmarks()}</div>
-        <h2 class='m-0 text-2xl font-normal tracking-tighter'>{title}</h2>
-      </div>
-      <Button
-        class='-mr-1.75'
-        title={$LL.dialogs.closeDialog()}
-        onclick={onclose}
-        size='icon'
-        variant='ghost'
-      >
-        <Icon name='close' size={18} />
-      </Button>
-    </header>
+<Dialog.Root bind:open onOpenChange={handleOpenChange}>
+  <Dialog.Content
+    bind:ref={content}
+    onOpenAutoFocus={handleOpenAutoFocus}
+  >
+    <Dialog.Header>
+      <div class='mb-2 text-[0.5rem] tracking-[0.5em] text-(--muted-foreground)'>{eyebrow ?? $LL.dialogs.yourBookmarks()}</div>
+      <Dialog.Title class='text-2xl font-normal'>{title}</Dialog.Title>
+    </Dialog.Header>
     {@render children()}
-  </div>
-</dialog>
+  </Dialog.Content>
+</Dialog.Root>

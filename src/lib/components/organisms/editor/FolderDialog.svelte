@@ -3,12 +3,12 @@
   import type { BookmarkNode, Command, Snapshot } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
-  import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import FolderSelect from '$lib/components/molecules/FolderSelect.svelte'
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
+  import * as Dialog from '$lib/components/ui/dialog'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { theme } from 'mode-watcher'
   import { onMount } from 'svelte'
@@ -65,7 +65,12 @@
       else
         color.colorIndex = colorIndex
     }
-    return send({ type: 'folder.create', parentId, title: name, ...color })
+    return send({
+      type: 'folder.create',
+      parentId,
+      title: name,
+      ...color,
+    })
   }
 
   const isRename = $derived(spec.kind === 'rename')
@@ -103,7 +108,7 @@
     />
   {/if}
   <DialogError error={command.error} />
-  <DialogActions>
+  <Dialog.Footer>
     <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button
       variant='default'
@@ -116,5 +121,5 @@
         ? $LL.dialogs.saveChanges()
         : $LL.dialogs.createGroup()}
     </Button>
-  </DialogActions>
+  </Dialog.Footer>
 </form>

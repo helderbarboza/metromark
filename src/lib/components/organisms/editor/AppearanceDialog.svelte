@@ -3,10 +3,10 @@
 
   import LL from '$i18n/i18n-svelte'
   import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
-  import DialogActions from '$lib/components/molecules/DialogActions.svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import { createDialogCommand } from '$lib/components/organisms/editor/dialog-command.svelte'
   import { Button } from '$lib/components/ui/button'
+  import * as Dialog from '$lib/components/ui/dialog'
   import { APPEARANCE_DEFAULTS } from '$lib/config'
   import { tileSizesForView } from '$lib/layout'
   import { getThemeAccentColors } from '$lib/theme-colors'
@@ -110,12 +110,12 @@
     <ColorSwatches colors={themeColors} bind:colorIndex bind:customColor />
   {/if}
   <DialogError error={command.error} />
-  <DialogActions>
+  <Dialog.Footer>
     <Button type='button' onclick={onclose}>{$LL.dialogs.cancel()}</Button>
     <Button variant='default' type='submit' disabled={command.busy}>
       {command.busy
         ? $LL.dialogs.saving()
         : $LL.dialogs.saveChanges()}
     </Button>
-  </DialogActions>
+  </Dialog.Footer>
 </form>

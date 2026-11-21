@@ -326,8 +326,12 @@ export class BookmarkCoordinator {
           title: this.title(command.title),
           url: command.url.trim(),
         })
-        if (Object.keys(appearance).length > 0)
-          this.data.appearance[created.id] = { ...this.data.appearance[created.id], ...appearance }
+        if (Object.keys(appearance).length > 0) {
+          this.data.appearance[created.id] = {
+            ...this.data.appearance[created.id],
+            ...appearance,
+          }
+        }
         return {
           message: getT().notices.bookmarkAdded(),
         }
@@ -343,8 +347,12 @@ export class BookmarkCoordinator {
           parentId: command.parentId,
           title: this.title(command.title),
         })
-        if (Object.keys(appearance).length > 0)
-          this.data.appearance[created.id] = { ...this.data.appearance[created.id], ...appearance }
+        if (Object.keys(appearance).length > 0) {
+          this.data.appearance[created.id] = {
+            ...this.data.appearance[created.id],
+            ...appearance,
+          }
+        }
         return {
           message: getT().notices.folderCreated(),
         }
