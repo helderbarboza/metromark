@@ -100,6 +100,20 @@ test('create, edit, customize, resize, move, delete and Undo; dialogs close with
   await expect.poll(async () => flat(await tree(page)).filter(node => node.title === 'QA edited favorite').length).toBe(1)
 })
 
+test('static tiles keep their geometry transition when resized', async ({ page }) => {
+  await start(page)
+  await page.getByRole('searchbox', { name: 'Search bookmarks' }).fill('Steam')
+  const tile = page.locator('[data-testid="tile-slot"]').first()
+  const wrapper = tile.locator('xpath=../..')
+  // Search renders tiles outside snapgrid, so the wrapper owns the geometry animation.
+  await expect(wrapper).toHaveCSS('transition-property', 'left, top, width, height')
+  await expect(wrapper).toHaveCSS('transition-duration', '0.15s')
+  await tile.click({ button: 'right' })
+  await expect(appBar(page)).toBeVisible()
+  await page.getByRole('button', { name: 'Resize selected tile to Small', exact: true }).click()
+  await expect(tile).toHaveAttribute('data-size', 'small')
+})
+
 test('group header opens its context menu from the keyboard; Escape closes and returns focus', async ({ page }) => {
   await start(page)
   const header = group(page, 'Work').locator('[data-testid="group-header"]')

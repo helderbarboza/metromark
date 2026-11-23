@@ -360,7 +360,10 @@
         ? tile
         : undefined}
       <div
-        class='absolute'
+        class='
+          absolute transition-[left,top,width,height] duration-150
+          motion-reduce:transition-none
+        '
         style={layoutItemStyle(entry, cell)}
       >
         {#if folderTile}
