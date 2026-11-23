@@ -241,11 +241,9 @@
   aria-label={group.path.join(' / ') || $LL.app.ungroupedBookmarks()}
 >
   {#snippet headerBody()}
-    <div class='min-w-0'>
+    <div class='min-w-0 text-foreground drop-shadow-sm'>
       <div
-        class='
-          mb-1.5 truncate text-xs tracking-widest text-(--muted-foreground) uppercase
-        '
+        class='mb-1.5 truncate text-xs tracking-widest uppercase'
         data-testid='group-path'
         title={group.path.join(' / ')}
       >
@@ -255,9 +253,7 @@
       </div>
       <div class='flex items-start gap-2.75'>
         <h2
-          class='
-            m-0 line-clamp-2 text-base/tight font-semibold wrap-break-word text-foreground
-          '
+          class='m-0 line-clamp-2 text-base/tight font-semibold wrap-break-word'
           title={group.title}
         >
           {group.title}
