@@ -42,6 +42,7 @@
   import FolderTile from '$lib/components/organisms/FolderTile.svelte'
   import { SETTINGS_DEFAULTS } from '$lib/config'
   import { advanceGesture, releaseOutcome, startGesture } from '$lib/interaction'
+  import { inspectLaunchUrl } from '$lib/launch-url'
   import { layoutItemStyle, sizeOf } from '$lib/layout'
   import { cn } from '$lib/utils.js'
   import { getWorkspace, hasWorkspace } from '$lib/workspace-context'
@@ -58,6 +59,8 @@
     showDomains: boolean
     preview: boolean
     onselect: (id: string, event: PointerEvent) => void
+    /** Called when a bookmark address is unsafe to open. The URL stays in the tree. */
+    onblocked?: (url: string) => void
     /** Folder tiles activate by scrolling to their group instead of launching. */
     onactivate?: (id: string) => void
     /** Omit to hide the quick grow/shrink button (read-only tiles). */
@@ -73,6 +76,7 @@
     showDomains,
     preview,
     onselect,
+    onblocked,
     onactivate,
     onresize,
   }: Props = $props()
@@ -108,7 +112,10 @@
   const bookmarkTile = $derived(tile.kind === 'bookmark'
     ? tile
     : undefined)
-  const href = $derived(bookmarkTile?.url)
+  const launch = $derived(bookmarkTile
+    ? inspectLaunchUrl(bookmarkTile.url)
+    : undefined)
+  const href = $derived(launch?.ok ? launch.url : undefined)
   const bookmarkLabel = $derived(bookmarkTile
     ? $LL.app.openBookmark({
       name: showDomains && bookmarkTile.size !== 'small'
@@ -152,6 +159,11 @@
     if (swallowClick || dragging) {
       swallowClick = false
       event.preventDefault()
+      return
+    }
+    if (bookmarkTile && launch && !launch.ok) {
+      event.preventDefault()
+      onblocked?.(bookmarkTile.url)
       return
     }
     if (folderTile) {
@@ -231,6 +243,7 @@
     {revealed}
     domain={bookmarkTile.domain}
     showDomain={showDomains}
+    as={launch?.ok ? 'a' : 'button'}
     href={href}
     target={preview ? '_blank' : undefined}
     ariaLabel={bookmarkLabel}
@@ -249,11 +262,15 @@
     // stays behind at the origin, so the lift styles go on the anchor, not the
     // wrapper. dnd-kit also clones the anchor as an invisible inert ghost
     // (data-dnd-placeholder="hidden"), which needs no exclusion handling.
-      dragging && !item.isDragging && !reducedMotion && 'animate-float [&>a]:scale-93',
-      dragging && !item.isDragging && '[&>a]:opacity-85',
-      dragging && item.isDragging && !reducedMotion && '[&>a]:scale-104',
-      dragging && item.isDragging && '[&>a]:opacity-95',
-      dragging && item.isDragging && '[&>a]:shadow-[0_10px_30px_color-mix(in_srgb,black_47%,transparent)]',
+      dragging && !item.isDragging && !reducedMotion && `animate-float
+        [&>a]:scale-93 [&>button]:scale-93`,
+      dragging && !item.isDragging && '[&>a]:opacity-85 [&>button]:opacity-85',
+      dragging && item.isDragging && !reducedMotion && '[&>a]:scale-104 [&>button]:scale-104',
+      dragging && item.isDragging && '[&>a]:opacity-95 [&>button]:opacity-95',
+      dragging && item.isDragging && `
+        [&>a]:shadow-[0_10px_30px_color-mix(in_srgb,black_47%,transparent)]
+        [&>button]:shadow-[0_10px_30px_color-mix(in_srgb,black_47%,transparent)]
+      `,
     )}
     style={style}
     dataTestId='bookmark-tile'

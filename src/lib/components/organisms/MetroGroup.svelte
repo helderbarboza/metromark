@@ -10,6 +10,7 @@
   import * as ContextMenu from '$lib/components/ui/context-menu'
   import * as Empty from '$lib/components/ui/empty'
   import { DRAG_PX } from '$lib/interaction'
+  import { inspectLaunchUrl } from '$lib/launch-url'
   import {
     cellsToPx,
     EMPTY_GROUP_COLS,
@@ -47,6 +48,8 @@
     onDragStart: () => void
     onDragStop: () => void
     onSelect: (id: string, event: PointerEvent) => void
+    /** Called when a bookmark address is unsafe to open. The URL stays in the tree. */
+    onblocked?: (url: string) => void
     /** Quick grow/shrink handler for the button on checked tiles. Omit to hide it. */
     onResizeTile?: (id: string, size: TileSize) => void
     /** Folder tiles activate by scrolling to their group instead of launching. */
@@ -71,6 +74,7 @@
     onDragStart,
     onDragStop,
     onSelect,
+    onblocked,
     onResizeTile,
     onActivateFolder,
     flash = false,
@@ -343,6 +347,7 @@
         {showDomains}
         {preview}
         onselect={onSelect}
+        {onblocked}
         onactivate={onActivateFolder}
         onresize={onResizeTile && (size => onResizeTile(entry.i, size))}
       />
@@ -373,20 +378,28 @@
               : undefined}
           />
         {:else if bookmarkTile}
+          {@const target = inspectLaunchUrl(bookmarkTile.url)}
           <BookmarkTile
             tile={bookmarkTile}
             size={sizeOf(entry)}
             selected={selectedId === entry.i}
             domain={bookmarkTile.domain}
             showDomain={showDomains}
-            href={bookmarkTile.url}
+            as={target.ok ? 'a' : 'button'}
+            href={target.ok ? target.url : undefined}
             target={preview ? '_blank' : undefined}
             ariaLabel={$LL.app.openBookmarkName({
               name: showDomains && sizeOf(entry) !== 'small'
                 ? `${bookmarkTile.title} ${bookmarkTile.domain}`
                 : bookmarkTile.title,
             })}
-            onclick={launch}
+            onclick={(event) => {
+              launch(event)
+              if (!target.ok) {
+                event.preventDefault()
+                onblocked?.(bookmarkTile.url)
+              }
+            }}
             class='block size-full'
             dataTestId='tile-slot'
             dataTileId={entry.i}

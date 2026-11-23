@@ -1,5 +1,7 @@
 import type { AppData, BookmarkPort, Client, Command, CommandResult, Snapshot } from '$lib/types'
 import { normalizeTree } from '$lib/adapters/memory'
+import { inspectLaunchUrl } from '$lib/launch-url'
+import { getT } from '$lib/locale'
 import { browser } from 'wxt/browser'
 
 export const MESSAGE_SCOPE = 'metromark/v1'
@@ -114,9 +116,12 @@ export function createNativeClient(): Client {
       }
     },
     async open(url, disposition) {
+      const target = inspectLaunchUrl(url)
+      if (!target.ok)
+        throw new Error(getT().urlErrors.unsafeScheme())
       if (disposition === 'window')
-        await browser.windows.create({ url })
-      else await browser.tabs.create({ url })
+        await browser.windows.create({ url: target.url })
+      else await browser.tabs.create({ url: target.url })
     },
     dispose() {
       disposed = true

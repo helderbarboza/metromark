@@ -333,6 +333,7 @@ const pt: Translation = {
   },
   urlErrors: {
     invalid: 'Use um endereço completo, como https://example.com.',
+    unsafeScheme: 'Este endereço não pode ser aberto com segurança.',
     iconAddressNotValid: 'Digite um endereço de imagem.',
     iconAddressInvalid: 'Use um endereço completo, como https://example.com/icon.png.',
     iconHttpOnly: 'Os endereços de ícone devem começar com http(s).',

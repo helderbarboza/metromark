@@ -31,7 +31,7 @@ describe('commands and synchronization', () => {
     const restored = await coordinator.execute({ type: 'undo', id: result.notice!.undoId! })
     expect(indexTree(restored.snapshot.tree).get('steam')?.title).toBe('Steam')
   })
-  it('stores an unusual URL scheme without validating it on edit', async () => {
+  it('keeps an unusual URL scheme in the tree on edit', async () => {
     const { coordinator, bookmarks } = fixture()
     const update = vi.spyOn(bookmarks, 'update')
     await coordinator.execute({
@@ -178,7 +178,7 @@ describe('bookmark creation', () => {
     })).rejects.toThrow('hex color')
     expect(create).not.toHaveBeenCalled()
   })
-  it('stores an unusual URL scheme without validating it', async () => {
+  it('keeps an unusual URL scheme in the tree on create', async () => {
     const { coordinator, bookmarks } = fixture()
     const create = vi.spyOn(bookmarks, 'create')
     const result = await coordinator.execute({

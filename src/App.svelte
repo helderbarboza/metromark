@@ -776,6 +776,10 @@
         onDragStart={boardDragStart}
         onDragStop={dragStop}
         onSelect={selectByGesture}
+        onblocked={() => showNotice({
+          message: $LL.urlErrors.unsafeScheme(),
+          tone: 'error',
+        })}
         onActivateFolder={activateFolder}
         onResizeTile={resizeTile}
         {groupMenu}

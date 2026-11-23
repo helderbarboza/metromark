@@ -42,6 +42,8 @@
     onDragStart: () => void
     onDragStop: () => void
     onSelect: (id: string, event: PointerEvent) => void
+    /** Called when a bookmark address is unsafe to open. The URL stays in the tree. */
+    onblocked?: (url: string) => void
     onActivateFolder: (id: string) => void
     onResizeTile: (id: string, size: TileSize) => void
     /** Per-group context menu content, rendered by each MetroGroup header. */
@@ -75,6 +77,7 @@
     onDragStart,
     onDragStop,
     onSelect,
+    onblocked,
     onActivateFolder,
     onResizeTile,
     groupMenu,
@@ -188,6 +191,7 @@
                         onDragStart={onDragStart}
                         onDragStop={onDragStop}
                         onSelect={onSelect}
+                        {onblocked}
                         onActivateFolder={onActivateFolder}
                         flash={flashGroup === group.id}
                         onResizeTile={onResizeTile}

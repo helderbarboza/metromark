@@ -1269,6 +1269,10 @@ type RootTranslation = {
 		 */
 		invalid: string
 		/**
+		 * T​h​i​s​ ​a​d​d​r​e​s​s​ ​c​a​n​n​o​t​ ​b​e​ ​o​p​e​n​e​d​ ​s​a​f​e​l​y​.
+		 */
+		unsafeScheme: string
+		/**
 		 * E​n​t​e​r​ ​a​n​ ​i​m​a​g​e​ ​a​d​d​r​e​s​s​.
 		 */
 		iconAddressNotValid: string
@@ -2793,6 +2797,10 @@ export type TranslationFunctions = {
 		 * Use a complete address, such as https://example.com.
 		 */
 		invalid: () => LocalizedString
+		/**
+		 * This address cannot be opened safely.
+		 */
+		unsafeScheme: () => LocalizedString
 		/**
 		 * Enter an image address.
 		 */

@@ -333,6 +333,7 @@ const en = {
   },
   urlErrors: {
     invalid: 'Use a complete address, such as https://example.com.',
+    unsafeScheme: 'This address cannot be opened safely.',
     iconAddressNotValid: 'Enter an image address.',
     iconAddressInvalid: 'Use a complete address, such as https://example.com/icon.png.',
     iconHttpOnly: 'Icon addresses must start with http(s).',

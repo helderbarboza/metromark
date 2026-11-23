@@ -4,6 +4,7 @@
 >
   import type { ComponentProps } from 'svelte'
   import BookmarkTile from '$lib/components/organisms/BookmarkTile.svelte'
+  import { inspectLaunchUrl } from '$lib/launch-url'
   import { cellsToPx, SIZES, TILE_SIZES } from '$lib/layout'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect } from 'storybook/test'
@@ -35,6 +36,20 @@
     ariaLabel="Open {args.tile.title}{args.showDomain && args.size !== 'small'
       ? ` ${args.domain}`
       : ''}"
+    style='display:block;
+      width:{cellsToPx(SIZES[args.size][0], 68)}px;
+        height:{cellsToPx(SIZES[args.size][1], 68)}px;
+        text-decoration:none
+    '
+  />
+{/snippet}
+{#snippet guardedTemplate(args: ComponentProps<typeof BookmarkTile>)}
+  {@const target = inspectLaunchUrl(args.tile.url ?? '')}
+  <BookmarkTile
+    {...args}
+    as={target.ok ? 'a' : 'button'}
+    href={target.ok ? target.url : undefined}
+    ariaLabel='Open {args.tile.title}'
     style='display:block;
       width:{cellsToPx(SIZES[args.size][0], 68)}px;
         height:{cellsToPx(SIZES[args.size][1], 68)}px;
@@ -112,4 +127,16 @@
     domain: 'example.com',
   }}
   {template}
+/>
+<Story
+  name='Blocked address'
+  args={{
+    tile: { title: 'Bookmarklet', colorIndex: 0, url: 'javascript:alert(1)' },
+    domain: '',
+  }}
+  play={async ({ canvas }) => {
+    await expect(canvas.getByRole('button', { name: 'Open Bookmarklet' })).toBeVisible()
+    await expect(canvas.queryByRole('link')).toBeNull()
+  }}
+  template={guardedTemplate}
 />
