@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import type { BookmarkNode, Command, Snapshot, TileSize } from '$lib/types'
+  import type { BookmarkNode, Command, TileSize } from '$lib/types'
 
   import LL from '$i18n/i18n-svelte'
   import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
@@ -10,6 +10,7 @@
   import * as Select from '$lib/components/ui/select'
   import { APPEARANCE_DEFAULTS } from '$lib/config'
   import { TILE_SIZES, tileSizesForView } from '$lib/layout'
+  import { requireSnapshot } from '$lib/snapshot-context'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { tileFor, tileForFolder } from '$lib/tile'
   import { isFolder } from '$lib/tree'
@@ -17,16 +18,18 @@
   import { onMount } from 'svelte'
 
   const {
-    snapshot,
     node,
     oncommand,
     onclose,
   }: {
-    snapshot: Snapshot
     node?: BookmarkNode
     oncommand: (command: Command) => Promise<boolean>
     onclose: () => void
   } = $props()
+
+  // This dialog mounts only while a loaded snapshot is present.
+  const readSnapshot = requireSnapshot()
+  const snapshot = $derived(readSnapshot())
 
   const { state: command, send } = createDialogCommand(
     command => oncommand(command),

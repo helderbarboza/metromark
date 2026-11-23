@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
-  import type { BookmarkNode, Command, Snapshot } from '$lib/types'
+  import type { BookmarkNode, Command } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import DialogError from '$lib/components/molecules/DialogError.svelte'
   import FolderSelect from '$lib/components/molecules/FolderSelect.svelte'
@@ -8,21 +8,24 @@
   import { destinationGroups, writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
   import * as Dialog from '$lib/components/ui/dialog'
+  import { requireSnapshot } from '$lib/snapshot-context'
   import { onMount } from 'svelte'
 
   const {
     spec,
-    snapshot,
     node,
     oncommand,
     onclose,
   }: {
     spec: DialogSpec
-    snapshot: Snapshot
     node?: BookmarkNode
     oncommand: (command: Command) => Promise<boolean>
     onclose: () => void
   } = $props()
+
+  // This dialog mounts only while a loaded snapshot is present.
+  const readSnapshot = requireSnapshot()
+  const snapshot = $derived(readSnapshot())
 
   const { state: command, send } = createDialogCommand(
     command => oncommand(command),

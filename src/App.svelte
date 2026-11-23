@@ -37,6 +37,7 @@
   import { loadRootFilter, resetRootFilter, saveRootFilter } from '$lib/root-filter'
   import { SettingsDebouncer } from '$lib/settings-debounce'
   import { SmoothScroller } from '$lib/smooth-scroll.svelte'
+  import { setSnapshot } from '$lib/snapshot-context'
   import { resetThemePreferences } from '$lib/theme-picker'
   import {
     flatten,
@@ -158,8 +159,9 @@
   const originalFavicons = $derived(
     snapshot?.settings.originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
   )
-  // Workspace state for the board subtree (tiles read it via context). The getter
-  // closure keeps consumers reactive without drilling props.
+  // Snapshot and workspace state reach deep consumers through context. The
+  // getter closures keep consumers reactive without drilling props.
+  setSnapshot(() => snapshot)
   setWorkspace(() => ({
     dragging,
     selectedId,
@@ -760,7 +762,6 @@
         bind:open={menuOpen}
         bind:scroller
         bind:contentEl={menuContentEl}
-        {snapshot}
         {loadError}
         {normalizedQuery}
         {visibleGroups}
@@ -836,7 +837,6 @@
         {#key JSON.stringify(dialog)}
           <Editor
             spec={dialog}
-            {snapshot}
             oncommand={execute}
             onclose={() => (dialog = null)}
           />

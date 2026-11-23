@@ -2,7 +2,7 @@
   import type { LayoutStager } from '$lib/layout-stager.svelte'
   import type { MenuItem } from '$lib/menus'
   import type { SmoothScroller } from '$lib/smooth-scroll.svelte'
-  import type { GroupView, Snapshot, TileSize, TileView } from '$lib/types'
+  import type { GroupView, TileSize, TileView } from '$lib/types'
   import type { Snippet } from 'svelte'
   import LL from '$i18n/i18n-svelte'
   import BoardStatus from '$lib/components/molecules/BoardStatus.svelte'
@@ -13,6 +13,7 @@
   import { Scrollbar } from '$lib/components/ui/scroll-area'
   import { gridViewDef, tileSizesForView } from '$lib/layout'
   import { focusFirstMenuItem } from '$lib/menu-focus'
+  import { getSnapshot } from '$lib/snapshot-context'
   import { cn } from '$lib/utils.js'
   import { SnapGridGroup } from '@snapgridjs/svelte'
   import { ScrollArea as ScrollAreaPrimitive } from 'bits-ui'
@@ -26,7 +27,6 @@
     scroller: HTMLElement | null
     /** The context-menu content element (bindable). */
     contentEl: HTMLDivElement | null
-    snapshot: Snapshot | null
     loadError: string
     normalizedQuery: string
     visibleGroups: GroupView[]
@@ -61,7 +61,6 @@
     open = $bindable(false),
     scroller = $bindable(null),
     contentEl = $bindable(null),
-    snapshot,
     loadError,
     normalizedQuery,
     visibleGroups,
@@ -89,6 +88,10 @@
     onCloseAutoFocus,
   }: Props = $props()
 
+  // Snapshot flows through context (set by the root component). The getter
+  // closure keeps the derived values below reactive across snapshot updates.
+  const readSnapshot = getSnapshot()
+  const snapshot = $derived(readSnapshot())
   const view = $derived(snapshot?.settings.gridView)
   const def = $derived(gridViewDef(view))
   const rows = $derived(def.rows)

@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
-  import type { BookmarkNode, Command, Snapshot } from '$lib/types'
+  import type { BookmarkNode, Command } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
   import ColorSwatches from '$lib/components/molecules/ColorSwatches.svelte'
@@ -12,6 +12,7 @@
   import * as Dialog from '$lib/components/ui/dialog'
   import { Input } from '$lib/components/ui/input'
   import { suggestAccentIndex } from '$lib/favicon-cache'
+  import { requireSnapshot } from '$lib/snapshot-context'
   import { getThemeAccentColors } from '$lib/theme-colors'
   import { projectGroups } from '$lib/tree'
   import { theme } from 'mode-watcher'
@@ -19,17 +20,19 @@
 
   const {
     spec,
-    snapshot,
     node,
     oncommand,
     onclose,
   }: {
     spec: DialogSpec
-    snapshot: Snapshot
     node?: BookmarkNode
     oncommand: (command: Command) => Promise<boolean>
     onclose: () => void
   } = $props()
+
+  // This dialog mounts only while a loaded snapshot is present.
+  const readSnapshot = requireSnapshot()
+  const snapshot = $derived(readSnapshot())
 
   const { state: command, send } = createDialogCommand(
     command => oncommand(command),

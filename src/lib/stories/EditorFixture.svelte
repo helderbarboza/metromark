@@ -6,6 +6,7 @@
   import SettingsDialog from '$lib/components/organisms/editor/SettingsDialog.svelte'
   import { Button } from '$lib/components/ui/button'
   import { SETTINGS_DEFAULTS } from '$lib/config'
+  import { setSnapshot } from '$lib/snapshot-context'
   import { onMount } from 'svelte'
 
   interface Props {
@@ -18,6 +19,8 @@
   const client = createPreviewClient(SETTINGS_DEFAULTS)
   let snapshot = $state.raw<Snapshot | null>(null)
   let open = $state(true)
+  // The editor reads the snapshot from context instead of a prop.
+  setSnapshot(() => snapshot)
   async function command(command: Command) {
     snapshot = (await client.execute(command)).snapshot
     return true
@@ -46,7 +49,6 @@
     {:else}
       <Editor
         spec={{ kind, id, parentId: 'bar', undoId }}
-        {snapshot}
         onclose={() => open = false}
         oncommand={command}
       />

@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { DialogSpec } from '$lib/components/organisms/editor/dialog-spec'
-  import type { Command, Snapshot } from '$lib/types'
+  import type { Command } from '$lib/types'
   import LL, { locale } from '$i18n/i18n-svelte'
   import Modal from '$lib/components/molecules/Modal.svelte'
   import AppearanceDialog from '$lib/components/organisms/editor/AppearanceDialog.svelte'
@@ -10,17 +10,20 @@
   import DestinationDialog from '$lib/components/organisms/editor/DestinationDialog.svelte'
   import { dialogEyebrow, dialogTitle } from '$lib/components/organisms/editor/dialog-spec'
   import FolderDialog from '$lib/components/organisms/editor/FolderDialog.svelte'
+  import { requireSnapshot } from '$lib/snapshot-context'
   import { indexTree } from '$lib/tree'
 
   interface Props {
     spec: DialogSpec
-    snapshot: Snapshot
     oncommand: (command: Command) => Promise<boolean>
     onclose: () => void
   }
 
-  const { spec, snapshot, oncommand, onclose }: Props = $props()
+  const { spec, oncommand, onclose }: Props = $props()
 
+  // The editor mounts only after the snapshot loads.
+  const readSnapshot = requireSnapshot()
+  const snapshot = $derived(readSnapshot())
   const nodes = $derived(indexTree(snapshot.tree))
   const node = $derived(spec.id
     ? nodes.get(spec.id)
@@ -70,7 +73,6 @@
   {:else if spec.kind === 'bookmark'}
     <BookmarkDialog
       {spec}
-      {snapshot}
       {node}
       {oncommand}
       {onclose}
@@ -78,7 +80,6 @@
   {:else if spec.kind === 'folder' || spec.kind === 'rename'}
     <FolderDialog
       {spec}
-      {snapshot}
       {node}
       {oncommand}
       {onclose}
@@ -86,14 +87,12 @@
   {:else if spec.kind === 'move' || spec.kind === 'restore'}
     <DestinationDialog
       {spec}
-      {snapshot}
       {node}
       {oncommand}
       {onclose}
     />
   {:else if spec.kind === 'appearance'}
     <AppearanceDialog
-      {snapshot}
       {node}
       {oncommand}
       {onclose}
