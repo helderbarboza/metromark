@@ -181,6 +181,10 @@
         DRAG_PX+:     permit tile reordering
     */
       threshold: DRAG_PX,
+      // Touch must arm on the same distance as mouse and pen. The default
+      // hold also sets touch-action: pan-y, which gives quick vertical
+      // swipes to the browser instead of the cross-slide recognizer.
+      touchHold: 0,
     },
 
     onLayoutChange: (next) => {
