@@ -116,7 +116,7 @@ export const SETTINGS_DEFAULTS: Settings = {
   density: 'comfortable',
   gridView: 'classic',
   showDomains: true,
-  originalFavicons: false,
+  originalFavicons: true,
   reducedMotion: false,
   language: 'auto',
   background: {
