@@ -101,7 +101,7 @@
   // Reactive colors that update when theme/mode changes
   let colors = $derived(resolveTileColors(tile))
   const bg = $derived(colors.bg)
-  // Cutouts are tinted, so white stays readable on any sampled wallpaper.
+  // Tile backgrounds are darkened, so white text stays readable over them.
   const fg = $derived(
     tileBackground || colors.fg === 1
       ? '#ffffff'

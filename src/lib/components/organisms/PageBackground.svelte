@@ -70,14 +70,14 @@
   )
   // Shaders have no parallax of their own. Give their tile background layer the same
   // horizontal drift as an image background so the tiles keep a depth effect.
-  const SHADER_CUTOUT_ZOOM = 1.5
-  const shaderCutout = $derived(
+  const SHADER_TILE_BACKGROUND_ZOOM = 1.5
+  const shaderTileBackground = $derived(
     tileBackground && background.type === 'shader' && !reducedMotion,
   )
   const shaderStyle = $derived.by(() => {
-    if (!shaderCutout)
+    if (!shaderTileBackground)
       return undefined
-    const zoom = SHADER_CUTOUT_ZOOM
+    const zoom = SHADER_TILE_BACKGROUND_ZOOM
     const shift = (0.5 - scrollProgress) * ((zoom - 1) / zoom) * 100
     const width = `${zoom * 100}%`
     const left = `${(1 - zoom) * 50}%`
@@ -146,7 +146,7 @@
   aria-hidden='true'
 >
   <div
-    class={shaderCutout ? 'absolute inset-y-0' : 'absolute inset-0'}
+    class={shaderTileBackground ? 'absolute inset-y-0' : 'absolute inset-0'}
     style={shaderStyle}
   >
     {#if background.type === 'color'}

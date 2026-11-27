@@ -688,7 +688,7 @@ test('a new folder cannot be moved into itself, but accepts a bookmark drop', as
   await expect(created.locator('a[data-grid-id="youtube"]')).toHaveCount(1)
 })
 
-test('image tile background clips the live wallpaper to tile shapes', async ({ page }) => {
+test('image tile background clips the live background to tile shapes', async ({ page }) => {
   await start(page)
   const data = await presentation(page)
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">'

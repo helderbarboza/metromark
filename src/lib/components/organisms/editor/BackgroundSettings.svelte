@@ -17,6 +17,7 @@
   import Icon from '$lib/components/atoms/Icon.svelte'
   import BaseColorMode from '$lib/components/molecules/BaseColorMode.svelte'
   import CollapsibleSection from '$lib/components/molecules/CollapsibleSection.svelte'
+  import SettingsCard from '$lib/components/molecules/SettingsCard.svelte'
   import SettingsRow from '$lib/components/molecules/SettingsRow.svelte'
   import ShaderThumb from '$lib/components/molecules/ShaderThumb.svelte'
   import { Button } from '$lib/components/ui/button'
@@ -768,38 +769,31 @@
   }
 </script>
 
-<CollapsibleSection
-  open={false}
-  title={$LL.settings.tileBackground()}
+<SettingsCard
+  title={$LL.settings.backgroundModeTitle()}
   helpText={$LL.settings.backgroundModeHelp()}
   icon='customize'
+  controlId='background-mode'
 >
-  <SettingsRow
-    title={$LL.settings.tileBackground()}
-    helpText={$LL.settings.backgroundModeHelp()}
-    controlId='background-mode'
+  <ToggleGroup.Root
+    type='single'
+    id='background-mode'
+    aria-labelledby='background-mode-title'
+    aria-describedby='background-mode-help'
+    value={settings.backgroundMode ?? 'fullScreen'}
     disabled={busy}
+    onValueChange={(value) => {
+      if (value !== 'tile' && value !== 'fullScreen')
+        return
+      onchange({ backgroundMode: value })
+    }}
   >
-    <ToggleGroup.Root
-      type='single'
-      id='background-mode'
-      aria-labelledby='background-mode-title'
-      aria-describedby='background-mode-help'
-      value={settings.backgroundMode ?? 'fullScreen'}
-      disabled={busy}
-      onValueChange={(value) => {
-        if (value !== 'tile' && value !== 'fullScreen')
-          return
-        onchange({ backgroundMode: value })
-      }}
-    >
-      <ToggleGroup.Item value='tile' class='grow'>{$LL.settings.tileBackground()}</ToggleGroup.Item>
-      <ToggleGroup.Item value='fullScreen' class='grow'>
-        {$LL.settings.fullScreenBackground()}
-      </ToggleGroup.Item>
-    </ToggleGroup.Root>
-  </SettingsRow>
-</CollapsibleSection>
+    <ToggleGroup.Item value='tile' class='grow'>{$LL.settings.tileBackground()}</ToggleGroup.Item>
+    <ToggleGroup.Item value='fullScreen' class='grow'>
+      {$LL.settings.fullScreenBackground()}
+    </ToggleGroup.Item>
+  </ToggleGroup.Root>
+</SettingsCard>
 <CollapsibleSection
   open={true}
   title={$LL.settings.backgroundType()}

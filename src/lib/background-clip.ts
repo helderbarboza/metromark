@@ -1,7 +1,7 @@
 /**
  * Builds a CSS clip path that limits a layer to tile background regions. The live
  * background layer stays visible and CSS hides everything outside the tiles,
- * so no wallpaper pixels need to be sampled into a canvas.
+ * so no background pixels need to be sampled into a canvas.
  */
 export function buildBackgroundClipPath(
   tiles: Iterable<HTMLElement>,

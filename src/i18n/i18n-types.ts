@@ -1110,15 +1110,19 @@ type RootTranslation = {
 		 */
 		parallaxZoomHelp: string
 		/**
-		 * T​i​l​e​ ​b​a​c​k​g​r​o​u​n​d
+		 * B​a​c​k​g​r​o​u​n​d​ ​p​l​a​c​e​m​e​n​t
+		 */
+		backgroundModeTitle: string
+		/**
+		 * I​n​ ​t​i​l​e​s
 		 */
 		tileBackground: string
 		/**
-		 * F​u​l​l​ ​s​c​r​e​e​n​ ​b​a​c​k​g​r​o​u​n​d
+		 * F​u​l​l​ ​s​c​r​e​e​n
 		 */
 		fullScreenBackground: string
 		/**
-		 * S​h​o​w​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​i​n​s​i​d​e​ ​t​i​l​e​s​,​ ​o​r​ ​a​c​r​o​s​s​ ​t​h​e​ ​f​u​l​l​ ​s​c​r​e​e​n​.​ ​T​i​l​e​ ​b​a​c​k​g​r​o​u​n​d​ ​s​h​o​w​s​ ​t​h​e​ ​l​i​v​e​ ​Y​o​u​T​u​b​e​ ​v​i​d​e​o​.
+		 * C​h​o​o​s​e​ ​w​h​e​r​e​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​a​p​p​e​a​r​s​:​ ​i​n​s​i​d​e​ ​t​h​e​ ​t​i​l​e​s​ ​o​r​ ​a​c​r​o​s​s​ ​t​h​e​ ​f​u​l​l​ ​s​c​r​e​e​n​.
 		 */
 		backgroundModeHelp: string
 		/**
@@ -2658,15 +2662,19 @@ export type TranslationFunctions = {
 		 */
 		parallaxZoomHelp: () => LocalizedString
 		/**
-		 * Tile background
+		 * Background placement
+		 */
+		backgroundModeTitle: () => LocalizedString
+		/**
+		 * In tiles
 		 */
 		tileBackground: () => LocalizedString
 		/**
-		 * Full screen background
+		 * Full screen
 		 */
 		fullScreenBackground: () => LocalizedString
 		/**
-		 * Show the background inside tiles, or across the full screen. Tile background shows the live YouTube video.
+		 * Choose where the background appears: inside the tiles or across the full screen.
 		 */
 		backgroundModeHelp: () => LocalizedString
 		/**
