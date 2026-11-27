@@ -5,6 +5,7 @@
   import CollapsibleSection from '$lib/components/molecules/CollapsibleSection.svelte'
   import SettingsRow from '$lib/components/molecules/SettingsRow.svelte'
   import { Button } from '$lib/components/ui/button'
+  import { Switch } from '$lib/components/ui/switch'
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, userEvent } from 'storybook/test'
 
@@ -66,24 +67,10 @@
 {/snippet}
 
 {#snippet switchControl(id: string, titleId: string, on: boolean)}
-  <label for={id} class='flex cursor-pointer items-center gap-2.5 text-sm'>
+  <span class='flex cursor-pointer items-center gap-2.5 text-sm'>
     <span>{on ? 'On' : 'Off'}</span>
-    <input
-      {id}
-      type='checkbox'
-      role='switch'
-      aria-labelledby={titleId}
-      checked={on}
-      class='
-        h-5.5 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-        p-0.75
-        before:block before:size-4 before:rounded-full before:bg-(--muted-foreground)
-        before:transition-transform before:duration-130
-        checked:bg-(--primary)
-        checked:before:translate-x-5.5 checked:before:bg-(--primary-foreground)
-      '
-    />
-  </label>
+    <Switch {id} aria-labelledby={titleId} checked={on} />
+  </span>
 {/snippet}
 
 <Story

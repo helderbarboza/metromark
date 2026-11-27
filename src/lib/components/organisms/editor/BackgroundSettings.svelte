@@ -24,6 +24,7 @@
   import { Input } from '$lib/components/ui/input'
   import * as Select from '$lib/components/ui/select'
   import { Slider } from '$lib/components/ui/slider'
+  import { Switch } from '$lib/components/ui/switch'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { getT } from '$lib/locale'
@@ -883,23 +884,13 @@
       controlId='shader-paused'
       disabled={busy}
     >
-      <input
+      <Switch
         id='shader-paused'
-        type='checkbox'
-        role='switch'
+        aria-labelledby='shader-paused-title'
         aria-describedby='shader-paused-help'
         checked={settings.background.type === 'shader' && settings.background.paused === true}
         disabled={busy}
-        onchange={event => updateShader({ paused: event.currentTarget.checked })}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
+        onCheckedChange={paused => updateShader({ paused })}
       />
     </SettingsRow>
     <div class='border-t border-(--border) p-4'>
@@ -1079,23 +1070,13 @@
       controlId='shader-parallax'
       disabled={busy || settings.reducedMotion}
     >
-      <input
+      <Switch
         id='shader-parallax'
-        type='checkbox'
-        role='switch'
+        aria-labelledby='shader-parallax-title'
         aria-describedby='shader-parallax-help'
         checked={settings.background.parallax ?? BACKGROUND_DEFAULTS.shader.parallax}
         disabled={busy || settings.reducedMotion}
-        onchange={event => updateShader({ parallax: event.currentTarget.checked })}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
+        onCheckedChange={parallax => updateShader({ parallax })}
       />
     </SettingsRow>
     {@const shaderParallaxDisabled = settings.reducedMotion
@@ -1194,24 +1175,14 @@
       controlId='shader-mouse'
       disabled={busy}
     >
-      <input
+      <Switch
         id='shader-mouse'
-        type='checkbox'
-        role='switch'
+        aria-labelledby='shader-mouse-title'
         aria-describedby='shader-mouse-help'
         checked={settings.background.mouseInteraction
           ?? BACKGROUND_DEFAULTS.shader.mouseInteraction}
         disabled={busy}
-        onchange={event => updateShader({ mouseInteraction: event.currentTarget.checked })}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
+        onCheckedChange={mouseInteraction => updateShader({ mouseInteraction })}
       />
     </SettingsRow>
   {/if}
@@ -1412,23 +1383,13 @@
       controlId='image-parallax'
       disabled={busy || uploading || settings.reducedMotion}
     >
-      <input
+      <Switch
         id='image-parallax'
-        type='checkbox'
-        role='switch'
+        aria-labelledby='image-parallax-title'
         aria-describedby='image-parallax-help'
         checked={bg.parallax ?? BACKGROUND_DEFAULTS.image.parallax}
         disabled={busy || uploading || settings.reducedMotion}
-        onchange={event => updateImage({ parallax: event.currentTarget.checked })}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
+        onCheckedChange={parallax => updateImage({ parallax })}
       />
     </SettingsRow>
     {@const parallaxDisabled = uploading || settings.reducedMotion
@@ -1598,23 +1559,13 @@
       controlId='youtube-parallax'
       disabled={busy || settings.reducedMotion}
     >
-      <input
+      <Switch
         id='youtube-parallax'
-        type='checkbox'
-        role='switch'
+        aria-labelledby='youtube-parallax-title'
         aria-describedby='youtube-parallax-help'
         checked={bg.parallax ?? BACKGROUND_DEFAULTS.youtube.parallax}
         disabled={busy || settings.reducedMotion}
-        onchange={event => updateYoutube({ parallax: event.currentTarget.checked })}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
+        onCheckedChange={parallax => updateYoutube({ parallax })}
       />
     </SettingsRow>
     {@const youtubeParallaxDisabled = settings.reducedMotion
@@ -1647,23 +1598,13 @@
       controlId='youtube-paused'
       disabled={busy}
     >
-      <input
+      <Switch
         id='youtube-paused'
-        type='checkbox'
-        role='switch'
+        aria-labelledby='youtube-paused-title'
         aria-describedby='youtube-paused-help'
         checked={bg.paused ?? BACKGROUND_DEFAULTS.youtube.paused}
         disabled={busy}
-        onchange={event => updateYoutube({ paused: event.currentTarget.checked })}
-        class='
-          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-          p-0.75
-          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-          before:transition-transform before:duration-130
-          checked:bg-(--primary)
-          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-          disabled:cursor-not-allowed disabled:opacity-50
-        '
+        onCheckedChange={paused => updateYoutube({ paused })}
       />
     </SettingsRow>
     <SettingsRow

@@ -13,6 +13,7 @@
   import ThemeGallery from '$lib/components/organisms/editor/ThemeGallery.svelte'
   import { Button } from '$lib/components/ui/button'
   import * as Select from '$lib/components/ui/select'
+  import { Switch } from '$lib/components/ui/switch'
   import * as Tabs from '$lib/components/ui/tabs'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import { GRID_VIEW_IDS, isGridView } from '$lib/layout'
@@ -286,23 +287,13 @@
         helpText={$LL.settings.showAddressesHelp()}
         controlId='show-domains'
       >
-        <input
+        <Switch
           id='show-domains'
-          type='checkbox'
-          role='switch'
+          aria-labelledby='show-domains-title'
           aria-describedby='show-domains-help'
           checked={settings.showDomains}
           disabled={command.busy}
-          class='
-            h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full
-            bg-(--border) p-0.75
-            before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-            before:transition-transform before:duration-130
-            checked:bg-(--primary)
-            checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-            disabled:cursor-not-allowed disabled:opacity-50
-          '
-          onchange={event => setting({ showDomains: event.currentTarget.checked })}
+          onCheckedChange={showDomains => setting({ showDomains })}
         />
       </SettingsCard>
       <SettingsCard
@@ -311,23 +302,13 @@
         helpText={$LL.settings.originalFaviconsHelp()}
         controlId='original-favicons'
       >
-        <input
+        <Switch
           id='original-favicons'
-          type='checkbox'
-          role='switch'
+          aria-labelledby='original-favicons-title'
           aria-describedby='original-favicons-help'
           checked={settings.originalFavicons}
           disabled={command.busy}
-          class='
-            h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full
-            bg-(--border) p-0.75
-            before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-            before:transition-transform before:duration-130
-            checked:bg-(--primary)
-            checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-            disabled:cursor-not-allowed disabled:opacity-50
-          '
-          onchange={event => setting({ originalFavicons: event.currentTarget.checked })}
+          onCheckedChange={originalFavicons => setting({ originalFavicons })}
         />
       </SettingsCard>
       <SettingsCard
@@ -336,23 +317,13 @@
         helpText={$LL.settings.reduceMotionHelp()}
         controlId='reduce-motion'
       >
-        <input
+        <Switch
           id='reduce-motion'
-          type='checkbox'
-          role='switch'
+          aria-labelledby='reduce-motion-title'
           aria-describedby='reduce-motion-help'
           checked={settings.reducedMotion}
           disabled={command.busy}
-          class='
-            h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full
-            bg-(--border) p-0.75
-            before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-            before:transition-transform before:duration-130
-            checked:bg-(--primary)
-            checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-            disabled:cursor-not-allowed disabled:opacity-50
-          '
-          onchange={event => setting({ reducedMotion: event.currentTarget.checked })}
+          onCheckedChange={reducedMotion => setting({ reducedMotion })}
         />
       </SettingsCard>
       <SettingsCard
