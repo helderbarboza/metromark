@@ -32,8 +32,9 @@
   orientation='horizontal'
   class={cn(
     `
-      flex min-h-14 items-center justify-between gap-4 border-t border-(--border) px-4
-      py-3 text-(--foreground)
+      flex min-h-14 items-center justify-between gap-4 border-border px-4 py-3
+      text-foreground
+      not-first:border-t
     `,
     disabled && 'text-(--muted-foreground)',
     className,
