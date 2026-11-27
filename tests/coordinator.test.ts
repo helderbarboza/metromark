@@ -414,6 +414,8 @@ describe('durable Undo', () => {
           targetFps: 30,
           opacity: 0.5,
           mouseInteraction: false,
+          parallax: true,
+          parallaxZoom: 2,
           renderScale: 0.5,
           auto: false,
           color: '#123abc',
@@ -427,6 +429,8 @@ describe('durable Undo', () => {
       targetFps: 30,
       opacity: 0.5,
       mouseInteraction: false,
+      parallax: true,
+      parallaxZoom: 2,
       renderScale: 0.5,
       auto: false,
       color: '#123abc',
@@ -446,6 +450,19 @@ describe('durable Undo', () => {
         background: { type: 'shader', mouseInteraction: 1 },
       } as never,
     })).rejects.toThrow('Invalid shader mouse setting')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      // eslint-disable-next-line ts/consistent-type-assertions
+      patch: {
+        background: { type: 'shader', parallax: 1 },
+      } as never,
+    })).rejects.toThrow('Invalid parallax setting')
+    await expect(coordinator.execute({
+      type: 'settings.update',
+      patch: {
+        background: { type: 'shader', parallaxZoom: 5 },
+      },
+    })).rejects.toThrow('Invalid parallax zoom')
     await expect(coordinator.execute({
       type: 'settings.update',
       patch: {

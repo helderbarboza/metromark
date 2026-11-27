@@ -736,6 +736,8 @@ test('shader tile background clips the live canvas to tile shapes', async ({ pag
     shaderId: 'flow',
     paused: false,
     opacity: 1,
+    parallax: true,
+    parallaxZoom: 2,
     auto: true,
   }
   data.settings = {
@@ -750,18 +752,52 @@ test('shader tile background clips the live canvas to tile shapes', async ({ pag
   await expect(link(page, 'Steam')).toBeVisible()
 
   const layer = page.getByTestId('page-background')
+  const canvas = layer.locator('canvas')
   await expect(layer).toHaveCSS('filter', 'brightness(0.76)')
-  await expect(layer.locator('canvas')).toHaveCount(1)
+  await expect(canvas).toHaveCount(1)
   await expect.poll(async () => layer.evaluate(element =>
     getComputedStyle(element).clipPath.startsWith('path('))).toBe(true)
 
   const clipBefore = await layer.evaluate(element => getComputedStyle(element).clipPath)
+  const transformBefore = await canvas.evaluate(element => getComputedStyle(element).transform)
+  const canvasWidth = await canvas.evaluate(element => element.getBoundingClientRect().width)
+  const layerWidth = await layer.evaluate(element => element.getBoundingClientRect().width)
+  expect(canvasWidth).toBeGreaterThan(layerWidth)
   await page.locator('#board').evaluate((board) => {
     board.scrollLeft = board.scrollWidth
   })
   await expect.poll(async () => layer.evaluate((element, before) => {
     return getComputedStyle(element).clipPath !== before
   }, clipBefore)).toBe(true)
+  await expect.poll(async () => canvas.evaluate((element, before) => {
+    return getComputedStyle(element).transform !== before
+  }, transformBefore)).toBe(true)
+})
+
+test('reduced motion disables shader parallax', async ({ page }) => {
+  await start(page)
+  const data = await presentation(page)
+  data.settings = {
+    ...data.settings,
+    reducedMotion: true,
+    background: {
+      type: 'shader',
+      shaderId: 'flow',
+      opacity: 1,
+      parallax: true,
+      parallaxZoom: 2,
+      auto: true,
+    },
+  }
+  await page.evaluate((value) => {
+    localStorage.setItem('metromark.preview.presentation.v1', JSON.stringify(value))
+  }, data)
+  await page.reload()
+  await expect(link(page, 'Steam')).toBeVisible()
+
+  const canvas = page.getByTestId('page-background').locator('canvas')
+  await expect(canvas).toHaveCount(1)
+  await expect(canvas).toHaveCSS('transform', 'none')
 })
 
 test('youtube tile background clips the live embed to tile shapes', async ({ page }) => {

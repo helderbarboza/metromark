@@ -289,6 +289,8 @@ const en = {
     parallaxDisabledHelp: 'Disabled because reduced motion is on',
     parallaxZoom: 'Parallax zoom',
     parallaxZoomHelp: 'More zoom gives the image room to shift',
+    shaderParallaxHelp: 'Nudge the shader as you scroll',
+    shaderParallaxZoomHelp: 'More zoom gives the shader room to shift',
     backgroundModeTitle: 'Background placement',
     tileBackground: 'In tiles',
     fullScreenBackground: 'Full screen',

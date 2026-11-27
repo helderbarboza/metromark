@@ -289,6 +289,8 @@ const fr: Translation = {
     parallaxDisabledHelp: 'Désactivé car la réduction des animations est activée',
     parallaxZoom: 'Zoom de parallaxe',
     parallaxZoomHelp: 'Plus de zoom donne de la place à l’image pour se décaler',
+    shaderParallaxHelp: 'Décale légèrement le shader lorsque tu fais défiler',
+    shaderParallaxZoomHelp: 'Plus de zoom donne de la place au shader pour se décaler',
     backgroundModeTitle: 'Placement du fond',
     tileBackground: 'Dans les tuiles',
     fullScreenBackground: 'Plein écran',

@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import type { ShaderBackgroundSettings } from '$lib/config'
   import type { ShaderDefinition } from '$lib/shaders'
   import type { ShaderMetrics } from '$lib/shaders/metrics.svelte'
   import type { ShaderPipeline } from '$lib/shaders/pipeline'
@@ -42,6 +43,12 @@
      * page. The pointer is still tracked, so turning the setting back on does not
      * need a fresh pointer move. */
     mouseInteraction?: boolean
+    /** 0..1 progress through the horizontal scroll; drives the parallax */
+    scrollProgress?: number
+    /** Enable the scroll parallax. Forced off by reduced motion. */
+    parallax?: boolean
+    /** Layer scale as a multiple of the canvas size, from 1 to 4 */
+    parallaxZoom?: ShaderBackgroundSettings['parallaxZoom']
   }
 
   const {
@@ -57,7 +64,20 @@
     metrics = true,
     onstruggle,
     mouseInteraction = BACKGROUND_DEFAULTS.shader.mouseInteraction,
+    scrollProgress = 0,
+    parallax = BACKGROUND_DEFAULTS.shader.parallax,
+    parallaxZoom = BACKGROUND_DEFAULTS.shader.parallaxZoom,
   }: Props = $props()
+
+  // Same visual treatment as an image or YouTube layer: scale the canvas wider
+  // than the viewport, then shift it as the board scrolls. The canvas backing
+  // store follows its CSS size through the resize observer, so the shader keeps
+  // its pixel density instead of being stretched.
+  const parallaxActive = $derived(parallax === true && !reducedMotion)
+  const zoom = $derived(parallaxActive
+    ? (parallaxZoom ?? BACKGROUND_DEFAULTS.shader.parallaxZoom)
+    : 1)
+  const shift = $derived((0.5 - scrollProgress) * ((zoom - 1) / zoom) * 100)
 
   // A live mirror of the setting, read by the render loop every frame. Deliberately
   // a plain object: a `$state` proxy here makes the renderer's own effect depend on
@@ -414,8 +434,17 @@
 >
   <canvas
     bind:this={canvas}
-    class='absolute inset-0 size-full'
+    class={parallaxActive
+      ? `
+        absolute inset-y-0 left-[calc((1-var(--parallax-zoom))*50%)] h-full
+        w-[calc(var(--parallax-zoom)*100%)] max-w-none will-change-transform
+      `
+      : 'absolute inset-0 size-full'}
+    style:--parallax-zoom={zoom}
     style:opacity={failed ? 0 : opacity}
+    style:transform={parallaxActive
+      ? `translate3d(${shift}%, 0, 0)`
+      : undefined}
     aria-hidden='true'
   ></canvas>
 </div>

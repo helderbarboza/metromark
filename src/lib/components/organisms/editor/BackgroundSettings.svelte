@@ -141,10 +141,18 @@
   let renderScaleDraft = $state(
     initialShader()?.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale,
   )
+  let shaderZoomDraft = $state(
+    initialShader()?.parallaxZoom ?? BACKGROUND_DEFAULTS.shader.parallaxZoom,
+  )
   let dragging = $state(false)
   // Target of the last commit, so a stale in-flight snapshot does not pull the
   // drafts back before the coordinator persists and republishes.
-  let pending = $state<{ speed: number, opacity: number, renderScale: number } | null>(null)
+  let pending = $state<{
+    speed: number
+    opacity: number
+    renderScale: number
+    parallaxZoom: number
+  } | null>(null)
 
   const COMMIT_INTERVAL_MS = 125
   let lastCommitAt = 0
@@ -164,6 +172,7 @@
         (bg.speed ?? BACKGROUND_DEFAULTS.shader.speed) === pending.speed
         && (bg.opacity ?? BACKGROUND_DEFAULTS.shader.opacity) === pending.opacity
         && (bg.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale) === pending.renderScale
+        && (bg.parallaxZoom ?? BACKGROUND_DEFAULTS.shader.parallaxZoom) === pending.parallaxZoom
       ) {
         pending = null
       }
@@ -174,6 +183,7 @@
     speedDraft = bg.speed ?? BACKGROUND_DEFAULTS.shader.speed
     opacityDraft = bg.opacity ?? BACKGROUND_DEFAULTS.shader.opacity
     renderScaleDraft = bg.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale
+    shaderZoomDraft = bg.parallaxZoom ?? BACKGROUND_DEFAULTS.shader.parallaxZoom
   })
 
   $effect(() => () => clearTimeout(trailingTimer))
@@ -185,7 +195,12 @@
     clearTimeout(trailingTimer)
     trailingTimer = undefined
     lastCommitAt = Date.now()
-    pending = { speed: speedDraft, opacity: opacityDraft, renderScale: renderScaleDraft }
+    pending = {
+      speed: speedDraft,
+      opacity: opacityDraft,
+      renderScale: renderScaleDraft,
+      parallaxZoom: shaderZoomDraft,
+    }
     onchange({
       background: {
         ...bg,
@@ -218,6 +233,12 @@
 
   function dragRenderScale(value: number) {
     renderScaleDraft = value
+    dragging = true
+    scheduleCommit()
+  }
+
+  function dragShaderZoom(value: number) {
+    shaderZoomDraft = value
     dragging = true
     scheduleCommit()
   }
@@ -1047,6 +1068,57 @@
         step={[0.25, 0.5, 0.75, 1.0]}
         class='w-32'
         onValueChange={dragRenderScale}
+        onValueCommit={finishDrag}
+      />
+    </SettingsRow>
+    <SettingsRow
+      title={$LL.settings.parallax()}
+      helpText={settings.reducedMotion
+        ? $LL.settings.parallaxDisabledHelp()
+        : $LL.settings.shaderParallaxHelp()}
+      controlId='shader-parallax'
+      disabled={busy || settings.reducedMotion}
+    >
+      <input
+        id='shader-parallax'
+        type='checkbox'
+        role='switch'
+        aria-describedby='shader-parallax-help'
+        checked={settings.background.parallax ?? BACKGROUND_DEFAULTS.shader.parallax}
+        disabled={busy || settings.reducedMotion}
+        onchange={event => updateShader({ parallax: event.currentTarget.checked })}
+        class='
+          h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
+          p-0.75
+          before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
+          before:transition-transform before:duration-130
+          checked:bg-(--primary)
+          checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
+          disabled:cursor-not-allowed disabled:opacity-50
+        '
+      />
+    </SettingsRow>
+    {@const shaderParallaxDisabled = settings.reducedMotion
+      || !(settings.background.parallax ?? BACKGROUND_DEFAULTS.shader.parallax)}
+    <SettingsRow
+      title={$LL.settings.parallaxZoom()}
+      helpText={$LL.settings.shaderParallaxZoomHelp()}
+      controlId='shader-parallax-zoom'
+      disabled={shaderParallaxDisabled}
+    >
+      <span>{String(Number(shaderZoomDraft.toFixed(2)))}x</span>
+      <Slider
+        id='shader-parallax-zoom'
+        aria-labelledby='shader-parallax-zoom-title'
+        aria-describedby='shader-parallax-zoom-help'
+        type='single'
+        value={shaderZoomDraft}
+        min={1}
+        max={4}
+        step={0.25}
+        class='w-32'
+        disabled={shaderParallaxDisabled}
+        onValueChange={dragShaderZoom}
         onValueCommit={finishDrag}
       />
     </SettingsRow>

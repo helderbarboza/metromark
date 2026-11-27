@@ -1110,6 +1110,14 @@ type RootTranslation = {
 		 */
 		parallaxZoomHelp: string
 		/**
+		 * N​u​d​g​e​ ​t​h​e​ ​s​h​a​d​e​r​ ​a​s​ ​y​o​u​ ​s​c​r​o​l​l
+		 */
+		shaderParallaxHelp: string
+		/**
+		 * M​o​r​e​ ​z​o​o​m​ ​g​i​v​e​s​ ​t​h​e​ ​s​h​a​d​e​r​ ​r​o​o​m​ ​t​o​ ​s​h​i​f​t
+		 */
+		shaderParallaxZoomHelp: string
+		/**
 		 * B​a​c​k​g​r​o​u​n​d​ ​p​l​a​c​e​m​e​n​t
 		 */
 		backgroundModeTitle: string
@@ -2661,6 +2669,14 @@ export type TranslationFunctions = {
 		 * More zoom gives the image room to shift
 		 */
 		parallaxZoomHelp: () => LocalizedString
+		/**
+		 * Nudge the shader as you scroll
+		 */
+		shaderParallaxHelp: () => LocalizedString
+		/**
+		 * More zoom gives the shader room to shift
+		 */
+		shaderParallaxZoomHelp: () => LocalizedString
 		/**
 		 * Background placement
 		 */

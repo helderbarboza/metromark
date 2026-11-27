@@ -68,22 +68,6 @@
       ? 'brightness(0.76)'
       : undefined,
   )
-  // Shaders have no parallax of their own. Give their tile background layer the same
-  // horizontal drift as an image background so the tiles keep a depth effect.
-  const SHADER_TILE_BACKGROUND_ZOOM = 1.5
-  const shaderTileBackground = $derived(
-    tileBackground && background.type === 'shader' && !reducedMotion,
-  )
-  const shaderStyle = $derived.by(() => {
-    if (!shaderTileBackground)
-      return undefined
-    const zoom = SHADER_TILE_BACKGROUND_ZOOM
-    const shift = (0.5 - scrollProgress) * ((zoom - 1) / zoom) * 100
-    const width = `${zoom * 100}%`
-    const left = `${(1 - zoom) * 50}%`
-    const transform = `translate3d(${shift}%, 0, 0)`
-    return `width: ${width}; left: ${left}; transform: ${transform};`
-  })
   let wrapper = $state<HTMLDivElement | null>(null)
   let clip = $state<string | undefined>(undefined)
 
@@ -145,10 +129,7 @@
   style:filter={layerFilter}
   aria-hidden='true'
 >
-  <div
-    class={shaderTileBackground ? 'absolute inset-y-0' : 'absolute inset-0'}
-    style={shaderStyle}
-  >
+  <div class='absolute inset-0'>
     {#if background.type === 'color'}
       {#if baseColor}
         <ColorBackground color={baseColor} />
@@ -192,6 +173,9 @@
         opacity={shaderBackground.opacity ?? BACKGROUND_DEFAULTS.shader.opacity}
         mouseInteraction={shaderBackground.mouseInteraction
           ?? BACKGROUND_DEFAULTS.shader.mouseInteraction}
+        parallax={shaderBackground.parallax ?? BACKGROUND_DEFAULTS.shader.parallax}
+        parallaxZoom={shaderBackground.parallaxZoom ?? BACKGROUND_DEFAULTS.shader.parallaxZoom}
+        {scrollProgress}
         renderScale={shaderBackground.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale}
         {onstruggle}
       />

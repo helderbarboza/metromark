@@ -24,6 +24,10 @@ const ShaderBackgroundSchema = v.object({
   opacity: v.optional(v.number()),
   /** Whether the pointer drives the shader's iMouse uniform */
   mouseInteraction: v.optional(v.boolean()),
+  /** Subtle horizontal offset while the board scrolls; forced off by reduced motion */
+  parallax: v.optional(v.boolean()),
+  /** Layer scale as a multiple of the canvas size, from 1 to 4; bigger means wider layer and more travel */
+  parallaxZoom: v.optional(v.number()),
   /** Render resolution as a fraction of the canvas backing store */
   renderScale: v.optional(v.number()),
   /** Prefer smooth motion or sharp detail when the renderer is under load */
@@ -168,6 +172,8 @@ export const BACKGROUND_DEFAULTS = {
     targetFps: 60,
     opacity: 1,
     mouseInteraction: false,
+    parallax: false,
+    parallaxZoom: 1.5,
     renderScale: 0.5,
     quality: 'motion',
     auto: true,

@@ -289,6 +289,8 @@ const de: Translation = {
     parallaxDisabledHelp: 'Deaktiviert, weil Bewegung reduzieren aktiv ist',
     parallaxZoom: 'Parallax-Zoom',
     parallaxZoomHelp: 'Mehr Zoom gibt dem Bild Raum zum Verschieben',
+    shaderParallaxHelp: 'Verschiebt den Shader leicht beim Scrollen',
+    shaderParallaxZoomHelp: 'Mehr Zoom gibt dem Shader Raum zum Verschieben',
     backgroundModeTitle: 'Hintergrundplatzierung',
     tileBackground: 'In Kacheln',
     fullScreenBackground: 'Vollbild',
