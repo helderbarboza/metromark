@@ -70,6 +70,11 @@ export const tileVariants = tv({
         `,
       },
     },
+    cutout: {
+      true: {
+        background: 'bg-transparent bg-none',
+      },
+    },
     revealed: {
       false: {
         root: `
@@ -90,5 +95,6 @@ export const tileVariants = tv({
     size: 'medium',
     selected: false,
     revealed: false,
+    cutout: false,
   },
 })

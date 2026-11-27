@@ -606,6 +606,13 @@ export class BookmarkCoordinator {
           throw new Error(getT().errors.invalidMotionSetting())
         if (patch.language !== undefined && !['auto', 'en', 'de', 'fr', 'es', 'pt'].includes(patch.language))
           throw new Error(getT().errors.invalidLanguage())
+        if (patch.cutoutTiles !== undefined && typeof patch.cutoutTiles !== 'boolean') {
+          throw new Error(getT().errors.invalidCutoutSetting())
+        }
+        if (patch.cutoutZoom !== undefined
+          && (!Number.isFinite(patch.cutoutZoom) || patch.cutoutZoom < 1 || patch.cutoutZoom > 4)) {
+          throw new Error(getT().errors.invalidCutoutZoom())
+        }
         if (patch.background !== undefined) {
           const background = patch.background
           if (background.type === 'color') {

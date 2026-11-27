@@ -10,6 +10,8 @@ export interface WorkspaceState {
   reducedMotion: boolean
   /** Show full-color favicons instead of single-color Metro glyphs. */
   originalFavicons: boolean
+  /** Paint tiles as wallpaper cutouts through the shared canvas layer. */
+  cutoutTiles: boolean
   /** Tile sizes the active view offers, smallest first. */
   sizes: readonly TileSize[]
 }

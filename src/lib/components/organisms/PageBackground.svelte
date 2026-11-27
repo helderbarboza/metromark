@@ -24,6 +24,10 @@
     onerror?: () => void
     /** Called when the YouTube video cannot be played. */
     onyoutubeerror?: () => void
+    /** Cutout tiles sample the live WebGL canvas, which needs a kept buffer. */
+    cutoutTiles?: boolean
+    /** Exposes the shader canvas to the cutout layer. */
+    onshadercanvas?: (canvas: HTMLCanvasElement | null) => void
   }
 
   const {
@@ -33,6 +37,8 @@
     onstruggle,
     onerror,
     onyoutubeerror,
+    cutoutTiles = false,
+    onshadercanvas,
   }: Props = $props()
 
   const shaderBackground = $derived(
@@ -57,50 +63,64 @@
   )
 </script>
 
-{#if background.type === 'color'}
-  {#if baseColor}
-    <ColorBackground color={baseColor} />
+<!--
+  With cutouts on, the full-page layer stays mounted (shaders keep producing
+  frames for the canvas to sample) but is invisible: the wallpaper is only
+  allowed to show through the tile slices. Gaps fall back to the page color.
+-->
+<div
+  data-testid='page-background'
+  class='pointer-events-none absolute inset-0 -z-1'
+  style:opacity={cutoutTiles ? 0 : 1}
+  aria-hidden='true'
+>
+  {#if background.type === 'color'}
+    {#if baseColor}
+      <ColorBackground color={baseColor} />
+    {/if}
+  {:else if background.type === 'image'}
+    <ImageBackground
+      src={background.url}
+      color={baseColor}
+      fit={background.fit ?? BACKGROUND_DEFAULTS.image.fit}
+      opacity={background.opacity ?? BACKGROUND_DEFAULTS.image.opacity}
+      parallax={background.parallax ?? BACKGROUND_DEFAULTS.image.parallax}
+      parallaxZoom={background.parallaxZoom ?? BACKGROUND_DEFAULTS.image.parallaxZoom}
+      {scrollProgress}
+      {reducedMotion}
+      {onerror}
+    />
+  {:else if background.type === 'youtube'}
+    <YoutubeBackground
+      src={background.url}
+      fit={background.fit ?? BACKGROUND_DEFAULTS.youtube.fit}
+      opacity={background.opacity ?? BACKGROUND_DEFAULTS.youtube.opacity}
+      parallax={background.parallax ?? BACKGROUND_DEFAULTS.youtube.parallax}
+      parallaxZoom={background.parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom}
+      playbackRate={background.playbackRate ?? BACKGROUND_DEFAULTS.youtube.playbackRate}
+      paused={background.paused ?? BACKGROUND_DEFAULTS.youtube.paused}
+      playlistOrder={background.playlistOrder ?? BACKGROUND_DEFAULTS.youtube.playlistOrder}
+      color={baseColor}
+      {scrollProgress}
+      {reducedMotion}
+      onerror={onyoutubeerror ?? onerror}
+    />
+  {:else if shaderBackground && shader}
+    <ShaderBackground
+      {shader}
+      {reducedMotion}
+      animated={!shaderBenchmark.running && shaderBackground.paused !== true}
+      color={baseColor}
+      speed={shaderBackground.speed ?? BACKGROUND_DEFAULTS.shader.speed}
+      targetFps={shaderBackground.targetFps ?? BACKGROUND_DEFAULTS.shader.targetFps}
+      quality={shaderBackground.quality ?? BACKGROUND_DEFAULTS.shader.quality}
+      opacity={shaderBackground.opacity ?? BACKGROUND_DEFAULTS.shader.opacity}
+      mouseInteraction={shaderBackground.mouseInteraction
+        ?? BACKGROUND_DEFAULTS.shader.mouseInteraction}
+      renderScale={shaderBackground.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale}
+      preserveDrawingBuffer={cutoutTiles}
+      oncanvas={onshadercanvas}
+      {onstruggle}
+    />
   {/if}
-{:else if background.type === 'image'}
-  <ImageBackground
-    src={background.url}
-    color={baseColor}
-    fit={background.fit ?? BACKGROUND_DEFAULTS.image.fit}
-    opacity={background.opacity ?? BACKGROUND_DEFAULTS.image.opacity}
-    parallax={background.parallax ?? BACKGROUND_DEFAULTS.image.parallax}
-    parallaxZoom={background.parallaxZoom ?? BACKGROUND_DEFAULTS.image.parallaxZoom}
-    {scrollProgress}
-    {reducedMotion}
-    {onerror}
-  />
-{:else if background.type === 'youtube'}
-  <YoutubeBackground
-    src={background.url}
-    fit={background.fit ?? BACKGROUND_DEFAULTS.youtube.fit}
-    opacity={background.opacity ?? BACKGROUND_DEFAULTS.youtube.opacity}
-    parallax={background.parallax ?? BACKGROUND_DEFAULTS.youtube.parallax}
-    parallaxZoom={background.parallaxZoom ?? BACKGROUND_DEFAULTS.youtube.parallaxZoom}
-    playbackRate={background.playbackRate ?? BACKGROUND_DEFAULTS.youtube.playbackRate}
-    paused={background.paused ?? BACKGROUND_DEFAULTS.youtube.paused}
-    playlistOrder={background.playlistOrder ?? BACKGROUND_DEFAULTS.youtube.playlistOrder}
-    color={baseColor}
-    {scrollProgress}
-    {reducedMotion}
-    onerror={onyoutubeerror ?? onerror}
-  />
-{:else if shaderBackground && shader}
-  <ShaderBackground
-    {shader}
-    {reducedMotion}
-    animated={!shaderBenchmark.running && shaderBackground.paused !== true}
-    color={baseColor}
-    speed={shaderBackground.speed ?? BACKGROUND_DEFAULTS.shader.speed}
-    targetFps={shaderBackground.targetFps ?? BACKGROUND_DEFAULTS.shader.targetFps}
-    quality={shaderBackground.quality ?? BACKGROUND_DEFAULTS.shader.quality}
-    opacity={shaderBackground.opacity ?? BACKGROUND_DEFAULTS.shader.opacity}
-    mouseInteraction={shaderBackground.mouseInteraction
-      ?? BACKGROUND_DEFAULTS.shader.mouseInteraction}
-    renderScale={shaderBackground.renderScale ?? BACKGROUND_DEFAULTS.shader.renderScale}
-    {onstruggle}
-  />
-{/if}
+</div>

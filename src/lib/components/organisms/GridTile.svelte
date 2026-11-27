@@ -99,6 +99,7 @@
     ? getWorkspace()
     : undefined
   const dragging = $derived(readWorkspace?.().dragging ?? false)
+  const cutout = $derived(readWorkspace?.().cutoutTiles ?? false)
   const selected = $derived((readWorkspace?.().selectedId ?? null) === id)
   const reducedMotion = $derived(readWorkspace?.().reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion)
   // Cross-slide runs on touch and pen only; a mouse selects with the right button
@@ -207,6 +208,7 @@
     size={size}
     {selected}
     {revealed}
+    {cutout}
     ariaLabel={$LL.app.folderTileLabel({ title: tile.title })}
     ariaRoleDescription={$LL.app.draggableFolder()}
     draggable={false}
@@ -242,6 +244,7 @@
     size={size}
     {selected}
     {revealed}
+    {cutout}
     domain={bookmarkTile.domain}
     showDomain={showDomains}
     as={launch?.ok ? 'a' : 'button'}

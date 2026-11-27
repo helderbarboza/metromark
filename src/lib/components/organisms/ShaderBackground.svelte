@@ -42,6 +42,10 @@
      * page. The pointer is still tracked, so turning the setting back on does not
      * need a fresh pointer move. */
     mouseInteraction?: boolean
+    /** Exposes the live WebGL canvas to the wallpaper-cutout layer. */
+    oncanvas?: (canvas: HTMLCanvasElement | null) => void
+    /** Keep the drawing buffer so the cutout layer can sample the canvas. */
+    preserveDrawingBuffer?: boolean
   }
 
   const {
@@ -57,6 +61,8 @@
     metrics = true,
     onstruggle,
     mouseInteraction = BACKGROUND_DEFAULTS.shader.mouseInteraction,
+    oncanvas,
+    preserveDrawingBuffer = false,
   }: Props = $props()
 
   // A live mirror of the setting, read by the render loop every frame. Deliberately
@@ -112,6 +118,10 @@
   })
 
   let canvas = $state<HTMLCanvasElement | null>(null)
+  $effect(() => {
+    oncanvas?.(canvas)
+    return () => oncanvas?.(null)
+  })
   // Set when the pipeline cannot start; hides the canvas so the base color
   // layer shows instead of an opaque black rectangle.
   let failed = $state(false)
@@ -125,10 +135,11 @@
     // Tracked reads: the context and programs are rebuilt when either changes.
     const paused = motion
     const definition = shader
+    const keepBuffer = preserveDrawingBuffer
     if (!element)
       return
 
-    const context = getContext(element)
+    const context = getContext(element, keepBuffer)
     if (!context) {
       // Decorative layer: degrade to the base color instead of throwing.
       console.error('[shader-background] WebGL is unavailable; showing the base color only.')

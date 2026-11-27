@@ -1,3 +1,8 @@
+import type { Settings } from '$lib/config'
+import type { Page } from '@playwright/test'
+
+import { Buffer } from 'node:buffer'
+
 import {
   appBar,
   draggable,
@@ -457,6 +462,8 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
     originalFavicons: true,
     reducedMotion: false,
     language: 'auto',
+    cutoutTiles: false,
+    cutoutZoom: 1.5,
     // Keep in sync with SETTINGS_DEFAULTS in src/lib/config.ts.
     background: {
       auto: true,
@@ -681,4 +688,111 @@ test('a new folder cannot be moved into itself, but accepts a bookmark drop', as
   await page.mouse.up()
   await expect.poll(async () => flat(await tree(page)).find(node => node.id === 'youtube')?.parentId).toBe(newId)
   await expect(created.locator('a[data-grid-id="youtube"]')).toHaveCount(1)
+})
+
+/** Reads the canvas pixel behind the first fully on-screen tile. */
+async function sampleCutout(page: Page): Promise<number[]> {
+  return page.locator('[data-cutout-tile]').evaluateAll((elements) => {
+    const canvas = document.querySelector('[data-testid="cutout-canvas"]')
+    if (!(canvas instanceof HTMLCanvasElement))
+      return [0, 0, 0, 0]
+    const ctx = canvas.getContext('2d')
+    if (!ctx)
+      return [0, 0, 0, 0]
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    for (const element of elements) {
+      const box = element.getBoundingClientRect()
+      if (
+        box.left < 4
+        || box.top < 4
+        || box.right > window.innerWidth - 4
+        || box.bottom > window.innerHeight - 4
+      ) {
+        continue
+      }
+      const pixel = ctx.getImageData(
+        Math.round((box.left + box.width / 2) * dpr),
+        Math.round((box.top + box.height / 2) * dpr),
+        1,
+        1,
+      ).data
+      return Array.from(pixel)
+    }
+    return [0, 0, 0, 0]
+  })
+}
+
+test('wallpaper cutout tiles paint slices and drift with board parallax', async ({ page }) => {
+  await start(page)
+  const data = await presentation(page)
+  // Two hard-edged halves: red at rest, blue once the wallpaper has shifted.
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">'
+    + '<rect width="100" height="100" fill="#ff0000"/>'
+    + '<rect x="100" width="100" height="100" fill="#0000ff"/></svg>'
+  const background: Settings['background'] = {
+    type: 'image',
+    url: `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`,
+    fit: 'fill',
+    opacity: 1,
+  }
+  const settings: Settings = {
+    ...data.settings,
+    cutoutTiles: true,
+    cutoutZoom: 2,
+    background,
+  }
+  data.settings = settings
+  await page.evaluate((value) => {
+    localStorage.setItem('metromark.preview.presentation.v1', JSON.stringify(value))
+  }, data)
+  await page.reload()
+  await expect(link(page, 'Steam')).toBeVisible()
+  await expect(page.getByTestId('cutout-canvas')).toHaveCount(1)
+  await expect(page.getByTestId('page-background')).toHaveCSS('opacity', '0')
+  // Gaps between tiles are transparent: the full-page wallpaper is hidden.
+  const gap = await page.evaluate(() => {
+    const canvas = document.querySelector('[data-testid="cutout-canvas"]')
+    if (!(canvas instanceof HTMLCanvasElement))
+      return null
+    const context = canvas.getContext('2d')
+    if (!context)
+      return null
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    return Array.from(context.getImageData(10 * dpr, 300 * dpr, 1, 1).data)
+  })
+  expect(gap).toEqual([0, 0, 0, 0])
+
+  // One tint scrim darkens the sampled wallpaper but keeps it unmistakable.
+  await expect.poll(async () => (await sampleCutout(page))[0]).toBeGreaterThan(150)
+  await page.locator('#board').evaluate((board) => {
+    board.scrollLeft = board.scrollWidth
+  })
+  await expect.poll(async () => (await sampleCutout(page))[2]).toBeGreaterThan(150)
+})
+
+test('animated shader cutouts keep updating while the board is idle', async ({ page }) => {
+  await start(page)
+  const data = await presentation(page)
+  const background: Settings['background'] = {
+    type: 'shader',
+    shaderId: 'flow',
+    paused: false,
+    opacity: 1,
+    auto: true,
+  }
+  data.settings = {
+    ...data.settings,
+    cutoutTiles: true,
+    cutoutZoom: 1.5,
+    background,
+  }
+  await page.evaluate((value) => {
+    localStorage.setItem('metromark.preview.presentation.v1', JSON.stringify(value))
+  }, data)
+  await page.reload()
+  await expect(link(page, 'Steam')).toBeVisible()
+  await expect(page.getByTestId('cutout-canvas')).toHaveCount(1)
+
+  const initial = (await sampleCutout(page)).join(',')
+  await expect.poll(async () => (await sampleCutout(page)).join(',') !== initial).toBe(true)
 })

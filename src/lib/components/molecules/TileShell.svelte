@@ -49,6 +49,7 @@
     size,
     selected = false,
     revealed = false,
+    cutout = false,
     as = 'button',
     href,
     target,
@@ -97,9 +98,12 @@
   // Reactive colors that update when theme/mode changes
   let colors = $derived(resolveTileColors(tile))
   const bg = $derived(colors.bg)
-  const fg = $derived(colors.fg === 1
-    ? '#ffffff'
-    : '#000000')
+  // Cutouts are tinted, so white stays readable on any sampled wallpaper.
+  const fg = $derived(
+    cutout || colors.fg === 1
+      ? '#ffffff'
+      : '#000000',
+  )
 
   // Update colors when theme/mode changes
   $effect(() => {
@@ -112,7 +116,7 @@
 
   const checked = $derived(selected || revealed)
 
-  const ui = $derived(tileVariants({ size, selected, revealed }))
+  const ui = $derived(tileVariants({ size, selected, revealed, cutout }))
 
   // Quick resize: grow through the view's preset list, then wrap straight
   // back to the first. Null when the parent does not want the button
@@ -130,6 +134,7 @@
 
 <div
   class={cn('relative size-full', className)}
+  data-cutout-tile={cutout ? '' : undefined}
   data-dragging={dataDragging || undefined}
   style={style}
   {...rest}

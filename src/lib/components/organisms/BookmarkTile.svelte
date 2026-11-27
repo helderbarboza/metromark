@@ -28,6 +28,7 @@
     size,
     selected = false,
     revealed = false,
+    cutout = false,
     as = 'a',
     href,
     target,
@@ -53,7 +54,7 @@
     }),
   )
 
-  const ui = $derived(tileVariants({ size, selected, revealed }))
+  const ui = $derived(tileVariants({ size, selected, revealed, cutout }))
 </script>
 
 <TileShell
@@ -62,6 +63,7 @@
   {size}
   {selected}
   {revealed}
+  {cutout}
   {as}
   {href}
   {target}

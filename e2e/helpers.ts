@@ -14,6 +14,8 @@ const PRESENTATION_FALLBACK: AppData = {
     originalFavicons: false,
     reducedMotion: false,
     language: 'auto',
+    cutoutTiles: false,
+    cutoutZoom: 1.5,
     background: { type: 'color', auto: true },
   },
   undos: [],

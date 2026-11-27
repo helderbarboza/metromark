@@ -29,6 +29,7 @@
     size,
     selected = false,
     revealed = false,
+    cutout = false,
     dataTestId = 'folder-tile',
     ...rest
   }: Props = $props()
@@ -65,7 +66,7 @@
   const diagonalOrder = (index: number, cols: number) =>
     Math.floor(index / cols) + (index % cols)
 
-  const ui = $derived(tileVariants({ size, selected, revealed }))
+  const ui = $derived(tileVariants({ size, selected, revealed, cutout }))
 
   const cols = $derived(Math.max(1, FOLDER_COLUMNS[size]))
   const iconRows = $derived(FOLDER_ROWS[size] - (size === 'small'
@@ -337,6 +338,7 @@
   {size}
   {selected}
   {revealed}
+  {cutout}
   dataTestId={dataTestId}
   defaultLabel={$LL.app.folderTileSummary({ title: tile.title })}
   resizeNoun={$LL.app.resizeNounFolderTile()}

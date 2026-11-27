@@ -9,6 +9,8 @@ export interface CommonTileProps {
   selected?: boolean
   revealed?: boolean
   draggable?: boolean
+  /** Tile fill comes from the wallpaper-cutout canvas instead of a solid color. */
+  cutout?: boolean
   class?: string
   style?: string
   dataTestId?: string

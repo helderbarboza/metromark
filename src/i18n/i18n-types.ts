@@ -1110,6 +1110,26 @@ type RootTranslation = {
 		 */
 		parallaxZoomHelp: string
 		/**
+		 * W​a​l​l​p​a​p​e​r​ ​c​u​t​o​u​t​ ​t​i​l​e​s
+		 */
+		cutoutTiles: string
+		/**
+		 * S​h​o​w​ ​t​h​e​ ​w​a​l​l​p​a​p​e​r​ ​o​n​l​y​ ​i​n​s​i​d​e​ ​t​i​l​e​s​;​ ​t​h​e​ ​f​u​l​l​-​p​a​g​e​ ​b​a​c​k​g​r​o​u​n​d​ ​i​s​ ​h​i​d​d​e​n
+		 */
+		cutoutTilesHelp: string
+		/**
+		 * C​u​t​o​u​t​ ​z​o​o​m
+		 */
+		cutoutZoom: string
+		/**
+		 * Z​o​o​m​ ​a​n​d​ ​p​a​r​a​l​l​a​x​ ​d​e​p​t​h​ ​o​f​ ​t​h​e​ ​w​a​l​l​p​a​p​e​r​ ​i​n​s​i​d​e​ ​t​i​l​e​s
+		 */
+		cutoutZoomHelp: string
+		/**
+		 * C​u​t​o​u​t​s​ ​u​s​e​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​c​o​l​o​r​ ​w​h​i​l​e​ ​a​ ​Y​o​u​T​u​b​e​ ​b​a​c​k​g​r​o​u​n​d​ ​i​s​ ​a​c​t​i​v​e​.
+		 */
+		cutoutYoutubeFallback: string
+		/**
 		 * R​e​m​o​v​e​ ​i​m​a​g​e
 		 */
 		removeImage: string
@@ -1484,6 +1504,14 @@ type RootTranslation = {
 		 * I​n​v​a​l​i​d​ ​p​a​r​a​l​l​a​x​ ​z​o​o​m​ ​s​e​t​t​i​n​g​.
 		 */
 		invalidParallaxZoom: string
+		/**
+		 * I​n​v​a​l​i​d​ ​c​u​t​o​u​t​ ​t​i​l​e​s​ ​s​e​t​t​i​n​g​.
+		 */
+		invalidCutoutSetting: string
+		/**
+		 * I​n​v​a​l​i​d​ ​c​u​t​o​u​t​ ​z​o​o​m​ ​s​e​t​t​i​n​g​.
+		 */
+		invalidCutoutZoom: string
 		/**
 		 * I​n​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​.
 		 */
@@ -2646,6 +2674,26 @@ export type TranslationFunctions = {
 		 */
 		parallaxZoomHelp: () => LocalizedString
 		/**
+		 * Wallpaper cutout tiles
+		 */
+		cutoutTiles: () => LocalizedString
+		/**
+		 * Show the wallpaper only inside tiles; the full-page background is hidden
+		 */
+		cutoutTilesHelp: () => LocalizedString
+		/**
+		 * Cutout zoom
+		 */
+		cutoutZoom: () => LocalizedString
+		/**
+		 * Zoom and parallax depth of the wallpaper inside tiles
+		 */
+		cutoutZoomHelp: () => LocalizedString
+		/**
+		 * Cutouts use the background color while a YouTube background is active.
+		 */
+		cutoutYoutubeFallback: () => LocalizedString
+		/**
 		 * Remove image
 		 */
 		removeImage: () => LocalizedString
@@ -3011,6 +3059,14 @@ export type TranslationFunctions = {
 		 * Invalid parallax zoom setting.
 		 */
 		invalidParallaxZoom: () => LocalizedString
+		/**
+		 * Invalid cutout tiles setting.
+		 */
+		invalidCutoutSetting: () => LocalizedString
+		/**
+		 * Invalid cutout zoom setting.
+		 */
+		invalidCutoutZoom: () => LocalizedString
 		/**
 		 * Invalid YouTube address.
 		 */

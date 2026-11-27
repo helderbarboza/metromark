@@ -96,6 +96,10 @@ const SettingsSchema = v.object({
   reducedMotion: v.boolean(),
   /** Interface language; 'auto' infers from the browser */
   language: LanguageSettingSchema,
+  /** Paint tiles as cutouts of the background wallpaper instead of solid colors */
+  cutoutTiles: v.optional(v.boolean()),
+  /** Wallpaper zoom for cutouts; also controls parallax travel (1–4) */
+  cutoutZoom: v.optional(v.number()),
   /** Selected background shader id */
   background: v.variant('type', [
     ShaderBackgroundSchema,
@@ -119,6 +123,8 @@ export const SETTINGS_DEFAULTS: Settings = {
   originalFavicons: true,
   reducedMotion: false,
   language: 'auto',
+  cutoutTiles: false,
+  cutoutZoom: 1.5,
   background: {
     type: 'color',
     auto: true,

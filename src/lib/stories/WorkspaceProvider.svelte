@@ -18,6 +18,7 @@
     selectedId: state.selectedId ?? null,
     reducedMotion: state.reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion,
     originalFavicons: state.originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
+    cutoutTiles: state.cutoutTiles ?? SETTINGS_DEFAULTS.cutoutTiles ?? false,
     sizes: state.sizes ?? TILE_SIZES,
   }))
 </script>
