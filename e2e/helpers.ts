@@ -15,7 +15,6 @@ const PRESENTATION_FALLBACK: AppData = {
     reducedMotion: false,
     language: 'auto',
     cutoutTiles: false,
-    cutoutZoom: 1.5,
     background: { type: 'color', auto: true },
   },
   undos: [],

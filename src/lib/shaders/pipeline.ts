@@ -47,17 +47,9 @@ export interface GlContext {
   webgl2: boolean
 }
 
-export function getContext(
-  element: HTMLCanvasElement,
-  preserveDrawingBuffer = false,
-): GlContext | null {
-  // Context attributes are fixed at creation time. The cutout layer samples the
-  // live WebGL canvas, so it needs the drawing buffer kept after compositing.
-  const attributes = preserveDrawingBuffer
-    ? { ...CONTEXT_ATTRIBUTES, preserveDrawingBuffer: true }
-    : CONTEXT_ATTRIBUTES
+export function getContext(element: HTMLCanvasElement): GlContext | null {
   if (PREFER_WEBGL2) {
-    const webgl2 = element.getContext('webgl2', attributes)
+    const webgl2 = element.getContext('webgl2', CONTEXT_ATTRIBUTES)
     // WebGL2 is a superset for everything used here, and its type is assignable
     // to `WebGLRenderingContext`, so both contexts share a single code path.
     // Do not gate this on `instanceof WebGLRenderingContext`: the WebGL2 context
@@ -66,7 +58,7 @@ export function getContext(
     if (webgl2)
       return { gl: webgl2, webgl2: true }
   }
-  const gl = element.getContext('webgl', attributes)
+  const gl = element.getContext('webgl', CONTEXT_ATTRIBUTES)
   return gl
     ? { gl, webgl2: false }
     : null

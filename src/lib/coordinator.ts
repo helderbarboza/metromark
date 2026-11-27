@@ -609,10 +609,6 @@ export class BookmarkCoordinator {
         if (patch.cutoutTiles !== undefined && typeof patch.cutoutTiles !== 'boolean') {
           throw new Error(getT().errors.invalidCutoutSetting())
         }
-        if (patch.cutoutZoom !== undefined
-          && (!Number.isFinite(patch.cutoutZoom) || patch.cutoutZoom < 1 || patch.cutoutZoom > 4)) {
-          throw new Error(getT().errors.invalidCutoutZoom())
-        }
         if (patch.background !== undefined) {
           const background = patch.background
           if (background.type === 'color') {

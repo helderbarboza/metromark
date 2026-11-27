@@ -13,7 +13,6 @@
   import MenuItems from '$lib/components/molecules/MenuItems.svelte'
   import WorkspaceFooter from '$lib/components/molecules/WorkspaceFooter.svelte'
   import BoardContextMenu from '$lib/components/organisms/BoardContextMenu.svelte'
-  import CutoutCanvas from '$lib/components/organisms/CutoutCanvas.svelte'
   import Editor from '$lib/components/organisms/Editor.svelte'
   import MetroAppBar from '$lib/components/organisms/MetroAppBar.svelte'
   import PageBackground from '$lib/components/organisms/PageBackground.svelte'
@@ -37,7 +36,6 @@
   } from '$lib/menus'
   import { loadRootFilter, resetRootFilter, saveRootFilter } from '$lib/root-filter'
   import { SettingsDebouncer } from '$lib/settings-debounce'
-  import { shaderBenchmark } from '$lib/shaders/benchmark.svelte'
   import { SmoothScroller } from '$lib/smooth-scroll.svelte'
   import { setSnapshot } from '$lib/snapshot-context'
   import { resetThemePreferences } from '$lib/theme-picker'
@@ -76,7 +74,6 @@
   let now = $state(Date.now())
   let viewportHeight = $state(800)
   let scroller = $state<HTMLElement | null>(null)
-  let shaderCanvas = $state<HTMLCanvasElement | null>(null)
   let searchInput = $state<HTMLInputElement | null>(null)
   /** Group id briefly outlined after an activation scrolled it into view. */
   let flashGroup = $state<string | null>(null)
@@ -165,14 +162,6 @@
   const cutoutTiles = $derived(
     snapshot?.settings.cutoutTiles ?? SETTINGS_DEFAULTS.cutoutTiles ?? false,
   )
-  // An animated shader keeps producing frames while the board is idle, so its
-  // cutouts need a continuous draw loop rather than scroll-driven redraws.
-  function animatedShader(settings: Snapshot['settings'] | undefined): boolean {
-    return settings?.background.type === 'shader' && settings.background.paused !== true
-  }
-  const cutoutAnimated = $derived(
-    cutoutTiles && animatedShader(snapshot?.settings) && !reducedMotion && !shaderBenchmark.running,
-  )
   // Snapshot and workspace state reach deep consumers through context. The
   // getter closures keep consumers reactive without drilling props.
   setSnapshot(() => snapshot)
@@ -184,20 +173,6 @@
     cutoutTiles,
     sizes,
   }))
-
-  /** Stable callback so ShaderBackground does not rebind on every snapshot. */
-  function handleShaderCanvas(element: HTMLCanvasElement | null) {
-    shaderCanvas = element
-  }
-
-  /** Tile shells the cutout canvas samples, scoped to the board scroller. */
-  function cutoutTargets(): HTMLElement[] {
-    return scroller
-      ? [
-        ...scroller.querySelectorAll<HTMLElement>('[data-cutout-tile]'),
-      ]
-      : []
-  }
 
   function applySnapshot(value: Snapshot) {
     snapshot = value
@@ -719,7 +694,7 @@
           {reducedMotion}
           scrollProgress={smoothScroll.scrollProgress}
           cutoutTiles={cutoutTiles}
-          onshadercanvas={handleShaderCanvas}
+          {scroller}
           onstruggle={() => showNotice(
             {
               message: $LL.app.animatedBackgroundPaused(),
@@ -765,17 +740,6 @@
               })
             },
           )}
-        />
-      {/if}
-      {#if snapshot && cutoutTiles}
-        <CutoutCanvas
-          {scroller}
-          getTargets={cutoutTargets}
-          background={snapshot.settings.background}
-          cutoutZoom={snapshot.settings.cutoutZoom}
-          {reducedMotion}
-          animated={cutoutAnimated}
-          {shaderCanvas}
         />
       {/if}
 

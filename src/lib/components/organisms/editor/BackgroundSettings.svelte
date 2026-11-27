@@ -24,7 +24,7 @@
   import * as Select from '$lib/components/ui/select'
   import { Slider } from '$lib/components/ui/slider'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
-  import { BACKGROUND_DEFAULTS, SETTINGS_DEFAULTS } from '$lib/config'
+  import { BACKGROUND_DEFAULTS } from '$lib/config'
   import { getT } from '$lib/locale'
   import { deleteBackgroundMedia, saveBackgroundMedia } from '$lib/media-store'
   import { getSettingsContext } from '$lib/settings-context'
@@ -63,18 +63,6 @@
       ? `${$LL.settings.cutoutTilesHelp()} ${$LL.settings.cutoutYoutubeFallback()}`
       : $LL.settings.cutoutTilesHelp(),
   )
-  let cutoutZoomOverride = $state<number | null>(null)
-  const cutoutZoomDraft = $derived(
-    cutoutZoomOverride ?? settings.cutoutZoom ?? SETTINGS_DEFAULTS.cutoutZoom ?? 1.5,
-  )
-  function dragCutoutZoom(value: number) {
-    cutoutZoomOverride = value
-  }
-  function commitCutoutZoom(value: number) {
-    cutoutZoomOverride = value
-    onchange({ cutoutZoom: value })
-  }
-
   const nonePressed = $derived(
     settings.background.type === 'shader' && settings.background.shaderId === NONE_SHADER_ID,
   )
@@ -814,28 +802,6 @@
         checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
         disabled:cursor-not-allowed disabled:opacity-50
       '
-    />
-  </SettingsRow>
-  <SettingsRow
-    title={$LL.settings.cutoutZoom()}
-    helpText={$LL.settings.cutoutZoomHelp()}
-    controlId='cutout-zoom'
-    disabled={busy || !settings.cutoutTiles}
-  >
-    <span>{String(Number(cutoutZoomDraft.toFixed(2)))}x</span>
-    <Slider
-      id='cutout-zoom'
-      aria-labelledby='cutout-zoom-title'
-      aria-describedby='cutout-zoom-help'
-      type='single'
-      value={cutoutZoomDraft}
-      min={1}
-      max={4}
-      step={0.25}
-      class='w-32'
-      disabled={busy || !settings.cutoutTiles}
-      onValueChange={dragCutoutZoom}
-      onValueCommit={commitCutoutZoom}
     />
   </SettingsRow>
 </CollapsibleSection>

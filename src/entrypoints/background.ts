@@ -24,7 +24,13 @@ function youtubeEmbedRefererRule(withInitiator: boolean): Browser.declarativeNet
     action: {
       type: 'modifyHeaders',
       requestHeaders: [
-        { header: 'referer', operation: 'set', value: browser.runtime.id },
+        {
+          header: 'referer',
+          operation: 'set',
+          value: /^[a-p]{32}$/.test(browser.runtime.id)
+            ? `chrome-extension://${browser.runtime.id}/`
+            : `moz-extension://${browser.runtime.id}/`,
+        },
       ],
     },
     condition: {

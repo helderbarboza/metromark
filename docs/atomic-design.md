@@ -76,7 +76,6 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `organisms/RootsSelect.svelte` | Root filter select. |
 | `organisms/BoardContextMenu.svelte` | Board context menu. |
 | `organisms/PageBackground.svelte` | Composes the configured background. |
-| `organisms/CutoutCanvas.svelte` | Paints wallpaper slices behind visible tiles on one canvas. |
 | `organisms/ColorBackground.svelte` | Color background. |
 | `organisms/ImageBackground.svelte` | Image background. |
 | `organisms/ShaderBackground.svelte` | Shader background. |
@@ -91,7 +90,7 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | File | Reason |
 | --- | --- |
 | `ThemeSync.svelte` | Headless. Applies the theme. Renders nothing. |
-| `cutouts.ts`, `cutout-source.ts` | Headless canvas geometry and wallpaper providers. No markup. |
+| `cutouts.ts` | Builds the CSS clip path for cutout tiles. No markup. |
 | `tile-variants.ts`, `tile-props.ts`, `tilt.ts` | Shared helpers. No markup. |
 | `components/ui/*/index.ts` | Re-export modules for the registry. |
 | `organisms/editor/dialog-*.ts` | Headless dialog state and spec helpers. |

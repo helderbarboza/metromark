@@ -1118,15 +1118,7 @@ type RootTranslation = {
 		 */
 		cutoutTilesHelp: string
 		/**
-		 * C​u​t​o​u​t​ ​z​o​o​m
-		 */
-		cutoutZoom: string
-		/**
-		 * Z​o​o​m​ ​a​n​d​ ​p​a​r​a​l​l​a​x​ ​d​e​p​t​h​ ​o​f​ ​t​h​e​ ​w​a​l​l​p​a​p​e​r​ ​i​n​s​i​d​e​ ​t​i​l​e​s
-		 */
-		cutoutZoomHelp: string
-		/**
-		 * C​u​t​o​u​t​s​ ​u​s​e​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​c​o​l​o​r​ ​w​h​i​l​e​ ​a​ ​Y​o​u​T​u​b​e​ ​b​a​c​k​g​r​o​u​n​d​ ​i​s​ ​a​c​t​i​v​e​.
+		 * C​u​t​o​u​t​s​ ​s​h​o​w​ ​t​h​e​ ​l​i​v​e​ ​Y​o​u​T​u​b​e​ ​v​i​d​e​o​ ​i​n​s​i​d​e​ ​t​i​l​e​s​.
 		 */
 		cutoutYoutubeFallback: string
 		/**
@@ -1508,10 +1500,6 @@ type RootTranslation = {
 		 * I​n​v​a​l​i​d​ ​c​u​t​o​u​t​ ​t​i​l​e​s​ ​s​e​t​t​i​n​g​.
 		 */
 		invalidCutoutSetting: string
-		/**
-		 * I​n​v​a​l​i​d​ ​c​u​t​o​u​t​ ​z​o​o​m​ ​s​e​t​t​i​n​g​.
-		 */
-		invalidCutoutZoom: string
 		/**
 		 * I​n​v​a​l​i​d​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​.
 		 */
@@ -2682,15 +2670,7 @@ export type TranslationFunctions = {
 		 */
 		cutoutTilesHelp: () => LocalizedString
 		/**
-		 * Cutout zoom
-		 */
-		cutoutZoom: () => LocalizedString
-		/**
-		 * Zoom and parallax depth of the wallpaper inside tiles
-		 */
-		cutoutZoomHelp: () => LocalizedString
-		/**
-		 * Cutouts use the background color while a YouTube background is active.
+		 * Cutouts show the live YouTube video inside tiles.
 		 */
 		cutoutYoutubeFallback: () => LocalizedString
 		/**
@@ -3063,10 +3043,6 @@ export type TranslationFunctions = {
 		 * Invalid cutout tiles setting.
 		 */
 		invalidCutoutSetting: () => LocalizedString
-		/**
-		 * Invalid cutout zoom setting.
-		 */
-		invalidCutoutZoom: () => LocalizedString
 		/**
 		 * Invalid YouTube address.
 		 */
