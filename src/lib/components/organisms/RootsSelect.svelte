@@ -44,7 +44,7 @@
     '
     aria-label={$LL.roots.label()}
   >
-    {selectedLabel}
+    <div class='truncate'>{selectedLabel}</div>
   </Select.Trigger>
   <Select.Content align='start'>
     <Select.Group>

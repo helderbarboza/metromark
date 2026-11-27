@@ -834,10 +834,10 @@
       }}
     >
       <Select.Trigger
-        class='w-32'
+        class='max-w-32'
         aria-label={$LL.settings.backgroundType()}
       >
-        {$LL.settings[settings.background.type]()}
+        <div class='truncate'>{$LL.settings[settings.background.type]()}</div>
       </Select.Trigger>
       <Select.Content>
         <Select.Group>

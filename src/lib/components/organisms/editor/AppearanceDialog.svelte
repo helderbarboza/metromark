@@ -114,7 +114,7 @@
           class='w-full'
           data-initial-focus
         >
-          {$LL.tileSizes[size]()}
+          <div class='truncate'>{$LL.tileSizes[size]()}</div>
         </Select.Trigger>
         <Select.Content>
           <Select.Group>

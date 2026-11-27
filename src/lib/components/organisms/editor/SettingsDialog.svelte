@@ -136,6 +136,7 @@
     variant='line'
     class='
       h-full! min-w-35 shrink-0 scrollbar-thin justify-start overflow-y-auto py-2 pr-2
+      max-sm:min-w-20
     '
   >
     {#each tabs as { value, label, icon } (value)}
@@ -151,7 +152,7 @@
       min-h-0 min-w-0 flex-1 scrollbar-thin scrollbar-gutter-stable overflow-y-auto px-4
       pt-2 pb-4
       *:grid *:animate-rise-enter *:gap-1
-      max-[480px]:p-6
+      max-sm:px-2
     '
   >
     <Tabs.Content value='general'>
@@ -174,11 +175,11 @@
         >
           <Select.Trigger
             id='language'
-            class='w-44'
+            class='w-full max-w-42'
             aria-labelledby='language-title'
             aria-describedby='language-help'
           >
-            {languageLabel}
+            <div class='truncate'>{languageLabel}</div>
           </Select.Trigger>
           <Select.Content>
             <Select.Group>
@@ -249,9 +250,8 @@
         helpText={$LL.settings.themesHelp()}
       >
         {#snippet control()}
-          <div class='inline-flex items-center gap-2 text-sm'>
+          <div class='inline-flex flex-col text-right text-xs'>
             <span>{getTheme(themes.light)?.label ?? themes.light}</span>
-            <span aria-hidden='true' class='text-(--muted-foreground)'>·</span>
             <span>{getTheme(themes.dark)?.label ?? themes.dark}</span>
           </div>
         {/snippet}
