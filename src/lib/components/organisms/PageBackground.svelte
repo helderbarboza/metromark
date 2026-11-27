@@ -62,12 +62,7 @@
       ? background.color
       : undefined,
   )
-  /** The live layer is clipped to the tiles instead of being sampled onto canvas. */
-  const layerFilter = $derived(
-    tileBackground && background.type !== 'color'
-      ? 'brightness(0.76)'
-      : undefined,
-  )
+
   let wrapper = $state<HTMLDivElement | null>(null)
   let clip = $state<string | undefined>(undefined)
 
@@ -126,7 +121,6 @@
   data-testid='page-background'
   class='pointer-events-none absolute inset-0 -z-1'
   style:clip-path={clip}
-  style:filter={layerFilter}
   aria-hidden='true'
 >
   <div class='absolute inset-0'>
