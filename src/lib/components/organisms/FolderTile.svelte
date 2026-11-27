@@ -413,20 +413,26 @@
               }}
             >
               {#if cell.kind === 'blank'}
-                <div class='size-full bg-(--tile-bg)'></div>
+                <div class={cutout ? 'size-full' : 'size-full bg-(--tile-bg)'}></div>
               {:else if cell.kind === 'folder'}
-                <div class='flex size-full items-center justify-center bg-(--tile-bg)'>
+                <div
+                  class={cn(
+                    'flex size-full items-center justify-center',
+                    !cutout && 'bg-(--tile-bg)',
+                  )}
+                  style:color={cutout ? '#ffffff' : undefined}
+                >
                   <Icon name='folder' class='size-[55%]' />
                 </div>
               {:else}
                 <div
                   class='@container flex size-full items-center justify-center'
-                  style:background={cell.bg}
-                  style:color={cell.tint}
+                  style:background={cutout ? undefined : cell.bg}
+                  style:color={cutout ? '#ffffff' : cell.tint}
                 >
                   <FaviconImage
                     pageUrl={cell.cell.url ?? ''}
-                    tint={cell.tint}
+                    tint={cutout ? '#ffffff' : cell.tint}
                     class='size-[55cqw]'
                   />
                 </div>

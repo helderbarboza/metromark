@@ -64,7 +64,7 @@
   )
   /** The live layer is clipped to the tiles instead of being sampled onto canvas. */
   const layerFilter = $derived(
-    cutoutTiles
+    cutoutTiles && background.type !== 'color'
       ? 'brightness(0.76)'
       : undefined,
   )

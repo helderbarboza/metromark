@@ -804,3 +804,37 @@ test('youtube cutouts clip the live embed to tile shapes', async ({ page }) => {
     return getComputedStyle(element).clipPath !== before
   }, clipBefore)).toBe(true)
 })
+
+test('cutout folder cells reveal the configured background color', async ({ page }) => {
+  await start(page)
+  const data = await presentation(page)
+  data.settings = {
+    ...data.settings,
+    cutoutTiles: true,
+    background: { type: 'color', auto: false, color: '#123456' },
+  }
+  await page.evaluate((value) => {
+    localStorage.setItem('metromark.preview.presentation.v1', JSON.stringify(value))
+  }, data)
+  await page.reload()
+  await expect(link(page, 'Steam')).toBeVisible()
+
+  const layer = page.getByTestId('page-background')
+  await expect(layer).toHaveCSS('filter', 'none')
+  const background = await layer.evaluate((element) => {
+    const colorLayer = element.firstElementChild?.firstElementChild
+    return colorLayer
+      ? getComputedStyle(colorLayer).backgroundColor
+      : null
+  })
+  expect(background).toBe('rgb(18, 52, 86)')
+
+  const transparent = await page.locator('[data-preview-cell]').evaluateAll((cells) => {
+    return cells.some((cell) => {
+      const fill = cell.firstElementChild?.firstElementChild
+      return fill !== null && fill !== undefined
+        && getComputedStyle(fill).backgroundColor === 'rgba(0, 0, 0, 0)'
+    })
+  })
+  expect(transparent).toBe(true)
+})
