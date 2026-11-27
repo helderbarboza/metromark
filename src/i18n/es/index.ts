@@ -174,6 +174,7 @@ const es: Translation = {
     makeYourselfAtHome: 'SIÉNTETE COMO EN CASA',
     settings: 'Configuración',
     closeSettings: 'Cerrar configuración',
+    tabGeneral: 'General',
     tabAppearance: 'Apariencia',
     tabTiles: 'Mosaicos',
     tabBackground: 'Fondo',

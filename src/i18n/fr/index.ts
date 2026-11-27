@@ -174,6 +174,7 @@ const fr: Translation = {
     makeYourselfAtHome: 'FAIS COMME CHEZ TOI',
     settings: 'Paramètres',
     closeSettings: 'Fermer les paramètres',
+    tabGeneral: 'Général',
     tabAppearance: 'Apparence',
     tabTiles: 'Tuiles',
     tabBackground: 'Fond',

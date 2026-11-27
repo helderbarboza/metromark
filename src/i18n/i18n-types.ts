@@ -645,6 +645,10 @@ type RootTranslation = {
 		 */
 		closeSettings: string
 		/**
+		 * G​e​n​e​r​a​l
+		 */
+		tabGeneral: string
+		/**
 		 * A​p​p​e​a​r​a​n​c​e
 		 */
 		tabAppearance: string
@@ -2193,6 +2197,10 @@ export type TranslationFunctions = {
 		 * Close settings
 		 */
 		closeSettings: () => LocalizedString
+		/**
+		 * General
+		 */
+		tabGeneral: () => LocalizedString
 		/**
 		 * Appearance
 		 */

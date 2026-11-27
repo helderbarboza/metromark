@@ -174,6 +174,7 @@ const de: Translation = {
     makeYourselfAtHome: 'MACH ES DIR GEMÜTLICH',
     settings: 'Einstellungen',
     closeSettings: 'Einstellungen schließen',
+    tabGeneral: 'Allgemein',
     tabAppearance: 'Erscheinungsbild',
     tabTiles: 'Kacheln',
     tabBackground: 'Hintergrund',

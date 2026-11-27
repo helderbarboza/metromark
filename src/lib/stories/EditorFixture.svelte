@@ -36,7 +36,7 @@
     {#if kind === 'settings'}
       <div
         class='
-          fixed inset-y-3 right-3 w-[min(410px,calc(100vw-24px))] overflow-auto border
+          fixed inset-y-3 right-3 flex w-[min(410px,calc(100vw-24px))] flex-col overflow-auto border
           border-(--border) bg-(--card) p-7.5 text-(--foreground) shadow-(--shadow)
         '
       >

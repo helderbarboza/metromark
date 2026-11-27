@@ -77,13 +77,18 @@
   const isPreview = $derived(typeof onresetpreview === 'function')
   const tabs: { value: string, icon: IconName, label: string }[] = $derived([
     {
+      value: 'general',
+      icon: 'settings',
+      label: $LL.settings.tabGeneral(),
+    },
+    {
       value: 'appearance',
       icon: 'paintBrush',
       label: $LL.settings.tabAppearance(),
     },
     {
       value: 'tiles',
-      icon: 'customize',
+      icon: 'layoutCellFour',
       label: $LL.settings.tabTiles(),
     },
     {
@@ -93,7 +98,7 @@
     },
     {
       value: 'advanced',
-      icon: 'settings',
+      icon: 'buildingFactory',
       label: $LL.settings.tabAdvanced(),
     },
   ])
@@ -125,51 +130,31 @@
   )
 </script>
 
-<Tabs.Root value={tabs[0].value}>
-  <Tabs.List variant='line'>
+<Tabs.Root value={tabs[0].value} orientation='vertical' class='relative ml-4 min-h-0 flex-1 gap-0 divide-x'>
+
+  <Tabs.List
+    variant='line'
+    class='
+      h-full! min-w-35 shrink-0 scrollbar-thin justify-start overflow-y-auto py-2 pr-2
+    '
+  >
     {#each tabs as { value, label, icon } (value)}
-      <Tabs.Trigger {value}>
+      <Tabs.Trigger {value} class='grow-0 text-xs after:-left-1'>
         <Icon name={icon} />
         {label}
       </Tabs.Trigger>
     {/each}
   </Tabs.List>
 
-  <div class='contents *:mt-4 *:grid *:animate-rise-enter *:gap-1'>
-    <Tabs.Content value='appearance'>
-      <SettingsCard
-        icon='darkTheme'
-        title={$LL.settings.mode()}
-        helpText={$LL.settings.modeHelp()}
-        controlId='app-mode'
-      >
-        <ToggleGroup.Root
-          type='single'
-          value={userPrefersMode.current}
-          onValueChange={(v) => {
-            // bits-ui passes a bare string; mode-watcher only accepts known modes.
-            if (v === 'light' || v === 'dark' || v === 'system')
-              setMode(v)
-          }}
-          id='app-mode'
-          aria-labelledby='app-mode-title'
-          aria-describedby='app-mode-help'
-        >
-          {#each modes as mode (mode)}
-            <ToggleGroup.Item
-              value={mode}
-              class={mode === 'system'
-                ? 'grow'
-                : 'grow capitalize'}
-            >
-              {mode === 'system'
-                ? $LL.settings.systemMode({ mode: systemsCaption })
-                : $LL.settings[mode]()}
-            </ToggleGroup.Item>
-          {/each}
-        </ToggleGroup.Root>
-      </SettingsCard>
-
+  <div
+    class='
+      min-h-0 min-w-0 flex-1 scrollbar-thin scrollbar-gutter-stable overflow-y-auto px-4
+      pt-2 pb-4
+      *:grid *:animate-rise-enter *:gap-1
+      max-[480px]:p-6
+    '
+  >
+    <Tabs.Content value='general'>
       <SettingsCard
         icon='translate'
         title={$LL.settings.language()}
@@ -206,6 +191,56 @@
             </Select.Group>
           </Select.Content>
         </Select.Root>
+      </SettingsCard>
+      <SettingsCard
+        icon='pause'
+        title={$LL.settings.reduceMotion()}
+        helpText={$LL.settings.reduceMotionHelp()}
+        controlId='reduce-motion'
+      >
+        <Switch
+          id='reduce-motion'
+          aria-labelledby='reduce-motion-title'
+          aria-describedby='reduce-motion-help'
+          checked={settings.reducedMotion}
+          disabled={command.busy}
+          onCheckedChange={reducedMotion => setting({ reducedMotion })}
+        />
+      </SettingsCard>
+    </Tabs.Content>
+
+    <Tabs.Content value='appearance'>
+      <SettingsCard
+        icon='darkTheme'
+        title={$LL.settings.mode()}
+        helpText={$LL.settings.modeHelp()}
+        controlId='app-mode'
+      >
+        <ToggleGroup.Root
+          type='single'
+          value={userPrefersMode.current}
+          onValueChange={(v) => {
+            // bits-ui passes a bare string; mode-watcher only accepts known modes.
+            if (v === 'light' || v === 'dark' || v === 'system')
+              setMode(v)
+          }}
+          id='app-mode'
+          aria-labelledby='app-mode-title'
+          aria-describedby='app-mode-help'
+        >
+          {#each modes as mode (mode)}
+            <ToggleGroup.Item
+              value={mode}
+              class={mode === 'system'
+                ? 'grow'
+                : 'grow capitalize'}
+            >
+              {mode === 'system'
+                ? $LL.settings.systemMode({ mode: systemsCaption })
+                : $LL.settings[mode]()}
+            </ToggleGroup.Item>
+          {/each}
+        </ToggleGroup.Root>
       </SettingsCard>
 
       <CollapsibleSection
@@ -312,21 +347,6 @@
         />
       </SettingsCard>
       <SettingsCard
-        icon='pause'
-        title={$LL.settings.reduceMotion()}
-        helpText={$LL.settings.reduceMotionHelp()}
-        controlId='reduce-motion'
-      >
-        <Switch
-          id='reduce-motion'
-          aria-labelledby='reduce-motion-title'
-          aria-describedby='reduce-motion-help'
-          checked={settings.reducedMotion}
-          disabled={command.busy}
-          onCheckedChange={reducedMotion => setting({ reducedMotion })}
-        />
-      </SettingsCard>
-      <SettingsCard
         icon='arrowReset'
         title={$LL.settings.resetLayouts()}
         helpText={layoutsHelp}
@@ -388,7 +408,7 @@
 <DialogError error={command.error} />
 
 {#if isPreview}
-  <div class='mt-7 rounded-sm border border-(--border) bg-(--background) p-4.25'>
+  <div class='shrink-0 rounded-sm border-t-border bg-background p-4'>
     <span class='text-[0.5rem] tracking-widest text-(--muted-foreground)'>{$LL.settings.demoWorkspace()}</span>
     <p class='mt-2.25 mb-3.25 text-[10px] leading-relaxed text-(--muted-foreground)'>
       {$LL.settings.demoWorkspaceText()}

@@ -174,6 +174,7 @@ const en = {
     makeYourselfAtHome: 'MAKE YOURSELF AT HOME',
     settings: 'Settings',
     closeSettings: 'Close settings',
+    tabGeneral: 'General',
     tabAppearance: 'Appearance',
     tabTiles: 'Tiles',
     tabBackground: 'Background',

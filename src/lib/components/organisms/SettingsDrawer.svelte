@@ -27,17 +27,17 @@
     will-change-[margin-right,opacity] motion-reduce:transition-none`,
     !open && '-mr-(--settings-width) opacity-0 pointer-events-none',
   ].filter(Boolean).join(' ')}
-  style='--settings-width: min(32rem, calc(100vw - 24px))'
+  style='--settings-width: min(40rem, calc(100vw - 4rem))'
   aria-label={$LL.settings.settings()}
   aria-hidden={!open}
   inert={!open}
 >
-  {#if settings}
 
+  {#if settings}
     <header
       class='
-        flex shrink-0 items-start justify-between gap-2.5 border-b border-(--border)
-        px-7.5 pt-7.25 pb-5
+        flex shrink-0 items-start justify-between gap-2.5 border-b border-(--border) px-4
+        pt-7.25 pb-5
       '
     >
       <div>
@@ -58,13 +58,7 @@
         <Icon name='close' size={18} />
       </Button>
     </header>
-    <div
-      class='
-        min-h-0 flex-1 scrollbar-thin scrollbar-gutter-stable overflow-auto px-7.5 pt-6.5
-        pb-7.5
-        max-[480px]:p-6
-      '
-    >
+    <div class='flex min-h-0 flex-1 flex-col'>
       <SettingsDialog
         {settings}
         {oncommand}
@@ -73,4 +67,5 @@
       />
     </div>
   {/if}
+
 </aside>
