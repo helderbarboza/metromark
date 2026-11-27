@@ -42,6 +42,8 @@
     gap?: number
     /** Tile body. Receives the resolved background and foreground colors. */
     content: Snippet<[TileContentArgs]>
+    /** False when inner elements provide the background clip regions instead. */
+    backgroundRegion?: boolean
   }
 
   const {
@@ -49,7 +51,7 @@
     size,
     selected = false,
     revealed = false,
-    cutout = false,
+    tileBackground = false,
     as = 'button',
     href,
     target,
@@ -59,6 +61,7 @@
     cell,
     gap,
     content,
+    backgroundRegion = true,
     class: className,
     style,
     dataTestId,
@@ -100,7 +103,7 @@
   const bg = $derived(colors.bg)
   // Cutouts are tinted, so white stays readable on any sampled wallpaper.
   const fg = $derived(
-    cutout || colors.fg === 1
+    tileBackground || colors.fg === 1
       ? '#ffffff'
       : '#000000',
   )
@@ -115,8 +118,18 @@
   })
 
   const checked = $derived(selected || revealed)
+  const backgroundRegionAttr = $derived.by(() => {
+    if (tileBackground && backgroundRegion)
+      return ''
+    return undefined
+  })
 
-  const ui = $derived(tileVariants({ size, selected, revealed, cutout }))
+  const ui = $derived(tileVariants({
+    size,
+    selected,
+    revealed,
+    tileBackground,
+  }))
 
   // Quick resize: grow through the view's preset list, then wrap straight
   // back to the first. Null when the parent does not want the button
@@ -134,7 +147,8 @@
 
 <div
   class={cn('relative size-full', className)}
-  data-cutout-tile={cutout ? '' : undefined}
+  data-tile-background={tileBackground ? '' : undefined}
+  data-background-region={backgroundRegionAttr}
   data-dragging={dataDragging || undefined}
   style={style}
   {...rest}

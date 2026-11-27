@@ -461,7 +461,7 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
     originalFavicons: true,
     reducedMotion: false,
     language: 'auto',
-    cutoutTiles: false,
+    backgroundMode: 'fullScreen',
     // Keep in sync with SETTINGS_DEFAULTS in src/lib/config.ts.
     background: {
       auto: true,
@@ -688,7 +688,7 @@ test('a new folder cannot be moved into itself, but accepts a bookmark drop', as
   await expect(created.locator('a[data-grid-id="youtube"]')).toHaveCount(1)
 })
 
-test('image cutouts clip the live wallpaper to tile shapes', async ({ page }) => {
+test('image tile background clips the live wallpaper to tile shapes', async ({ page }) => {
   await start(page)
   const data = await presentation(page)
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">'
@@ -704,7 +704,7 @@ test('image cutouts clip the live wallpaper to tile shapes', async ({ page }) =>
   }
   data.settings = {
     ...data.settings,
-    cutoutTiles: true,
+    backgroundMode: 'tile',
     background,
   }
   await page.evaluate((value) => {
@@ -728,7 +728,7 @@ test('image cutouts clip the live wallpaper to tile shapes', async ({ page }) =>
   }, clipBefore)).toBe(true)
 })
 
-test('shader cutouts clip the live canvas to tile shapes', async ({ page }) => {
+test('shader tile background clips the live canvas to tile shapes', async ({ page }) => {
   await start(page)
   const data = await presentation(page)
   const background: Settings['background'] = {
@@ -740,7 +740,7 @@ test('shader cutouts clip the live canvas to tile shapes', async ({ page }) => {
   }
   data.settings = {
     ...data.settings,
-    cutoutTiles: true,
+    backgroundMode: 'tile',
     background,
   }
   await page.evaluate((value) => {
@@ -764,7 +764,7 @@ test('shader cutouts clip the live canvas to tile shapes', async ({ page }) => {
   }, clipBefore)).toBe(true)
 })
 
-test('youtube cutouts clip the live embed to tile shapes', async ({ page }) => {
+test('youtube tile background clips the live embed to tile shapes', async ({ page }) => {
   await start(page)
   const data = await presentation(page)
   const background: Settings['background'] = {
@@ -781,7 +781,7 @@ test('youtube cutouts clip the live embed to tile shapes', async ({ page }) => {
   }
   data.settings = {
     ...data.settings,
-    cutoutTiles: true,
+    backgroundMode: 'tile',
     background,
   }
   await page.evaluate((value) => {
@@ -805,12 +805,12 @@ test('youtube cutouts clip the live embed to tile shapes', async ({ page }) => {
   }, clipBefore)).toBe(true)
 })
 
-test('cutout folder cells reveal the configured background color', async ({ page }) => {
+test('tile background cells reveal the configured background color', async ({ page }) => {
   await start(page)
   const data = await presentation(page)
   data.settings = {
     ...data.settings,
-    cutoutTiles: true,
+    backgroundMode: 'tile',
     background: { type: 'color', auto: false, color: '#123456' },
   }
   await page.evaluate((value) => {
@@ -837,4 +837,10 @@ test('cutout folder cells reveal the configured background color', async ({ page
     })
   })
   expect(transparent).toBe(true)
+
+  // Folder tiles contribute their individual cells as clip regions, so the
+  // 1px layout gaps stay outside the clip and show the page color.
+  const tiles = await page.locator('[data-tile-background]').count()
+  const regions = await page.locator('[data-background-region]').count()
+  expect(regions).toBeGreaterThan(tiles)
 })

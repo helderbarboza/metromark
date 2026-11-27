@@ -18,7 +18,7 @@
     selectedId: state.selectedId ?? null,
     reducedMotion: state.reducedMotion ?? SETTINGS_DEFAULTS.reducedMotion,
     originalFavicons: state.originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
-    cutoutTiles: state.cutoutTiles ?? SETTINGS_DEFAULTS.cutoutTiles ?? false,
+    tileBackground: state.tileBackground ?? (SETTINGS_DEFAULTS.backgroundMode === 'tile'),
     sizes: state.sizes ?? TILE_SIZES,
   }))
 </script>

@@ -1,9 +1,9 @@
 /**
- * Builds a CSS clip path that limits a layer to the cutout tiles. The live
+ * Builds a CSS clip path that limits a layer to tile background regions. The live
  * background layer stays visible and CSS hides everything outside the tiles,
  * so no wallpaper pixels need to be sampled into a canvas.
  */
-export function buildTileClipPath(
+export function buildBackgroundClipPath(
   tiles: Iterable<HTMLElement>,
   origin: DOMRect,
 ): string {

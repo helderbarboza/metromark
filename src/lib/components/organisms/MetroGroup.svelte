@@ -89,7 +89,7 @@
     : undefined
   const dragging = $derived(readWorkspace?.().dragging ?? false)
   const selectedId = $derived(readWorkspace?.().selectedId ?? null)
-  const cutout = $derived(readWorkspace?.().cutoutTiles ?? false)
+  const tileBackground = $derived(readWorkspace?.().tileBackground ?? false)
 
   let liveCols = $state(0)
   let menuContentEl = $state<HTMLDivElement | null>(null)
@@ -372,7 +372,7 @@
             tile={folderTile}
             size={sizeOf(entry)}
             selected={selectedId === entry.i}
-            {cutout}
+            {tileBackground}
             ariaLabel={$LL.app.folderTileSummary({ title: folderTile.title })}
             onclick={() => onActivateFolder?.(entry.i)}
             class='block size-full'
@@ -388,7 +388,7 @@
             tile={bookmarkTile}
             size={sizeOf(entry)}
             selected={selectedId === entry.i}
-            {cutout}
+            {tileBackground}
             domain={bookmarkTile.domain}
             showDomain={showDomains}
             as={target.ok ? 'a' : 'button'}

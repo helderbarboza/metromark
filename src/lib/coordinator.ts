@@ -606,8 +606,9 @@ export class BookmarkCoordinator {
           throw new Error(getT().errors.invalidMotionSetting())
         if (patch.language !== undefined && !['auto', 'en', 'de', 'fr', 'es', 'pt'].includes(patch.language))
           throw new Error(getT().errors.invalidLanguage())
-        if (patch.cutoutTiles !== undefined && typeof patch.cutoutTiles !== 'boolean') {
-          throw new Error(getT().errors.invalidCutoutSetting())
+        if (patch.backgroundMode !== undefined
+          && !['tile', 'fullScreen'].includes(patch.backgroundMode)) {
+          throw new Error(getT().errors.invalidBackgroundMode())
         }
         if (patch.background !== undefined) {
           const background = patch.background

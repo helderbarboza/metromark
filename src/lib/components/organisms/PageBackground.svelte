@@ -4,12 +4,12 @@
   // the accessibility tree; every layer sits behind the page content.
 
   import type { Settings } from '$lib/config'
+  import { buildBackgroundClipPath } from '$lib/background-clip'
   import ColorBackground from '$lib/components/organisms/ColorBackground.svelte'
   import ImageBackground from '$lib/components/organisms/ImageBackground.svelte'
   import ShaderBackground from '$lib/components/organisms/ShaderBackground.svelte'
   import YoutubeBackground from '$lib/components/organisms/YoutubeBackground.svelte'
   import { BACKGROUND_DEFAULTS } from '$lib/config'
-  import { buildTileClipPath } from '$lib/cutouts'
   import { getShader, NONE_SHADER_ID } from '$lib/shaders'
   import { shaderBenchmark } from '$lib/shaders/benchmark.svelte'
 
@@ -26,8 +26,8 @@
     /** Called when the YouTube video cannot be played. */
     onyoutubeerror?: () => void
     /** Clip the live background layer to the tile rectangles. */
-    cutoutTiles?: boolean
-    /** Board scroll viewport; used to clip cutouts to tile shapes. */
+    tileBackground?: boolean
+    /** Board scroll viewport; used to clip tile background regions. */
     scroller?: HTMLElement | null
   }
 
@@ -38,7 +38,7 @@
     onstruggle,
     onerror,
     onyoutubeerror,
-    cutoutTiles = false,
+    tileBackground = false,
     scroller = null,
   }: Props = $props()
 
@@ -64,15 +64,15 @@
   )
   /** The live layer is clipped to the tiles instead of being sampled onto canvas. */
   const layerFilter = $derived(
-    cutoutTiles && background.type !== 'color'
+    tileBackground && background.type !== 'color'
       ? 'brightness(0.76)'
       : undefined,
   )
-  // Shaders have no parallax of their own. Give their cutout layer the same
+  // Shaders have no parallax of their own. Give their tile background layer the same
   // horizontal drift as an image background so the tiles keep a depth effect.
   const SHADER_CUTOUT_ZOOM = 1.5
   const shaderCutout = $derived(
-    cutoutTiles && background.type === 'shader' && !reducedMotion,
+    tileBackground && background.type === 'shader' && !reducedMotion,
   )
   const shaderStyle = $derived.by(() => {
     if (!shaderCutout)
@@ -90,7 +90,7 @@
   $effect(() => {
     const element = wrapper
     const board = scroller
-    if (!cutoutTiles) {
+    if (!tileBackground) {
       clip = undefined
       return
     }
@@ -100,8 +100,8 @@
     const update = () => {
       frame = 0
       const origin = element.getBoundingClientRect()
-      const tiles = board.querySelectorAll<HTMLElement>('[data-cutout-tile]')
-      clip = buildTileClipPath(tiles, origin)
+      const tiles = board.querySelectorAll<HTMLElement>('[data-background-region]')
+      clip = buildBackgroundClipPath(tiles, origin)
     }
     const schedule = () => {
       if (frame === 0)
@@ -118,7 +118,7 @@
         'style',
         'class',
         'data-offscreen',
-        'data-cutout-tile',
+        'data-background-region',
       ],
     })
     const resizeObserver = new ResizeObserver(schedule)
@@ -134,7 +134,7 @@
 </script>
 
 <!--
-  With cutouts on, the live background stays visible but is clipped to the tile
+  With tile background on, the live background stays visible but is clipped to the tile
   rectangles. Gaps fall back to the page color; no offscreen canvas is needed.
 -->
 <div

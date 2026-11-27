@@ -90,7 +90,7 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | File | Reason |
 | --- | --- |
 | `ThemeSync.svelte` | Headless. Applies the theme. Renders nothing. |
-| `cutouts.ts` | Builds the CSS clip path for cutout tiles. No markup. |
+| `background-clip.ts` | Builds the CSS clip path for tile background regions. No markup. |
 | `tile-variants.ts`, `tile-props.ts`, `tilt.ts` | Shared helpers. No markup. |
 | `components/ui/*/index.ts` | Re-export modules for the registry. |
 | `organisms/editor/dialog-*.ts` | Headless dialog state and spec helpers. |

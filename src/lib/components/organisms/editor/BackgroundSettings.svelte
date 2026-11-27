@@ -58,11 +58,6 @@
   const busy = $derived(ctx().busy)
   const onchange = (patch: Partial<Settings>) => ctx().update(patch)
 
-  const cutoutHelp = $derived(
-    settings.background.type === 'youtube'
-      ? `${$LL.settings.cutoutTilesHelp()} ${$LL.settings.cutoutYoutubeFallback()}`
-      : $LL.settings.cutoutTilesHelp(),
-  )
   const nonePressed = $derived(
     settings.background.type === 'shader' && settings.background.shaderId === NONE_SHADER_ID,
   )
@@ -775,34 +770,34 @@
 
 <CollapsibleSection
   open={false}
-  title={$LL.settings.cutoutTiles()}
-  helpText={cutoutHelp}
+  title={$LL.settings.tileBackground()}
+  helpText={$LL.settings.backgroundModeHelp()}
   icon='customize'
 >
   <SettingsRow
-    title={$LL.settings.cutoutTiles()}
-    helpText={cutoutHelp}
-    controlId='cutout-tiles'
+    title={$LL.settings.tileBackground()}
+    helpText={$LL.settings.backgroundModeHelp()}
+    controlId='background-mode'
     disabled={busy}
   >
-    <input
-      id='cutout-tiles'
-      type='checkbox'
-      role='switch'
-      aria-describedby='cutout-tiles-help'
-      checked={settings.cutoutTiles ?? false}
+    <ToggleGroup.Root
+      type='single'
+      id='background-mode'
+      aria-labelledby='background-mode-title'
+      aria-describedby='background-mode-help'
+      value={settings.backgroundMode ?? 'fullScreen'}
       disabled={busy}
-      onchange={event => onchange({ cutoutTiles: event.currentTarget.checked })}
-      class='
-        h-4.5 w-7.75 shrink-0 cursor-pointer appearance-none rounded-full bg-(--border)
-        p-0.75
-        before:block before:size-3 before:rounded-full before:bg-(--muted-foreground)
-        before:transition-transform before:duration-130
-        checked:bg-(--primary)
-        checked:before:translate-x-3.25 checked:before:bg-(--primary-foreground)
-        disabled:cursor-not-allowed disabled:opacity-50
-      '
-    />
+      onValueChange={(value) => {
+        if (value !== 'tile' && value !== 'fullScreen')
+          return
+        onchange({ backgroundMode: value })
+      }}
+    >
+      <ToggleGroup.Item value='tile' class='grow'>{$LL.settings.tileBackground()}</ToggleGroup.Item>
+      <ToggleGroup.Item value='fullScreen' class='grow'>
+        {$LL.settings.fullScreenBackground()}
+      </ToggleGroup.Item>
+    </ToggleGroup.Root>
   </SettingsRow>
 </CollapsibleSection>
 <CollapsibleSection

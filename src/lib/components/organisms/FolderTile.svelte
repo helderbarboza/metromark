@@ -29,7 +29,7 @@
     size,
     selected = false,
     revealed = false,
-    cutout = false,
+    tileBackground = false,
     dataTestId = 'folder-tile',
     ...rest
   }: Props = $props()
@@ -66,7 +66,12 @@
   const diagonalOrder = (index: number, cols: number) =>
     Math.floor(index / cols) + (index % cols)
 
-  const ui = $derived(tileVariants({ size, selected, revealed, cutout }))
+  const ui = $derived(tileVariants({
+    size,
+    selected,
+    revealed,
+    tileBackground,
+  }))
 
   const cols = $derived(Math.max(1, FOLDER_COLUMNS[size]))
   const iconRows = $derived(FOLDER_ROWS[size] - (size === 'small'
@@ -338,7 +343,8 @@
   {size}
   {selected}
   {revealed}
-  {cutout}
+  {tileBackground}
+  backgroundRegion={false}
   dataTestId={dataTestId}
   defaultLabel={$LL.app.folderTileSummary({ title: tile.title })}
   resizeNoun={$LL.app.resizeNounFolderTile()}
@@ -356,6 +362,7 @@
           <div
             class='absolute top-0 left-0'
             data-preview-title=''
+            data-background-region=''
             style:transform={`translate(${titlePos.x}px, ${titlePos.y}px)`}
             style:width={`${titlePos.w}px`}
             style:height={`${titlePos.h}px`}
@@ -390,6 +397,7 @@
           <div
             class='absolute top-0 left-0'
             data-preview-cell={cell.key}
+            data-background-region=''
             style:transform={`translate(${pos.x}px, ${pos.y}px)`}
             style:width={`${pos.w}px`}
             style:height={`${pos.h}px`}
@@ -413,26 +421,26 @@
               }}
             >
               {#if cell.kind === 'blank'}
-                <div class={cutout ? 'size-full' : 'size-full bg-(--tile-bg)'}></div>
+                <div class={tileBackground ? 'size-full' : 'size-full bg-(--tile-bg)'}></div>
               {:else if cell.kind === 'folder'}
                 <div
                   class={cn(
                     'flex size-full items-center justify-center',
-                    !cutout && 'bg-(--tile-bg)',
+                    !tileBackground && 'bg-(--tile-bg)',
                   )}
-                  style:color={cutout ? '#ffffff' : undefined}
+                  style:color={tileBackground ? '#ffffff' : undefined}
                 >
                   <Icon name='folder' class='size-[55%]' />
                 </div>
               {:else}
                 <div
                   class='@container flex size-full items-center justify-center'
-                  style:background={cutout ? undefined : cell.bg}
-                  style:color={cutout ? '#ffffff' : cell.tint}
+                  style:background={tileBackground ? undefined : cell.bg}
+                  style:color={tileBackground ? '#ffffff' : cell.tint}
                 >
                   <FaviconImage
                     pageUrl={cell.cell.url ?? ''}
-                    tint={cutout ? '#ffffff' : cell.tint}
+                    tint={tileBackground ? '#ffffff' : cell.tint}
                     class='size-[55cqw]'
                   />
                 </div>

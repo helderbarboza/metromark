@@ -159,8 +159,8 @@
   const originalFavicons = $derived(
     snapshot?.settings.originalFavicons ?? SETTINGS_DEFAULTS.originalFavicons,
   )
-  const cutoutTiles = $derived(
-    snapshot?.settings.cutoutTiles ?? SETTINGS_DEFAULTS.cutoutTiles ?? false,
+  const tileBackground = $derived(
+    (snapshot?.settings.backgroundMode ?? SETTINGS_DEFAULTS.backgroundMode) === 'tile',
   )
   // Snapshot and workspace state reach deep consumers through context. The
   // getter closures keep consumers reactive without drilling props.
@@ -170,7 +170,7 @@
     selectedId,
     reducedMotion,
     originalFavicons,
-    cutoutTiles,
+    tileBackground,
     sizes,
   }))
 
@@ -693,7 +693,7 @@
           background={snapshot.settings.background}
           {reducedMotion}
           scrollProgress={smoothScroll.scrollProgress}
-          cutoutTiles={cutoutTiles}
+          tileBackground={tileBackground}
           {scroller}
           onstruggle={() => showNotice(
             {
