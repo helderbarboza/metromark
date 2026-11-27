@@ -215,8 +215,9 @@
         snapgrid-item block cursor-default
         data-offscreen:paused
         data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
+        [&>button]:transition-all [&>button]:duration-300
       `,
-      dragging && !item.isDragging && !reducedMotion && 'animate-float [&>button]:scale-93',
+      dragging && !item.isDragging && !reducedMotion && 'animate-float [&>button]:scale-95',
       dragging && !item.isDragging && '[&>button]:opacity-85',
       dragging && item.isDragging && !reducedMotion && '[&>button]:scale-104',
       dragging && item.isDragging && '[&>button]:opacity-95',
@@ -254,6 +255,8 @@
         snapgrid-item block cursor-default
         data-offscreen:paused
         data-[dragging=true]:z-10 data-[dragging=true]:cursor-grabbing
+        [&>a]:transition-all [&>a]:duration-300
+        [&>button]:transition-all [&>button]:duration-300
       `,
       // During a drag, sibling tiles shrink and dim while the dragged tile lifts.
     // Tailwind v4 `scale-*` uses the CSS `scale` property, so it composes with the
@@ -263,7 +266,7 @@
     // wrapper. dnd-kit also clones the anchor as an invisible inert ghost
     // (data-dnd-placeholder="hidden"), which needs no exclusion handling.
       dragging && !item.isDragging && !reducedMotion && `animate-float
-        [&>a]:scale-93 [&>button]:scale-93`,
+        [&>a]:scale-95 [&>button]:scale-95`,
       dragging && !item.isDragging && '[&>a]:opacity-85 [&>button]:opacity-85',
       dragging && item.isDragging && !reducedMotion && '[&>a]:scale-104 [&>button]:scale-104',
       dragging && item.isDragging && '[&>a]:opacity-95 [&>button]:opacity-95',

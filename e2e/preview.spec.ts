@@ -454,7 +454,7 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
     density: 'comfortable',
     gridView: 'classic',
     showDomains: true,
-    originalFavicons: false,
+    originalFavicons: true,
     reducedMotion: false,
     language: 'auto',
     // Keep in sync with SETTINGS_DEFAULTS in src/lib/config.ts.

@@ -4,8 +4,9 @@ import { tv } from 'tailwind-variants'
 export const tileVariants = tv({
   slots: {
     root: `
-      relative block size-full font-sans text-(--tile-fg) no-underline
-      transition-[transform,translate,opacity] duration-160 ease-fluent
+      relative block size-full overflow-hidden font-sans text-(--tile-fg)
+      no-underline transition-[transform,translate,opacity] duration-160
+      ease-fluent
       before:pointer-events-none before:absolute before:inset-0 before:z-1
       before:border-2 before:border-transparent before:transition-[border-color]
       before:duration-160 before:ease-fluent before:content-['']

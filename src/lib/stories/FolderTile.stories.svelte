@@ -6,8 +6,9 @@
   import type { ComponentProps } from 'svelte'
   import FolderTile from '$lib/components/organisms/FolderTile.svelte'
   import { cellsToPx, SIZES, TILE_SIZES } from '$lib/layout'
+  import FolderTileFixture from '$lib/stories/FolderTileFixture.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import { expect, fn } from 'storybook/test'
+  import { expect, fn, userEvent, waitFor } from 'storybook/test'
 
   const fullPreview: FolderTileView['preview'] = [
     {
@@ -267,3 +268,58 @@
   }}
   {template}
 />
+<Story
+  name='Resize reflow'
+  asChild
+  play={async ({ canvas, canvasElement }) => {
+    const cells = () => canvasElement.querySelectorAll('[data-preview-cell]')
+    const tile = () => canvasElement.querySelector('[data-testid="folder-tile"]')
+    const width = () => tile()?.getBoundingClientRect().width ?? 0
+    await waitFor(() => expect(cells()).toHaveLength(6))
+    await waitFor(() => expect(width()).toBeGreaterThan(0))
+    const before = width()
+    await userEvent.click(canvas.getByTestId('size-large'))
+    await waitFor(() => expect(cells()).toHaveLength(30))
+    await waitFor(() => expect(width()).toBeGreaterThan(before * 1.5))
+  }}
+>
+  <FolderTileFixture />
+</Story>
+<Story
+  name='Content changes'
+  asChild
+  play={async ({ canvas, canvasElement }) => {
+    const cell = (key: string) => canvasElement.querySelector(`[data-preview-cell="${key}"]`)
+    await waitFor(() => expect(cell('bookmark_a')).not.toBeNull())
+    await userEvent.click(canvas.getByTestId('add-child'))
+    await waitFor(() => expect(cell('bookmark_extra-3')).not.toBeNull())
+    await userEvent.click(canvas.getByTestId('remove-child'))
+    await waitFor(() => expect(cell('bookmark_extra-3')).toBeNull())
+  }}
+>
+  <FolderTileFixture />
+</Story>
+<Story
+  name='Reduced motion'
+  asChild
+  play={async ({ canvas, canvasElement }) => {
+    const cells = () => canvasElement.querySelectorAll('[data-preview-cell]')
+    await waitFor(() => expect(cells()).toHaveLength(6))
+    await userEvent.click(canvas.getByTestId('size-large'))
+    // Zero-duration tweens must still commit the new structure and render its cells.
+    await waitFor(() => expect(cells()).toHaveLength(30))
+  }}
+>
+  <FolderTileFixture reducedMotion />
+</Story>
+<Story
+  name='Title exit'
+  asChild
+  play={async ({ canvas, canvasElement }) => {
+    await waitFor(() => expect(canvasElement.querySelector('[data-preview-title]')).not.toBeNull())
+    await userEvent.click(canvas.getByTestId('size-small'))
+    await waitFor(() => expect(canvasElement.querySelector('[data-preview-title]')).toBeNull())
+  }}
+>
+  <FolderTileFixture />
+</Story>
