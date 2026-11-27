@@ -45,7 +45,7 @@
   }}
 >
   <div class='w-180 max-w-full border border-(--border)'>
-    <SettingsRow title='Choose a fit for your desktop image' controlId='fit'>
+    <SettingsRow label='Choose a fit for your desktop image' controlId='fit'>
       <select
         id='fit'
         class='

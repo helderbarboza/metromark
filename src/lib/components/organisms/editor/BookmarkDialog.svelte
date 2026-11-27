@@ -10,6 +10,7 @@
   import { writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
   import * as Dialog from '$lib/components/ui/dialog'
+  import * as Field from '$lib/components/ui/field'
   import { Input } from '$lib/components/ui/input'
   import { suggestAccentIndex } from '$lib/favicon-cache'
   import { requireSnapshot } from '$lib/snapshot-context'
@@ -119,9 +120,12 @@
       ? $LL.dialogs.editIntro()
       : $LL.dialogs.createIntro()}
   </p>
-  <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.title()}</span>
+  <div class='mb-5.25 flex flex-col gap-2.25'>
+    <Field.Label for='bookmark-title' class='text-xs font-medium text-(--foreground)'>
+      {$LL.dialogs.title()}
+    </Field.Label>
     <Input
+      id='bookmark-title'
       data-initial-focus
       bind:value={name}
       required
@@ -129,17 +133,20 @@
       placeholder={$LL.dialogs.titlePlaceholder()}
       autocomplete='off'
     />
-  </label>
-  <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.websiteAddress()}</span>
+  </div>
+  <div class='mb-5.25 flex flex-col gap-2.25'>
+    <Field.Label for='bookmark-url' class='text-xs font-medium text-(--foreground)'>
+      {$LL.dialogs.websiteAddress()}
+    </Field.Label>
     <Input
+      id='bookmark-url'
       bind:value={url}
       required
       placeholder={$LL.dialogs.urlPlaceholder()}
       autocomplete='url'
       spellcheck='false'
     />
-  </label>
+  </div>
   {#if !node}
     <FolderSelect folders={folders} bind:value={parentId} label={$LL.dialogs.folder()} />
     <ColorSwatches

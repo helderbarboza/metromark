@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { GroupView } from '$lib/types'
   import LL from '$i18n/i18n-svelte'
+  import * as Field from '$lib/components/ui/field'
 
   let {
     folders,
@@ -21,12 +22,12 @@
   const uid = $props.id()
 </script>
 
-<label class='mb-5.25 flex flex-col gap-2.25'>
-  <span class='text-xs font-medium text-(--foreground)' id={`${uid}-label`}>
+<Field.Field class='mb-5.25 gap-2.25'>
+  <Field.Label for={`${uid}-select`} class='text-xs font-medium text-(--foreground)'>
     {label}
-  </span>
+  </Field.Label>
   <select
-    aria-labelledby={`${uid}-label`}
+    id={`${uid}-select`}
     aria-describedby={hint
       ? `${uid}-hint`
       : undefined}
@@ -44,8 +45,11 @@
     {/each}
   </select>
   {#if hint}
-    <span class='m-0 text-xs/relaxed text-(--muted-foreground)' id={`${uid}-hint`}>
+    <Field.Description
+      id={`${uid}-hint`}
+      class='text-xs/relaxed text-(--muted-foreground)'
+    >
       {hint}
-    </span>
+    </Field.Description>
   {/if}
-</label>
+</Field.Field>

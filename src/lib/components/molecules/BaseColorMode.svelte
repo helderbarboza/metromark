@@ -50,7 +50,7 @@
 </SettingsRow>
 {#if !auto}
   <SettingsRow
-    title={$LL.settings.customColor()}
+    label={$LL.settings.customColor()}
     helpText={$LL.settings.customColorHelp()}
     controlId={`${idPrefix}-color`}
     disabled={busy}

@@ -9,6 +9,7 @@
   import { writableGroups } from '$lib/components/organisms/editor/dialog-spec'
   import { Button } from '$lib/components/ui/button'
   import * as Dialog from '$lib/components/ui/dialog'
+  import * as Field from '$lib/components/ui/field'
   import { Input } from '$lib/components/ui/input'
   import { requireSnapshot } from '$lib/snapshot-context'
   import { getThemeAccentColors } from '$lib/theme-colors'
@@ -86,9 +87,12 @@
       ? $LL.dialogs.renameIntro()
       : $LL.dialogs.createGroupIntro()}
   </p>
-  <label class='mb-5.25 flex flex-col gap-2.25'>
-    <span class='text-xs font-medium text-(--foreground)'>{$LL.dialogs.folderName()}</span>
+  <div class='mb-5.25 flex flex-col gap-2.25'>
+    <Field.Label for='folder-name' class='text-xs font-medium text-(--foreground)'>
+      {$LL.dialogs.folderName()}
+    </Field.Label>
     <Input
+      id='folder-name'
       data-initial-focus
       bind:value={name}
       required
@@ -96,7 +100,7 @@
       placeholder={$LL.dialogs.folderNamePlaceholder()}
       autocomplete='off'
     />
-  </label>
+  </div>
   {#if !isRename}
     <FolderSelect folders={folders} bind:value={parentId} label={$LL.dialogs.createInside()} />
     <ColorSwatches

@@ -222,7 +222,7 @@
       <SettingsRow title='Choose a photo'>
         <Button variant='secondary'>Browse photos</Button>
       </SettingsRow>
-      <SettingsRow title='Choose a fit for your desktop image' controlId='background-fit'>
+      <SettingsRow label='Choose a fit for your desktop image' controlId='background-fit'>
         <select
           id='background-fit'
           class='

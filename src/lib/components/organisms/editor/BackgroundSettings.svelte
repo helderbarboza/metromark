@@ -21,6 +21,7 @@
   import SettingsRow from '$lib/components/molecules/SettingsRow.svelte'
   import ShaderThumb from '$lib/components/molecules/ShaderThumb.svelte'
   import { Button } from '$lib/components/ui/button'
+  import * as Field from '$lib/components/ui/field'
   import { Input } from '$lib/components/ui/input'
   import * as Select from '$lib/components/ui/select'
   import { Slider } from '$lib/components/ui/slider'
@@ -1258,66 +1259,73 @@
           onchange={handleUpload}
         />
       {:else}
-        <label
-          for='image-url'
-          class='
-            mt-4 mb-2 block text-[0.5rem] font-semibold tracking-widest
-            text-(--muted-foreground)
-          '
-        >
-          {$LL.settings.imageUrl()}
-        </label>
-        <div class='flex items-center gap-2'>
-          <Input
-            id='image-url'
-            type='text'
-            inputmode='url'
-            placeholder={isStoredMedia(bg.url)
-              ? $LL.settings.uploadedImageInUse()
-              : $LL.settings.imageUrlPlaceholder()}
-            class='min-w-0 flex-1 text-sm'
-            value={urlDraft}
-            disabled={busy || uploading}
-            aria-invalid={urlError !== ''
-              ? 'true'
-              : undefined}
-            aria-describedby={urlError !== ''
-              ? 'image-url-help image-url-error'
-              : 'image-url-help'}
-            oninput={(event) => {
-              urlDraft = event.currentTarget.value
-              urlDirty = true
-              urlError = ''
-            }}
-            onkeydown={(event) => {
-              if (event.key === 'Enter') {
-                event.preventDefault()
-                void commitUrl()
-              }
-            }}
-          />
-          <Button
-            variant='default'
-            size='sm'
-            class='h-9 px-4'
-            disabled={busy || uploading || checking}
-            onclick={() => void commitUrl()}
+        <Field.Field class='mt-4 gap-2'>
+          <Field.Label
+            for='image-url'
+            class='
+              block text-[0.5rem] font-semibold tracking-widest text-(--muted-foreground)
+            '
           >
-            {checking
-              ? $LL.settings.checking()
-              : $LL.settings.apply()}
-          </Button>
-        </div>
-        <p id='image-url-help' class='mt-2 text-xs text-(--muted-foreground)'>
-          {$LL.settings.imageAddressHelp()}
-        </p>
+            {$LL.settings.imageUrl()}
+          </Field.Label>
+          <div class='flex items-center gap-2'>
+            <Input
+              id='image-url'
+              type='text'
+              inputmode='url'
+              placeholder={isStoredMedia(bg.url)
+                ? $LL.settings.uploadedImageInUse()
+                : $LL.settings.imageUrlPlaceholder()}
+              class='min-w-0 flex-1 text-sm'
+              value={urlDraft}
+              disabled={busy || uploading}
+              aria-invalid={urlError !== ''
+                ? 'true'
+                : undefined}
+              aria-describedby={urlError !== ''
+                ? 'image-url-help image-url-error'
+                : 'image-url-help'}
+              oninput={(event) => {
+                urlDraft = event.currentTarget.value
+                urlDirty = true
+                urlError = ''
+              }}
+              onkeydown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  void commitUrl()
+                }
+              }}
+            />
+            <Button
+              variant='default'
+              size='sm'
+              class='h-9 px-4'
+              disabled={busy || uploading || checking}
+              onclick={() => void commitUrl()}
+            >
+              {checking
+                ? $LL.settings.checking()
+                : $LL.settings.apply()}
+            </Button>
+          </div>
+          <Field.Description
+            id='image-url-help'
+            class='text-xs text-(--muted-foreground)'
+          >
+            {$LL.settings.imageAddressHelp()}
+          </Field.Description>
+        </Field.Field>
       {/if}
     </div>
 
     {#if urlError !== ''}
-      <p id='image-url-error' role='alert' class='border-t border-(--border) px-4 py-2 text-xs text-(--destructive)'>
+      <Field.Error
+        id='image-url-error'
+        class='border-t border-(--border) px-4 py-2 text-xs text-(--destructive)'
+      >
         {urlError}
-      </p>
+      </Field.Error>
     {/if}
     <SettingsRow
       title={$LL.settings.fit()}
@@ -1439,61 +1447,68 @@
   {#if settings.background.type === 'youtube'}
     {@const bg = settings.background}
     <div class='px-4 py-3'>
-      <label
-        for='youtube-url'
-        class='
-          mt-1 mb-2 block text-[0.5rem] font-semibold tracking-widest
-          text-(--muted-foreground)
-        '
-      >
-        {$LL.settings.youtubeUrl()}
-      </label>
-      <div class='flex items-center gap-2'>
-        <Input
-          id='youtube-url'
-          type='text'
-          inputmode='url'
-          placeholder={$LL.settings.youtubeUrlPlaceholder()}
-          class='min-w-0 flex-1 text-sm'
-          value={youtubeUrlDraft}
-          disabled={busy}
-          aria-invalid={youtubeUrlError !== ''
-            ? 'true'
-            : undefined}
-          aria-describedby={youtubeUrlError !== ''
-            ? 'youtube-url-help youtube-url-error'
-            : 'youtube-url-help'}
-          oninput={(event) => {
-            youtubeUrlDraft = event.currentTarget.value
-            youtubeUrlDirty = true
-            youtubeUrlError = ''
-          }}
-          onkeydown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault()
-              commitYoutubeUrl()
-            }
-          }}
-        />
-        <Button
-          variant='default'
-          size='sm'
-          class='h-9 px-4'
-          disabled={busy}
-          onclick={commitYoutubeUrl}
+      <Field.Field class='mt-1 gap-2'>
+        <Field.Label
+          for='youtube-url'
+          class='
+            block text-[0.5rem] font-semibold tracking-widest text-(--muted-foreground)
+          '
         >
-          {$LL.settings.apply()}
-        </Button>
-      </div>
-      <p id='youtube-url-help' class='mt-2 text-xs text-(--muted-foreground)'>
-        {$LL.settings.youtubeAddressHelp()}
-      </p>
+          {$LL.settings.youtubeUrl()}
+        </Field.Label>
+        <div class='flex items-center gap-2'>
+          <Input
+            id='youtube-url'
+            type='text'
+            inputmode='url'
+            placeholder={$LL.settings.youtubeUrlPlaceholder()}
+            class='min-w-0 flex-1 text-sm'
+            value={youtubeUrlDraft}
+            disabled={busy}
+            aria-invalid={youtubeUrlError !== ''
+              ? 'true'
+              : undefined}
+            aria-describedby={youtubeUrlError !== ''
+              ? 'youtube-url-help youtube-url-error'
+              : 'youtube-url-help'}
+            oninput={(event) => {
+              youtubeUrlDraft = event.currentTarget.value
+              youtubeUrlDirty = true
+              youtubeUrlError = ''
+            }}
+            onkeydown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                commitYoutubeUrl()
+              }
+            }}
+          />
+          <Button
+            variant='default'
+            size='sm'
+            class='h-9 px-4'
+            disabled={busy}
+            onclick={commitYoutubeUrl}
+          >
+            {$LL.settings.apply()}
+          </Button>
+        </div>
+        <Field.Description
+          id='youtube-url-help'
+          class='text-xs text-(--muted-foreground)'
+        >
+          {$LL.settings.youtubeAddressHelp()}
+        </Field.Description>
+      </Field.Field>
     </div>
 
     {#if youtubeUrlError !== ''}
-      <p id='youtube-url-error' role='alert' class='border-t border-(--border) px-4 py-2 text-xs text-(--destructive)'>
+      <Field.Error
+        id='youtube-url-error'
+        class='border-t border-(--border) px-4 py-2 text-xs text-(--destructive)'
+      >
         {youtubeUrlError}
-      </p>
+      </Field.Error>
     {/if}
     <SettingsRow
       title={$LL.settings.fit()}

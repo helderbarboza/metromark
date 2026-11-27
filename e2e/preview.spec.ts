@@ -423,6 +423,8 @@ test('factory reset restores MetroMark defaults and keeps sample bookmarks', asy
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'one-light')
 
   await page.getByRole('tab', { name: 'Advanced', exact: true }).click()
+  await page.locator('#factory-reset-title').click()
+  await expect(page.getByText('Reset MetroMark to factory defaults?')).toHaveCount(0)
   await page.getByRole('button', { name: 'Factory reset', exact: true }).click()
   await expect(page.getByText('Reset MetroMark to factory defaults?')).toBeVisible()
   await page.getByRole('button', { name: 'Reset MetroMark', exact: true }).click()

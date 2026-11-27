@@ -26,7 +26,7 @@
   <div class='w-180 max-w-full'>
     <SettingsCard
       icon='customize'
-      title='Choose your mode'
+      label='Choose your mode'
       helpText='Change the colors that appear in Windows and your apps'
       controlId='mode'
     >
@@ -77,7 +77,7 @@
   <div class='w-180 max-w-full'>
     <SettingsCard
       icon='settings'
-      title='Background effects'
+      label='Background effects'
       helpText='Animated backgrounds use more battery. MetroMark lowers the frame rate when hidden'
       controlId='effects'
     >
