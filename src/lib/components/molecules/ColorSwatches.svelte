@@ -1,5 +1,6 @@
 <script lang='ts'>
   import LL from '$i18n/i18n-svelte'
+  import ColorInput from '$lib/components/atoms/ColorInput.svelte'
   import Icon from '$lib/components/atoms/Icon.svelte'
 
   let {
@@ -73,14 +74,10 @@
       {/if}
     </button>
     {#if customColor}
-      <input
-        type='color'
+      <ColorInput
         bind:value={customColor}
-        aria-label={$LL.colors.customTileColor()}
+        ariaLabel={$LL.colors.customTileColor()}
         title={$LL.colors.customColor()}
-        class='
-          size-8 cursor-pointer rounded-xs border border-(--border) bg-transparent p-0.5
-        '
       />
     {/if}
   </div>

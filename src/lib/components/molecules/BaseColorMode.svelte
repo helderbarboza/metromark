@@ -1,5 +1,6 @@
 <script lang='ts'>
   import LL from '$i18n/i18n-svelte'
+  import ColorInput from '$lib/components/atoms/ColorInput.svelte'
   import * as ToggleGroup from '$lib/components/ui/toggle-group'
   import SettingsRow from './SettingsRow.svelte'
 
@@ -55,20 +56,15 @@
     controlId={`${idPrefix}-color`}
     disabled={busy}
   >
-    <input
-      id={`${idPrefix}-color`}
-      type='color'
-      disabled={busy}
-      value={color || DEFAULT_CUSTOM_COLOR}
-      aria-describedby={`${idPrefix}-color-help`}
-      class='
-        size-8 cursor-pointer rounded-xs border border-(--border) bg-transparent p-0.5
-        disabled:cursor-not-allowed disabled:opacity-50
-      '
-      oninput={event => onchange(false, event.currentTarget.value)}
-    />
-    <p class='m-0 text-xs text-(--muted-foreground) uppercase'>
+    <p class='m-0 text-xs uppercase'>
       {color || DEFAULT_CUSTOM_COLOR}
     </p>
+    <ColorInput
+      id={`${idPrefix}-color`}
+      disabled={busy}
+      value={color || DEFAULT_CUSTOM_COLOR}
+      ariaDescribedBy={`${idPrefix}-color-help`}
+      onValueChange={value => onchange(false, value)}
+    />
   </SettingsRow>
 {/if}

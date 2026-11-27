@@ -43,6 +43,7 @@ Stories stay in `src/lib/stories/`. Story `title` matches the level directory, f
 | `ui/**` | shadcn-svelte primitives. Managed by the registry. Aliases live in `components.json`. |
 | `atoms/Icon.svelte` | Inline icon from the bundled registry. |
 | `atoms/FaviconIcon.svelte` | Presentational. Receives the resolved favicon state as props. |
+| `atoms/ColorInput.svelte` | Color picker input shared by the base color and swatch controls. |
 ### Molecules
 
 | Component | Notes |
