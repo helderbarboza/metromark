@@ -950,13 +950,13 @@ type RootTranslation = {
 		 */
 		maximumFpsHelp: string
 		/**
-		 * H​o​w​ ​v​i​s​i​b​l​e​ ​t​h​e​ ​s​h​a​d​e​r​ ​i​s
-		 */
-		shaderOpacityHelp: string
-		/**
 		 * O​p​a​c​i​t​y
 		 */
 		opacity: string
+		/**
+		 * H​o​w​ ​v​i​s​i​b​l​e​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​i​s
+		 */
+		opacityHelp: string
 		/**
 		 * I​m​a​g​e​ ​s​o​u​r​c​e
 		 */
@@ -1086,15 +1086,11 @@ type RootTranslation = {
 		 */
 		fitFill: string
 		/**
-		 * H​o​w​ ​v​i​s​i​b​l​e​ ​t​h​e​ ​i​m​a​g​e​ ​i​s
-		 */
-		imageOpacityHelp: string
-		/**
 		 * P​a​r​a​l​l​a​x
 		 */
 		parallax: string
 		/**
-		 * N​u​d​g​e​ ​t​h​e​ ​i​m​a​g​e​ ​a​s​ ​y​o​u​ ​s​c​r​o​l​l
+		 * N​u​d​g​e​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​a​s​ ​y​o​u​ ​s​c​r​o​l​l
 		 */
 		parallaxHelp: string
 		/**
@@ -1106,17 +1102,9 @@ type RootTranslation = {
 		 */
 		parallaxZoom: string
 		/**
-		 * M​o​r​e​ ​z​o​o​m​ ​g​i​v​e​s​ ​t​h​e​ ​i​m​a​g​e​ ​r​o​o​m​ ​t​o​ ​s​h​i​f​t
+		 * M​o​r​e​ ​z​o​o​m​ ​g​i​v​e​s​ ​t​h​e​ ​b​a​c​k​g​r​o​u​n​d​ ​r​o​o​m​ ​t​o​ ​s​h​i​f​t
 		 */
 		parallaxZoomHelp: string
-		/**
-		 * N​u​d​g​e​ ​t​h​e​ ​s​h​a​d​e​r​ ​a​s​ ​y​o​u​ ​s​c​r​o​l​l
-		 */
-		shaderParallaxHelp: string
-		/**
-		 * M​o​r​e​ ​z​o​o​m​ ​g​i​v​e​s​ ​t​h​e​ ​s​h​a​d​e​r​ ​r​o​o​m​ ​t​o​ ​s​h​i​f​t
-		 */
-		shaderParallaxZoomHelp: string
 		/**
 		 * B​a​c​k​g​r​o​u​n​d​ ​p​l​a​c​e​m​e​n​t
 		 */
@@ -1153,10 +1141,6 @@ type RootTranslation = {
 		 * A​ ​Y​o​u​T​u​b​e​ ​a​d​d​r​e​s​s​,​ ​a​ ​v​i​d​e​o​ ​o​r​ ​a​ ​p​l​a​y​l​i​s​t​.​ ​I​t​ ​p​l​a​y​s​ ​m​u​t​e​d
 		 */
 		youtubeAddressHelp: string
-		/**
-		 * H​o​w​ ​v​i​s​i​b​l​e​ ​t​h​e​ ​v​i​d​e​o​ ​i​s
-		 */
-		youtubeOpacityHelp: string
 		/**
 		 * P​l​a​y​b​a​c​k​ ​s​p​e​e​d
 		 */
@@ -2510,13 +2494,13 @@ export type TranslationFunctions = {
 		 */
 		maximumFpsHelp: () => LocalizedString
 		/**
-		 * How visible the shader is
-		 */
-		shaderOpacityHelp: () => LocalizedString
-		/**
 		 * Opacity
 		 */
 		opacity: () => LocalizedString
+		/**
+		 * How visible the background is
+		 */
+		opacityHelp: () => LocalizedString
 		/**
 		 * Image source
 		 */
@@ -2646,15 +2630,11 @@ export type TranslationFunctions = {
 		 */
 		fitFill: () => LocalizedString
 		/**
-		 * How visible the image is
-		 */
-		imageOpacityHelp: () => LocalizedString
-		/**
 		 * Parallax
 		 */
 		parallax: () => LocalizedString
 		/**
-		 * Nudge the image as you scroll
+		 * Nudge the background as you scroll
 		 */
 		parallaxHelp: () => LocalizedString
 		/**
@@ -2666,17 +2646,9 @@ export type TranslationFunctions = {
 		 */
 		parallaxZoom: () => LocalizedString
 		/**
-		 * More zoom gives the image room to shift
+		 * More zoom gives the background room to shift
 		 */
 		parallaxZoomHelp: () => LocalizedString
-		/**
-		 * Nudge the shader as you scroll
-		 */
-		shaderParallaxHelp: () => LocalizedString
-		/**
-		 * More zoom gives the shader room to shift
-		 */
-		shaderParallaxZoomHelp: () => LocalizedString
 		/**
 		 * Background placement
 		 */
@@ -2713,10 +2685,6 @@ export type TranslationFunctions = {
 		 * A YouTube address, a video or a playlist. It plays muted
 		 */
 		youtubeAddressHelp: () => LocalizedString
-		/**
-		 * How visible the video is
-		 */
-		youtubeOpacityHelp: () => LocalizedString
 		/**
 		 * Playback speed
 		 */

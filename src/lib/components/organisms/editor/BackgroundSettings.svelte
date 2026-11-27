@@ -1033,7 +1033,7 @@
     </SettingsRow>
     <SettingsRow
       title={$LL.settings.opacity()}
-      helpText={$LL.settings.shaderOpacityHelp()}
+      helpText={$LL.settings.opacityHelp()}
       controlId='shader-opacity'
     >
       <span>{Math.round(opacityDraft * 100)}%</span>
@@ -1075,7 +1075,7 @@
       title={$LL.settings.parallax()}
       helpText={settings.reducedMotion
         ? $LL.settings.parallaxDisabledHelp()
-        : $LL.settings.shaderParallaxHelp()}
+        : $LL.settings.parallaxHelp()}
       controlId='shader-parallax'
       disabled={busy || settings.reducedMotion}
     >
@@ -1102,7 +1102,7 @@
       || !(settings.background.parallax ?? BACKGROUND_DEFAULTS.shader.parallax)}
     <SettingsRow
       title={$LL.settings.parallaxZoom()}
-      helpText={$LL.settings.shaderParallaxZoomHelp()}
+      helpText={$LL.settings.parallaxZoomHelp()}
       controlId='shader-parallax-zoom'
       disabled={shaderParallaxDisabled}
     >
@@ -1385,7 +1385,7 @@
     />
     <SettingsRow
       title={$LL.settings.opacity()}
-      helpText={$LL.settings.imageOpacityHelp()}
+      helpText={$LL.settings.opacityHelp()}
       controlId='image-opacity'
       disabled={busy || uploading}
     >
@@ -1571,7 +1571,7 @@
     />
     <SettingsRow
       title={$LL.settings.opacity()}
-      helpText={$LL.settings.youtubeOpacityHelp()}
+      helpText={$LL.settings.opacityHelp()}
       controlId='youtube-opacity'
       disabled={busy}
     >
