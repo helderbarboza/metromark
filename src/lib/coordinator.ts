@@ -14,12 +14,13 @@ import type {
   UndoRecord,
 } from '$lib/types'
 import { normalizeImageBackgroundSettings, validateBackgroundUrl } from '$lib/background-image'
-import { APPEARANCE_DEFAULTS } from '$lib/config'
+import { APPEARANCE_DEFAULTS, BackgroundFitSchema, BackgroundModeSchema, DensitySchema, GridViewSchema, LanguageSettingSchema, PlaybackRateSchema, PlaylistOrderSchema, ShaderQualitySchema } from '$lib/config'
 import { isLayoutable } from '$lib/folder-preview'
-import { allowsLargeSize, effectiveTileSize, freePosition, GRID_VIEW_IDS, gridViewDef, isGridView, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
+import { allowsLargeSize, effectiveTileSize, freePosition, GRID_VIEW_IDS, gridViewDef, reconcileLayout, SIZES, validateLayout } from '$lib/layout'
 import { applyLocale, getT } from '$lib/locale'
 import { canAddTo, canModify, flatten, indexTree, isBookmark, isFolder, projectGroups } from '$lib/tree'
 import { parseYouTubeBackgroundTarget } from '$lib/youtube'
+import * as v from 'valibot'
 
 export const UNDO_TTL = 30_000
 
@@ -594,9 +595,9 @@ export class BookmarkCoordinator {
       }
       case 'settings.update': {
         const patch = command.patch
-        if (patch.density !== undefined && !['comfortable', 'compact'].includes(patch.density))
+        if (patch.density !== undefined && !v.is(DensitySchema, patch.density))
           throw new Error(getT().errors.invalidDensity())
-        if (patch.gridView !== undefined && !isGridView(patch.gridView))
+        if (patch.gridView !== undefined && !v.is(GridViewSchema, patch.gridView))
           throw new Error(getT().errors.invalidGridView())
         if (patch.showDomains !== undefined && typeof patch.showDomains !== 'boolean')
           throw new Error(getT().errors.invalidDomainSetting())
@@ -604,10 +605,10 @@ export class BookmarkCoordinator {
           throw new Error(getT().errors.invalidFaviconSetting())
         if (patch.reducedMotion !== undefined && typeof patch.reducedMotion !== 'boolean')
           throw new Error(getT().errors.invalidMotionSetting())
-        if (patch.language !== undefined && !['auto', 'en', 'de', 'fr', 'es', 'pt'].includes(patch.language))
+        if (patch.language !== undefined && !v.is(LanguageSettingSchema, patch.language))
           throw new Error(getT().errors.invalidLanguage())
         if (patch.backgroundMode !== undefined
-          && !['tile', 'fullScreen'].includes(patch.backgroundMode)) {
+          && !v.is(BackgroundModeSchema, patch.backgroundMode)) {
           throw new Error(getT().errors.invalidBackgroundMode())
         }
         if (patch.background !== undefined) {
@@ -629,7 +630,7 @@ export class BookmarkCoordinator {
                 ? error.message
                 : getT().errors.invalidBackgroundImage())
             }
-            if (background.fit !== undefined && !['cover', 'contain', 'fill'].includes(background.fit))
+            if (background.fit !== undefined && !v.is(BackgroundFitSchema, background.fit))
               throw new Error(getT().errors.invalidImageFit())
             if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
               throw new Error(getT().errors.invalidImageOpacity())
@@ -647,7 +648,7 @@ export class BookmarkCoordinator {
               throw new TypeError(getT().errors.invalidYoutubeUrl())
             if (background.url.trim() !== '' && parseYouTubeBackgroundTarget(background.url) === null)
               throw new Error(getT().errors.invalidYoutubeUrl())
-            if (background.fit !== undefined && !['cover', 'contain', 'fill'].includes(background.fit))
+            if (background.fit !== undefined && !v.is(BackgroundFitSchema, background.fit))
               throw new Error(getT().errors.invalidYoutubeFit())
             if (background.opacity !== undefined && (typeof background.opacity !== 'number' || !Number.isFinite(background.opacity) || background.opacity < 0 || background.opacity > 1))
               throw new Error(getT().errors.invalidYoutubeOpacity())
@@ -655,9 +656,9 @@ export class BookmarkCoordinator {
               throw new Error(getT().errors.invalidParallax())
             if (background.parallaxZoom !== undefined && (!Number.isFinite(background.parallaxZoom) || background.parallaxZoom < 1 || background.parallaxZoom > 4))
               throw new Error(getT().errors.invalidParallaxZoom())
-            if (background.playbackRate !== undefined && ![0.25, 0.5, 1, 1.5, 2].includes(background.playbackRate))
+            if (background.playbackRate !== undefined && !v.is(PlaybackRateSchema, background.playbackRate))
               throw new Error(getT().errors.invalidYoutubePlaybackRate())
-            if (background.playlistOrder !== undefined && !['shuffle', 'sequential'].includes(background.playlistOrder))
+            if (background.playlistOrder !== undefined && !v.is(PlaylistOrderSchema, background.playlistOrder))
               throw new Error(getT().errors.invalidPlaylistOrder())
             if (background.paused !== undefined && typeof background.paused !== 'boolean')
               throw new Error(getT().errors.invalidBackgroundSetting())
@@ -683,7 +684,7 @@ export class BookmarkCoordinator {
               throw new Error(getT().errors.invalidParallaxZoom())
             if (background.renderScale !== undefined && (typeof background.renderScale !== 'number' || !Number.isFinite(background.renderScale) || background.renderScale < 0.25 || background.renderScale > 1.5))
               throw new Error(getT().errors.invalidShaderRenderScale())
-            if (background.quality !== undefined && (typeof background.quality !== 'string' || !['motion', 'detail'].includes(background.quality)))
+            if (background.quality !== undefined && !v.is(ShaderQualitySchema, background.quality))
               throw new Error(getT().errors.invalidShaderQuality())
             if (background.paused !== undefined && typeof background.paused !== 'boolean')
               throw new Error(getT().errors.invalidBackgroundSetting())

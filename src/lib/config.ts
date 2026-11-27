@@ -1,10 +1,24 @@
 import * as v from 'valibot'
 
-const BackgroundFitSchema = v.picklist(['cover', 'contain', 'fill'])
+/** Allowed values behind the settings picklists. The schemas below and the command checks share them. */
+export const DENSITY_VALUES = ['comfortable', 'compact'] as const
+export const GRID_VIEW_VALUES = ['classic', 'dock'] as const
 const LANGUAGE_SETTING_VALUES = ['auto', 'en', 'de', 'fr', 'es', 'pt'] as const
+export const BACKGROUND_MODE_VALUES = ['tile', 'fullScreen'] as const
+export const BACKGROUND_FIT_VALUES = ['cover', 'contain', 'fill'] as const
+export const PLAYBACK_RATE_VALUES = [0.25, 0.5, 1, 1.5, 2] as const
+export const PLAYLIST_ORDER_VALUES = ['shuffle', 'sequential'] as const
+export const SHADER_QUALITY_VALUES = ['motion', 'detail'] as const
 
+export const DensitySchema = v.picklist(DENSITY_VALUES)
+export const GridViewSchema = v.picklist(GRID_VIEW_VALUES)
 // Keep in sync with the locales under src/i18n (base locale first). 'auto' infers the UI language from the browser.
-const LanguageSettingSchema = v.picklist(LANGUAGE_SETTING_VALUES)
+export const LanguageSettingSchema = v.picklist(LANGUAGE_SETTING_VALUES)
+export const BackgroundModeSchema = v.picklist(BACKGROUND_MODE_VALUES)
+export const BackgroundFitSchema = v.picklist(BACKGROUND_FIT_VALUES)
+export const PlaybackRateSchema = v.picklist(PLAYBACK_RATE_VALUES)
+export const PlaylistOrderSchema = v.picklist(PLAYLIST_ORDER_VALUES)
+export const ShaderQualitySchema = v.picklist(SHADER_QUALITY_VALUES)
 
 const ColorBackgroundSchema = v.object({
   type: v.literal('color'),
@@ -31,7 +45,7 @@ const ShaderBackgroundSchema = v.object({
   /** Render resolution as a fraction of the canvas backing store */
   renderScale: v.optional(v.number()),
   /** Prefer smooth motion or sharp detail when the renderer is under load */
-  quality: v.optional(v.picklist(['motion', 'detail'])),
+  quality: v.optional(ShaderQualitySchema),
   /** Freeze the animation frame; the last frame stays on the canvas */
   paused: v.optional(v.boolean()),
   /** Use the theme background instead of a custom base color */
@@ -53,11 +67,11 @@ const YoutubeBackgroundSchema = v.object({
   /** Layer scale as a multiple of the canvas size, from 1 to 4; bigger means wider layer and more travel */
   parallaxZoom: v.optional(v.number()),
   /** Playback speed; YouTube only honors 0.25, 0.5, 1, 1.5 and 2 */
-  playbackRate: v.optional(v.picklist([0.25, 0.5, 1, 1.5, 2])),
+  playbackRate: v.optional(PlaybackRateSchema),
   /** Hold the video on the current frame instead of playing it */
   paused: v.optional(v.boolean()),
   /** How the playlist picks a video when a new tab opens; 'shuffle' picks at random, 'sequential' plays the next one in playlist order and wraps at the end */
-  playlistOrder: v.optional(v.picklist(['shuffle', 'sequential'])),
+  playlistOrder: v.optional(PlaylistOrderSchema),
   /** Use the theme background instead of a custom base color */
   auto: v.optional(v.boolean()),
   /** Base color under the YouTube layer */
@@ -83,15 +97,9 @@ const ImageBackgroundSchema = v.object({
 /** User-facing settings schema with per-key defaults and docs */
 const SettingsSchema = v.object({
   /** Tile density: 'comfortable' (68px) or 'compact' (54px) */
-  density: v.union([
-    v.literal('comfortable'),
-    v.literal('compact'),
-  ]),
+  density: DensitySchema,
   /** Grid view: 'classic' (8 rows) or 'dock' (2 rows anchored to the bottom) */
-  gridView: v.union([
-    v.literal('classic'),
-    v.literal('dock'),
-  ]),
+  gridView: GridViewSchema,
   /** Show domain names on tiles */
   showDomains: v.boolean(),
   /** Show the site's full-color favicon instead of a single-color Metro glyph */
@@ -101,7 +109,7 @@ const SettingsSchema = v.object({
   /** Interface language; 'auto' infers from the browser */
   language: LanguageSettingSchema,
   /** Where the background appears: inside tiles or across the full screen */
-  backgroundMode: v.optional(v.picklist(['tile', 'fullScreen'])),
+  backgroundMode: v.optional(BackgroundModeSchema),
   /** Selected background shader id */
   background: v.variant('type', [
     ShaderBackgroundSchema,
