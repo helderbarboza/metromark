@@ -66,9 +66,9 @@
     >
       <Icon name={icon} size={20} />
       <div class='min-w-0'>
-        <div id={titleId} class='text-sm/5'>{title}</div>
+        <div id={titleId} class='text-sm/5 font-medium'>{title}</div>
         {#if helpText}
-          <p id={helpId} class='mt-0.5 text-xs/4 text-(--muted-foreground)'>{helpText}</p>
+          <p id={helpId} class='mt-0.5 text-xs/4 text-muted-foreground'>{helpText}</p>
         {/if}
       </div>
     </div>
